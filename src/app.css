@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'League Spartan';
+  src: url('/fonts/LeagueSpartan.ttf');
+}
+
+body {
+  padding-top: 3rem;
+  font-family: 'League Spartan', sans-serif;
+  background: theme('colors.gray.800');
+  color: theme('colors.gray.200');
+}
