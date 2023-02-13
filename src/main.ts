@@ -1,21 +1,21 @@
-import './app.css'
-import App from './App.svelte'
+import './app.css';
+import App from './App.svelte';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { Capacitor } from '@capacitor/core';
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { initializeApp } from 'firebase/app';
+import { getAnalytics } from 'firebase/analytics';
 
 // Initialize Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyBefRKyQloI4sGF-WRWkSTgZw1TSb5dz-g",
-  authDomain: "friendsfm.firebaseapp.com",
-  databaseURL: "https://friendsfm-default-rtdb.firebaseio.com",
-  projectId: "friendsfm",
-  storageBucket: "friendsfm.appspot.com",
-  messagingSenderId: "611764643709",
-  appId: "1:611764643709:web:5356e1828d9a0f46348e14",
-  measurementId: "G-6RD7JFYB8D"
+  apiKey: 'AIzaSyBefRKyQloI4sGF-WRWkSTgZw1TSb5dz-g',
+  authDomain: 'friendsfm.firebaseapp.com',
+  databaseURL: 'https://friendsfm-default-rtdb.firebaseio.com',
+  projectId: 'friendsfm',
+  storageBucket: 'friendsfm.appspot.com',
+  messagingSenderId: '611764643709',
+  appId: '1:611764643709:web:5356e1828d9a0f46348e14',
+  measurementId: 'G-6RD7JFYB8D',
 };
 const firebaseApp = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(firebaseApp);
@@ -28,7 +28,7 @@ if (Capacitor.isPluginAvailable('StatusBar'))
 
 // Initialize Svelte
 const app = new App({
-  target: document.getElementById('app')
-})
+  target: document.getElementById('app'),
+});
 
-export default app
+export default app;

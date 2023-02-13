@@ -1,9 +1,4 @@
-import {
-  MusicPlatform,
-  ResponseType,
-  type NetworkResponse,
-  type User,
-} from './types';
+import { MusicPlatform, ResponseType, type NetworkResponse } from './types';
 import { router } from 'tinro';
 import { currPath } from './store';
 import { Preferences } from '@capacitor/preferences';
@@ -62,5 +57,5 @@ export const handleApiResponse = async (res: Response) => {
     return false;
   }
 
-  return true;
+  return json;
 };

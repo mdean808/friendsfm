@@ -59,5 +59,5 @@ export enum ResponseType {
 
 export interface NetworkResponse {
   type: ResponseType;
-  message: string;
+  message: string | User;
 }

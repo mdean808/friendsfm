@@ -17,7 +17,7 @@ import { User } from './types';
 import {
   createUser,
   getUserByUid as getUserById,
-  setUserMusicPreference,
+  setUserMusicPlatform,
   setUserUsername,
 } from './lib/db';
 
@@ -53,16 +53,25 @@ export const generateNotificationTime = functions.pubsub
 
 export const setUsername = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
-  const { username, authToken, id } = JSON.parse(req.body);
+  const { username, authToken } = JSON.parse(req.body);
   try {
-    await auth.verifyIdToken(authToken);
+    const id = (await auth.verifyIdToken(authToken)).uid;
     const userRes = await getUserById(id);
     if (!userRes) {
-      //WARN: user does not exist
+      res
+        .status(400)
+        .type('json')
+        .send({ type: 'error', message: 'User does not exist.' });
     } else {
-      // TODO: handle the errors thrown by this function
-      await setUserUsername(id, username);
-      res.status(200).type('json').send({ type: 'success', message: username });
+      try {
+        await setUserUsername(id, username);
+        res
+          .status(200)
+          .type('json')
+          .send({ type: 'success', message: username });
+      } catch (e) {
+        res.status(400).type('json').send({ type: 'error', message: e });
+      }
     }
   } catch (e) {
     // firebase authnetication error
@@ -74,33 +83,37 @@ export const setUsername = functions.https.onRequest(async (req, res) => {
   }
 });
 
-export const setMusicPreference = functions.https.onRequest(
-  async (req, res) => {
-    res.set('Access-Control-Allow-Origin', '*');
-    const { username: musicPreference, authToken, id } = JSON.parse(req.body);
-    try {
-      await auth.verifyIdToken(authToken);
-      const userRes = await getUserById(id);
-      if (!userRes) {
-        //WARN: user does not exist
-      } else {
-        // TODO: handle the errors thrown by this function
-        await setUserMusicPreference(id, musicPreference);
-        res
-          .status(200)
-          .type('json')
-          .send({ type: 'success', message: musicPreference });
-      }
-    } catch (e) {
-      // firebase authnetication error
-      functions.logger.error(e);
+export const setMusicPlatform = functions.https.onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  const { musicPlatform, authToken } = JSON.parse(req.body);
+  try {
+    const id = (await auth.verifyIdToken(authToken)).uid;
+    const userRes = await getUserById(id);
+    if (!userRes) {
       res
         .status(400)
         .type('json')
-        .send({ type: 'error', message: 'Authentication Failed.' });
+        .send({ type: 'error', message: 'User does not exist.' });
+    } else {
+      try {
+        await setUserMusicPlatform(id, musicPlatform);
+        res
+          .status(200)
+          .type('json')
+          .send({ type: 'success', message: musicPlatform });
+      } catch (e) {
+        res.status(400).type('json').send({ type: 'error', message: e });
+      }
     }
+  } catch (e) {
+    // firebase authnetication error
+    functions.logger.error(e);
+    res
+      .status(400)
+      .type('json')
+      .send({ type: 'error', message: 'Authentication Failed.' });
   }
-);
+});
 
 export const loginUser = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');

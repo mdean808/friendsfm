@@ -1,10 +1,10 @@
 <script lang="ts">
   import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
   import { goto} from "../lib";
-  import { loginUser, updateUser, user } from "../store";
+  import { loading, loginUser, updateUser, user } from "../store";
 
   const signInWithGoogle = async () => {
-    //TODO: show loading indicator
+    loading.set(true)
     const res = await FirebaseAuthentication.signInWithGoogle();
     const idToken = await FirebaseAuthentication.getIdToken()
     await updateUser({ ...res.user, authToken: idToken.token, registered: false });
@@ -16,6 +16,7 @@
       if (!u.registered) goto("/username");
       else goto("/")
     }
+    loading.set(false)
   };
 </script>
 

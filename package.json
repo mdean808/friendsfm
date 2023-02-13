@@ -9,6 +9,7 @@
     "ios:build": "vite build && npx cap sync ios",
     "ios:open": "npx cap open ios",
     "ios:run": "pnpm ios-build && npx cap run ios --target 0F14861A-995E-4B36-AA3F-14F1367CF132",
+    "ios:run:morgan": "vite build && npx cap run ios --target 00008120-000E49243AC0C01E",
     "firebase:deploy": "cd ./functions && firebase deploy",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json"

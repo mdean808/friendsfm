@@ -46,13 +46,15 @@ export const setUserUsername = async (id: string, username: string) => {
   }
 };
 
-export const setUserMusicPreference = async (
+export const setUserMusicPlatform = async (
   id: string,
-  musicPreference: string
+  musicPlatform: string
 ) => {
+  if (!id) throw Error('No user provided');
+  if (!musicPlatform) throw Error('No music platform preference provided.');
   const usersRef = db.collection('users');
   const user = usersRef.doc(id);
-  await user.update({ musicPreference });
+  await user.update({ musicPlatform });
 };
 
 export const createSubmission = async (submission: Submission) => {

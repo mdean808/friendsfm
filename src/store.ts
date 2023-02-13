@@ -82,12 +82,12 @@ export const updateUsername = action(
   'update-username',
   async (store, newUsername: string) => {
     const u = store.get();
+    u.authToken = (await FirebaseAuthentication.getIdToken()).token;
     const res = await fetch(
       'https://us-central1-friendsfm.cloudfunctions.net/setUsername',
       {
         method: 'POST',
         body: JSON.stringify({
-          id: u.id,
           authToken: u.authToken,
           username: newUsername,
         }),
@@ -110,14 +110,14 @@ export const updateMusicPlatform = action(
   'update-music-platform',
   async (store, newMusicPlatform: MusicPlatform) => {
     const u = store.get();
+    u.authToken = (await FirebaseAuthentication.getIdToken()).token;
     const res = await fetch(
       'https://us-central1-friendsfm.cloudfunctions.net/setMusicPlatform',
       {
         method: 'POST',
         body: JSON.stringify({
-          id: u.id,
-          token: u.authToken,
-          platform: newMusicPlatform,
+          authToken: u.authToken,
+          musicPlatform: newMusicPlatform,
         }),
       }
     );
@@ -147,12 +147,13 @@ export const loginUser = action(user, 'login-user', async (store) => {
     }
   );
 
-  if (!(await handleApiResponse(res))) {
+  const json = await handleApiResponse(res);
+  if (!json) {
     // handle login failure
     return false;
   }
 
-  store.set(await res.json());
+  store.set(json.message as User);
 
   await Preferences.set({
     key: 'user',
@@ -168,3 +169,5 @@ export const logout = action(user, 'logout', async (store) => {
 });
 
 export const submissions = atom<Submission[]>([]);
+
+export const loading = atom<boolean>(false);
