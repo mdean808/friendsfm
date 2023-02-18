@@ -158,9 +158,7 @@ export const setUsername = functions.https.onRequest(async (req, res) => {
 
 export const setMusicPlatform = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
-  const { musicPlatform, platformAccessToken, authToken } = JSON.parse(
-    req.body
-  );
+  const { musicPlatform, platformAuthCode, authToken } = JSON.parse(req.body);
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
     const userRes = await getUserById(id);
@@ -168,7 +166,7 @@ export const setMusicPlatform = functions.https.onRequest(async (req, res) => {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       try {
-        await setUserMusicPlatform(id, musicPlatform, platformAccessToken);
+        await setUserMusicPlatform(id, musicPlatform, platformAuthCode);
         res.status(200).json({ type: 'success', message: musicPlatform });
       } catch (e) {
         console.log(e);

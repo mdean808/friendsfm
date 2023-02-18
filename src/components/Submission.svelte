@@ -2,6 +2,7 @@
   import { getPlatformColor } from '../lib';
   import MusicPlatformIcon from './MusicPlatformIcon.svelte';
   import type { Submission } from '../types';
+  import { onMount } from 'svelte';
 
   export let data: Submission;
 </script>

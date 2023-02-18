@@ -6,7 +6,7 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
-import { spotifyAccessToken } from './store';
+import { spotifyAuthCode } from './store';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -39,7 +39,7 @@ CapacitorApp.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
   const url = new URL(event.url);
   if (url.pathname.includes('spotify-login')) {
     const spotifyAccessCode = url.searchParams.get('code');
-    spotifyAccessToken.set(spotifyAccessCode);
+    spotifyAuthCode.set(spotifyAccessCode);
   }
   if (url.pathname.includes('apple-music-login')) {
   }

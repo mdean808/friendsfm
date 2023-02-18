@@ -1,6 +1,17 @@
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
-import { Submission, User, Song, MusicPlatform } from '../types';
+import {
+  Submission,
+  User,
+  Song,
+  MusicPlatform,
+  SpotifyAuthRes,
+} from '../types';
+import * as functions from 'firebase-functions';
+import { checkSpotifyAccessCode, getCurrentSpotifySong } from './spotify';
 
+const SPOTIFY_AUTH = Buffer.from(
+  process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET
+).toString('base64');
 const db = getFirestore();
 
 export const getUserByUid = async (uid: string) => {
@@ -47,38 +58,45 @@ export const setUserUsername = async (id: string, username: string) => {
 export const setUserMusicPlatform = async (
   id: string,
   musicPlatform: string,
-  platformAccessToken: string
+  platformAuthCode: string
 ) => {
   if (!id) throw new Error('No user provided.');
   if (!musicPlatform) throw new Error('No music platform preference provided.');
   const usersRef = db.collection('users');
   const user = usersRef.doc(id);
   // spotify
-  console.log(musicPlatform);
   if (musicPlatform === MusicPlatform.spotify) {
-    const params = new URLSearchParams();
-    params.append('client_id', process.env.SPOTIFY_CLIENT_ID || '');
-    params.append('client_secret', process.env.SPOTIFY_CLIENT_SECRET || '');
-    params.append('grant_type', 'authorization_code');
-    params.append('code', platformAccessToken);
-    params.append('redirect_uri', process.env.SPOTIFY_REDIRECT_URL || '');
+    const body = new URLSearchParams();
+    body.append('grant_type', 'authorization_code');
+    body.append('code', platformAuthCode);
+    body.append('redirect_uri', process.env.SPOTIFY_REDIRECT_URL || '');
 
-    const res = await fetch(
-      'https://accounts.spotify.com/api/token?' + params.toString(),
-      {
-        method: 'post',
-      }
-    );
-    const musicPlatformAuth = await res.json();
-    console.log(musicPlatformAuth);
-    await user.update({
-      musicPlatform,
-      musicPlatformAuth,
+    const res = await fetch('https://accounts.spotify.com/api/token', {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: 'Baseic ' + SPOTIFY_AUTH,
+      },
+      method: 'post',
+      body,
     });
+    if (res.status !== 200) {
+      functions.logger.error(res.status, await res.text());
+    } else {
+      const spotifyAuthRes: SpotifyAuthRes = await res.json();
+      const musicPlatformAuth = {
+        expires_at: new Date(Date.now() + spotifyAuthRes.expires_in * 1000),
+        access_token: spotifyAuthRes.access_token,
+        refresh_token: spotifyAuthRes.refresh_token,
+      };
+      await user.update({
+        musicPlatform,
+        musicPlatformAuth,
+      });
+    }
+  } else {
+    // apple music
+    await user.update({ musicPlatform });
   }
-
-  // apple music
-  await user.update({ musicPlatform });
 };
 
 export const getUserSubmission = async (id: string) => {
@@ -113,12 +131,18 @@ export const generateUserSubmission = async (
   const currentSubmissionCount = (
     await db.collection('misc').doc('notifications').get()
   ).get('count');
-  //TODO: get song info from the music provider
+  const accessCode = await checkSpotifyAccessCode(
+    (await userRef.get()).get('musicPlatformAuth'),
+    userRef
+  );
+
+  const currentSong = await getCurrentSpotifySong(accessCode);
+
   const song: Song = {
-    name: 'Personal Jesus - 2006 Remaster',
-    artist: 'Depeche Mode',
-    url: 'https://open.spotify.com/track/7dhM0KUBxuZV9z5iNodLyn?si=9e70b4c13dda4394',
-    durationElapsed: 21,
+    name: currentSong.item.name,
+    artist: currentSong.item.artists[0]?.name,
+    url: currentSong.item.external_urls.spotify,
+    durationElapsed: currentSong.progress_ms / 1000,
   };
   const time = Timestamp.fromDate(new Date());
   const submission: Submission = {
@@ -131,6 +155,10 @@ export const generateUserSubmission = async (
   await submissionsRef.add(submission);
   const username = (await userRef.get()).get('username');
   const musicPlatform = (await userRef.get()).get('musicPlatform');
+  submission.time = new Timestamp(
+    (submission.time as Timestamp).seconds,
+    (submission.time as Timestamp).nanoseconds
+  ).toDate();
   return { ...submission, user: { username, musicPlatform } };
 };
 

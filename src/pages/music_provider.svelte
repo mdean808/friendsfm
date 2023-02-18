@@ -2,7 +2,7 @@
   import Button from '../components/Button.svelte';
 
   import { MusicPlatform } from '../types';
-  import { updateMusicPlatform, loading, spotifyAccessToken } from '../store';
+  import { updateMusicPlatform, loading, spotifyAuthCode } from '../store';
   import { goto } from '../lib';
 
   let platform: MusicPlatform;
@@ -10,7 +10,7 @@
     if (!platform) return;
     loading.set(true);
     if (platform == MusicPlatform.spotify) {
-      spotifyAccessToken.listen(async (value: string) => {
+      spotifyAuthCode.listen(async (value: string) => {
         if (await updateMusicPlatform(platform, value)) goto('/');
       });
       const spotifyUrl = `https://accounts.spotify.com/authorize?client_id=${

@@ -138,9 +138,8 @@ export const updateUsername = action(
 export const updateMusicPlatform = action(
   user,
   'update-music-platform',
-  async (store, newMusicPlatform: MusicPlatform, accessToken?: string) => {
+  async (store, newMusicPlatform: MusicPlatform, authCode?: string) => {
     const u = store.get();
-    console.log('spotify_acess_token', accessToken);
     const res = await fetch(
       'https://us-central1-friendsfm.cloudfunctions.net/setMusicPlatform',
       {
@@ -148,7 +147,7 @@ export const updateMusicPlatform = action(
         body: JSON.stringify({
           authToken: authToken.get(),
           musicPlatform: newMusicPlatform,
-          platformAccessToken: accessToken,
+          platformAuthCode: authCode,
         }),
       }
     );
@@ -251,4 +250,4 @@ export const getSubmissionStatus = action(
 );
 export const loading = atom<boolean>(false);
 
-export const spotifyAccessToken = atom<string>('');
+export const spotifyAuthCode = atom<string>('');

@@ -50,3 +50,44 @@ export interface Audial {
   number: number;
   score: string;
 }
+
+export interface SpotifyAuthRes {
+  access_token: string;
+  token_type: string;
+  scope: string;
+  expires_in: number;
+  refresh_token: string;
+}
+
+export interface MusicPlatformAuth {
+  access_token: string;
+  expires_at: Date;
+  refresh_token: string;
+}
+
+export interface SpotifyCurrentlyPlayingRes {
+  timestamp: number;
+  context: {
+    external_urls: {
+      spotify: string;
+    };
+    href: string; // api url
+    type: string;
+  };
+  progress_ms: number;
+  item: {
+    artists: [
+      {
+        name: string;
+      }
+    ];
+    duration_ms: number;
+    external_urls: {
+      spotify: string;
+    };
+    href: string; // api url
+    name: string;
+    preview_url: string;
+  };
+  is_playing: boolean;
+}
