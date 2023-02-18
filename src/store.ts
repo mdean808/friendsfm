@@ -10,7 +10,7 @@ import type {
   Submission,
 } from './types';
 import { NativeGeocoder } from '@capgo/nativegeocoder';
-import { handleApiResponse, registerForNotifications } from './lib';
+import { handleApiResponse, registerForNotifications, goto } from './lib';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 
 export const currPath = atom<string>('/');
@@ -66,7 +66,38 @@ export const getReverseGeocode: () => Promise<ReverseGeolocationPosition> =
     return l.rgp;
   });
 
+export const authToken = atom<string>('');
+
+export const getNewAuthToken = action(
+  authToken,
+  'new-authtoken',
+  async (store) => {
+    try {
+      const res = await FirebaseAuthentication.getIdToken();
+      store.set(res.token);
+      return res.token;
+    } catch (e) {
+      // user isn't logged in anymore
+      console.log('Error grabbing new authToken. User must sign in.');
+      return '';
+    }
+  }
+);
+
 export const user = map<User>();
+
+// Load user from preferences
+export const getUserFromPreferences = action(
+  user,
+  'get-user-preferences',
+  async (store) => {
+    const res = await Preferences.get({ key: 'user' });
+    const u = JSON.parse(res.value);
+    store.set(u);
+    return u;
+  }
+);
+
 // Update user in preferences
 export const updateUser = action(
   user,
@@ -82,13 +113,12 @@ export const updateUsername = action(
   'update-username',
   async (store, newUsername: string) => {
     const u = store.get();
-    u.authToken = (await FirebaseAuthentication.getIdToken()).token;
     const res = await fetch(
       'https://us-central1-friendsfm.cloudfunctions.net/setUsername',
       {
         method: 'POST',
         body: JSON.stringify({
-          authToken: u.authToken,
+          authToken: authToken.get(),
           username: newUsername,
         }),
       }
@@ -98,8 +128,8 @@ export const updateUsername = action(
       return false;
     }
     u.username = newUsername;
-    await Preferences.set({ key: 'user', value: JSON.stringify(u) });
     store.set(u);
+    await updateUser(u);
     // username setting succeeded!
     return true;
   }
@@ -108,16 +138,17 @@ export const updateUsername = action(
 export const updateMusicPlatform = action(
   user,
   'update-music-platform',
-  async (store, newMusicPlatform: MusicPlatform) => {
+  async (store, newMusicPlatform: MusicPlatform, accessToken?: string) => {
     const u = store.get();
-    u.authToken = (await FirebaseAuthentication.getIdToken()).token;
+    console.log('spotify_acess_token', accessToken);
     const res = await fetch(
       'https://us-central1-friendsfm.cloudfunctions.net/setMusicPlatform',
       {
         method: 'POST',
         body: JSON.stringify({
-          authToken: u.authToken,
+          authToken: authToken.get(),
           musicPlatform: newMusicPlatform,
+          platformAccessToken: accessToken,
         }),
       }
     );
@@ -126,12 +157,8 @@ export const updateMusicPlatform = action(
       return false;
     }
     u.musicPlatform = newMusicPlatform;
-    u.registered = true;
-    await Preferences.set({
-      key: 'user',
-      value: JSON.stringify(u),
-    });
     store.set(u);
+    await updateUser(u);
     // musuc platform set succeeded!
     return true;
   }
@@ -154,11 +181,7 @@ export const loginUser = action(user, 'login-user', async (store) => {
   }
 
   store.set(json.message as User);
-
-  await Preferences.set({
-    key: 'user',
-    value: JSON.stringify(u),
-  });
+  await updateUser(json.message);
   return true;
 });
 // Log thet user out
@@ -168,6 +191,64 @@ export const logout = action(user, 'logout', async (store) => {
   await Preferences.remove({ key: 'user' });
 });
 
-export const submissions = atom<Submission[]>([]);
+export const userSubmission = map<Submission>();
 
+export const generateSubmission = action(
+  userSubmission,
+  'generate-submission',
+  async (store) => {
+    let location: GeolocationPosition;
+    try {
+      await Geolocation.requestPermissions();
+      location = await Geolocation.getCurrentPosition();
+    } catch (e) {
+      console.log(e);
+    }
+    const res = await fetch(
+      'https://us-central1-friendsfm.cloudfunctions.net/createNewUserSubmission',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          authToken: authToken.get(),
+          latitude: location ? location.coords.latitude : undefined,
+          longitude: location ? location.coords.longitude : undefined,
+        }),
+      }
+    );
+    const json = await handleApiResponse(res);
+    if (!json) {
+      // failed to set new music platform
+      return false;
+    }
+    store.set(json.message.user as Submission);
+    friendSubmissions.set(json.message.friends as Submission[]);
+  }
+);
+
+export const friendSubmissions = atom<Submission[]>([]);
+
+export const getSubmissionStatus = action(
+  friendSubmissions,
+  'get-submission-status',
+  async (store) => {
+    const res = await fetch(
+      'https://us-central1-friendsfm.cloudfunctions.net/getCurrentSubmissionStatus',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          authToken: authToken.get(),
+        }),
+      }
+    );
+    const json = await handleApiResponse(res);
+    if (!json) {
+      // failed to set new music platform
+      return false;
+    }
+    store.set(json.message.friends as Submission[]);
+    if (json.message.user) userSubmission.set(json.message.user as Submission);
+  }
+);
 export const loading = atom<boolean>(false);
+
+export const spotifyAccessToken = atom<string>('');

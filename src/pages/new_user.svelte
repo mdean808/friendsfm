@@ -1,22 +1,33 @@
 <script lang="ts">
-  import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
-  import { goto} from "../lib";
-  import { loading, loginUser, updateUser, user } from "../store";
+  import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
+  import { goto } from '../lib';
+  import {
+    authToken,
+    getNewAuthToken,
+    loading,
+    loginUser,
+    updateUser,
+    user,
+  } from '../store';
 
   const signInWithGoogle = async () => {
-    loading.set(true)
+    loading.set(true);
     const res = await FirebaseAuthentication.signInWithGoogle();
-    const idToken = await FirebaseAuthentication.getIdToken()
-    await updateUser({ ...res.user, authToken: idToken.token, registered: false });
-    // send login information to the backend 
-    if (!await loginUser()) {
+    await getNewAuthToken();
+    await updateUser({
+      ...res.user,
+      authToken: authToken.get(),
+    });
+    // send login information to the backend
+    if (!(await loginUser())) {
       // don't goto username
     } else {
-      const u = user.get()
-      if (!u.registered) goto("/username");
-      else goto("/")
+      const u = user.get();
+      if (!u.username) goto('/username');
+      else if (!u.musicPlatform) goto('/music_provider');
+      else goto('/');
     }
-    loading.set(false)
+    loading.set(false);
   };
 </script>
 

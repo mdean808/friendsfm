@@ -1,20 +1,23 @@
+import { getFirestore } from 'firebase-admin/firestore';
 import { getMessaging, Message } from 'firebase-admin/messaging';
 
 const messaging = getMessaging();
+const db = getFirestore();
 
 export const sendDaily = async () => {
-  const topic = 'all';
-
   const message = {
     notification: {
       title: 'FriendsFM',
       body: 'See what your friends are currently listening to!',
     },
-    topic: topic,
+    topic: 'all',
   };
 
   // Send a message to devices subscribed to the provided topic.
   const res = await messaging.send(message);
+  const notificationsRef = db.collection('misc').doc('notifications');
+  const prevCount = (await notificationsRef.get()).get('count');
+  await notificationsRef.update({ count: prevCount + 1 });
   console.log('Successfully sent message:', res);
 };
 

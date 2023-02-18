@@ -1,7 +1,6 @@
 import type { Timestamp } from 'firebase-admin/firestore';
 
 export interface User {
-  registered?: boolean;
   email?: string;
   displayName?: string;
   photoURL?: string;
@@ -25,16 +24,25 @@ export enum MusicPlatform {
 export interface Song {
   name: string;
   artist: string;
-  duration: number; // in seconds
-  id: string;
+  durationElapsed: number; // in seconds
+  url: string;
+  id?: string;
 }
 
 export interface Submission {
-  id: string;
-  user: User;
-  song: string; // song id
+  id?: string;
+  number: number;
+  song: Song; // song id
   time: Date | Timestamp;
   audial: string; // audial id
+  user?: {
+    username: string;
+    musicPlatform: MusicPlatform;
+  };
+  location: {
+    longitude: number;
+    latitude: number;
+  };
 }
 
 export interface Audial {

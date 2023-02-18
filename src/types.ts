@@ -7,7 +7,6 @@ export interface User {
   uid: string;
   username?: string;
   musicPlatform?: MusicPlatform;
-  registered?: boolean;
   friends?: User[];
   submissions?: Submission[];
   savedSongs?: Song[];
@@ -34,13 +33,17 @@ export enum MusicPlatform {
 export interface Song {
   name: string;
   artist: string;
-  duration: number; // in seconds
+  durationElapsed: number; // in seconds
+  url: string;
   id: string;
 }
 
 export interface Submission {
   id: string;
-  user: User;
+  user: {
+    username: string;
+    musicPlatform: MusicPlatform;
+  };
   song: Song;
   time: Date;
   audial: Audial;
@@ -59,5 +62,6 @@ export enum ResponseType {
 
 export interface NetworkResponse {
   type: ResponseType;
-  message: string | User;
+  message: string | any;
+  error?: string;
 }

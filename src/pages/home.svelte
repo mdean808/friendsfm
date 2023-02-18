@@ -1,6 +1,6 @@
 <script lang="ts">
   // IMPORTS
-  import { onMount } from "svelte";
+  import { onMount } from 'svelte';
   // import { Geolocation } from "@capacitor/geolocation";
   // import { FirebaseMessaging, type Notification } from "@capacitor-firebase/messaging";
   import {
@@ -9,19 +9,33 @@
     statusBarHeight,
     // getReverseGeocode,
     bottomInset,
-    submissions,
-  } from "../store";
-  import Button from "../components/Button.svelte";
-  import { goto } from "../lib";
-  import Submission from "../components/Submission.svelte";
+    friendSubmissions,
+    loading,
+    generateSubmission,
+    userSubmission,
+    getSubmissionStatus,
+    authToken,
+  } from '../store';
+  import Button from '../components/Button.svelte';
+  import { goto } from '../lib';
+  import Submission from '../components/Submission.svelte';
+  import LoadingIndicator from '../components/LoadingIndicator.svelte';
+  import SkeletonSubmission from '../components/SkeletonSubmission.svelte';
 
   // GLOBALS
-
+  let loadingSubmissions = true;
 
   // ONMOUNT
   onMount(async () => {
-    //TODO: load submissions!
+    if (authToken.get()) await getSubmissionStatus();
+    loadingSubmissions = false;
   });
+
+  const createSubmission = async () => {
+    loading.set(true);
+    await generateSubmission();
+    loading.set(false);
+  };
 </script>
 
 <div
@@ -37,21 +51,38 @@
     class="py-2 px-4 overflow-y-scroll overflow-x-hidden"
   >
     <h2>Hello, {$user?.username}!</h2>
-    <Button
-      type="primary"
-      title="reset"
-      on:click={() => {
-        logout(); goto("/new_user");
-      }}>Reset</Button
-    >
-      <div class="my-2">
-        {#if !$submissions.length}
-          <h3>Looks like you're the only one listening right now!</h3>
-        {:else}
-          {#each $submissions as submission}
-            <Submission data={submission}/>
-          {/each}
+    <div class="my-2">
+      {#if loadingSubmissions}
+        <SkeletonSubmission />
+      {:else if $userSubmission.song}
+        <Submission data={$userSubmission} />
       {/if}
+    </div>
+    <span class="border-white border-t-2 block w-full" />
+    <div class="my-2">
+      {#if loadingSubmissions}
+        <LoadingIndicator className={'mx-auto w-16 h-16'} />
+      {:else if !$friendSubmissions.length && !$userSubmission.song}
+        <h3>Looks like you're the only one listening right now!</h3>
+        <Button
+          type="primary"
+          title="Share current song."
+          on:click={createSubmission}>Share Current Song</Button
+        >
+      {:else}
+        {#each $friendSubmissions as submission}
+          <Submission data={submission} />
+        {/each}
+      {/if}
+      <Button
+        className="mt-2"
+        type="primary"
+        title="reset"
+        on:click={async () => {
+          goto('/new_user');
+          await logout();
+        }}>Reset</Button
+      >
     </div>
   </div>
 </div>

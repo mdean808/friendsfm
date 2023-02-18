@@ -1,7 +1,6 @@
 import { MusicPlatform, ResponseType, type NetworkResponse } from './types';
 import { router } from 'tinro';
 import { currPath } from './store';
-import { Preferences } from '@capacitor/preferences';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
 
@@ -17,11 +16,6 @@ export const getPlatformColor = (platform: MusicPlatform) => {
 export const goto = (url: string) => {
   currPath.set(url);
   router.goto(url);
-};
-
-export const getUserFromPreferences = async () => {
-  const res = await Preferences.get({ key: 'user' });
-  return JSON.parse(res.value);
 };
 
 export const registerForNotifications = async () => {
@@ -50,10 +44,8 @@ export const handleApiResponse = async (res: Response) => {
     toast.push('Error ' + res.status + ': ' + res.statusText, toastError);
     return false;
   } else if (json.type === ResponseType.error) {
-    toast.push(
-      'Error: ' + JSON.stringify(json.message, null, '\t'),
-      toastError
-    );
+    console.log('ERROR:', json);
+    toast.push('Error: ' + json.message, toastError);
     return false;
   }
 

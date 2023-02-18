@@ -12,11 +12,14 @@ const auth = getAuth();
 
 import { sendDaily } from './lib/notifications';
 import { createNotificationTask } from './lib/tasks';
-import { User } from './types';
+import { Submission, User } from './types';
 
 import {
   createUser,
+  generateUserSubmission,
+  getFriendSubmissions,
   getUserByUid as getUserById,
+  getUserSubmission,
   setUserMusicPlatform,
   setUserUsername,
 } from './lib/db';
@@ -42,14 +45,86 @@ export const sendNotification = functions.https.onRequest(async (req, res) => {
     );
     res
       .status(401)
-      .type('json')
-      .send({ type: 'error', message: 'Incorrect secret provided.' });
+      .json({ type: 'error', message: 'Incorrect secret provided.' });
   }
 });
 
 export const generateNotificationTime = functions.pubsub
   .schedule('0 0 * * *')
   .onRun(createNotificationTask);
+
+export const createNewUserSubmission = functions.https.onRequest(
+  async (req, res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    const { latitude, longitude, authToken } = JSON.parse(req.body);
+    try {
+      const id = (await auth.verifyIdToken(authToken)).uid;
+      const userRes = await getUserById(id);
+      if (!userRes) {
+        res
+          .status(400)
+          .json({ type: 'error', message: 'User does not exist.' });
+      } else {
+        try {
+          const userSub = await generateUserSubmission(id, latitude, longitude);
+          const friendSubs: Submission[] = await getFriendSubmissions(id);
+          res.status(200).json({
+            type: 'success',
+            message: { user: userSub || {}, friends: friendSubs || [] },
+          });
+        } catch (e) {
+          functions.logger.error(e);
+          res.status(400).json({ type: 'error', message: e });
+        }
+      }
+    } catch (e) {
+      // firebase authnetication error
+      functions.logger.error(e);
+      res.status(401).json({
+        type: 'error',
+        message: 'Authentication Failed.',
+        error: (e as Error).message,
+      });
+    }
+  }
+);
+
+export const getCurrentSubmissionStatus = functions.https.onRequest(
+  async (req, res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    const { authToken } = JSON.parse(req.body);
+    try {
+      const id = (await auth.verifyIdToken(authToken)).uid;
+      const userRes = await getUserById(id);
+      if (!userRes) {
+        res
+          .status(400)
+          .json({ type: 'error', message: 'User does not exist.' });
+      } else {
+        try {
+          const userSub = await getUserSubmission(id);
+          let friendSubs: Submission[] = [];
+          if (userSub) friendSubs = await getFriendSubmissions(id);
+          res.status(200).json({
+            type: 'success',
+            message: { user: userSub || {}, friends: friendSubs || [] },
+          });
+        } catch (e) {
+          functions.logger.error(e);
+          res.status(400).type('json').send({ type: 'error', message: e });
+        }
+      }
+    } catch (e) {
+      // firebase authnetication error
+      functions.logger.error(e);
+      res.status(401).json({
+        type: 'error',
+        message: 'Authentication Failed.',
+        error: (e as Error).message,
+      });
+    }
+  }
+);
 
 export const setUsername = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
@@ -58,10 +133,7 @@ export const setUsername = functions.https.onRequest(async (req, res) => {
     const id = (await auth.verifyIdToken(authToken)).uid;
     const userRes = await getUserById(id);
     if (!userRes) {
-      res
-        .status(400)
-        .type('json')
-        .send({ type: 'error', message: 'User does not exist.' });
+      res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       try {
         await setUserUsername(id, username);
@@ -70,48 +142,47 @@ export const setUsername = functions.https.onRequest(async (req, res) => {
           .type('json')
           .send({ type: 'success', message: username });
       } catch (e) {
-        res.status(400).type('json').send({ type: 'error', message: e });
+        res.status(400).json({ type: 'error', message: e });
       }
     }
   } catch (e) {
     // firebase authnetication error
     functions.logger.error(e);
-    res
-      .status(400)
-      .type('json')
-      .send({ type: 'error', message: 'Authentication Failed.' });
+    res.status(401).json({
+      type: 'error',
+      message: 'Authentication Failed.',
+      error: (e as Error).message,
+    });
   }
 });
 
 export const setMusicPlatform = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
-  const { musicPlatform, authToken } = JSON.parse(req.body);
+  const { musicPlatform, platformAccessToken, authToken } = JSON.parse(
+    req.body
+  );
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
     const userRes = await getUserById(id);
     if (!userRes) {
-      res
-        .status(400)
-        .type('json')
-        .send({ type: 'error', message: 'User does not exist.' });
+      res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       try {
-        await setUserMusicPlatform(id, musicPlatform);
-        res
-          .status(200)
-          .type('json')
-          .send({ type: 'success', message: musicPlatform });
+        await setUserMusicPlatform(id, musicPlatform, platformAccessToken);
+        res.status(200).json({ type: 'success', message: musicPlatform });
       } catch (e) {
-        res.status(400).type('json').send({ type: 'error', message: e });
+        console.log(e);
+        res.status(400).json({ type: 'error', message: (e as Error).message });
       }
     }
   } catch (e) {
     // firebase authnetication error
     functions.logger.error(e);
-    res
-      .status(400)
-      .type('json')
-      .send({ type: 'error', message: 'Authentication Failed.' });
+    res.status(401).json({
+      type: 'error',
+      message: 'Authentication Failed.',
+      error: (e as Error).message,
+    });
   }
 });
 
@@ -127,29 +198,26 @@ export const loginUser = functions.https.onRequest(async (req, res) => {
     if (userRes) {
       // user has already been registered, send success
       functions.logger.info(`User ${userRes.id} already registered`);
-      userRes.registered = true;
-      res.status(200).type('json').send({ type: 'success', message: userRes });
+      res.status(200).json({ type: 'success', message: userRes });
     } else {
       try {
         const userRes = await createUser(user);
         //store user to the database and return id
-        res
-          .status(200)
-          .type('json')
-          .send({ type: 'success', message: userRes });
+        res.status(200).json({ type: 'success', message: userRes });
       } catch (e) {
         functions.logger.error(e);
         // error with creating the user
-        res.status(400).type('json').send({ type: 'error', message: e });
+        res.status(400).json({ type: 'error', message: e });
         return;
       }
     }
   } catch (e) {
     // firebase authnetication error
     functions.logger.error(e);
-    res
-      .status(400)
-      .type('json')
-      .send({ type: 'error', message: 'Authentication Failed.' });
+    res.status(401).json({
+      type: 'error',
+      message: 'Authentication Failed.',
+      error: (e as Error).message,
+    });
   }
 });

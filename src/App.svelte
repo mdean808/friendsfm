@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { Route } from "tinro";
+  import { Route } from 'tinro';
 
-  import { FirebaseMessaging } from "@capacitor-firebase/messaging";
-  import { SvelteToast } from '@zerodevx/svelte-toast'
+  import { FirebaseMessaging } from '@capacitor-firebase/messaging';
+  import { SvelteToast } from '@zerodevx/svelte-toast';
 
-  import Home from "./pages/home.svelte";
-  import NewUser from "./pages/new_user.svelte";
-  import Songs from "./pages/songs.svelte";
-  import Audial from "./pages/audial.svelte";
-  import Username from "./pages/username.svelte";
-  import MusicProvider from "./pages/music_provider.svelte";
-  import { onMount } from "svelte";
+  import Home from './pages/home.svelte';
+  import NewUser from './pages/new_user.svelte';
+  import Songs from './pages/songs.svelte';
+  import Audial from './pages/audial.svelte';
+  import Username from './pages/username.svelte';
+  import MusicProvider from './pages/music_provider.svelte';
+  import { onMount } from 'svelte';
 
   import {
     user,
@@ -20,54 +20,59 @@
     statusBarHeight,
     getBottomInset,
     loading,
-  } from "./store";
-  import { getPlatformColor, goto, getUserFromPreferences } from "./lib";
-  import Loading from "./components/Loading.svelte";
+    getNewAuthToken,
+    getUserFromPreferences,
+  } from './store';
+  import { getPlatformColor, goto } from './lib';
+  import Loading from './components/Loading.svelte';
 
   onMount(async () => {
-    loading.set(false)
-    await FirebaseMessaging.requestPermissions();
-    const tokenRes = await FirebaseMessaging.getToken();
-    console.log('MessagingPermissions:', tokenRes.token);
+    loading.set(false);
 
-    user.set(await getUserFromPreferences());
     await getStatusBarHeight();
     await getBottomInset();
-    const u = user.get();
-
-    if (u && u.registered) {
-      goto("/");
-    } else if (u && !u.username) {
-      goto("/username");
-    } else if (u && !u.musicPlatform) {
-      goto("/music_provider");
+    // request permissions
+    FirebaseMessaging.requestPermissions();
+    // load user
+    if (!(await getNewAuthToken())) {
+      goto('/new_user');
     } else {
-      goto("/new_user");
+      await getUserFromPreferences();
+      const u = user.get();
+      if (u && u.username && u.musicPlatform) {
+        goto('/');
+      } else if (u && !u.username) {
+        goto('/username');
+      } else if (u && !u.musicPlatform) {
+        goto('/music_provider');
+      } else {
+        goto('/new_user');
+      }
     }
   });
 </script>
 
 <!-- Navigation -->
-{#if $loading }
-  <Loading/>
+{#if $loading}
+  <Loading />
 {/if}
-{#if $user?.registered}
+{#if $user?.username && $user.musicPlatform}
   <nav
     style={`height: ${70 + $bottomInset + (bottomInset ? -15 : 0)}px`}
     class={`bottom-0 fixed bg-gray-900 flex w-full`}
   >
     <button
-      on:click={() => goto("/songs")}
+      on:click={() => goto('/songs')}
       class="w-1/3 flex justify-center py-2"
     >
       <div class="mx-auto">
         <svg
           class={`w-6 h-6 mx-auto ${
-            $currPath === "/songs"
+            $currPath === '/songs'
               ? `text-${getPlatformColor($user.musicPlatform)}`
-              : "currentColor"
+              : 'currentColor'
           }`}
-          fill={"currentColor"}
+          fill={'currentColor'}
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
           ><path
@@ -77,13 +82,13 @@
         <span class="text-white">songs</span>
       </div>
     </button>
-    <button on:click={() => goto("/")} class="w-1/3 flex justify-center py-2">
+    <button on:click={() => goto('/')} class="w-1/3 flex justify-center py-2">
       <div class="mx-auto">
         <svg
           class={`w-6 h-6 mx-auto ${
-            $currPath === "/"
+            $currPath === '/'
               ? `text-${getPlatformColor($user.musicPlatform)}`
-              : "currentColor"
+              : 'currentColor'
           }`}
           fill="currentColor"
           viewBox="0 0 20 20"
@@ -96,15 +101,15 @@
       </div>
     </button>
     <button
-      on:click={() => goto("/audial")}
+      on:click={() => goto('/audial')}
       class="w-1/3 flex justify-center py-2"
     >
       <div class="mx-auto">
         <svg
           class={`w-6 h-6 mx-auto ${
-            $currPath === "/audial"
+            $currPath === '/audial'
               ? `text-${getPlatformColor($user.musicPlatform)}`
-              : "currentColor"
+              : 'currentColor'
           }`}
           fill="currentColor"
           viewBox="0 0 20 20"
@@ -119,53 +124,59 @@
       </div>
     </button>
   </nav>
-<div
-  style={`height: ${55 + $statusBarHeight}px`}
-  class={`top-0 bg-gray-900 left-0 fixed w-full `}
->
-  <nav
-    style={`margin-top: ${$statusBarHeight}px`}
-    class={`w-full flex p-3  flex-row justify-between items-center text-${getPlatformColor(
-      $user?.musicPlatform
-    )}`}
+  <div
+    style={`height: ${55 + $statusBarHeight}px`}
+    class={`top-0 bg-gray-900 left-0 fixed w-full `}
   >
-    <div class="flex-grow-0">
-      <svg
-        class="w-8 h-8"
-        fill="currentColor"
-        viewBox="0 0 20 20"
-        xmlns="http://www.w3.org/2000/svg"
-        ><path
-          d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"
-        /></svg
-      >
-    </div>
-    <h1 class="text-center mx-auto text-3xl text-white flex-grow">FriendsFM</h1>
-    <div class="flex-grow-0">
-      <svg
-        class="w-8 h-8"
-        fill="currentColor"
-        viewBox="0 0 20 20"
-        xmlns="http://www.w3.org/2000/svg"
-        ><path
-          fill-rule="evenodd"
-          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
-          clip-rule="evenodd"
-        /></svg
-      >
-    </div>
-  </nav>
-</div>
+    <nav
+      style={`margin-top: ${$statusBarHeight}px`}
+      class={`w-full flex p-3  flex-row justify-between items-center text-${getPlatformColor(
+        $user?.musicPlatform
+      )}`}
+    >
+      <div class="flex-grow-0">
+        <svg
+          class="w-8 h-8"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+          ><path
+            d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"
+          /></svg
+        >
+      </div>
+      <h1 class="text-center mx-auto text-3xl text-white flex-grow">
+        FriendsFM
+      </h1>
+      <div class="flex-grow-0">
+        <svg
+          class="w-8 h-8"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+          ><path
+            fill-rule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
+            clip-rule="evenodd"
+          /></svg
+        >
+      </div>
+    </nav>
+  </div>
 {/if}
 
 <!-- Routing -->
 <main class="pt-[3rem]">
-  <SvelteToast options={{theme: {
-    '--toastContainerTop': 'auto',
-    '--toastContainerRight': 'auto',
-    '--toastContainerBottom': '8rem',
-    '--toastContainerLeft': 'calc(50vw - 8rem);'
-  }}}/>
+  <SvelteToast
+    options={{
+      theme: {
+        '--toastContainerTop': 'auto',
+        '--toastContainerRight': 'auto',
+        '--toastContainerBottom': '8rem',
+        '--toastContainerLeft': 'calc(50vw - 8rem);',
+      },
+    }}
+  />
   <Route path="/new_user"><NewUser /></Route>
   <Route path="/username"><Username /></Route>
   <Route path="/music_provider"><MusicProvider /></Route>

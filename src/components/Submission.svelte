@@ -1,31 +1,36 @@
 <script lang="ts">
-  import { getPlatformColor } from "../lib";
-  import MusicPlatformIcon from "./MusicPlatformIcon.svelte";
-  import type { Submission } from "../types";
+  import { getPlatformColor } from '../lib';
+  import MusicPlatformIcon from './MusicPlatformIcon.svelte';
+  import type { Submission } from '../types';
 
   export let data: Submission;
-
 </script>
 
 <main class="border-2 border-gray-600 rounded-md py-2 px-4 flex">
   <div class="flex-grow text-left">
     <h4 class="text-xl mb-2">
-      {data.user.displayName}
+      {data.user ? data.user.username : 'Unknown'}
       <span class={`text-${getPlatformColor(data.user.musicPlatform)}`}
         ><MusicPlatformIcon
-          className="inline w-6 h-6"
-          id={data.user.musicPlatform}
+          className="inline w-5 h-5"
+          id={data.user ? data.user.musicPlatform : 'spotify'}
         />
       </span>
       <span class="text-sm text-gray-400"
-        >{data.metadata.time.toLocaleTimeString().split(":")[0]}:{data.metadata.time
-          .toLocaleTimeString()
-          .split(":")[1]}}</span
+        >{new Date(data.time).toLocaleString('en-US', {
+          hour: 'numeric',
+          minute: 'numeric',
+          hour12: true,
+        })}</span
       >
     </h4>
-    <p class={`text-${getPlatformColor(data.user.musicPlatform)}`}>{data.song.name}</p>
-    <p>{data.song.artist}</p>
-    <p class="text-gray-400">{data.song.duration}</p>
+    <a href={data.song.url}>
+      <p class={`text-${getPlatformColor(data.user.musicPlatform)}`}>
+        {data.song.name}
+      </p>
+      <p>{data.song.artist}</p>
+      <p class="text-gray-400">{data.song.durationElapsed}s played</p>
+    </a>
   </div>
   <div class="flex-grow-0 text-right">
     <div class="h-full flex flex-col flex-nowrap justify-between">
@@ -43,8 +48,10 @@
         /></svg
       >
       <div class="flex-grow-0 flex-shrink">
-        <p>#{data.metadata.audial.number}</p>
-        {data.metadata.audial.score}
+        {#if data.audial}
+          <p>#{data.audial.number}</p>
+          {data.audial.score}
+        {/if}
       </div>
     </div>
   </div>
