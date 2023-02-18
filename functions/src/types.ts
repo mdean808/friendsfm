@@ -61,7 +61,7 @@ export interface SpotifyAuthRes {
 
 export interface MusicPlatformAuth {
   access_token: string;
-  expires_at: Date;
+  expires_at: Date | Timestamp;
   refresh_token: string;
 }
 
@@ -75,19 +75,38 @@ export interface SpotifyCurrentlyPlayingRes {
     type: string;
   };
   progress_ms: number;
-  item: {
-    artists: [
-      {
-        name: string;
-      }
-    ];
-    duration_ms: number;
-    external_urls: {
-      spotify: string;
-    };
-    href: string; // api url
-    name: string;
-    preview_url: string;
-  };
+  item: SpotifyItem;
   is_playing: boolean;
+}
+
+export interface SpotifyItem {
+  artists: [
+    {
+      name: string;
+    }
+  ];
+  duration_ms: number;
+  external_urls: {
+    spotify: string;
+  };
+  href: string; // api url
+  name: string;
+  preview_url: string;
+}
+
+export interface SpotifyRecentlyPlayedRes {
+  href: string;
+  items: [
+    {
+      track: SpotifyItem;
+      played_at: Date;
+      context: {
+        type: 'string';
+        href: 'string';
+        external_urls: {
+          spotify: 'string';
+        };
+      };
+    }
+  ];
 }

@@ -12,6 +12,7 @@
     userSubmission,
     getSubmissionStatus,
     authToken,
+    currPath,
   } from '../store';
   import Button from '../components/Button.svelte';
   import { goto } from '../lib';
@@ -22,8 +23,9 @@
   // GLOBALS
   let loadingSubmissions = false;
 
+  // TODO: make this only run on load -- sometimes it causes issues with premature calls
   authToken.listen(async (value) => {
-    if (value) {
+    if (value && currPath.get() == '/') {
       loadingSubmissions = true;
       await getSubmissionStatus();
       loadingSubmissions = false;
@@ -49,6 +51,7 @@
     }px)`}
     class="py-2 px-4 overflow-y-scroll overflow-x-hidden"
   >
+    <!--TODO: scroll up to refresh  -->
     <h2>Hello, {$user?.username}!</h2>
     <div class="my-2">
       {#if loadingSubmissions}
@@ -70,7 +73,9 @@
         >
       {:else}
         {#each $friendSubmissions as submission}
-          <Submission data={submission} />
+          <div class="my-2">
+            <Submission data={submission} />
+          </div>
         {/each}
       {/if}
       <Button

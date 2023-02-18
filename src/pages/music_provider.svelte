@@ -17,7 +17,7 @@
         import.meta.env.VITE_SPOTIFY_CLIENT_ID
       }&response_type=code&redirect_uri=${
         import.meta.env.VITE_SPOTIFY_REDIRECT_URL
-      }&scope=user-read-private%20user-read-currently-playing`;
+      }&scope=user-read-private%20user-read-currently-playing%20user-read-recently-played`;
       window.location.href = spotifyUrl;
     } else if (platform === MusicPlatform.appleMusic) {
       //todo: authenticate with appleMusic

@@ -112,6 +112,7 @@ export const updateUsername = action(
   user,
   'update-username',
   async (store, newUsername: string) => {
+    console.log('updateUsername');
     const u = store.get();
     const res = await fetch(
       'https://us-central1-friendsfm.cloudfunctions.net/setUsername',
@@ -139,6 +140,7 @@ export const updateMusicPlatform = action(
   user,
   'update-music-platform',
   async (store, newMusicPlatform: MusicPlatform, authCode?: string) => {
+    console.log('updateMusicPlatform');
     const u = store.get();
     const res = await fetch(
       'https://us-central1-friendsfm.cloudfunctions.net/setMusicPlatform',
@@ -196,6 +198,7 @@ export const generateSubmission = action(
   userSubmission,
   'generate-submission',
   async (store) => {
+    console.log('generateSubmission');
     let location: GeolocationPosition;
     try {
       await Geolocation.requestPermissions();
@@ -230,6 +233,7 @@ export const getSubmissionStatus = action(
   friendSubmissions,
   'get-submission-status',
   async (store) => {
+    console.log('getSubmissionStatus');
     const res = await fetch(
       'https://us-central1-friendsfm.cloudfunctions.net/getCurrentSubmissionStatus',
       {

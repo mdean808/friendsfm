@@ -8,7 +8,6 @@
   let username: string;
   const setUsername = async () => {
     if (!username) return;
-    //TODO: show loading indicator
     loading.set(true);
     if (await updateUsername(username)) goto('/music_provider');
     loading.set(false);

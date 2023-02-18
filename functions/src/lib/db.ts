@@ -74,7 +74,7 @@ export const setUserMusicPlatform = async (
     const res = await fetch('https://accounts.spotify.com/api/token', {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: 'Baseic ' + SPOTIFY_AUTH,
+        Authorization: 'Basic ' + SPOTIFY_AUTH,
       },
       method: 'post',
       body,
@@ -178,11 +178,17 @@ export const getFriendSubmissions = async (id: string) => {
       .get();
     const username = (await friendRef.get()).get('username');
     const musicPlatform = (await friendRef.get()).get('musicPlatform');
-    if (!friendSubmission.empty)
+    if (!friendSubmission.empty) {
+      const friendSub = friendSubmission.docs[0].data() as Submission;
+      friendSub.time = new Timestamp(
+        (friendSub.time as Timestamp).seconds,
+        (friendSub.time as Timestamp).nanoseconds
+      ).toDate();
       friendSubmissions.push({
-        ...(friendSubmission.docs[0].data() as Submission),
+        ...friendSub,
         user: { username, musicPlatform },
       });
+    }
   }
 
   return friendSubmissions;

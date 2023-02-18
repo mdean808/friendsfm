@@ -1,4 +1,9 @@
-import { MusicPlatformAuth, SpotifyCurrentlyPlayingRes } from '../types';
+import { Timestamp } from 'firebase-admin/firestore';
+import {
+  MusicPlatformAuth,
+  SpotifyCurrentlyPlayingRes,
+  SpotifyRecentlyPlayedRes,
+} from '../types';
 
 const SPOTIFY_AUTH = Buffer.from(
   process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET
@@ -9,8 +14,12 @@ export const checkSpotifyAccessCode = async (
   userRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>
 ) => {
   console.log(data);
+
+  data.expires_at = new Timestamp(
+    (data.expires_at as Timestamp).seconds,
+    (data.expires_at as Timestamp).nanoseconds
+  ).toDate();
   if (new Date(data.expires_at) < new Date()) {
-    //todo: refresh the token!
     const body = new URLSearchParams();
     body.append('grant_type', 'refresh_token');
     body.append('refresh_token', data.refresh_token);
@@ -51,9 +60,51 @@ export const getCurrentSpotifySong = async (accessToken: string) => {
   );
 
   if (res.status !== 200) {
-    console.error(await res.text());
-    throw new Error('Spotify now playing error.');
+    console.error('get current spotify song: ' + res.status, await res.text());
+    if (res.status === 204) {
+      return await getRecentlyPlayedSpotifySongs(accessToken);
+    }
+    throw new Error('Spotify now playing error. ' + res.status);
   } else {
     return (await res.json()) as SpotifyCurrentlyPlayingRes;
+  }
+};
+
+export const getRecentlyPlayedSpotifySongs = async (accessToken: string) => {
+  const res = await fetch(
+    'https://api.spotify.com/v1/me/player/recently-played?limit=1',
+    {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + accessToken,
+      },
+    }
+  );
+
+  if (res.status !== 200) {
+    console.error(
+      'get resently played spotify songs: ' + res.status,
+      await res.text()
+    );
+    throw new Error('Spotify recent songs error.');
+  } else {
+    const json = (await res.json()) as SpotifyRecentlyPlayedRes;
+
+    const currentlyPlaying: SpotifyCurrentlyPlayingRes = {
+      timestamp: new Date(json.items[0].played_at).getMilliseconds(),
+      context: {
+        external_urls: {
+          spotify: json.items[0].context.external_urls.spotify,
+        },
+        href: json.items[0].context.href, // api url
+        type: json.items[0].context.type,
+      },
+      progress_ms: json.items[0].track.duration_ms,
+      item: json.items[0].track,
+      is_playing: false,
+    };
+    return currentlyPlaying;
   }
 };
