@@ -6,6 +6,7 @@ import {
   MusicPlatform,
   SpotifyAuthRes,
 } from '../types';
+import * as functions from 'firebase-functions';
 import { checkSpotifyAccessCode, getCurrentSpotifySong } from './spotify';
 
 const SPOTIFY_AUTH = Buffer.from(
@@ -27,11 +28,6 @@ export const createUser = async (user: User) => {
   }
 
   if ((await usersRef.doc(user.id).get()).exists) {
-    console.log(
-      'uid token',
-      user.id,
-      (await usersRef.doc(user.id).get()).exists
-    );
     throw new Error(
       'User ID taken. (Perhaps the user has already registered.)'
     );
@@ -40,7 +36,7 @@ export const createUser = async (user: User) => {
   const newUserRef = db.collection('users').doc(user.id);
   user.friends = [];
   await newUserRef.set(user);
-  console.log('User inserted into database:', user.id);
+  functions.logger.info('User inserted into database:', user.id);
   return user;
 };
 

@@ -67,19 +67,12 @@ export interface MusicPlatformAuth {
 
 export interface SpotifyCurrentlyPlayingRes {
   timestamp: number;
-  context: {
-    external_urls: {
-      spotify: string;
-    };
-    href: string; // api url
-    type: string;
-  };
   progress_ms: number;
-  item: SpotifyItem;
+  item: SpotifyTrack;
   is_playing: boolean;
 }
 
-export interface SpotifyItem {
+export interface SpotifyTrack {
   artists: [
     {
       name: string;
@@ -98,15 +91,8 @@ export interface SpotifyRecentlyPlayedRes {
   href: string;
   items: [
     {
-      track: SpotifyItem;
+      track: SpotifyTrack;
       played_at: Date;
-      context: {
-        type: 'string';
-        href: 'string';
-        external_urls: {
-          spotify: 'string';
-        };
-      };
     }
   ];
 }

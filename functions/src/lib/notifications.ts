@@ -1,5 +1,6 @@
 import { getFirestore } from 'firebase-admin/firestore';
 import { getMessaging, Message } from 'firebase-admin/messaging';
+import * as functions from 'firebase-functions';
 
 const messaging = getMessaging();
 const db = getFirestore();
@@ -18,7 +19,7 @@ export const sendDaily = async () => {
   const notificationsRef = db.collection('misc').doc('notifications');
   const prevCount = (await notificationsRef.get()).get('count');
   await notificationsRef.update({ count: prevCount + 1 });
-  console.log('Successfully sent message:', res);
+  functions.logger.info('Successfully sent message:', res);
 };
 
 export const sendToMorgan = async (date: Date) => {
@@ -31,5 +32,5 @@ export const sendToMorgan = async (date: Date) => {
   };
 
   const res = await messaging.send(message);
-  console.log('Sent message to morgan', res);
+  functions.logger.info('Sent message to morgan', res);
 };

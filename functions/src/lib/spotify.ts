@@ -14,8 +14,6 @@ export const checkSpotifyAccessCode = async (
   data: MusicPlatformAuth,
   userRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>
 ) => {
-  console.log(data);
-
   data.expires_at = new Timestamp(
     (data.expires_at as Timestamp).seconds,
     (data.expires_at as Timestamp).nanoseconds
@@ -91,19 +89,15 @@ export const getRecentlyPlayedSpotifySongs = async (accessToken: string) => {
     );
     throw new Error('Spotify recent songs error.');
   } else {
-    const json = (await res.json()) as SpotifyRecentlyPlayedRes;
+    // const jsonRes = await res.json();
+    const jsonRes = await res.text();
+    functions.logger.info(res.status);
+    functions.logger.info(jsonRes);
 
-    functions.logger.info(json);
+    const json = JSON.parse(jsonRes) as SpotifyRecentlyPlayedRes;
 
     const currentlyPlaying: SpotifyCurrentlyPlayingRes = {
       timestamp: new Date(json.items[0].played_at).getMilliseconds(),
-      context: {
-        external_urls: {
-          spotify: json.items[0].context.external_urls.spotify,
-        },
-        href: json.items[0].context.href, // api url
-        type: json.items[0].context.type,
-      },
       progress_ms: json.items[0].track.duration_ms,
       item: json.items[0].track,
       is_playing: false,
