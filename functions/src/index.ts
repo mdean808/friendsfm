@@ -73,6 +73,9 @@ export const createNewUserSubmission = functions.https.onRequest(
             message: { user: userSub || {}, friends: friendSubs || [] },
           });
         } catch (e) {
+          functions.logger.info(
+            'Error in generateUserSubmission or getFriendSubmissions.'
+          );
           functions.logger.error(e);
           res
             .status(400)
@@ -112,6 +115,9 @@ export const getCurrentSubmissionStatus = functions.https.onRequest(
             message: { user: userSub || {}, friends: friendSubs || [] },
           });
         } catch (e) {
+          functions.logger.info(
+            'Error in getUserSubmission or getFriendSubmissions.'
+          );
           functions.logger.error(e);
           res
             .status(400)
@@ -147,6 +153,8 @@ export const setUsername = functions.https.onRequest(async (req, res) => {
           .type('json')
           .send({ type: 'success', message: username });
       } catch (e) {
+        functions.logger.info('Error in setUserUsername.');
+        functions.logger.error(e);
         res.status(400).json({ type: 'error', message: (e as Error).message });
       }
     }
@@ -174,7 +182,8 @@ export const setMusicPlatform = functions.https.onRequest(async (req, res) => {
         await setUserMusicPlatform(id, musicPlatform, platformAuthCode);
         res.status(200).json({ type: 'success', message: musicPlatform });
       } catch (e) {
-        console.log(e);
+        functions.logger.info('Error in setMusicPlatform.');
+        functions.logger.error(e);
         res.status(400).json({ type: 'error', message: (e as Error).message });
       }
     }
@@ -208,6 +217,7 @@ export const loginUser = functions.https.onRequest(async (req, res) => {
         //store user to the database and return id
         res.status(200).json({ type: 'success', message: userRes });
       } catch (e) {
+        functions.logger.info('Error in createUser.');
         functions.logger.error(e);
         // error with creating the user
         res.status(400).json({ type: 'error', message: (e as Error).message });

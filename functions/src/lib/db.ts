@@ -6,7 +6,6 @@ import {
   MusicPlatform,
   SpotifyAuthRes,
 } from '../types';
-import * as functions from 'firebase-functions';
 import { checkSpotifyAccessCode, getCurrentSpotifySong } from './spotify';
 
 const SPOTIFY_AUTH = Buffer.from(
@@ -80,7 +79,6 @@ export const setUserMusicPlatform = async (
       body,
     });
     if (res.status !== 200) {
-      functions.logger.error(res.status, await res.text());
     } else {
       const spotifyAuthRes: SpotifyAuthRes = await res.json();
       const musicPlatformAuth = {
