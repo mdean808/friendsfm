@@ -1,13 +1,10 @@
 <script lang="ts">
   // IMPORTS
   import { onMount } from 'svelte';
-  // import { Geolocation } from "@capacitor/geolocation";
-  // import { FirebaseMessaging, type Notification } from "@capacitor-firebase/messaging";
   import {
     user,
     logout,
     statusBarHeight,
-    // getReverseGeocode,
     bottomInset,
     friendSubmissions,
     loading,
@@ -23,12 +20,14 @@
   import SkeletonSubmission from '../components/SkeletonSubmission.svelte';
 
   // GLOBALS
-  let loadingSubmissions = true;
+  let loadingSubmissions = false;
 
-  // ONMOUNT
-  onMount(async () => {
-    if (authToken.get()) await getSubmissionStatus();
-    loadingSubmissions = false;
+  authToken.listen(async (value) => {
+    if (value) {
+      loadingSubmissions = true;
+      await getSubmissionStatus();
+      loadingSubmissions = false;
+    }
   });
 
   const createSubmission = async () => {

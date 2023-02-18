@@ -74,7 +74,9 @@ export const createNewUserSubmission = functions.https.onRequest(
           });
         } catch (e) {
           functions.logger.error(e);
-          res.status(400).json({ type: 'error', message: e });
+          res
+            .status(400)
+            .json({ type: 'error', message: (e as Error).message });
         }
       }
     } catch (e) {
@@ -111,7 +113,10 @@ export const getCurrentSubmissionStatus = functions.https.onRequest(
           });
         } catch (e) {
           functions.logger.error(e);
-          res.status(400).type('json').send({ type: 'error', message: e });
+          res
+            .status(400)
+            .type('json')
+            .send({ type: 'error', message: (e as Error).message });
         }
       }
     } catch (e) {
@@ -142,7 +147,7 @@ export const setUsername = functions.https.onRequest(async (req, res) => {
           .type('json')
           .send({ type: 'success', message: username });
       } catch (e) {
-        res.status(400).json({ type: 'error', message: e });
+        res.status(400).json({ type: 'error', message: (e as Error).message });
       }
     }
   } catch (e) {
@@ -205,7 +210,7 @@ export const loginUser = functions.https.onRequest(async (req, res) => {
       } catch (e) {
         functions.logger.error(e);
         // error with creating the user
-        res.status(400).json({ type: 'error', message: e });
+        res.status(400).json({ type: 'error', message: (e as Error).message });
         return;
       }
     }

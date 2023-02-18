@@ -2,9 +2,18 @@
   import { getPlatformColor } from '../lib';
   import MusicPlatformIcon from './MusicPlatformIcon.svelte';
   import type { Submission } from '../types';
-  import { onMount } from 'svelte';
 
   export let data: Submission;
+
+  const formatDurationPlayed = (duration: number) => {
+    console.log(duration);
+    const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, duration * 1000)),
+      // Pull out parts of interest
+      parts = [d.getUTCMinutes(), d.getUTCSeconds()];
+    // Zero-pad
+    console.log(parts);
+    return parts.map((s) => String(s).padStart(2, '0')).join(':');
+  };
 </script>
 
 <main class="border-2 border-gray-600 rounded-md py-2 px-4 flex">
@@ -30,7 +39,9 @@
         {data.song.name}
       </p>
       <p>{data.song.artist}</p>
-      <p class="text-gray-400">{data.song.durationElapsed}s played</p>
+      <p class="text-gray-400">
+        {formatDurationPlayed(data.song.durationElapsed)} played
+      </p>
     </a>
   </div>
   <div class="flex-grow-0 text-right">
