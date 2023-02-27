@@ -24,6 +24,10 @@ const config: CapacitorConfig = {
       resizeOnFullScreen: true,
     },
   },
+  // server: {
+  //   url: 'http://10.0.0.128:8080',
+  //   cleartext: true,
+  // },
 };
 
 export default config;

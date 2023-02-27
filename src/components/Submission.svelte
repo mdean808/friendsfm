@@ -6,12 +6,10 @@
   export let data: Submission;
 
   const formatDurationPlayed = (duration: number) => {
-    console.log(duration);
     const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, duration * 1000)),
       // Pull out parts of interest
       parts = [d.getUTCMinutes(), d.getUTCSeconds()];
     // Zero-pad
-    console.log(parts);
     return parts.map((s) => String(s).padStart(2, '0')).join(':');
   };
 </script>
@@ -26,13 +24,23 @@
           id={data.user ? data.user.musicPlatform : 'spotify'}
         />
       </span>
-      <span class="text-sm text-gray-400"
-        >{new Date(data.time).toLocaleString('en-US', {
-          hour: 'numeric',
-          minute: 'numeric',
-          hour12: true,
-        })}</span
-      >
+      {#if !data.late}
+        <span class="text-sm text-gray-400"
+          >{new Date(data.time).toLocaleString('en-US', {
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true,
+          })}
+        </span>
+      {:else}
+        <span class="text-sm text-red-500"
+          >{new Date(data.time).toLocaleString('en-US', {
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true,
+          })}
+        </span>
+      {/if}
     </h4>
     <a href={data.song.url}>
       <p class={`text-${getPlatformColor(data.user.musicPlatform)}`}>

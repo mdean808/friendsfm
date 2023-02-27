@@ -8,6 +8,7 @@ export interface User {
   username?: string;
   musicPlatform?: MusicPlatform;
   friends?: string[]; // user ids
+  friendRequests?: string[]; // usernames
   submissions?: string[]; // submission ids
   savedSongs?: string[]; // song ids
   audials?: string[]; // audial ids
@@ -32,6 +33,7 @@ export interface Song {
 export interface Submission {
   id?: string;
   number: number;
+  late: boolean;
   song: Song; // song id
   time: Date | Timestamp;
   audial: string; // audial id

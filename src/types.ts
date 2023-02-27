@@ -40,6 +40,7 @@ export interface Song {
 
 export interface Submission {
   id: string;
+  late?: boolean;
   user: {
     username: string;
     musicPlatform: MusicPlatform;

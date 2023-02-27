@@ -1,5 +1,4 @@
 import { Timestamp } from 'firebase-admin/firestore';
-import * as functions from 'firebase-functions';
 import {
   MusicPlatformAuth,
   SpotifyCurrentlyPlayingRes,
@@ -89,12 +88,9 @@ export const getRecentlyPlayedSpotifySongs = async (accessToken: string) => {
     );
     throw new Error('Spotify recent songs error.');
   } else {
-    // const jsonRes = await res.json();
-    const jsonRes = await res.text();
-    functions.logger.info(res.status);
-    functions.logger.info(jsonRes);
+    const jsonRes = await res.json();
 
-    const json = JSON.parse(jsonRes) as SpotifyRecentlyPlayedRes;
+    const json = jsonRes as SpotifyRecentlyPlayedRes;
 
     const currentlyPlaying: SpotifyCurrentlyPlayingRes = {
       timestamp: new Date(json.items[0].played_at).getMilliseconds(),

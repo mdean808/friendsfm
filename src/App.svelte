@@ -57,7 +57,7 @@
   <Loading />
 {/if}
 {#if $user?.username && $user.musicPlatform}
-  <nav
+  <div
     style={`height: ${70 + $bottomInset + (bottomInset ? -15 : 0)}px`}
     class={`bottom-0 fixed bg-gray-900 flex w-full`}
   >
@@ -123,12 +123,12 @@
         <span class="text-white">audial</span>
       </div>
     </button>
-  </nav>
+  </div>
   <div
     style={`height: ${55 + $statusBarHeight}px`}
     class={`top-0 bg-gray-900 left-0 fixed w-full `}
   >
-    <nav
+    <div
       style={`margin-top: ${$statusBarHeight}px`}
       class={`w-full flex p-3  flex-row justify-between items-center text-${getPlatformColor(
         $user?.musicPlatform
@@ -161,12 +161,15 @@
           /></svg
         >
       </div>
-    </nav>
+    </div>
   </div>
 {/if}
 
 <!-- Routing -->
-<main class="pt-[3rem]">
+<main
+  style={`margin-top: calc(55px + ${$statusBarHeight}px); 
+          height: calc(100vh - ${110 + $bottomInset + $statusBarHeight}px)`}
+>
   <SvelteToast
     options={{
       theme: {
@@ -181,9 +184,7 @@
   <Route path="/username"><Username /></Route>
   <Route path="/music_provider"><MusicProvider /></Route>
   <Route path="/songs"><Songs /></Route>
-  <Route path="/">
-    <Home />
-  </Route>
+  <Route path="/"><Home /></Route>
   <Route path="/audial"><Audial /></Route>
 </main>
 

@@ -1,12 +1,13 @@
 <script lang="ts">
   export let className = '';
+  export let animated = true;
 </script>
 
 <svg
   fill="none"
   stroke="currentColor"
   stroke-width="1.5"
-  class={`${className} animate-spin`}
+  class={`${className} ${animated ? 'animate-spin' : ''}`}
   viewBox="0 0 24 24"
   xmlns="http://www.w3.org/2000/svg"
   aria-hidden="true"
