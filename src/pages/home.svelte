@@ -1,6 +1,6 @@
 <script lang="ts">
   // IMPORTS
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import {
     logout,
     friendSubmissions,
@@ -33,6 +33,10 @@
   });
 
   onMount(async () => {
+    // setup pull to refresh
+    document.addEventListener('touchstart', swipeStart, false);
+    document.addEventListener('touchmove', swipeMove, false);
+    document.addEventListener('touchend', swipeEnd, false);
     //todo: wait until authToken is set
     // loadingSubmissions = true;
     // await getSubmissionStatus();
@@ -70,6 +74,7 @@
   };
 
   const swipeEnd = async () => {
+    //todo: prevent this from being called multiple times over and over again (might have had something to do with event listeners, I might have fixed it)
     if (shouldRefreshOnSwipeEnd && !loadingSubmissions) {
       loadingSubmissions = true;
       await getSubmissionStatus();
@@ -78,10 +83,11 @@
     }
   };
 
-  // setup pull to refresh
-  document.addEventListener('touchstart', swipeStart, false);
-  document.addEventListener('touchmove', swipeMove, false);
-  document.addEventListener('touchend', swipeEnd, false);
+  onDestroy(() => {
+    document.addEventListener('touchstart', swipeStart, false);
+    document.addEventListener('touchmove', swipeMove, false);
+    document.addEventListener('touchend', swipeEnd, false);
+  });
 </script>
 
 <div

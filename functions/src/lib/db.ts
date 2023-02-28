@@ -140,6 +140,7 @@ export const generateUserSubmission = async (
     artist: currentSong.item.artists[0]?.name,
     url: currentSong.item.external_urls.spotify,
     durationElapsed: currentSong.progress_ms / 1000,
+    timestamp: currentSong.timestamp || undefined,
   };
   let late = false;
   // check for a late friendsFM
@@ -222,7 +223,10 @@ export const acceptFriendRequest = async (
     const userRef = usersRef.doc(user.uid);
     await userRef.update({ friends: userFriends });
     // remove from friend request array
-    const updatedRequests = userFriends.filter((u) => u !== friend.username);
+    const userFriendRequests = user.friendRequests || [];
+    const updatedRequests = userFriendRequests.filter(
+      (u) => u !== friend.username
+    );
     await userRef.update({ friendRequests: updatedRequests });
 
     // update friend friends
@@ -230,6 +234,7 @@ export const acceptFriendRequest = async (
     friendFriends.push(user.uid);
     const friendRef = usersRef.doc(friend.uid);
     await friendRef.update({ friends: friendFriends });
+    return (await userRef.get()).data() as User;
   } else {
     throw new Error('Friend request does not exist.');
   }

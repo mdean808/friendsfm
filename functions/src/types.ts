@@ -17,6 +17,11 @@ export interface User {
   authToken: string;
 }
 
+export interface Friend {
+  username: string;
+  id: string;
+}
+
 export enum MusicPlatform {
   spotify = 'spotify',
   appleMusic = 'apple-music',
@@ -26,6 +31,7 @@ export interface Song {
   name: string;
   artist: string;
   durationElapsed: number; // in seconds
+  timestamp?: number; // the time the song was played in milliseconds
   url: string;
   id?: string;
 }
@@ -68,7 +74,7 @@ export interface MusicPlatformAuth {
 }
 
 export interface SpotifyCurrentlyPlayingRes {
-  timestamp: number;
+  timestamp?: number;
   progress_ms: number;
   item: SpotifyTrack;
   is_playing: boolean;

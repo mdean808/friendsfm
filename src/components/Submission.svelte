@@ -12,6 +12,11 @@
     // Zero-pad
     return parts.map((s) => String(s).padStart(2, '0')).join(':');
   };
+
+  const formatTimePlayed = (time: number = Date.now()) => {
+    const date = new Date(time);
+    return date.toLocaleTimeString();
+  };
 </script>
 
 <main class="border-2 border-gray-600 rounded-md py-2 px-4 flex">
@@ -48,7 +53,11 @@
       </p>
       <p>{data.song.artist}</p>
       <p class="text-gray-400">
-        {formatDurationPlayed(data.song.durationElapsed)} played
+        {#if data.song.timestamp}
+          played at {formatTimePlayed(data.song.timestamp)}
+        {:else}
+          {formatDurationPlayed(data.song.durationElapsed)} played
+        {/if}
       </p>
     </a>
   </div>

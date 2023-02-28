@@ -8,6 +8,7 @@ export interface User {
   username?: string;
   musicPlatform?: MusicPlatform;
   friends?: User[];
+  friendRequests?: string[];
   submissions?: Submission[];
   savedSongs?: Song[];
   audials?: Audial[];
@@ -34,6 +35,7 @@ export interface Song {
   name: string;
   artist: string;
   durationElapsed: number; // in seconds
+  timestamp?: number; // date (milliseconds) when it was played
   url: string;
   id: string;
 }

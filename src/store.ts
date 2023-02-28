@@ -248,6 +248,51 @@ export const getSubmissionStatus = action(
     if (json.message.user) userSubmission.set(json.message.user as Submission);
   }
 );
+
+export const sendFriendRequest = action(
+  user,
+  'send-friend-request',
+  async (_store, friend) => {
+    const res = await fetch(
+      'https://us-central1-friendsfm.cloudfunctions.net/requestFriend',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          authToken: authToken.get(),
+          friend,
+        }),
+      }
+    );
+    const json = await handleApiResponse(res);
+    if (!json) {
+      // failed to send request
+      return false;
+    }
+  }
+);
+
+export const acceptFriendRequest = action(
+  user,
+  'accpet-friend-request',
+  async (store, requester) => {
+    const res = await fetch(
+      'https://us-central1-friendsfm.cloudfunctions.net/acceptFriend',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          authToken: authToken.get(),
+          requester,
+        }),
+      }
+    );
+    const json = await handleApiResponse(res);
+    if (!json) {
+      // failed to send request
+      return false;
+    }
+    store.set(json.message as User);
+  }
+);
 export const loading = atom<boolean>(false);
 
 export const spotifyAuthCode = atom<string>('');

@@ -64,7 +64,9 @@ export const getCurrentSpotifySong = async (accessToken: string) => {
     }
     throw new Error('Spotify now playing error. ' + res.status);
   } else {
-    return (await res.json()) as SpotifyCurrentlyPlayingRes;
+    const realRes = (await res.json()) as SpotifyCurrentlyPlayingRes;
+    if (realRes.timestamp) delete realRes?.timestamp;
+    return realRes;
   }
 };
 

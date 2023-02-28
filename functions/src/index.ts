@@ -247,11 +247,8 @@ export const acceptFriend = functions.https.onRequest(async (req, res) => {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       try {
-        await acceptFriendRequest(userRes, requester);
-        res
-          .status(200)
-          .type('json')
-          .send({ type: 'success', message: 'Friend Frequest Accepted' });
+        const user = await acceptFriendRequest(userRes, requester);
+        res.status(200).type('json').send({ type: 'success', message: user });
       } catch (e) {
         functions.logger.info('Error in acceptFriendRequest.');
         functions.logger.error(e);
