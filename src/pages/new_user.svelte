@@ -14,7 +14,7 @@
     loading.set(true);
     const res = await FirebaseAuthentication.signInWithGoogle();
     await getNewAuthToken();
-    if (!res.user.email)
+    if (res.user.email)
       await updateUser({
         ...res.user,
         username: undefined,

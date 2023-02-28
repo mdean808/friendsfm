@@ -1,6 +1,5 @@
 import { MusicPlatform, ResponseType, type NetworkResponse } from './types';
-import { router } from 'tinro';
-import { currPath } from './store';
+import { currPath, prevPath } from './store';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
 
@@ -14,8 +13,8 @@ export const getPlatformColor = (platform: MusicPlatform) => {
 };
 
 export const goto = (url: string) => {
+  prevPath.set(currPath.get());
   currPath.set(url);
-  router.goto(url);
 };
 
 export const registerForNotifications = async () => {
@@ -50,4 +49,17 @@ export const handleApiResponse = async (res: Response) => {
   }
 
   return json;
+};
+
+export const formatDurationPlayed = (duration: number) => {
+  const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, duration * 1000)),
+    // Pull out parts of interest
+    parts = [d.getUTCMinutes(), d.getUTCSeconds()];
+  // Zero-pad
+  return parts.map((s) => String(s).padStart(2, '0')).join(':');
+};
+
+export const formatTimePlayed = (time: number = Date.now()) => {
+  const date = new Date(time);
+  return date.toLocaleTimeString();
 };

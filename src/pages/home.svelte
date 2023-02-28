@@ -2,7 +2,6 @@
   // IMPORTS
   import { onMount, onDestroy } from 'svelte';
   import {
-    logout,
     friendSubmissions,
     loading,
     generateSubmission,
@@ -10,27 +9,30 @@
     getSubmissionStatus,
     authToken,
     currPath,
+    user,
   } from '../store';
   import { slide } from 'svelte/transition';
   import Button from '../components/Button.svelte';
-  import { goto } from '../lib';
   import Submission from '../components/Submission.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
   import SkeletonSubmission from '../components/SkeletonSubmission.svelte';
+  import { formatDurationPlayed, formatTimePlayed } from '../lib';
 
   // GLOBALS
-  let loadingSubmissions = false;
-
-  // MOUNT
+  let loadingSubmissions = true;
 
   onMount(async () => {
     // setup pull to refresh
     document.addEventListener('touchstart', swipeStart, false);
     document.addEventListener('touchmove', swipeMove, false);
     document.addEventListener('touchend', swipeEnd, false);
-    // TODO: make this only run on load -- sometimes it causes issues with premature calls
+    if (authToken.get() && !userSubmission.get().song) {
+      loadingSubmissions = true;
+      await getSubmissionStatus();
+    }
+    loadingSubmissions = false;
     authToken.listen(async (value) => {
-      if (value && currPath.get() == '/') {
+      if (value && currPath.get() == '/' && !userSubmission.get().song) {
         loadingSubmissions = true;
         await getSubmissionStatus();
         loadingSubmissions = false;
@@ -96,21 +98,73 @@
       </p>
     </div>
   {/if}
-  <div class="my-2">
+  <div class="mb-3">
     {#if loadingSubmissions}
-      <SkeletonSubmission />
+      <LoadingIndicator className={'mx-auto w-16 h-16'} />
     {:else if $userSubmission.song}
-      <Submission data={$userSubmission} />
+      {#if !$userSubmission.late}
+        <span class="text-sm text-gray-400"
+          >{new Date($userSubmission.time).toLocaleString('en-US', {
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true,
+          })}
+        </span>
+      {:else}
+        <span class="text-sm text-red-500"
+          >{new Date($userSubmission.time).toLocaleString('en-US', {
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true,
+          })}
+        </span>
+      {/if}
+      <div
+        class="border-2 border-gray-600 rounded-md w-fit mx-auto my-1 py-2 text-left px-2 "
+      >
+        <a href={$userSubmission.song.url} class="flex space-x-4">
+          <div>
+            <p class={`text-${$user.musicPlatform}`}>
+              {$userSubmission.song.name}
+            </p>
+            <p>{$userSubmission.song.artist}</p>
+          </div>
+          <div>
+            <svg
+              class="w-6 h-6 ml-auto flex-grow-0 flex-shrink "
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              /></svg
+            >
+          </div>
+        </a>
+      </div>
+      <p class="text-gray-400">
+        {#if $userSubmission.song.timestamp > 0}
+          played at {formatTimePlayed($userSubmission.song.timestamp)}
+        {:else}
+          {formatDurationPlayed($userSubmission.song.durationElapsed)} of {formatDurationPlayed(
+            $userSubmission.song.length
+          )} played
+        {/if}
+      </p>
     {/if}
   </div>
   {#if !loadingSubmissions && !$userSubmission.song}
     <h3>you haven't shared what you're listening to yet.</h3>
-    <h4 class="mb-2">submit late to see what your friends are playing!</h4>
+    <h4 class="mb-2">submit to see what your friends are playing!</h4>
   {/if}
   <span class="border-white border-t-2 block w-full" />
   <div class="my-2">
     {#if loadingSubmissions}
-      <LoadingIndicator className={'mx-auto w-16 h-16'} />
+      <SkeletonSubmission />
     {:else if !loadingSubmissions && !$userSubmission.song}
       <Button
         type="primary"
@@ -125,14 +179,5 @@
         </div>
       {/each}
     {/if}
-    <Button
-      className="mt-2"
-      type="primary"
-      title="reset"
-      on:click={async () => {
-        goto('/new_user');
-        await logout();
-      }}>Reset</Button
-    >
   </div>
 </div>

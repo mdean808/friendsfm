@@ -1,22 +1,13 @@
 <script lang="ts">
-  import { getPlatformColor } from '../lib';
+  import {
+    getPlatformColor,
+    formatDurationPlayed,
+    formatTimePlayed,
+  } from '../lib';
   import MusicPlatformIcon from './MusicPlatformIcon.svelte';
   import type { Submission } from '../types';
 
   export let data: Submission;
-
-  const formatDurationPlayed = (duration: number) => {
-    const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, duration * 1000)),
-      // Pull out parts of interest
-      parts = [d.getUTCMinutes(), d.getUTCSeconds()];
-    // Zero-pad
-    return parts.map((s) => String(s).padStart(2, '0')).join(':');
-  };
-
-  const formatTimePlayed = (time: number = Date.now()) => {
-    const date = new Date(time);
-    return date.toLocaleTimeString();
-  };
 </script>
 
 <main class="border-2 border-gray-600 rounded-md py-2 px-4 flex">
@@ -53,7 +44,7 @@
       </p>
       <p>{data.song.artist}</p>
       <p class="text-gray-400">
-        {#if data.song.timestamp}
+        {#if data.song.timestamp > 0}
           played at {formatTimePlayed(data.song.timestamp)}
         {:else}
           {formatDurationPlayed(data.song.durationElapsed)} of {formatDurationPlayed(

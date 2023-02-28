@@ -1,6 +1,12 @@
 <script lang="ts">
   import { goto } from '../lib';
-  import { user, sendFriendRequest, acceptFriendRequest } from '../store';
+  import {
+    user,
+    sendFriendRequest,
+    acceptFriendRequest,
+    statusBarHeight,
+    prevPath,
+  } from '../store';
   import Input from '../components/Input.svelte';
   import Button from '../components/Button.svelte';
   import { toast } from '@zerodevx/svelte-toast';
@@ -10,8 +16,10 @@
 
   const addFriend = async () => {
     loading = true;
-    if (await sendFriendRequest(newUsername))
+    if (await sendFriendRequest(newUsername)) {
+      newUsername = '';
       toast.push('Succcessfully sent friend request');
+    }
     loading = false;
   };
   const acceptRequest = async (requester: string) => {
@@ -22,7 +30,10 @@
   };
 </script>
 
-<div class="z-40 fixed top-0 left-0 bg-gray-900 w-full h-full">
+<div
+  style={`padding-top: ${0 + $statusBarHeight}px`}
+  class="z-40 bg-gray-900 w-full h-[100vh]"
+>
   <div
     class="w-full flex border-b-white border-b-2 flex-row justify-between items-center h-[55px] px-2"
   >
@@ -40,11 +51,11 @@
     <h1 class="text-center pt-2 mx-auto text-2xl text-white flex-grow">
       friends
     </h1>
-    <button on:click={() => goto('/')} class="flex-grow-0">
+    <button on:click={() => goto(prevPath.get())} class="flex-grow-0">
       <svg
         fill="none"
+        class="w-8 h-8 mx-auto"
         stroke="currentColor"
-        class="w-8 h-8"
         stroke-width="1.5"
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
@@ -53,7 +64,7 @@
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
-          d="M6 18L18 6M6 6l12 12"
+          d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5"
         />
       </svg>
     </button>
@@ -69,7 +80,7 @@
   </div>
   <div class="px-2 py-2 flex bg-gray-800">
     <div
-      class="inline-block py-1 px-1 border-2 border-gray-600 text-gray-400 w-2/12 text-center mr-1 rounded-sm"
+      class="inline-block py-1 px-1 border-2 border-r-0 rounded-sm rounded-r-none border-gray-600 text-gray-400 w-2/12 text-center "
     >
       <svg
         fill="none"
@@ -87,12 +98,17 @@
       </svg>
     </div>
     <div class="w-8/12">
-      <Input placeholder="johndoe20" name="username" bind:value={newUsername} />
+      <Input
+        placeholder="usename"
+        name="username"
+        className="rounded-l-none"
+        bind:value={newUsername}
+      />
     </div>
     <div class="w-2/12">
       {#if !loading}
         <Button
-          type="submit"
+          type="primary"
           title="Add friend"
           on:click={() => addFriend()}
           className="w-full mx-1 px-0 py-0 h-full my-auto text-3xl"

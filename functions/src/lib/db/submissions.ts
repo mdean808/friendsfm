@@ -53,7 +53,7 @@ export const generateUserSubmission = async (
     url: currentSong.item.external_urls.spotify,
     length: currentSong.item.duration_ms / 1000,
     durationElapsed: currentSong.progress_ms / 1000,
-    timestamp: currentSong.timestamp || undefined,
+    timestamp: currentSong.timestamp || 0,
   };
   let late = false;
   // check for a late submission

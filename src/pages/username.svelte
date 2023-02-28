@@ -19,7 +19,7 @@
     <h1 class="text-4xl">Username</h1>
     <p class="text-lg text-gray-400">Your friends will find you @{username}</p>
     <div class="mt-20">
-      <Input placeholder="johndoe20" name="username" bind:value={username} />
+      <Input placeholder="username" name="username" bind:value={username} />
     </div>
     <div class="w-full mt-8">
       <Button

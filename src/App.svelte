@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { Route } from 'tinro';
-
   import { FirebaseMessaging } from '@capacitor-firebase/messaging';
   import { SvelteToast } from '@zerodevx/svelte-toast';
 
@@ -27,6 +25,7 @@
   import { getPlatformColor, goto } from './lib';
   import Loading from './components/Loading.svelte';
   import Friends from './pages/friends.svelte';
+  import { fade, fly, slide } from 'svelte/transition';
 
   onMount(async () => {
     loading.set(false);
@@ -56,10 +55,21 @@
 
 <!-- Navigation -->
 {#if $loading}
-  <Loading />
+  <div transition:fade={{ duration: 100 }}>
+    <Loading />
+  </div>
 {/if}
-{#if $user?.username && $user.musicPlatform}
+{#if $currPath === '/friends'}
+  <div transition:fly={{ x: -document.body.clientWidth }}>
+    <Friends />
+  </div>
+{:else if $currPath === '/settings'}
+  <div transition:fly={{ x: document.body.clientWidth }}>
+    <Settings />
+  </div>
+{:else if $user?.username && $user.musicPlatform}
   <div
+    transition:slide
     style={`height: ${70 + $bottomInset + (bottomInset ? -15 : 0)}px`}
     class={`bottom-0 fixed bg-gray-900 flex w-full`}
   >
@@ -127,6 +137,7 @@
     </button>
   </div>
   <div
+    transition:slide
     style={`height: ${55 + $statusBarHeight}px`}
     class={`top-0 bg-gray-900 left-0 fixed w-full `}
   >
@@ -147,8 +158,8 @@
           /></svg
         >
       </button>
-      <h1 class="text-center mx-auto text-3xl text-white flex-grow">
-        FriendsFM
+      <h1 class="text-center mx-auto text-2xl text-white flex-grow">
+        {$user.username}
       </h1>
       <button class="flex-grow-0" on:click={() => goto('/settings')}>
         <svg
@@ -166,7 +177,6 @@
     </div>
   </div>
 {/if}
-
 <!-- Routing -->
 <main
   style={`margin-top: calc(55px + ${$statusBarHeight}px); 
@@ -182,16 +192,32 @@
       },
     }}
   />
-  <Route path="/new_user"><NewUser /></Route>
-  <Route path="/username"><Username /></Route>
-  <Route path="/music_provider"><MusicProvider /></Route>
-  <Route path="/songs"><Songs /></Route>
-  <Route path="/"><Home /></Route>
-  <Route path="/audial"><Audial /></Route>
+  {#if $currPath === '/'}
+    <div in:fade={{ duration: 300 }}>
+      <Home />
+    </div>
+  {:else if $currPath === '/songs'}
+    <div in:fade={{ duration: 300 }}>
+      <Songs />
+    </div>
+  {:else if $currPath === '/audial'}
+    <div in:fade={{ duration: 300 }}>
+      <Audial />
+    </div>
+  {:else if $currPath === '/new_user'}
+    <div in:fade={{ duration: 300 }}>
+      <NewUser />
+    </div>
+  {:else if $currPath === '/username'}
+    <div in:fade={{ duration: 300 }}>
+      <Username />
+    </div>
+  {:else if $currPath === '/music_provider'}
+    <div in:fade={{ duration: 300 }}>
+      <MusicProvider />
+    </div>
+  {/if}
 </main>
-
-<Route path="/friends"><Friends /></Route>
-<Route path="/settings"><Settings /></Route>
 
 <div class="hidden">
   Hidden div for Tailwind JIT

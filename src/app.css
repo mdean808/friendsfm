@@ -8,6 +8,7 @@
 }
 
 body {
+  user-select: none;
   margin: 0;
   overflow-y: hidden;
   font-family: 'League Spartan', sans-serif;

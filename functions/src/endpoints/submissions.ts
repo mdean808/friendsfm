@@ -9,6 +9,7 @@ import {
   getUserById,
   getUserSubmission,
 } from '../lib/db';
+
 import { Submission } from '../types';
 export const createNewUserSubmission = functions.https.onRequest(
   async (req, res) => {
