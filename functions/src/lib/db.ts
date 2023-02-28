@@ -127,6 +127,7 @@ export const generateUserSubmission = async (
     .doc('notifications')
     .get();
   const currentSubmissionCount = notificationsRef.get('count');
+  //TODO: check if there is already a submission with this count in the user's submissions
   const notificationTimestamp = notificationsRef.get('time');
   const accessCode = await checkSpotifyAccessCode(
     (await userRef.get()).get('musicPlatformAuth'),
