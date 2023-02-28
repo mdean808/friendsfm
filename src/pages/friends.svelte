@@ -6,6 +6,7 @@
     acceptFriendRequest,
     statusBarHeight,
     prevPath,
+    rejectFriendRequest,
   } from '../store';
   import Input from '../components/Input.svelte';
   import Button from '../components/Button.svelte';
@@ -26,6 +27,13 @@
     loading = true;
     if (await acceptFriendRequest(requester))
       toast.push('Succcessfully accepted friend request');
+    loading = false;
+  };
+
+  const rejectRequest = async (requester: string) => {
+    loading = true;
+    if (await rejectFriendRequest(requester))
+      toast.push('Succcessfully rejected friend request');
     loading = false;
   };
 </script>
@@ -78,7 +86,7 @@
       </div>
     {/each}
   </div>
-  <div class="px-2 py-2 flex bg-gray-800">
+  <div class="px-2 py-2 flex bg-gray-800 border-b-2 border-white">
     <div
       class="inline-block py-1 px-1 border-2 border-r-0 rounded-sm rounded-r-none border-gray-600 text-gray-400 w-2/12 text-center "
     >
@@ -99,7 +107,7 @@
     </div>
     <div class="w-8/12">
       <Input
-        placeholder="usename"
+        placeholder="username"
         name="username"
         className="rounded-l-none"
         bind:value={newUsername}
@@ -135,48 +143,74 @@
       {/if}
     </div>
   </div>
-  <div class="bg-gray-900 border-t-2 border-white">
-    <p
-      class="text-2xl mx-auto text-center pt-3 pb-2 w-full border-b-2 border-white"
-    >
-      friend requests
-    </p>
-    <div class="bg-gray-800">
-      {#each $user.friendRequests as username}
-        <div class="w-full border-b-white text-lg border-b-2 py-1 px-3 flex">
-          <span class="text-gray-200 inline-block text-center pt-2 w-1/12"
-            >@</span
-          ><span class="text-white inline-block w-9/12 pt-1.5">{username}</span>
-          {#if !loading}
-            <Button
-              type="submit"
-              title="Add friend"
-              on:click={() => acceptRequest(username)}
-              className="w-2/12 h-full my-auto text-3xl"
+  {#if $user.friendRequests.length > 0}
+    <div class="bg-gray-900 border-white">
+      <p
+        class="text-2xl mx-auto text-center pt-3 pb-2 w-full border-b-2 border-white"
+      >
+        friend requests
+      </p>
+      <div class="bg-gray-800">
+        {#each $user.friendRequests as username}
+          <div class="w-full border-b-white text-lg border-b-2 py-1 px-3 flex">
+            <span class="text-gray-200 inline-block text-center pt-2 w-1/12"
+              >@</span
+            ><span class="text-white inline-block w-9/12 pt-1.5"
+              >{username}</span
             >
-              <svg
-                fill="none"
-                class="w-6 h-6 mx-auto"
-                stroke="currentColor"
-                stroke-width="1.5"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
+            {#if !loading}
+              <Button
+                type="breaking"
+                title="Add friend"
+                on:click={() => rejectRequest(username)}
+                className="w-2/12 mr-2 h-full my-auto text-3xl"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </Button>
-          {:else}
-            <div class="w-8 h-8 mx-auto mt-1">
-              <LoadingIndicator />
-            </div>
-          {/if}
-        </div>
-      {/each}
+                <svg
+                  fill="none"
+                  class="w-6 h-6 mx-auto"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </Button>
+              <Button
+                type="submit"
+                title="Add friend"
+                on:click={() => acceptRequest(username)}
+                className="w-2/12 h-full my-auto text-3xl"
+              >
+                <svg
+                  fill="none"
+                  class="w-6 h-6 mx-auto"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </Button>
+            {:else}
+              <div class="w-8 h-8 mx-auto mt-1">
+                <LoadingIndicator />
+              </div>
+            {/if}
+          </div>
+        {/each}
+      </div>
     </div>
-  </div>
+  {/if}
 </div>

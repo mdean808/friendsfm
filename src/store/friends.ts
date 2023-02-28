@@ -1,5 +1,5 @@
 import { action } from 'nanostores';
-import { authToken, user } from '.';
+import { authToken, updateUser, user } from '.';
 import { handleApiResponse } from '../lib';
 import type { User } from '../types';
 
@@ -22,6 +22,7 @@ export const sendFriendRequest = action(
       // failed to send request
       return false;
     }
+    return true;
   }
 );
 
@@ -44,6 +45,33 @@ export const acceptFriendRequest = action(
       // failed to send request
       return false;
     }
-    store.set(json.message as User);
+    store.set(json.message);
+    updateUser(json.message);
+    return true;
+  }
+);
+
+export const rejectFriendRequest = action(
+  user,
+  'accpet-friend-request',
+  async (store, requester) => {
+    const res = await fetch(
+      'https://us-central1-friendsfm.cloudfunctions.net/rejectFriend',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          authToken: authToken.get(),
+          requester,
+        }),
+      }
+    );
+    const json = await handleApiResponse(res);
+    if (!json) {
+      // failed to send request
+      return false;
+    }
+    store.set(json.message);
+    updateUser(json.message);
+    return true;
   }
 );

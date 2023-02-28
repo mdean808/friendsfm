@@ -36,6 +36,30 @@ export const acceptFriendRequest = async (
   }
 };
 
+export const rejectFriendRequest = async (
+  user: User,
+  requestUsername: string
+) => {
+  if (!requestUsername) throw new Error('No requester provided');
+  const usersRef = db.collection('users');
+  const friendQuery = usersRef.where('username', '==', requestUsername);
+  const friend = (await friendQuery.get()).docs[0].data() as User;
+  // if we have such a friend and there is an actual request from them to the user
+  if (friend && user.friendRequests.find((u) => u === friend.username)) {
+    // remove from friend request array
+    const userRef = usersRef.doc(user.uid);
+    const userFriendRequests = user.friendRequests;
+    const updatedRequests = userFriendRequests.filter(
+      (u) => u !== friend.username
+    );
+    await userRef.update({ friendRequests: updatedRequests });
+
+    // update friend friends
+    return (await userRef.get()).data() as User;
+  } else {
+    throw new Error('Friend request does not exist.');
+  }
+};
 export const sendFriendRequest = async (user: User, friendUsername: string) => {
   if (!friendUsername) throw new Error('No username provided');
 

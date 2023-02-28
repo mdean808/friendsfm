@@ -37,6 +37,10 @@ export const handleApiResponse = async (res: Response) => {
       '--toastColor': 'white',
       '--toastBackground': '#ad2626',
       '--toastBarBackground': 'white',
+      '--toastContainerTop': 'auto',
+      '--toastContainerRight': 'auto',
+      '--toastContainerBottom': '8rem',
+      '--toastContainerLeft': 'calc(50vw - 8rem);',
     },
   };
   if (res.status !== 200 && !json) {

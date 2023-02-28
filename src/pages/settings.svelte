@@ -6,7 +6,7 @@
 </script>
 
 <div
-  style={` top: ${0 + $statusBarHeight}px `}
+  style={`padding-top: ${0 + $statusBarHeight}px`}
   class="z-40 bg-gray-900 w-full h-[100vh]"
 >
   <div
@@ -53,6 +53,15 @@
         goto('/new_user');
         await logout();
       }}>log out</Button
+    >
+
+    <Button
+      className="mt-2 mx-auto"
+      type="primary"
+      title="reset"
+      on:click={async () => {
+        goto('/username');
+      }}>change username</Button
     >
   </div>
 </div>

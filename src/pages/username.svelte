@@ -3,21 +3,30 @@
   import Input from '../components/Input.svelte';
   import { goto } from '../lib';
 
-  import { updateUsername, loading } from '../store';
+  import { updateUsername, loading, user } from '../store';
 
   let username: string;
   const setUsername = async () => {
     if (!username) return;
     loading.set(true);
-    if (await updateUsername(username)) goto('/music_provider');
+    if (await updateUsername(username)) {
+      if (!user.get().musicPlatform) goto('/music_provider');
+      else goto('/');
+    }
     loading.set(false);
   };
 </script>
 
 <main class="text-center mx-auto w-full">
   <div class="mx-auto py-6 px-4 w-full">
-    <h1 class="text-4xl">Username</h1>
-    <p class="text-lg text-gray-400">Your friends will find you @{username}</p>
+    <h1 class="text-4xl">
+      {#if $user.username}
+        change username
+      {:else}
+        username
+      {/if}
+    </h1>
+    <p class="text-lg text-gray-400">your friends will find you @{username}</p>
     <div class="mt-20">
       <Input placeholder="username" name="username" bind:value={username} />
     </div>
@@ -28,7 +37,7 @@
           username ? '' : 'bg-gray-600 hover:bg-gray-600 cursor-default'
         } mx-auto px-6`}
         title="Finish Up"
-        on:click={setUsername}>Next</Button
+        on:click={setUsername}>next</Button
       >
     </div>
   </div>

@@ -182,16 +182,7 @@
   style={`margin-top: calc(55px + ${$statusBarHeight}px); 
           height: calc(100vh - ${110 + $bottomInset + $statusBarHeight}px)`}
 >
-  <SvelteToast
-    options={{
-      theme: {
-        '--toastContainerTop': 'auto',
-        '--toastContainerRight': 'auto',
-        '--toastContainerBottom': '8rem',
-        '--toastContainerLeft': 'calc(50vw - 8rem);',
-      },
-    }}
-  />
+  <SvelteToast />
   {#if $currPath === '/'}
     <div in:fade={{ duration: 300 }}>
       <Home />
