@@ -23,24 +23,19 @@
 
   // MOUNT
 
-  // TODO: make this only run on load -- sometimes it causes issues with premature calls
-  authToken.listen(async (value) => {
-    if (value && currPath.get() == '/') {
-      loadingSubmissions = true;
-      await getSubmissionStatus();
-      loadingSubmissions = false;
-    }
-  });
-
   onMount(async () => {
     // setup pull to refresh
     document.addEventListener('touchstart', swipeStart, false);
     document.addEventListener('touchmove', swipeMove, false);
     document.addEventListener('touchend', swipeEnd, false);
-    //todo: wait until authToken is set
-    // loadingSubmissions = true;
-    // await getSubmissionStatus();
-    // loadingSubmissions = false;
+    // TODO: make this only run on load -- sometimes it causes issues with premature calls
+    authToken.listen(async (value) => {
+      if (value && currPath.get() == '/') {
+        loadingSubmissions = true;
+        await getSubmissionStatus();
+        loadingSubmissions = false;
+      }
+    });
   });
 
   const createSubmission = async () => {
@@ -74,7 +69,6 @@
   };
 
   const swipeEnd = async () => {
-    //todo: prevent this from being called multiple times over and over again (might have had something to do with event listeners, I might have fixed it)
     if (shouldRefreshOnSwipeEnd && !loadingSubmissions) {
       loadingSubmissions = true;
       await getSubmissionStatus();

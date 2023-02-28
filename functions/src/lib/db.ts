@@ -15,7 +15,7 @@ const SPOTIFY_AUTH = Buffer.from(
 ).toString('base64');
 const db = getFirestore();
 
-export const getUserByUid = async (uid: string) => {
+export const getUserById = async (uid: string) => {
   const usersRef = db.collection('users');
   const res = await usersRef.doc(uid).get();
   return res.data() as User;
