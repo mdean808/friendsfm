@@ -56,7 +56,9 @@
         {#if data.song.timestamp}
           played at {formatTimePlayed(data.song.timestamp)}
         {:else}
-          {formatDurationPlayed(data.song.durationElapsed)} played
+          {formatDurationPlayed(data.song.durationElapsed)} of {formatDurationPlayed(
+            data.song.length
+          )} played
         {/if}
       </p>
     </a>

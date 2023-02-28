@@ -1,20 +1,25 @@
 import type { Adress as Address } from '@capgo/nativegeocoder';
 
 export interface User {
-  email?: string;
+  email: string;
   displayName?: string;
   photoURL?: string;
   uid: string;
-  username?: string;
+  username: string;
   musicPlatform?: MusicPlatform;
-  friends?: User[];
-  friendRequests?: string[];
+  friends: Friend[];
+  friendRequests: string[];
   submissions?: Submission[];
   savedSongs?: Song[];
   audials?: Audial[];
   messagingToken?: string;
   authToken: string;
   id?: string;
+}
+
+export interface Friend {
+  username: string;
+  id: string;
 }
 
 export interface Location {
@@ -34,6 +39,7 @@ export enum MusicPlatform {
 export interface Song {
   name: string;
   artist: string;
+  length: number; // in seconds
   durationElapsed: number; // in seconds
   timestamp?: number; // date (milliseconds) when it was played
   url: string;

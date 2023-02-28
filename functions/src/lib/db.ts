@@ -5,6 +5,7 @@ import {
   Song,
   MusicPlatform,
   SpotifyAuthRes,
+  Friend,
 } from '../types';
 import * as functions from 'firebase-functions';
 import { checkSpotifyAccessCode, getCurrentSpotifySong } from './spotify';
@@ -35,6 +36,8 @@ export const createUser = async (user: User) => {
 
   const newUserRef = db.collection('users').doc(user.id);
   user.friends = [];
+  user.username = user.id;
+  user.friendRequests = [];
   await newUserRef.set(user);
   functions.logger.info('User inserted into database:', user.id);
   return user;
@@ -140,11 +143,12 @@ export const generateUserSubmission = async (
     name: currentSong.item.name,
     artist: currentSong.item.artists[0]?.name,
     url: currentSong.item.external_urls.spotify,
+    length: currentSong.item.duration_ms / 1000,
     durationElapsed: currentSong.progress_ms / 1000,
     timestamp: currentSong.timestamp || undefined,
   };
   let late = false;
-  // check for a late friendsFM
+  // check for a late submission
   const notificationTime = new Timestamp(
     (notificationTimestamp as Timestamp).seconds,
     (notificationTimestamp as Timestamp).nanoseconds
@@ -182,15 +186,14 @@ export const getFriendSubmissions = async (id: string) => {
     await db.collection('misc').doc('notifications').get()
   ).get('count');
   const userRef = db.collection('users').doc(id);
-  const friendIds = (await userRef.get()).get('friends');
+  const friends = (await userRef.get()).get('friends') as Friend[];
   const friendSubmissions: Submission[] = [];
-  for (const fId of friendIds) {
-    const friendRef = db.collection('users').doc(fId);
+  for (const friend of friends) {
+    const friendRef = db.collection('users').doc(friend.id);
     const friendSubmission = await friendRef
       .collection('submissions')
       .where('number', '==', currentSubmissionCount)
       .get();
-    const username = (await friendRef.get()).get('username');
     const musicPlatform = (await friendRef.get()).get('musicPlatform');
     if (!friendSubmission.empty) {
       const friendSub = friendSubmission.docs[0].data() as Submission;
@@ -200,7 +203,7 @@ export const getFriendSubmissions = async (id: string) => {
       ).toDate();
       friendSubmissions.push({
         ...friendSub,
-        user: { username, musicPlatform },
+        user: { username: friend.username, musicPlatform },
       });
     }
   }
@@ -217,22 +220,22 @@ export const acceptFriendRequest = async (
   const friendQuery = usersRef.where('username', '==', requestUsername);
   const friend = (await friendQuery.get()).docs[0].data() as User;
   // if we have such a friend and there is an actual request from them to the user
-  if (friend && user.friendRequests?.find((u) => u === friend.username)) {
+  if (friend && user.friendRequests.find((u) => u === friend.username)) {
     // update user friends
-    const userFriends = user.friends || [];
-    userFriends.push(friend.uid);
+    const userFriends = user.friends;
+    userFriends.push({ username: friend.username, id: friend.uid });
     const userRef = usersRef.doc(user.uid);
     await userRef.update({ friends: userFriends });
     // remove from friend request array
-    const userFriendRequests = user.friendRequests || [];
+    const userFriendRequests = user.friendRequests;
     const updatedRequests = userFriendRequests.filter(
       (u) => u !== friend.username
     );
     await userRef.update({ friendRequests: updatedRequests });
 
     // update friend friends
-    const friendFriends = friend.friends || [];
-    friendFriends.push(user.uid);
+    const friendFriends = friend.friends;
+    friendFriends.push({ username: friend.username, id: user.uid });
     const friendRef = usersRef.doc(friend.uid);
     await friendRef.update({ friends: friendFriends });
     return (await userRef.get()).data() as User;
@@ -249,7 +252,7 @@ export const sendFriendRequest = async (user: User, friendUsername: string) => {
   const friend = (await friendQuery.get()).docs[0].data() as User;
   if (friend) {
     const friendRef = usersRef.doc(friend.id);
-    const requests = [...(friend.friendRequests || []), user.username];
+    const requests = [...friend.friendRequests, user.username];
     await friendRef.update({ friendRequests: requests });
   } else {
     throw new Error('No user with provided username.');

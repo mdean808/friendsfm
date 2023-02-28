@@ -10,7 +10,7 @@ import type {
   Submission,
 } from './types';
 import { NativeGeocoder } from '@capgo/nativegeocoder';
-import { handleApiResponse, registerForNotifications, goto } from './lib';
+import { handleApiResponse, registerForNotifications } from './lib';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 
 export const currPath = atom<string>('/');
@@ -84,7 +84,7 @@ export const getNewAuthToken = action(
   }
 );
 
-export const user = map<User>();
+export const user = map<User>({} as User);
 
 // Load user from preferences
 export const getUserFromPreferences = action(

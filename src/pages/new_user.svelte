@@ -14,10 +14,14 @@
     loading.set(true);
     const res = await FirebaseAuthentication.signInWithGoogle();
     await getNewAuthToken();
-    await updateUser({
-      ...res.user,
-      authToken: authToken.get(),
-    });
+    if (!res.user.email)
+      await updateUser({
+        ...res.user,
+        username: undefined,
+        friends: [],
+        friendRequests: [],
+        authToken: authToken.get(),
+      });
     // send login information to the backend
     if (!(await loginUser())) {
       // don't goto username

@@ -5,12 +5,12 @@
   import Button from '../components/Button.svelte';
   import { toast } from '@zerodevx/svelte-toast';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
-  let username = '';
+  let newUsername = '';
   let loading = false;
 
   const addFriend = async () => {
     loading = true;
-    if (await sendFriendRequest(username))
+    if (await sendFriendRequest(newUsername))
       toast.push('Succcessfully sent friend request');
     loading = false;
   };
@@ -62,7 +62,7 @@
     {#each $user.friends as friend}
       <div class="w-full border-b-white border-b-2 py-1 px-3">
         <span class="text-gray-200 text-xl inline-block">@</span><span
-          class="text-white inline-block">{friend}</span
+          class="text-white inline-block">{friend.username}</span
         >
       </div>
     {/each}
@@ -87,7 +87,7 @@
       </svg>
     </div>
     <div class="w-8/12">
-      <Input placeholder="johndoe20" name="username" bind:value={username} />
+      <Input placeholder="johndoe20" name="username" bind:value={newUsername} />
     </div>
     <div class="w-2/12">
       {#if !loading}
@@ -126,16 +126,16 @@
       friend requests
     </p>
     <div class="bg-gray-800">
-      {#each $user.friendRequests as friend}
+      {#each $user.friendRequests as username}
         <div class="w-full border-b-white text-lg border-b-2 py-1 px-3 flex">
           <span class="text-gray-200 inline-block text-center pt-2 w-1/12"
             >@</span
-          ><span class="text-white inline-block w-9/12 pt-1.5">{friend}</span>
+          ><span class="text-white inline-block w-9/12 pt-1.5">{username}</span>
           {#if !loading}
             <Button
               type="submit"
               title="Add friend"
-              on:click={() => acceptRequest(friend)}
+              on:click={() => acceptRequest(username)}
               className="w-2/12 h-full my-auto text-3xl"
             >
               <svg

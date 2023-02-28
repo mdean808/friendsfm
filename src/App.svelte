@@ -27,7 +27,6 @@
   import { getPlatformColor, goto } from './lib';
   import Loading from './components/Loading.svelte';
   import Friends from './pages/friends.svelte';
-  import { fade } from 'svelte/transition';
 
   onMount(async () => {
     loading.set(false);
