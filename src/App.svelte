@@ -42,7 +42,7 @@
       const u = user.get();
       if (u && u.username && u.musicPlatform) {
         goto('/');
-      } else if (u && !u.username) {
+      } else if ((u && !u.username) || u.username === u.id) {
         goto('/username');
       } else if (u && !u.musicPlatform) {
         goto('/music_provider');
@@ -158,7 +158,9 @@
           /></svg
         >
       </button>
-      <h1 class="text-center mx-auto text-2xl text-white flex-grow">
+      <h1
+        class="text-center mx-auto text-2xl text-white truncate flex-grow px-4"
+      >
         {$user.username}
       </h1>
       <button class="flex-grow-0" on:click={() => goto('/settings')}>

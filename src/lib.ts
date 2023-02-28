@@ -1,5 +1,5 @@
 import { MusicPlatform, ResponseType, type NetworkResponse } from './types';
-import { currPath, prevPath } from './store';
+import { currPath, logout, prevPath } from './store';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
 
@@ -49,6 +49,10 @@ export const handleApiResponse = async (res: Response) => {
   } else if (json.type === ResponseType.error) {
     console.log('ERROR:', json);
     toast.push('Error: ' + json.message, toastError);
+    if (json.message === 'User does not exist.') {
+      logout();
+      goto('/new_user');
+    }
     return false;
   }
 

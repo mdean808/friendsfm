@@ -20,7 +20,7 @@
 <main class="text-center mx-auto w-full">
   <div class="mx-auto py-6 px-4 w-full">
     <h1 class="text-4xl">
-      {#if $user.username}
+      {#if $user.username && $user.username !== $user.id}
         change username
       {:else}
         username

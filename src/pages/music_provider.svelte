@@ -2,10 +2,22 @@
   import Button from '../components/Button.svelte';
 
   import { MusicPlatform } from '../types';
-  import { updateMusicPlatform, loading, spotifyAuthCode } from '../store';
+  import {
+    updateMusicPlatform,
+    loading,
+    spotifyAuthCode,
+    user,
+  } from '../store';
   import { goto } from '../lib';
+  import { toast } from '@zerodevx/svelte-toast';
+  import { onMount } from 'svelte';
 
   let platform: MusicPlatform;
+
+  onMount(() => {
+    if (!user.get().username) goto('/username');
+  });
+
   const setProvider = async () => {
     if (!platform) return;
     loading.set(true);
@@ -20,8 +32,10 @@
       }&scope=user-read-private%20user-read-currently-playing%20user-read-recently-played`;
       window.location.href = spotifyUrl;
     } else if (platform === MusicPlatform.appleMusic) {
+      loading.set(false);
+      return toast.push('Apple music support coming soon!');
       //todo: authenticate with appleMusic
-      if (await updateMusicPlatform(platform)) goto('/');
+      // if (await updateMusicPlatform(platform)) goto('/');
     }
     loading.set(false);
   };

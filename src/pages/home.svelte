@@ -16,7 +16,7 @@
   import Submission from '../components/Submission.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
   import SkeletonSubmission from '../components/SkeletonSubmission.svelte';
-  import { formatDurationPlayed, formatTimePlayed } from '../lib';
+  import { formatDurationPlayed, formatTimePlayed, goto } from '../lib';
 
   // GLOBALS
   let loadingSubmissions = true;
@@ -178,6 +178,16 @@
           <Submission data={submission} />
         </div>
       {/each}
+      {#if $friendSubmissions.length === 0}
+        <p class="mx-auto text-center mt-3">nobody else has submitted yet.</p>
+        <p
+          on:keyup={() => goto('/friends')}
+          on:click={() => goto('/friends')}
+          class="mx-auto text-center text-blue-500 underline"
+        >
+          add friends for more submissions.
+        </p>
+      {/if}
     {/if}
   </div>
 </div>
