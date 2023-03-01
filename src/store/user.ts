@@ -1,7 +1,7 @@
 import { Preferences } from '@capacitor/preferences';
 import { map, action } from 'nanostores';
 import { authToken } from '.';
-import { handleApiResponse } from '../lib';
+import { goto, handleApiResponse } from '../lib';
 import type { MusicPlatform, User } from '../types';
 export const user = map<User>({} as User);
 
@@ -11,7 +11,11 @@ export const getUserFromPreferences = action(
   'get-user-preferences',
   async (store) => {
     const res = await Preferences.get({ key: 'user' });
-    const u = JSON.parse(res.value);
+    if (!res.value) {
+      goto('/new_user');
+      return {} as User;
+    }
+    const u = JSON.parse(res.value) as User;
     store.set(u);
     return u;
   }

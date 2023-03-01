@@ -40,11 +40,12 @@
     } else {
       await getUserFromPreferences();
       const u = user.get();
-      if (u && u.username && u.musicPlatform) {
+      if (!u || Object.keys(u).length === 0) return goto('/new_user');
+      if (u.username && u.musicPlatform) {
         goto('/');
-      } else if ((u && !u.username) || u.username === u.id) {
+      } else if (!u.username || u.username === u.id) {
         goto('/username');
-      } else if (u && !u.musicPlatform) {
+      } else if (!u.musicPlatform) {
         goto('/music_provider');
       } else {
         goto('/new_user');
