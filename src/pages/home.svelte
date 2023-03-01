@@ -26,18 +26,19 @@
     document.addEventListener('touchstart', swipeStart, false);
     document.addEventListener('touchmove', swipeMove, false);
     document.addEventListener('touchend', swipeEnd, false);
-    if (authToken.get() && !userSubmission.get().song) {
+    if (!authToken.get()) {
+      authToken.listen(async (value) => {
+        if (value && currPath.get() == '/') {
+          loadingSubmissions = true;
+          await getSubmissionStatus();
+          loadingSubmissions = false;
+        }
+      });
+    } else if (!userSubmission.get()?.song) {
       loadingSubmissions = true;
       await getSubmissionStatus();
     }
     loadingSubmissions = false;
-    authToken.listen(async (value) => {
-      if (value && currPath.get() == '/' && !userSubmission.get().song) {
-        loadingSubmissions = true;
-        await getSubmissionStatus();
-        loadingSubmissions = false;
-      }
-    });
   });
 
   const createSubmission = async () => {

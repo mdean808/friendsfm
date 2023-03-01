@@ -7,11 +7,14 @@
     statusBarHeight,
     prevPath,
     rejectFriendRequest,
+    getUserData,
   } from '../store';
   import Input from '../components/Input.svelte';
   import Button from '../components/Button.svelte';
   import { toast } from '@zerodevx/svelte-toast';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
+  import { onDestroy, onMount } from 'svelte';
+  import { slide } from 'svelte/transition';
   let newUsername = '';
   let loading = false;
 
@@ -36,9 +39,55 @@
       toast.push('Succcessfully rejected friend request');
     loading = false;
   };
+
+  const swipePosStart = { x: 0, y: 0 };
+  const swipePosCurrent = { x: 0, y: 0 };
+  let shouldRefreshOnSwipeEnd = false;
+  let loadingFriends = false;
+
+  const swipeStart = (e: TouchEvent) => {
+    const touch = e.targetTouches[0];
+    if (touch) {
+      swipePosStart.x = touch.screenX;
+      swipePosStart.y = touch.screenY;
+    }
+  };
+
+  const swipeMove = (e: TouchEvent) => {
+    const touch = e.targetTouches[0];
+    if (touch) {
+      swipePosCurrent.x = touch.screenX;
+      swipePosCurrent.y = touch.screenY;
+    }
+    const changeInY = swipePosCurrent.y - swipePosStart.y;
+    if (document.getElementById('friends')?.scrollTop <= 0 && changeInY > 100)
+      shouldRefreshOnSwipeEnd = true;
+    else shouldRefreshOnSwipeEnd = false;
+  };
+
+  const swipeEnd = async () => {
+    if (shouldRefreshOnSwipeEnd && !loadingFriends) {
+      loadingFriends = true;
+      await getUserData();
+      loadingFriends = false;
+      shouldRefreshOnSwipeEnd = false;
+    }
+  };
+  onMount(async () => {
+    // setup pull to refresh
+    document.addEventListener('touchstart', swipeStart, false);
+    document.addEventListener('touchmove', swipeMove, false);
+    document.addEventListener('touchend', swipeEnd, false);
+  });
+  onDestroy(() => {
+    document.addEventListener('touchstart', swipeStart, false);
+    document.addEventListener('touchmove', swipeMove, false);
+    document.addEventListener('touchend', swipeEnd, false);
+  });
 </script>
 
 <div
+  id="friends"
   style={`padding-top: ${0 + $statusBarHeight}px`}
   class="z-40 bg-gray-900 w-full h-[100vh]"
 >
@@ -77,9 +126,22 @@
       </svg>
     </button>
   </div>
+  {#if shouldRefreshOnSwipeEnd}
+    <div transition:slide class="mx-auto">
+      {#if !loadingFriends}
+        <p
+          class="mx-auto w-fit py-0.5 px-3 rounded-lg bg-gray-900 animate-pulse"
+        >
+          release to refresh
+        </p>
+      {:else}
+        <LoadingIndicator className="w-8 h-8 my-2 mx-auto" />
+      {/if}
+    </div>
+  {/if}
   <div class="bg-gray-800">
     {#each $user.friends as friend}
-      <div class="w-full border-b-white border-b-2 py-1 px-3">
+      <div transition:slide class="w-full border-b-white border-b-2 py-1 px-3">
         <span class="text-gray-200 text-xl inline-block">@</span><span
           class="text-white inline-block">{friend.username}</span
         >
@@ -152,7 +214,10 @@
       </p>
       <div class="bg-gray-800">
         {#each $user.friendRequests as username}
-          <div class="w-full border-b-white text-lg border-b-2 py-1 px-3 flex">
+          <div
+            transition:slide
+            class="w-full border-b-white text-lg border-b-2 py-1 px-3 flex"
+          >
             <span class="text-gray-200 inline-block text-center pt-2 w-1/12"
               >@</span
             ><span class="text-white inline-block w-9/12 pt-1.5"

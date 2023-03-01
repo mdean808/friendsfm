@@ -81,3 +81,23 @@ export const updateMusicPlatform = action(
     return true;
   }
 );
+
+// get updated user data
+export const getUserData = action(user, 'get-user-data', async (_store) => {
+  const res = await fetch(
+    'https://us-central1-friendsfm.cloudfunctions.net/getUser',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+      }),
+    }
+  );
+  const json = await handleApiResponse(res);
+  if (!json) {
+    // failed to set new music platform
+    return false;
+  }
+
+  await updateUser(json.message as User);
+});

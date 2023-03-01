@@ -45,7 +45,7 @@ export const acceptFriendRequest = action(
       // failed to send request
       return false;
     }
-    store.set(json.message);
+    store.set(json.message as User);
     updateUser(json.message);
     return true;
   }
@@ -56,7 +56,7 @@ export const rejectFriendRequest = action(
   'accpet-friend-request',
   async (store, requester) => {
     const res = await fetch(
-      'https://us-central1-friendsfm.cloudfunctions.net/rejectFriend',
+      'https://us-central1-friendsfm.cloudfunctions.net/rejectRequest',
       {
         method: 'POST',
         body: JSON.stringify({
@@ -70,7 +70,7 @@ export const rejectFriendRequest = action(
       // failed to send request
       return false;
     }
-    store.set(json.message);
+    store.set(json.message as User);
     updateUser(json.message);
     return true;
   }
