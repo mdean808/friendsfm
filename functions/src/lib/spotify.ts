@@ -97,7 +97,7 @@ export const getRecentlyPlayedSpotifySongs = async (accessToken: string) => {
     if (!json.items[0]) throw new Error('No recently played songs');
 
     const currentlyPlaying: SpotifyCurrentlyPlayingRes = {
-      timestamp: new Date(json.items[0]?.played_at).getMilliseconds(),
+      timestamp: new Date(json.items[0]?.played_at).getTime(),
       progress_ms: json.items[0]?.track.duration_ms,
       item: json.items[0]?.track,
       is_playing: false,
