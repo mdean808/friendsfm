@@ -27,6 +27,7 @@ end
 target 'FriendsFM' do
   capacitor_pods
   pod 'CapacitorFirebaseAuthentication/Google', :path => '../../node_modules/@capacitor-firebase/authentication'
+  pod 'CapacitorFirebaseAnalytics/Analytics', :path => '../../node_modules/@capacitor-firebase/analytics'
   pod 'FirebaseAuth'
   pod 'FirebaseCrashlytics'
 end

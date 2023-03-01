@@ -2,6 +2,7 @@ import { MusicPlatform, ResponseType, type NetworkResponse } from './types';
 import { currPath, logout, prevPath } from './store';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 
 export const getPlatformColor = (platform: MusicPlatform) => {
   switch (platform) {
@@ -13,6 +14,7 @@ export const getPlatformColor = (platform: MusicPlatform) => {
 };
 
 export const goto = (url: string) => {
+  FirebaseAnalytics.setCurrentScreen({ screenName: url.split('/')[1] });
   prevPath.set(currPath.get());
   currPath.set(url);
 };

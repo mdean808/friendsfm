@@ -3,6 +3,7 @@ import type { Submission } from '../types';
 import { Geolocation } from '@capacitor/geolocation';
 import { handleApiResponse } from '../lib';
 import { authToken } from '.';
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 
 export const userSubmission = map<Submission>();
 
@@ -35,6 +36,7 @@ export const generateSubmission = action(
     }
     store.set(json.message.user as Submission);
     friendSubmissions.set(json.message.friends as Submission[]);
+    FirebaseAnalytics.logEvent({ name: 'generate-submission' });
   }
 );
 

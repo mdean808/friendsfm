@@ -14,7 +14,7 @@ export interface User {
   audials?: Audial[];
   messagingToken?: string;
   authToken: string;
-  id?: string;
+  id: string;
 }
 
 export interface Friend {

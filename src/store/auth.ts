@@ -1,3 +1,4 @@
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { Preferences } from '@capacitor/preferences';
 import { atom, action } from 'nanostores';
@@ -43,10 +44,16 @@ export const loginUser = action(user, 'login-user', async (store) => {
 
   store.set(json.message as User);
   await updateUser(json.message);
+  FirebaseAnalytics.setUserId({ userId: store.get().id });
+  FirebaseAnalytics.logEvent({ name: 'login', params: { id: store.get().id } });
   return true;
 });
 // Log thet user out
 export const logout = action(user, 'logout', async (store) => {
+  FirebaseAnalytics.logEvent({
+    name: 'logout',
+    params: { id: store.get().id },
+  });
   FirebaseAuthentication.signOut();
   store.set(null);
   userSubmission.set(null);

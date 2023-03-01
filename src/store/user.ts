@@ -1,3 +1,4 @@
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Preferences } from '@capacitor/preferences';
 import { map, action } from 'nanostores';
 import { authToken } from '.';
@@ -53,6 +54,7 @@ export const updateUsername = action(
     u.username = newUsername;
     store.set(u);
     await updateUser(u);
+    FirebaseAnalytics.setUserProperty({ key: 'username', value: newUsername });
     // username setting succeeded!
     return true;
   }
@@ -81,6 +83,10 @@ export const updateMusicPlatform = action(
     u.musicPlatform = newMusicPlatform;
     store.set(u);
     await updateUser(u);
+    FirebaseAnalytics.setUserProperty({
+      key: 'musicPlatform',
+      value: newMusicPlatform,
+    });
     // musuc platform set succeeded!
     return true;
   }

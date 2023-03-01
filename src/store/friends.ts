@@ -1,3 +1,4 @@
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { action } from 'nanostores';
 import { authToken, updateUser, user } from '.';
 import { handleApiResponse } from '../lib';
@@ -22,6 +23,7 @@ export const sendFriendRequest = action(
       // failed to send request
       return false;
     }
+    FirebaseAnalytics.logEvent({ name: 'send-friend-request' });
     return true;
   }
 );
@@ -47,6 +49,7 @@ export const acceptFriendRequest = action(
     }
     store.set(json.message as User);
     updateUser(json.message);
+    FirebaseAnalytics.logEvent({ name: 'accpet-friend-request' });
     return true;
   }
 );
@@ -72,6 +75,7 @@ export const rejectFriendRequest = action(
     }
     store.set(json.message as User);
     updateUser(json.message);
+    FirebaseAnalytics.logEvent({ name: 'reject-friend-request' });
     return true;
   }
 );
