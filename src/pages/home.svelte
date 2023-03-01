@@ -10,6 +10,8 @@
     authToken,
     currPath,
     user,
+    toggleSong,
+    songs,
   } from '../store';
   import { slide } from 'svelte/transition';
   import Button from '../components/Button.svelte';
@@ -17,7 +19,6 @@
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
   import SkeletonSubmission from '../components/SkeletonSubmission.svelte';
   import { formatDurationPlayed, formatTimePlayed, goto } from '../lib';
-  import { toast } from '@zerodevx/svelte-toast';
 
   // GLOBALS
   let loadingSubmissions = true;
@@ -122,31 +123,39 @@
         </span>
       {/if}
       <div
-        class="border-2 border-gray-600 rounded-md w-fit mx-auto my-1 py-2 text-left px-2 "
+        class="border-2 border-gray-600 rounded-md w-fit mx-auto my-1 py-2 text-left space-x-4 flex px-2"
       >
-        <a href={$userSubmission.song.url} class="flex space-x-4">
+        <a href={$userSubmission.song.url} class="flex-grow">
           <div>
             <p class={`text-${$user.musicPlatform}`}>
               {$userSubmission.song.name}
             </p>
             <p>{$userSubmission.song.artist}</p>
           </div>
-          <div>
-            <svg
-              class="w-6 h-6 ml-auto flex-grow-0 flex-shrink "
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-              ><path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              /></svg
-            >
-          </div>
         </a>
+        <div class="flex-grow-0 flex-shrink-0">
+          <svg
+            on:click={() => toggleSong($userSubmission.song)}
+            on:keypress={() => toggleSong($userSubmission.song)}
+            class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
+              $songs.find((s) => s.name === $userSubmission.song.name)
+                ? 'text-pink-500'
+                : ''
+            } `}
+            fill={$songs.find((s) => s.name === $userSubmission.song.name)
+              ? 'currentColor'
+              : 'none'}
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            ><path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+            /></svg
+          >
+        </div>
       </div>
       <p class="text-gray-400">
         {#if $userSubmission.song.timestamp > 0}
@@ -191,8 +200,5 @@
         </p>
       {/if}
     {/if}
-    <button on:click={() => toast.push('test toast that is this thing here')}
-      >toast</button
-    >
   </div>
 </div>

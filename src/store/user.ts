@@ -1,9 +1,9 @@
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Preferences } from '@capacitor/preferences';
-import { map, action } from 'nanostores';
+import { map, action, atom } from 'nanostores';
 import { authToken } from '.';
 import { goto, handleApiResponse } from '../lib';
-import type { MusicPlatform, User } from '../types';
+import type { Song, MusicPlatform, User } from '../types';
 export const user = map<User>({} as User);
 
 // Load user from preferences
@@ -111,3 +111,18 @@ export const getUserData = action(user, 'get-user-data', async (_store) => {
 
   await updateUser(json.message as User);
 });
+
+export const songs = atom<Song[]>([]);
+export const toggleSong = action(
+  songs,
+  'add-song',
+  async (store, song: Song) => {
+    let s = store.get();
+    if (s.find((s) => s.name === song.name)) {
+      s = s.filter((s) => s.name !== song.name);
+    } else {
+      s.push(song);
+    }
+    store.set(s);
+  }
+);

@@ -6,6 +6,7 @@
   } from '../lib';
   import MusicPlatformIcon from './MusicPlatformIcon.svelte';
   import type { Submission } from '../types';
+  import { toggleSong, songs } from '../store';
 
   export let data: Submission;
 </script>
@@ -57,8 +58,14 @@
   <div class="flex-grow-0 text-right">
     <div class="h-full flex flex-col flex-nowrap justify-between">
       <svg
-        class="w-6 h-6 ml-auto flex-grow-0 flex-shrink "
-        fill="none"
+        on:click={() => toggleSong(data.song)}
+        on:keypress={() => toggleSong(data.song)}
+        class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
+          $songs.find((s) => s.name === data.song.name) ? 'text-pink-500' : ''
+        } `}
+        fill={$songs.find((s) => s.name === data.song.name)
+          ? 'currentColor'
+          : 'none'}
         stroke="currentColor"
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
