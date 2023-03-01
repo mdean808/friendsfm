@@ -27,7 +27,7 @@ export const acceptFriendRequest = async (
 
     // update friend friends
     const friendFriends = friend.friends;
-    friendFriends.push({ username: friend.username, id: user.uid });
+    friendFriends.push({ username: user.username, id: user.uid });
     const friendRef = usersRef.doc(friend.uid);
     await friendRef.update({ friends: friendFriends });
     return (await userRef.get()).data() as User;
