@@ -185,7 +185,11 @@
   style={`margin-top: calc(55px + ${$statusBarHeight}px); 
           height: calc(100vh - ${110 + $bottomInset + $statusBarHeight}px)`}
 >
-  <SvelteToast />
+  <SvelteToast
+    options={{
+      reversed: true,
+    }}
+  />
   {#if $currPath === '/'}
     <div in:fade={{ duration: 300 }}>
       <Home />

@@ -17,6 +17,7 @@
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
   import SkeletonSubmission from '../components/SkeletonSubmission.svelte';
   import { formatDurationPlayed, formatTimePlayed, goto } from '../lib';
+  import { toast } from '@zerodevx/svelte-toast';
 
   // GLOBALS
   let loadingSubmissions = true;
@@ -190,5 +191,8 @@
         </p>
       {/if}
     {/if}
+    <button on:click={() => toast.push('test toast that is this thing here')}
+      >toast</button
+    >
   </div>
 </div>
