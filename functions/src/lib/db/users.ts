@@ -42,6 +42,7 @@ export const setUserUsername = async (id: string, username: string) => {
   if ((await usersRef.where('username', '==', username).get()).docs[0]) {
     throw new Error('Username taken. Please try another.');
   } else {
+    //todo: update user's friends stored username for this user
     await user.update({ username });
   }
 };

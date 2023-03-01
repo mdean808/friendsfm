@@ -17,6 +17,7 @@
     if (res.user.email)
       await updateUser({
         ...res.user,
+        id: res.user.uid,
         username: undefined,
         friends: [],
         friendRequests: [],
@@ -41,6 +42,7 @@
     if (res.user.email)
       await updateUser({
         ...res.user,
+        id: res.user.uid,
         username: undefined,
         friends: [],
         friendRequests: [],
