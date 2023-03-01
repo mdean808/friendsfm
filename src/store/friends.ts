@@ -7,7 +7,8 @@ import type { User } from '../types';
 export const sendFriendRequest = action(
   user,
   'send-friend-request',
-  async (_store, friend) => {
+  async (_store, friend: string) => {
+    friend = friend.toLowerCase();
     const res = await fetch(
       'https://us-central1-friendsfm.cloudfunctions.net/requestFriend',
       {

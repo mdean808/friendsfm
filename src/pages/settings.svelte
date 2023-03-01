@@ -50,18 +50,18 @@
       type="primary"
       title="reset"
       on:click={async () => {
+        goto('/username');
+      }}>change username</Button
+    >
+    <br />
+    <Button
+      className="mt-2 mx-auto"
+      type="breaking"
+      title="reset"
+      on:click={async () => {
         goto('/new_user');
         await logout();
       }}>log out</Button
-    >
-
-    <Button
-      className="mt-2 mx-auto"
-      type="primary"
-      title="reset"
-      on:click={async () => {
-        goto('/username');
-      }}>change username</Button
     >
   </div>
 </div>

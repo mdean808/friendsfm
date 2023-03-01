@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { toast } from '@zerodevx/svelte-toast';
   import Button from '../components/Button.svelte';
   import Input from '../components/Input.svelte';
   import { goto } from '../lib';
@@ -8,6 +9,9 @@
   let username: string;
   const setUsername = async () => {
     if (!username) return;
+    if (username.includes(' '))
+      return toast.push('Your username may not have spaces.');
+    username = username.toLowerCase();
     loading.set(true);
     if (await updateUsername(username)) {
       if (!user.get().musicPlatform) goto('/music_provider');
