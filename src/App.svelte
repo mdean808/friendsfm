@@ -191,15 +191,15 @@
     }}
   />
   {#if $currPath === '/'}
-    <div in:fade={{ duration: 300 }}>
+    <div in:fly={{ y: document.body.clientHeight, duration: 400 }}>
       <Home />
     </div>
   {:else if $currPath === '/songs'}
-    <div in:fade={{ duration: 300 }}>
+    <div transition:fly={{ x: -document.body.clientWidth, duration: 250 }}>
       <Songs />
     </div>
   {:else if $currPath === '/audial'}
-    <div in:fade={{ duration: 300 }}>
+    <div transition:fly={{ x: document.body.clientWidth, duration: 250 }}>
       <Audial />
     </div>
   {:else if $currPath === '/new_user'}
