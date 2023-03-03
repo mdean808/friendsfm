@@ -25,7 +25,7 @@ const config: CapacitorConfig = {
     },
   },
   // server: {
-  //   url: 'http://10.0.0.128:8080',
+  //   url: 'http://206.12.70.138:8080',
   //   cleartext: true,
   // },
 };
