@@ -11,3 +11,4 @@ export * from './endpoints/friends';
 export * from './endpoints/notifications';
 export * from './endpoints/submissions';
 export * from './endpoints/users';
+export * from './endpoints/songs';

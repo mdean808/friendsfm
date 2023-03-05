@@ -108,6 +108,5 @@ export const getUserData = action(user, 'get-user-data', async (_store) => {
     // failed to set new music platform
     return false;
   }
-
   await updateUser(json.message as User);
 });

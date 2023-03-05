@@ -17,8 +17,7 @@ export const createNewUserSubmission = functions.https.onRequest(
     const { latitude, longitude, authToken } = JSON.parse(req.body);
     try {
       const id = (await auth.verifyIdToken(authToken)).uid;
-      const userRes = await getUserById(id);
-      if (!userRes) {
+      if (!id) {
         res
           .status(400)
           .json({ type: 'error', message: 'User does not exist.' });
@@ -65,9 +64,9 @@ export const getCurrentSubmissionStatus = functions.https.onRequest(
           .json({ type: 'error', message: 'User does not exist.' });
       } else {
         try {
-          const userSub = await getUserSubmission(id);
+          const userSub = await getUserSubmission(userRes);
           let friendSubs: Submission[] = [];
-          if (userSub) friendSubs = await getFriendSubmissions(id);
+          if (userSub) friendSubs = await getFriendSubmissions(userRes);
           res.status(200).json({
             type: 'success',
             message: { user: userSub || {}, friends: friendSubs || [] },

@@ -4,6 +4,25 @@ import type { Song } from '../types';
 import { authToken } from './auth';
 
 export const songs = atom<Song[]>([]);
+
+export const loadSongs = action(songs, 'load-songs', async (store) => {
+  const res = await fetch(
+    'https://us-central1-friendsfm.cloudfunctions.net/getSongs',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+      }),
+    }
+  );
+  const json = await handleApiResponse(res);
+  if (!json) {
+    // failed to set new music platform
+    return false;
+  }
+  store.set(json.message as Song[]);
+});
+
 export const toggleSong = action(
   songs,
   'add-song',
@@ -14,7 +33,7 @@ export const toggleSong = action(
       store.set(s);
       // save to backend
       const res = await fetch(
-        'https://us-central1-friendsfm.cloudfunctions.net/removeSong',
+        'https://us-central1-friendsfm.cloudfunctions.net/deleteSong',
         {
           method: 'POST',
           body: JSON.stringify({
@@ -29,8 +48,6 @@ export const toggleSong = action(
         return false;
       }
     } else {
-      s.push(song);
-      store.set(s);
       // save to the backend
       const res = await fetch(
         'https://us-central1-friendsfm.cloudfunctions.net/saveSong',
@@ -47,6 +64,8 @@ export const toggleSong = action(
         // failed to set new music platform
         return false;
       }
+      s.push(json.message as Song);
+      store.set(s);
     }
   }
 );

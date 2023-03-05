@@ -1,7 +1,12 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
   import { formatDurationPlayed, getPlatformColor } from '../lib';
-  import { songs, toggleSong, user } from '../store';
+  import { loadSongs, songs, toggleSong, user } from '../store';
+
+  onMount(async () => {
+    // await loadSongs();
+  });
 </script>
 
 <div class="mx-4 py-1 text-center border-b-2 border-gray-400">

@@ -16,7 +16,7 @@ export const acceptFriendRequest = async (
     // update user friends
     const userFriends = user.friends;
     userFriends.push({ username: friend.username, id: friend.uid });
-    const userRef = usersRef.doc(user.uid);
+    const userRef = usersRef.doc(user.id);
     await userRef.update({ friends: userFriends });
     // remove from friend request array
     const userFriendRequests = user.friendRequests;
@@ -27,7 +27,7 @@ export const acceptFriendRequest = async (
 
     // update friend friends
     const friendFriends = friend.friends;
-    friendFriends.push({ username: user.username, id: user.uid });
+    friendFriends.push({ username: user.username, id: user.id });
     const friendRef = usersRef.doc(friend.uid);
     await friendRef.update({ friends: friendFriends });
     return (await userRef.get()).data() as User;

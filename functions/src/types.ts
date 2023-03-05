@@ -34,7 +34,7 @@ export interface Song {
   durationElapsed: number; // in seconds
   timestamp?: number; // the time the song was played in milliseconds
   url: string;
-  id?: string;
+  id: string;
 }
 
 export interface Submission {

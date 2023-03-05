@@ -1,12 +1,12 @@
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
-import { Friend, Song, Submission } from '../../types';
+import { Friend, Song, Submission, User } from '../../types';
 import { checkSpotifyAccessCode, getCurrentSpotifySong } from '../spotify';
 
 const db = getFirestore();
 
-export const getUserSubmission = async (id: string) => {
-  if (!id) throw new Error('No user provided.');
-  const userRef = db.collection('users').doc(id);
+export const getUserSubmission = async (user: User) => {
+  if (!user) throw new Error('No user provided.');
+  const userRef = db.collection('users').doc(user.id);
   const currentSubmissionCount = (
     await db.collection('misc').doc('notifications').get()
   ).get('count');
@@ -16,8 +16,8 @@ export const getUserSubmission = async (id: string) => {
     .get();
   if (!submission.docs[0]) return;
   const submissionData = submission.docs[0].data() as Submission;
-  const username = (await userRef.get()).get('username');
-  const musicPlatform = (await userRef.get()).get('musicPlatform');
+  const username = user.username;
+  const musicPlatform = user.musicPlatform;
   submissionData.time = new Timestamp(
     (submissionData.time as Timestamp).seconds,
     (submissionData.time as Timestamp).nanoseconds
@@ -48,6 +48,7 @@ export const generateUserSubmission = async (
   const currentSong = await getCurrentSpotifySong(accessCode);
 
   const song: Song = {
+    id: '',
     name: currentSong.item.name,
     artist: currentSong.item.artists[0]?.name,
     url: currentSong.item.external_urls.spotify,
@@ -88,15 +89,13 @@ export const generateUserSubmission = async (
   return { ...submission, user: { username, musicPlatform } };
 };
 
-export const getFriendSubmissions = async (id: string) => {
-  if (!id) throw new Error('No user provided.');
+export const getFriendSubmissions = async (user: User) => {
+  if (!user) throw new Error('No user provided.');
   const currentSubmissionCount = (
     await db.collection('misc').doc('notifications').get()
   ).get('count');
-  const userRef = db.collection('users').doc(id);
-  const friends = (await userRef.get()).get('friends') as Friend[];
   const friendSubmissions: Submission[] = [];
-  for (const friend of friends) {
+  for (const friend of user.friends) {
     const friendRef = db.collection('users').doc(friend.id);
     const friendSubmission = await friendRef
       .collection('submissions')

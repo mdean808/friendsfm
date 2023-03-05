@@ -55,6 +55,13 @@
 </script>
 
 <!-- Navigation -->
+<div class="absolute" style={`bottom: calc(110px + ${$bottomInset}px); `}>
+  <SvelteToast
+    options={{
+      reversed: true,
+    }}
+  />
+</div>
 {#if $loading}
   <div transition:fade={{ duration: 100 }}>
     <Loading />
@@ -185,11 +192,6 @@
   style={`margin-top: calc(55px + ${$statusBarHeight}px); 
           height: calc(100vh - ${110 + $bottomInset + $statusBarHeight}px)`}
 >
-  <SvelteToast
-    options={{
-      reversed: true,
-    }}
-  />
   {#if $currPath === '/'}
     <div in:fly={{ y: document.body.clientHeight, duration: 400 }}>
       <Home />
