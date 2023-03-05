@@ -46,7 +46,7 @@
       <p>{data.song.artist}</p>
       <p class="text-gray-400">
         {#if data.song.timestamp > 0}
-          played at {formatTimePlayed(data.song.timestamp)}
+          played at {formatTimePlayed(data.song?.timestamp)}
         {:else}
           {formatDurationPlayed(data.song.durationElapsed)} of {formatDurationPlayed(
             data.song.length

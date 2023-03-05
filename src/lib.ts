@@ -1,5 +1,5 @@
 import { MusicPlatform, ResponseType, type NetworkResponse } from './types';
-import { currPath, logout, prevPath } from './store';
+import { currPath, getNewAuthToken, logout, prevPath } from './store';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
@@ -51,6 +51,9 @@ export const handleApiResponse = async (res: Response) => {
       logout();
       goto('/new_user');
     }
+    if (json.message.toLowerCase().includes('authorization')) {
+      await getNewAuthToken();
+    }
     return false;
   }
 
@@ -66,6 +69,7 @@ export const formatDurationPlayed = (duration: number) => {
 };
 
 export const formatTimePlayed = (time: number = Date.now()) => {
+  console.log(time);
   const date = new Date(time);
   return date.toLocaleTimeString();
 };
