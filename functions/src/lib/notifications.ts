@@ -6,12 +6,22 @@ const messaging = getMessaging();
 const db = getFirestore();
 
 export const sendDaily = async () => {
-  const message = {
+  const message: Message = {
     notification: {
       title: 'FriendsFM',
       body: 'See what your friends are currently listening to!',
     },
     topic: 'all',
+    android: {
+      priority: 'high',
+    },
+    apns: {
+      payload: {
+        aps: {
+          'interruption-level': 'time_sensitive',
+        },
+      },
+    },
   };
 
   // Send a message to devices subscribed to the provided topic.
@@ -29,6 +39,16 @@ export const sendToMorgan = async (date: Date) => {
       body: date.toLocaleTimeString(),
     },
     token: process.env.MORGAN_TOKEN || '',
+    android: {
+      priority: 'high',
+    },
+    apns: {
+      payload: {
+        aps: {
+          'interruption-level': 'time_sensitive',
+        },
+      },
+    },
   };
 
   const res = await messaging.send(message);

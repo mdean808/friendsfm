@@ -17,14 +17,15 @@ export const createNewUserSubmission = functions.https.onRequest(
     const { latitude, longitude, authToken } = JSON.parse(req.body);
     try {
       const id = (await auth.verifyIdToken(authToken)).uid;
-      if (!id) {
+      const userRes = await getUserById(id);
+      if (!userRes) {
         res
           .status(400)
           .json({ type: 'error', message: 'User does not exist.' });
       } else {
         try {
           const userSub = await generateUserSubmission(id, latitude, longitude);
-          const friendSubs: Submission[] = await getFriendSubmissions(id);
+          const friendSubs: Submission[] = await getFriendSubmissions(userRes);
           res.status(200).json({
             type: 'success',
             message: { user: userSub || {}, friends: friendSubs || [] },

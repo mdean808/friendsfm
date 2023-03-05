@@ -1,5 +1,5 @@
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
-import { Friend, Song, Submission, User } from '../../types';
+import { Song, Submission, User } from '../../types';
 import { checkSpotifyAccessCode, getCurrentSpotifySong } from '../spotify';
 
 const db = getFirestore();

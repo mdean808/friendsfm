@@ -8,7 +8,8 @@ export const getUserSongs = async (id: string) => {
   const songsRef = userRef.collection('songs');
   const songs: Song[] = [];
   (await songsRef.get()).forEach((doc) => {
-    songs.push(doc.data() as Song);
+    const song = doc.data() as Song;
+    songs.push({ ...song, id: doc.id });
   });
   return songs;
 };
@@ -19,13 +20,15 @@ export const addSong = async (id: string, song: Song) => {
   const songsRef = userRef.collection('songs');
 
   const songRef = await songsRef.add(song);
-  const songRes = (await songRef.get()).data();
+  const songRes = await songRef.get();
+  const songData = { ...songRes.data(), id: songRes.id };
 
-  return songRes;
+  return songData;
 };
 
 export const removeSong = async (id: string, song: Song) => {
   if (!id) throw new Error('No user id provided.');
+  if (!song?.id) throw new Error('No song provided.');
   const userRef = db.collection('users').doc(id);
   const songsRef = userRef.collection('songs');
   const songRef = songsRef.doc(song.id);
