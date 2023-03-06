@@ -87,6 +87,14 @@
     document.addEventListener('touchmove', swipeMove, false);
     document.addEventListener('touchend', swipeEnd, false);
   });
+
+  let loadingHeart = false;
+  const toggleHeart = async () => {
+    if (loadingHeart) return;
+    loadingHeart = true;
+    await toggleSong($userSubmission.song);
+    loadingHeart = false;
+  };
 </script>
 
 <div
@@ -135,9 +143,11 @@
         </a>
         <div class="flex-grow-0 flex-shrink-0">
           <svg
-            on:click={() => toggleSong($userSubmission.song)}
-            on:keypress={() => toggleSong($userSubmission.song)}
+            on:click={toggleHeart}
+            on:keypress={toggleHeart}
             class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
+              loadingHeart ? 'animate-ping text-pink-500' : ''
+            } ${
               $songs.find((s) => s.name === $userSubmission.song.name)
                 ? 'text-pink-500'
                 : ''

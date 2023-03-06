@@ -29,6 +29,11 @@ export const toggleSong = action(
   async (store, song: Song) => {
     let s = store.get();
     if (s.find((s) => s.name === song.name)) {
+      //todo: figure out why this doesn't update in the backend when toggleSong is called from home.svelte
+
+      // make sure the ID is present
+      if (!song.id) song.id = s.find((so) => so.name === song.name)?.id;
+      // remove the song from the list
       s = s.filter((s) => s.name !== song.name);
       store.set(s);
       // save to backend
@@ -38,7 +43,7 @@ export const toggleSong = action(
           method: 'POST',
           body: JSON.stringify({
             authToken: authToken.get(),
-            song: song,
+            song,
           }),
         }
       );
@@ -55,7 +60,7 @@ export const toggleSong = action(
           method: 'POST',
           body: JSON.stringify({
             authToken: authToken.get(),
-            song: song,
+            song,
           }),
         }
       );

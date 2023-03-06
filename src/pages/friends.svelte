@@ -86,11 +86,7 @@
   });
 </script>
 
-<div
-  id="friends"
-  style={`padding-top: ${0 + $statusBarHeight}px`}
-  class="z-40 bg-gray-900 w-full h-[100vh]"
->
+<div id="friends">
   <div
     class="w-full flex border-b-white border-b-2 flex-row justify-between items-center h-[55px] px-2"
   >

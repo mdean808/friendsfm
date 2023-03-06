@@ -69,7 +69,6 @@ export const formatDurationPlayed = (duration: number) => {
 };
 
 export const formatTimePlayed = (time: number = Date.now()) => {
-  console.log(time);
   const date = new Date(time);
   return date.toLocaleTimeString();
 };

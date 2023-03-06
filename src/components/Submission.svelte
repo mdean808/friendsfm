@@ -9,6 +9,13 @@
   import { toggleSong, songs } from '../store';
 
   export let data: Submission;
+  let loadingHeart = false;
+  const toggleHeart = async () => {
+    if (loadingHeart) return;
+    loadingHeart = true;
+    await toggleSong(data.song);
+    loadingHeart = false;
+  };
 </script>
 
 <main class="border-2 border-gray-600 rounded-md py-2 px-4 flex">
@@ -58,9 +65,11 @@
   <div class="flex-grow-0 text-right">
     <div class="h-full flex flex-col flex-nowrap justify-between">
       <svg
-        on:click={() => toggleSong(data.song)}
-        on:keypress={() => toggleSong(data.song)}
+        on:click={toggleHeart}
+        on:keypress={toggleHeart}
         class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
+          loadingHeart ? 'animate-ping text-pink-500' : ''
+        } ${
           $songs.find((s) => s.name === data.song.name) ? 'text-pink-500' : ''
         } `}
         fill={$songs.find((s) => s.name === data.song.name)
