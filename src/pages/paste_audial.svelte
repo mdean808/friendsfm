@@ -29,28 +29,7 @@
   };
 </script>
 
-<main class="z-40 text-center mx-auto w-full">
-  <div
-    class="absolute right-3 top-3"
-    on:keydown={() => goto('/')}
-    on:click={() => goto('/')}
-  >
-    <svg
-      fill="none"
-      class="h-8 w-8"
-      stroke="currentColor"
-      stroke-width="1.5"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M6 18L18 6M6 6l12 12"
-      />
-    </svg>
-  </div>
+<main class="z-40 relative text-center mx-auto w-full">
   <div class="mx-auto py-6 px-4 w-full mt-8">
     <h1 class="text-4xl">share audial score</h1>
     {#if !res}
@@ -89,5 +68,9 @@
         on:click={() => shareAudial(res)}>share</Button
       >
     {/if}
+    <button
+      on:click={() => goto('/')}
+      class="underline text-blue-500 mt-10 text-center mx-auto">go back</button
+    >
   </div>
 </main>
