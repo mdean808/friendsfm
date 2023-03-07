@@ -12,7 +12,7 @@ import {
   userSubmission,
 } from '.';
 import { goto, handleApiResponse, registerForNotifications } from '../lib';
-import type { Song, User } from '../types';
+import type { SavedSong, User } from '../types';
 
 // refresh every 30 seconds
 export const userRefreshInterval = map<NodeJS.Timer>(
@@ -65,7 +65,7 @@ export const loginUser = action(user, 'login-user', async (store) => {
   }
 
   loggedIn.set(true);
-  songs.set(json.message.songs as Song[]);
+  songs.set(json.message.songs as SavedSong[]);
   await updateUser(json.message.user as User);
   FirebaseAnalytics.setUserId({ userId: store.get().id });
   FirebaseAnalytics.logEvent({ name: 'login', params: { id: store.get().id } });

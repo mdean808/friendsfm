@@ -24,6 +24,7 @@
     formatTimePlayed,
     goto,
   } from '../lib';
+  import type { SavedSong } from '../types';
 
   // GLOBALS
   let loadingSubmissions = true;
@@ -97,7 +98,14 @@
   const toggleHeart = async () => {
     if (loadingHeart) return;
     loadingHeart = true;
-    await toggleSong($userSubmission.song);
+    const savedSong: SavedSong = {
+      ...$userSubmission.song,
+      user: {
+        id: $user.id,
+        username: $user.username,
+      },
+    };
+    await toggleSong(savedSong);
     loadingHeart = false;
   };
 </script>

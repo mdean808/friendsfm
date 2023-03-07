@@ -6,7 +6,7 @@
     convertDateToLateString,
   } from '../lib';
   import MusicPlatformIcon from './MusicPlatformIcon.svelte';
-  import type { Submission } from '../types';
+  import type { SavedSong, Submission } from '../types';
   import { toggleSong, songs } from '../store';
 
   export let data: Submission;
@@ -15,7 +15,14 @@
   const toggleHeart = async () => {
     if (loadingHeart) return;
     loadingHeart = true;
-    await toggleSong(data.song);
+    const savedSong: SavedSong = {
+      ...data.song,
+      user: {
+        id: data.user.id,
+        username: data.user.username,
+      },
+    };
+    await toggleSong(savedSong);
     loadingHeart = false;
   };
 </script>

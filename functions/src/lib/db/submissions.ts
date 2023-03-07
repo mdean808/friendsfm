@@ -4,7 +4,9 @@ import { checkSpotifyAccessCode, getCurrentSpotifySong } from '../spotify';
 
 const db = getFirestore();
 
-export const getUserSubmission = async (user: User) => {
+export const getUserSubmission: (
+  user: User
+) => Promise<Submission | undefined> = async (user) => {
   if (!user) throw new Error('No user provided.');
   const userRef = db.collection('users').doc(user.id);
   const currentSubmissionCount = (
@@ -26,14 +28,17 @@ export const getUserSubmission = async (user: User) => {
     (submissionData.lateTime as Timestamp).seconds,
     (submissionData.lateTime as Timestamp).nanoseconds
   ).toDate();
-  return { ...submissionData, user: { username, musicPlatform } };
+  return {
+    ...submissionData,
+    user: { username, musicPlatform, id: user.id },
+  } as Submission;
 };
 
-export const generateUserSubmission = async (
+export const generateUserSubmission: (
   id: string,
-  latitude: number = 0,
-  longitude: number = 0
-) => {
+  latitude: number,
+  longitude: number
+) => Promise<Submission> = async (id, latitude = 0, longitude = 0) => {
   if (!id) throw new Error('No user provided.');
   const userRef = db.collection('users').doc(id);
   const submissionsRef = userRef.collection('submissions');
@@ -105,10 +110,12 @@ export const generateUserSubmission = async (
     (submission.lateTime as Timestamp).seconds,
     (submission.lateTime as Timestamp).nanoseconds
   ).toDate();
-  return { ...submission, user: { username, musicPlatform } };
+  return { ...submission, user: { username, musicPlatform, id } };
 };
 
-export const getFriendSubmissions = async (user: User) => {
+export const getFriendSubmissions: (
+  user: User
+) => Promise<Submission[]> = async (user) => {
   if (!user) throw new Error('No user provided.');
   const currentSubmissionCount = (
     await db.collection('misc').doc('notifications').get()
@@ -133,7 +140,7 @@ export const getFriendSubmissions = async (user: User) => {
       ).toDate();
       friendSubmissions.push({
         ...friendSub,
-        user: { username: friend.username, musicPlatform },
+        user: { username: friend.username, musicPlatform, id: friend.id },
       });
     }
   }

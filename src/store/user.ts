@@ -2,9 +2,9 @@ import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { Preferences } from '@capacitor/preferences';
 import { map, action } from 'nanostores';
-import { authToken, FIREBASE_URL, getNewAuthToken, loggedIn, songs } from '.';
+import { authToken, FIREBASE_URL, loggedIn, songs } from '.';
 import { goto, handleApiResponse } from '../lib';
-import type { MusicPlatform, Song, User } from '../types';
+import type { MusicPlatform, SavedSong, User } from '../types';
 export const user = map<User>({} as User);
 
 // Load user from preferences
@@ -114,6 +114,6 @@ export const refreshUser = action(user, 'get-user-data', async (_store) => {
     // failed to refresh user
     return false;
   }
-  songs.set(json.message.songs as Song[]);
+  songs.set(json.message.songs as SavedSong[]);
   await updateUser(json.message.user as User);
 });

@@ -1,10 +1,10 @@
 import { action, atom } from 'nanostores';
 import { handleApiResponse } from '../lib';
-import type { Song } from '../types';
+import type { SavedSong } from '../types';
 import { authToken } from './auth';
 import { FIREBASE_URL } from './misc';
 
-export const songs = atom<Song[]>([]);
+export const songs = atom<SavedSong[]>([]);
 
 export const loadSongs = action(songs, 'load-songs', async (store) => {
   const res = await fetch(FIREBASE_URL.get() + '/getSongs', {
@@ -18,13 +18,13 @@ export const loadSongs = action(songs, 'load-songs', async (store) => {
     // failed to set new music platform
     return false;
   }
-  store.set(json.message as Song[]);
+  store.set(json.message as SavedSong[]);
 });
 
 export const toggleSong = action(
   songs,
   'add-song',
-  async (store, song: Song) => {
+  async (store, song: SavedSong) => {
     let s = store.get();
     if (s.find((s) => s.name === song.name)) {
       // make sure the ID is present
@@ -59,7 +59,7 @@ export const toggleSong = action(
         // failed to set new music platform
         return false;
       }
-      s.push(json.message as Song);
+      s.push(json.message as SavedSong);
       store.set(s);
     }
   }

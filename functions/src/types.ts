@@ -37,6 +37,13 @@ export interface Song {
   id: string;
 }
 
+export interface SavedSong extends Song {
+  user: {
+    id: string;
+    username: string;
+  };
+}
+
 export interface Submission {
   id?: string;
   number: number;
@@ -47,6 +54,7 @@ export interface Submission {
   user?: {
     username: string;
     musicPlatform: MusicPlatform;
+    id: string;
   };
   location: {
     longitude: number;

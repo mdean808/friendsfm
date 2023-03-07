@@ -1,13 +1,13 @@
 import { getAuth } from 'firebase-admin/auth';
 import * as functions from 'firebase-functions';
 import { addSong, getUserSongs, removeSong } from '../lib/db';
-import { Song } from '../types';
+import { SavedSong } from '../types';
 
 const auth = getAuth();
 
 export const getSongs = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
-  const { authToken }: { song: Song; authToken: string } = JSON.parse(req.body);
+  const { authToken }: { authToken: string } = JSON.parse(req.body);
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
     if (!id) {
@@ -35,9 +35,8 @@ export const getSongs = functions.https.onRequest(async (req, res) => {
 
 export const saveSong = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
-  const { song, authToken }: { song: Song; authToken: string } = JSON.parse(
-    req.body
-  );
+  const { song, authToken }: { song: SavedSong; authToken: string } =
+    JSON.parse(req.body);
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
     if (!id) {
@@ -68,9 +67,8 @@ export const saveSong = functions.https.onRequest(async (req, res) => {
 
 export const deleteSong = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
-  const { song, authToken }: { song: Song; authToken: string } = JSON.parse(
-    req.body
-  );
+  const { song, authToken }: { song: SavedSong; authToken: string } =
+    JSON.parse(req.body);
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
     if (!id) {

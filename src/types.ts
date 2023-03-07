@@ -10,7 +10,7 @@ export interface User {
   friends: Friend[];
   friendRequests: string[];
   submissions?: Submission[];
-  savedSongs?: Song[];
+  savedSongs?: SavedSong[];
   audials?: Audial[];
   messagingToken?: string;
   authToken: string;
@@ -46,12 +46,20 @@ export interface Song {
   id: string;
 }
 
+export interface SavedSong extends Song {
+  user: {
+    id: string;
+    username: string;
+  };
+}
+
 export interface Submission {
   id: string;
   late?: boolean;
   user: {
     username: string;
     musicPlatform: MusicPlatform;
+    id: string;
   };
   song: Song;
   time: Date;

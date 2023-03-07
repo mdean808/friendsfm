@@ -11,13 +11,6 @@
     user,
   } from '../store';
 
-  const useEmulator = async () => {
-    await FirebaseAuthentication.useEmulator({
-      host: 'http://127.0.0.1',
-      port: 9099,
-    });
-  };
-
   const signInWithGoogle = async () => {
     loading.set(true);
     // if (import.meta.env.DEV) {

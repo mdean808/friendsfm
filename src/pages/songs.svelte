@@ -43,7 +43,11 @@
             </p>
             <p class="text-sm text-gray-500">
               <!-- todo: make this show the person who's submission the song was saved from -->
-              {formatDurationPlayed(song.length)}
+              {#if song.user?.username}
+                {song.user?.username}
+              {:else}
+                {formatDurationPlayed(song.length)}
+              {/if}
             </p>
           </a>
           <div class="flex-grow-0 flex-shrink">
