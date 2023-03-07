@@ -20,10 +20,11 @@ const firebaseConfig = {
   appId: '1:611764643709:web:5356e1828d9a0f46348e14',
   measurementId: 'G-6RD7JFYB8D',
 };
-const firebaseApp = initializeApp(firebaseConfig);
-// export const analytics = getAnalytics(firebaseApp);
+initializeApp(firebaseConfig);
 
 FirebaseAnalytics.setEnabled({ enabled: true });
+
+// use emulator for auth if on dev
 
 // Initialize Status Bar
 if (Capacitor.isPluginAvailable('StatusBar'))

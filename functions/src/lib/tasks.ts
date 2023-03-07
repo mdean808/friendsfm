@@ -1,6 +1,5 @@
 import * as functions from 'firebase-functions';
 import { CloudTasksClient } from '@google-cloud/tasks';
-import { sendToMorgan } from './notifications';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 const db = getFirestore();
 const client = new CloudTasksClient();
@@ -44,14 +43,21 @@ export const createNotificationTask = async () => {
   // save notifcation time
   const notifTime = new Date(inSeconds * 1000 + Date.now());
   const notificationsRef = db.collection('misc').doc('notifications');
+  const notificationTimestamp = (await notificationsRef.get()).get('time');
+  const prevTime = new Timestamp(
+    (notificationTimestamp as Timestamp).seconds,
+    (notificationTimestamp as Timestamp).nanoseconds
+  ).toDate();
 
-  await notificationsRef.update({ time: Timestamp.fromDate(notifTime) });
+  await notificationsRef.update({
+    time: Timestamp.fromDate(notifTime),
+    prevTime,
+  });
 
   // Send create task request.
   const request = { parent: parent, task: task };
   await client.createTask(request);
   functions.logger.info('Task Created');
-  await sendToMorgan(notificationTime);
 };
 
 const getRandomDate = (from: Date, to: Date) => {

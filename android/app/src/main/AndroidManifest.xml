@@ -30,7 +30,7 @@
         <!-- Accepts URIs that begin with "http://audial.mogdan.xyz/friendsfm/spotify” -->
         <data android:scheme="https"
           android:host="audial.mogdan.xyz"
-          android:pathPrefix="/friendsfm" />
+          android:pathPrefix="/friendsfm/spotify" />
         <!-- note that the leading "/" is required for pathPrefix-->
       </intent-filter>
 

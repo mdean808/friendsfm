@@ -8,9 +8,10 @@ import {
   getFriendSubmissions,
   getUserById,
   getUserSubmission,
+  setUserCurrentSubmissionAudialScore,
 } from '../lib/db';
 
-import { Submission } from '../types';
+import { Audial, Submission } from '../types';
 export const createNewUserSubmission = functions.https.onRequest(
   async (req, res) => {
     res.set('Access-Control-Allow-Origin', '*');
@@ -71,6 +72,49 @@ export const getCurrentSubmissionStatus = functions.https.onRequest(
           res.status(200).json({
             type: 'success',
             message: { user: userSub || {}, friends: friendSubs || [] },
+          });
+        } catch (e) {
+          functions.logger.info(
+            'Error in getUserSubmission or getFriendSubmissions.'
+          );
+          functions.logger.error(e);
+          res
+            .status(400)
+            .type('json')
+            .send({ type: 'error', message: (e as Error).message });
+        }
+      }
+    } catch (e) {
+      // firebase authnetication error
+      functions.logger.error(e);
+      res.status(401).json({
+        type: 'error',
+        message: 'Authentication Failed.',
+        error: (e as Error).message,
+      });
+    }
+  }
+);
+
+export const setCurrentSubmissionAudialScore = functions.https.onRequest(
+  async (req, res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    const {
+      parsedAudial,
+      authToken,
+    }: { parsedAudial: Audial; authToken: string } = JSON.parse(req.body);
+    try {
+      const id = (await auth.verifyIdToken(authToken)).uid;
+      if (!id) {
+        res
+          .status(400)
+          .json({ type: 'error', message: 'User does not exist.' });
+      } else {
+        try {
+          await setUserCurrentSubmissionAudialScore(id, parsedAudial);
+          res.status(200).json({
+            type: 'success',
+            message: 'success',
           });
         } catch (e) {
           functions.logger.info(

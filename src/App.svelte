@@ -21,13 +21,15 @@
     loading,
     getNewAuthToken,
     getUserFromPreferences,
+    loggedIn,
   } from './store';
-  import { getPlatformColor, goto } from './lib';
+  import { goto } from './lib';
   import Loading from './components/Loading.svelte';
   import Friends from './pages/friends.svelte';
-  import { fade, fly, slide } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
   import TopNav from './components/TopNav.svelte';
   import BottomNav from './components/BottomNav.svelte';
+  import PasteAudial from './pages/paste_audial.svelte';
 
   onMount(async () => {
     loading.set(false);
@@ -37,21 +39,19 @@
     // request permissions
     FirebaseMessaging.requestPermissions();
     // load user
-    if (!(await getNewAuthToken())) {
-      goto('/new_user');
+    await getNewAuthToken();
+    await getUserFromPreferences();
+    const u = user.get();
+    if (!loggedIn.get() || !u || Object.keys(u).length === 0)
+      return goto('/new_user');
+    if (u.username && u.username !== u.id && u.musicPlatform) {
+      goto('/');
+    } else if (!u.username || u.username === u.id) {
+      goto('/username');
+    } else if (!u.musicPlatform) {
+      goto('/music_provider');
     } else {
-      await getUserFromPreferences();
-      const u = user.get();
-      if (!u || Object.keys(u).length === 0) return goto('/new_user');
-      if (u.username && u.musicPlatform) {
-        goto('/');
-      } else if (!u.username || u.username === u.id) {
-        goto('/username');
-      } else if (!u.musicPlatform) {
-        goto('/music_provider');
-      } else {
-        goto('/new_user');
-      }
+      goto('/new_user');
     }
   });
 </script>
@@ -69,37 +69,43 @@
     <Loading />
   </div>
 {/if}
-<!-- {:else if $currPath === '/settings'} -->
-<!--   <div transition:fly={{ x: document.body.clientWidth }}> -->
-<!--     <Settings /> -->
-<!--   </div> -->
 <div>
-  <TopNav />
+  {#if $loggedIn && $user.username && $user.musicPlatform}
+    <TopNav />
+  {/if}
   <main
     style={`height: calc(100vh - ${110 + $bottomInset + $statusBarHeight}px)`}
   >
     {#if $currPath === '/'}
-      <div in:fly={{ y: document.body.clientHeight }}>
+      <div
+        style="height: inherit;"
+        class="overflow-y-scroll"
+        in:fly={{ y: document.body.clientHeight }}
+      >
         <Home />
       </div>
     {:else if $currPath === '/songs'}
-      <div in:fly={{ x: -document.body.clientWidth }}>
+      <div
+        style="height: inherit;"
+        class="overflow-y-scroll"
+        in:fly={{ x: -document.body.clientWidth }}
+      >
         <Songs />
       </div>
     {:else if $currPath === '/audial'}
-      <div in:fly={{ x: document.body.clientWidth }}>
+      <div style="height: inherit;" in:fly={{ x: document.body.clientWidth }}>
         <Audial />
       </div>
     {:else if $currPath === '/new_user'}
-      <div in:fade={{ duration: 300 }}>
+      <div style={`margin-top: 55px`} in:fade={{ duration: 300 }}>
         <NewUser />
       </div>
     {:else if $currPath === '/username'}
-      <div in:fade={{ duration: 300 }}>
+      <div style={`margin-top: 55px`} in:fade={{ duration: 300 }}>
         <Username />
       </div>
     {:else if $currPath === '/music_provider'}
-      <div in:fade={{ duration: 300 }}>
+      <div style={`margin-top: 55px`} in:fade={{ duration: 300 }}>
         <MusicProvider />
       </div>
     {:else if $currPath === '/settings'}
@@ -118,9 +124,19 @@
       >
         <Friends />
       </div>
+    {:else if $currPath === '/paste_audial'}
+      <div
+        style={`padding-top: ${0 + $statusBarHeight}px`}
+        class="z-40 bg-gray-900 w-full absolute top-0 left-0 h-[100vh]"
+        transition:fly={{ y: -document.body.clientWidth }}
+      >
+        <PasteAudial />
+      </div>
     {/if}
   </main>
-  <BottomNav />
+  {#if $loggedIn && $user.username && $user.musicPlatform}
+    <BottomNav />
+  {/if}
 </div>
 
 <div class="hidden">

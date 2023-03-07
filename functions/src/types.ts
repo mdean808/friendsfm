@@ -43,7 +43,7 @@ export interface Submission {
   late: boolean;
   song: Song; // song id
   time: Date | Timestamp;
-  audial: string; // audial id
+  audial: Audial;
   user?: {
     username: string;
     musicPlatform: MusicPlatform;
@@ -55,7 +55,6 @@ export interface Submission {
 }
 
 export interface Audial {
-  id: string;
   number: number;
   score: string;
 }

@@ -1,19 +1,33 @@
 import { getAuth } from 'firebase-admin/auth';
 import * as functions from 'firebase-functions';
-import { getUserById, setUserMusicPlatform, setUserUsername } from '../lib/db';
+import {
+  getUserById,
+  getUserSongs,
+  setUserMusicPlatform,
+  setUserUsername,
+  updateUserMessagingToken,
+} from '../lib/db';
 
 const auth = getAuth();
 
 export const getUser = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
-  const { authToken } = JSON.parse(req.body);
+  const {
+    messagingToken,
+    authToken,
+  }: { messagingToken?: string; authToken: string } = JSON.parse(req.body);
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
     const userRes = await getUserById(id);
     if (!userRes) {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
-      res.status(200).type('json').send({ type: 'success', message: userRes });
+      if (messagingToken) updateUserMessagingToken(id, messagingToken);
+      const songs = await getUserSongs(id);
+      res
+        .status(200)
+        .type('json')
+        .send({ type: 'success', message: { user: userRes, songs: songs } });
     }
   } catch (e) {
     // firebase authnetication error

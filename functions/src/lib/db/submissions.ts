@@ -1,5 +1,5 @@
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
-import { Song, Submission, User } from '../../types';
+import { Audial, Song, Submission, User } from '../../types';
 import { checkSpotifyAccessCode, getCurrentSpotifySong } from '../spotify';
 
 const db = getFirestore();
@@ -39,7 +39,7 @@ export const generateUserSubmission = async (
     .get();
   const currentSubmissionCount = notificationsRef.get('count');
   //TODO: check if there is already a submission with this count in the user's submissions
-  const notificationTimestamp = notificationsRef.get('time');
+  const notificationTimestamp = notificationsRef.get('time') as Timestamp;
   const accessCode = await checkSpotifyAccessCode(
     (await userRef.get()).get('musicPlatformAuth'),
     userRef
@@ -56,26 +56,38 @@ export const generateUserSubmission = async (
     durationElapsed: currentSong.progress_ms / 1000,
     timestamp: currentSong.timestamp || 0,
   };
-  let late = false;
   // check for a late submission
   const notificationTime = new Timestamp(
-    (notificationTimestamp as Timestamp).seconds,
-    (notificationTimestamp as Timestamp).nanoseconds
+    notificationTimestamp.seconds,
+    notificationTimestamp.nanoseconds
   ).toDate();
-  var startTime = notificationTime;
-  var endTime = new Date();
-  var difference = endTime.getTime() - startTime.getTime(); // This will give difference in milliseconds
-  var resultInMinutes = Math.round(difference / 60000);
 
-  if (resultInMinutes > 2) {
-    late = true;
+  let late = false;
+  let lateTime: Date | null = null;
+  if (notificationTime.getTime() > new Date().getTime()) {
+    // the current date is before the current notification time, so we use the previous time.
+    const prevTime = (notificationsRef.get('prevTime') as Timestamp).toDate();
+    const difference = new Date().getTime() - prevTime.getTime(); // This will give difference in milliseconds
+    const resultInMinutes = Math.round(difference / (60 * 1000));
+    if (resultInMinutes > 2) {
+      late = true;
+      lateTime = new Date(new Date().getTime() - prevTime.getTime());
+    }
+  } else {
+    // the current date is after the current notification time
+    const difference = new Date().getTime() - notificationTime.getTime(); // This will give difference in milliseconds
+    const resultInMinutes = Math.round(difference / (60 * 1000));
+    if (resultInMinutes > 2) {
+      late = true;
+      lateTime = new Date(new Date().getTime() - notificationTime.getTime());
+    }
   }
-  const time = Timestamp.fromDate(new Date());
+  let time = Timestamp.fromDate(new Date());
   const submission: Submission = {
     time,
     late,
     number: currentSubmissionCount,
-    audial: '',
+    audial: { number: -1, score: '' },
     song,
     location: { latitude, longitude },
   };
@@ -86,6 +98,9 @@ export const generateUserSubmission = async (
     (submission.time as Timestamp).seconds,
     (submission.time as Timestamp).nanoseconds
   ).toDate();
+  if (late && lateTime) {
+    submission.time = lateTime;
+  }
   return { ...submission, user: { username, musicPlatform } };
 };
 
@@ -94,6 +109,16 @@ export const getFriendSubmissions = async (user: User) => {
   const currentSubmissionCount = (
     await db.collection('misc').doc('notifications').get()
   ).get('count');
+  // load notification information for late logic
+  const notificationsRef = await db
+    .collection('misc')
+    .doc('notifications')
+    .get();
+  const notificationTimestamp = notificationsRef.get('time');
+  const notificationTime = new Timestamp(
+    (notificationTimestamp as Timestamp).seconds,
+    (notificationTimestamp as Timestamp).nanoseconds
+  ).toDate();
   const friendSubmissions: Submission[] = [];
   for (const friend of user.friends) {
     const friendRef = db.collection('users').doc(friend.id);
@@ -104,10 +129,16 @@ export const getFriendSubmissions = async (user: User) => {
     const musicPlatform = (await friendRef.get()).get('musicPlatform');
     if (!friendSubmission.empty) {
       const friendSub = friendSubmission.docs[0].data() as Submission;
-      friendSub.time = new Timestamp(
-        (friendSub.time as Timestamp).seconds,
-        (friendSub.time as Timestamp).nanoseconds
-      ).toDate();
+      if (friendSub.late) {
+        friendSub.time = new Date(
+          new Date().getMilliseconds() - notificationTime.getMilliseconds()
+        );
+      } else {
+        friendSub.time = new Timestamp(
+          (friendSub.time as Timestamp).seconds,
+          (friendSub.time as Timestamp).nanoseconds
+        ).toDate();
+      }
       friendSubmissions.push({
         ...friendSub,
         user: { username: friend.username, musicPlatform },
@@ -116,4 +147,23 @@ export const getFriendSubmissions = async (user: User) => {
   }
 
   return friendSubmissions;
+};
+
+export const setUserCurrentSubmissionAudialScore = async (
+  id: string,
+  audial: Audial
+) => {
+  if (!id) throw new Error('No user provided.');
+  if (!audial || !audial.score || !audial.number)
+    throw new Error('Invalid audial provided');
+  const userRef = db.collection('users').doc(id);
+  const currentSubmissionCount = (
+    await db.collection('misc').doc('notifications').get()
+  ).get('count');
+  const submissionRef = await userRef
+    .collection('submissions')
+    .where('number', '==', currentSubmissionCount)
+    .get();
+  if (submissionRef.empty) throw new Error('No current submission.');
+  submissionRef.docs[0].ref.update({ audial: audial });
 };

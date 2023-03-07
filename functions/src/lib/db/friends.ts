@@ -1,5 +1,7 @@
 import { getFirestore } from 'firebase-admin/firestore';
+import { Message } from 'firebase-admin/messaging';
 import { User } from '../../types';
+import { newNotification } from '../notifications';
 
 const db = getFirestore();
 
@@ -72,5 +74,16 @@ export const sendFriendRequest = async (user: User, friendUsername: string) => {
     await friendRef.update({ friendRequests: requests });
   } else {
     throw new Error('No user with provided username.');
+  }
+
+  if (friend.messagingToken) {
+    const message: Message = {
+      notification: {
+        title: user.username + ' added you as a friend!',
+        body: 'open the app to accept their request',
+      },
+      token: friend.messagingToken,
+    };
+    await newNotification(message);
   }
 };

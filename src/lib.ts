@@ -46,13 +46,13 @@ export const handleApiResponse = async (res: Response) => {
     return false;
   } else if (json.type === ResponseType.error) {
     console.log('ERROR:', json);
-    toast.push('Error: ' + json.message, toastError);
     if (json.message === 'User does not exist.') {
       logout();
       goto('/new_user');
-    }
-    if (json.message.toLowerCase().includes('authorization')) {
+    } else if (json.message === 'Authentication Failed.') {
       await getNewAuthToken();
+    } else {
+      toast.push('Error: ' + json.message, toastError);
     }
     return false;
   }
@@ -64,11 +64,25 @@ export const formatDurationPlayed = (duration: number) => {
   const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, duration * 1000)),
     // Pull out parts of interest
     parts = [d.getUTCMinutes(), d.getUTCSeconds()];
-  // Zero-pad
-  return parts.map((s) => String(s).padStart(2, '0')).join(':');
+  return parts.map((s) => String(s).padStart(2, '')).join(':');
 };
 
 export const formatTimePlayed = (time: number = Date.now()) => {
   const date = new Date(time);
-  return date.toLocaleTimeString();
+  return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+};
+
+export const convertDateToLateString = (date: Date) => {
+  const time = date.toLocaleTimeString().split(' ')[0];
+  const hours = parseInt(time.split(':')[0]);
+  const minutes = parseInt(time.split(':')[1]);
+  const seconds = parseInt(time.split(':')[2]);
+  let res = '';
+  if (hours === 0 && minutes === 0) res = seconds + 's late';
+  else if (hours === 0) res = minutes + 'm late';
+  else if (minutes > 20 && minutes < 45)
+    res = hours + 'h ' + minutes + 'm late';
+  else if (minutes > 45) res = hours + 1 + 'h late';
+  else res = hours + 'h late';
+  return res;
 };

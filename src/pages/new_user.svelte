@@ -11,8 +11,18 @@
     user,
   } from '../store';
 
+  const useEmulator = async () => {
+    await FirebaseAuthentication.useEmulator({
+      host: 'http://127.0.0.1',
+      port: 9099,
+    });
+  };
+
   const signInWithGoogle = async () => {
     loading.set(true);
+    // if (import.meta.env.DEV) {
+    //   await useEmulator().then(() => console.log('Using firebase emulator.'));
+    // }
     const res = await FirebaseAuthentication.signInWithGoogle();
     await getNewAuthToken();
     if (res.user.email)
@@ -29,6 +39,7 @@
       // don't goto username
     } else {
       const u = user.get();
+      if (!u) return;
       if (!u.username || u.username === u.id) goto('/username');
       else if (!u.musicPlatform) goto('/music_provider');
       else goto('/');

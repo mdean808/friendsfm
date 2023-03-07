@@ -1,9 +1,10 @@
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { Preferences } from '@capacitor/preferences';
 import { map, action } from 'nanostores';
-import { authToken } from '.';
+import { authToken, FIREBASE_URL, getNewAuthToken, loggedIn, songs } from '.';
 import { goto, handleApiResponse } from '../lib';
-import type { MusicPlatform, User } from '../types';
+import type { MusicPlatform, Song, User } from '../types';
 export const user = map<User>({} as User);
 
 // Load user from preferences
@@ -17,6 +18,7 @@ export const getUserFromPreferences = action(
       return {} as User;
     }
     const u = JSON.parse(res.value) as User;
+    loggedIn.set(true);
     store.set(u);
     return u;
   }
@@ -28,6 +30,7 @@ export const updateUser = action(
   'update',
   async (store, newUser: User) => {
     await Preferences.set({ key: 'user', value: JSON.stringify(newUser) });
+    await Preferences.set({ key: 'songs', value: JSON.stringify(songs.get()) });
     store.set(newUser);
   }
 );
@@ -37,16 +40,13 @@ export const updateUsername = action(
   'update-username',
   async (store, newUsername: string) => {
     const u = store.get();
-    const res = await fetch(
-      'https://us-central1-friendsfm.cloudfunctions.net/setUsername',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          authToken: authToken.get(),
-          username: newUsername,
-        }),
-      }
-    );
+    const res = await fetch(FIREBASE_URL.get() + '/setUsername', {
+      method: 'POST',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+        username: newUsername,
+      }),
+    });
     if (!(await handleApiResponse(res))) {
       // failed to set new username
       return false;
@@ -65,17 +65,14 @@ export const updateMusicPlatform = action(
   'update-music-platform',
   async (store, newMusicPlatform: MusicPlatform, authCode?: string) => {
     const u = store.get();
-    const res = await fetch(
-      'https://us-central1-friendsfm.cloudfunctions.net/setMusicPlatform',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          authToken: authToken.get(),
-          musicPlatform: newMusicPlatform,
-          platformAuthCode: authCode,
-        }),
-      }
-    );
+    const res = await fetch(FIREBASE_URL.get() + '/setMusicPlatform', {
+      method: 'POST',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+        musicPlatform: newMusicPlatform,
+        platformAuthCode: authCode,
+      }),
+    });
     if (!(await handleApiResponse(res))) {
       // failed to set new music platform
       return false;
@@ -93,20 +90,30 @@ export const updateMusicPlatform = action(
 );
 
 // get updated user data
-export const getUserData = action(user, 'get-user-data', async (_store) => {
-  const res = await fetch(
-    'https://us-central1-friendsfm.cloudfunctions.net/getUser',
-    {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-      }),
-    }
-  );
+export const refreshUser = action(user, 'get-user-data', async (_store) => {
+  if (!loggedIn.get()) return false;
+  let messagingToken = '';
+  try {
+    await FirebaseMessaging.checkPermissions().catch(
+      async () => await FirebaseMessaging.requestPermissions()
+    );
+    messagingToken = (await FirebaseMessaging.getToken())?.token;
+  } catch (e) {
+    console.log(e);
+  }
+  await getNewAuthToken();
+  const res = await fetch(FIREBASE_URL.get() + '/getUser', {
+    method: 'POST',
+    body: JSON.stringify({
+      authToken: authToken.get(),
+      messagingToken,
+    }),
+  });
   const json = await handleApiResponse(res);
   if (!json) {
-    // failed to set new music platform
+    // failed to refresh user
     return false;
   }
-  await updateUser(json.message as User);
+  songs.set(json.message.songs as Song[]);
+  await updateUser(json.message.user as User);
 });

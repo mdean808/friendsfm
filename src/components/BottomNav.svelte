@@ -5,7 +5,7 @@
 
 <div
   style={`height: ${70 + $bottomInset + (bottomInset ? -15 : 0)}px`}
-  class={`bg-gray-900 flex w-full`}
+  class={`bg-gray-900 z-30 flex w-full`}
 >
   <button
     on:click={() => goto('/songs')}

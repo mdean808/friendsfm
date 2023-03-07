@@ -1,7 +1,7 @@
 <script lang="ts">
 </script>
 
-<div class="z-40 fixed top-0 left-0 backdrop-blur-md w-full h-full flex">
+<div class="z-50 fixed top-0 left-0 backdrop-blur-md w-full h-full flex">
   <div class="self-center mx-auto items-center justify-center">
     <svg
       fill="none"

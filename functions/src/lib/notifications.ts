@@ -32,25 +32,7 @@ export const sendDaily = async () => {
   functions.logger.info('Successfully sent message:', res);
 };
 
-export const sendToMorgan = async (date: Date) => {
-  const message: Message = {
-    notification: {
-      title: 'New Notification Time Generated',
-      body: date.toLocaleTimeString(),
-    },
-    token: process.env.MORGAN_TOKEN || '',
-    android: {
-      priority: 'high',
-    },
-    apns: {
-      payload: {
-        aps: {
-          'interruption-level': 'time_sensitive',
-        },
-      },
-    },
-  };
-
+export const newNotification = async (message: Message) => {
   const res = await messaging.send(message);
   functions.logger.info('Sent message to morgan', res);
 };

@@ -8,6 +8,19 @@ const SPOTIFY_AUTH = Buffer.from(
 
 const db = getFirestore();
 
+export const updateUserMessagingToken = async (
+  id: string,
+  messagingToken: string
+) => {
+  if (!id) throw Error('No user id provided.');
+  if (!messagingToken) throw Error('No messaging token provided.');
+  const usersRef = db.collection('users');
+  const res = usersRef.doc(id);
+  if (!(await res.get()).exists)
+    throw new Error('User of given id does not exit.');
+  await res.update({ messagingToken });
+};
+
 export const getUserById = async (uid: string) => {
   const usersRef = db.collection('users');
   const res = await usersRef.doc(uid).get();

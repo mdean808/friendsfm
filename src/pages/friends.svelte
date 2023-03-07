@@ -4,10 +4,9 @@
     user,
     sendFriendRequest,
     acceptFriendRequest,
-    statusBarHeight,
     prevPath,
     rejectFriendRequest,
-    getUserData,
+    refreshUser,
   } from '../store';
   import Input from '../components/Input.svelte';
   import Button from '../components/Button.svelte';
@@ -68,7 +67,7 @@
   const swipeEnd = async () => {
     if (shouldRefreshOnSwipeEnd && !loadingFriends) {
       loadingFriends = true;
-      await getUserData();
+      await refreshUser();
       loadingFriends = false;
       shouldRefreshOnSwipeEnd = false;
     }

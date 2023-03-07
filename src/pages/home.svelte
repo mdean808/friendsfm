@@ -18,7 +18,12 @@
   import Submission from '../components/Submission.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
   import SkeletonSubmission from '../components/SkeletonSubmission.svelte';
-  import { formatDurationPlayed, formatTimePlayed, goto } from '../lib';
+  import {
+    convertDateToLateString,
+    formatDurationPlayed,
+    formatTimePlayed,
+    goto,
+  } from '../lib';
 
   // GLOBALS
   let loadingSubmissions = true;
@@ -97,11 +102,7 @@
   };
 </script>
 
-<div
-  id="home"
-  class="text-center w-full py-2 px-4 overflow-y-auto"
-  style="height: inherit;"
->
+<div id="home" class="text-center w-full py-2 px-4 overflow-y-auto">
   {#if shouldRefreshOnSwipeEnd && !loadingSubmissions}
     <div transition:slide class="mx-auto">
       <p class="mx-auto w-fit py-0.5 px-3 rounded-lg bg-gray-900 animate-pulse">
@@ -109,7 +110,7 @@
       </p>
     </div>
   {/if}
-  <div class="mb-3">
+  <div class="mb-3 w-3/4 mx-auto">
     {#if loadingSubmissions}
       <LoadingIndicator className={'mx-auto w-16 h-16'} />
     {:else if $userSubmission.song}
@@ -122,58 +123,92 @@
           })}
         </span>
       {:else}
-        <span class="text-sm text-red-500"
-          >{new Date($userSubmission.time).toLocaleString('en-US', {
-            hour: 'numeric',
-            minute: 'numeric',
-            hour12: true,
-          })}
+        <span class="text-sm text-red-500">
+          {convertDateToLateString(new Date($userSubmission.time))}
+          <!-- {new Date($userSubmission.time).toLocaleString('en-US', { -->
+          <!--   hour: 'numeric', -->
+          <!--   minute: 'numeric', -->
+          <!--   hour12: true, -->
+          <!-- })} -->
         </span>
       {/if}
       <div
-        class="border-2 border-gray-600 rounded-md w-fit mx-auto my-1 py-2 text-left space-x-4 flex px-2"
+        class="border-2 w-full border-gray-600 rounded-md mx-auto my-1 py-2 text-left space-x-4 flex px-2"
       >
         <a href={$userSubmission.song.url} class="flex-grow">
-          <div>
-            <p class={`text-${$user.musicPlatform}`}>
+          <div class="flex-col flex h-full">
+            <p class={`flex-grow text-${$user.musicPlatform}`}>
               {$userSubmission.song.name}
             </p>
-            <p>{$userSubmission.song.artist}</p>
+            <p class="">{$userSubmission.song.artist}</p>
           </div>
         </a>
-        <div class="flex-grow-0 flex-shrink-0">
-          <svg
-            on:click={toggleHeart}
-            on:keypress={toggleHeart}
-            class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
-              loadingHeart ? 'animate-ping text-pink-500' : ''
-            } ${
-              $songs.find((s) => s.name === $userSubmission.song.name)
-                ? 'text-pink-500'
-                : ''
-            } `}
-            fill={$songs.find((s) => s.name === $userSubmission.song.name)
-              ? 'currentColor'
-              : 'none'}
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-            /></svg
-          >
+        <div class="flex-grow-0 text-right">
+          <div class="h-full flex flex-col flex-nowrap justify-between">
+            <svg
+              on:click={toggleHeart}
+              on:keypress={toggleHeart}
+              class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
+                loadingHeart ? 'animate-ping text-pink-500' : ''
+              } ${
+                $songs.find((s) => s.name === $userSubmission.song.name)
+                  ? 'text-pink-500'
+                  : ''
+              } `}
+              fill={$songs.find((s) => s.name === $userSubmission.song.name)
+                ? 'currentColor'
+                : 'none'}
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              /></svg
+            >
+            <div class="flex-grow-0 flex-shrink" />
+          </div>
         </div>
       </div>
-      <p class="text-gray-400">
+      {#if $userSubmission.audial && $userSubmission.audial.number != -1}
+        <div class="text-sm">
+          <p>audial #{$userSubmission.audial.number}</p>
+          {$userSubmission.audial.score}
+        </div>
+      {:else}
+        <button
+          class="text-blue-500 text-sm underline"
+          on:click={() => goto('/paste_audial')}>share audial score</button
+        >
+      {/if}
+      <p class="text-gray-400 ">
         {#if $userSubmission.song.timestamp > 0}
-          played at {formatTimePlayed($userSubmission.song.timestamp)}
+          song played at {formatTimePlayed($userSubmission.song.timestamp)}
         {:else}
-          {formatDurationPlayed($userSubmission.song.durationElapsed)} of {formatDurationPlayed(
-            $userSubmission.song.length
-          )} played
+          <div class="flex items-center my-2">
+            <span class="h-5"
+              >{formatDurationPlayed(
+                $userSubmission.song.durationElapsed
+              )}</span
+            >
+            <div
+              class="w-full mx-2 my-auto ray-200 rounded-full h-1 bg-gray-600"
+            >
+              <div
+                class="bg-blue-500 h-1 rounded-full"
+                style={`width: ${
+                  ($userSubmission.song.durationElapsed /
+                    $userSubmission.song.length) *
+                  100
+                }%`}
+              />
+            </div>
+            <span class="h-5"
+              >{formatDurationPlayed($userSubmission.song.length)}</span
+            >
+          </div>
         {/if}
       </p>
     {/if}

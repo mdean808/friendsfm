@@ -59,7 +59,6 @@ export interface Submission {
 }
 
 export interface Audial {
-  id: string;
   number: number;
   score: string;
 }

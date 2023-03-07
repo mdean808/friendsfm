@@ -1,12 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
+  import LoadingIndicator from '../components/LoadingIndicator.svelte';
   import { formatDurationPlayed, getPlatformColor } from '../lib';
   import { loadSongs, songs, toggleSong, user } from '../store';
 
   let loadingSongs = false;
   onMount(async () => {
-    if (loadingSongs) return;
+    if (loadingSongs || !songs.get() || songs.get().length !== 0) return;
     loadingSongs = true;
     await loadSongs();
     loadingSongs = false;
@@ -17,46 +18,53 @@
   <div class="mx-4 py-1 text-center border-b-2 border-gray-400">
     <h1 class="text-xl">songs</h1>
   </div>
-  <div class="">
-    {#if $songs.length === 0}
-      <p class="text-gray-500 mx-auto text-center mt-2">
-        you have no saved songs
-      </p>
-    {/if}
-    {#each $songs as song}
-      <div
-        transition:slide
-        class="text-left px-2 mx-4 border-b-2 border-gray-400 py-2 mb-2 flex space-x-4"
-      >
-        <a href={song.url} class="flex-grow">
-          <h1 class={`text-${getPlatformColor($user.musicPlatform)}`}>
-            {song.name}
-          </h1>
-          <p class="text-white">
-            {song.artist}
-          </p>
-          <p class="text-sm text-gray-500">
-            {formatDurationPlayed(song.length)}
-          </p>
-        </a>
-        <div class="flex-grow-0 flex-shrink">
-          <svg
-            on:click={() => toggleSong(song)}
-            on:keypress={() => toggleSong(song)}
-            class="w-6 h-6 ml-auto flex-grow-0 flex-shrink text-pink-500"
-            fill="currentColor"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-            /></svg
-          >
+  {#if loadingSongs}
+    <div class="w-16 h-16 mt-2 mx-auto">
+      <LoadingIndicator className="mx-auto" />
+    </div>
+  {:else}
+    <div class="">
+      {#if $songs.length === 0}
+        <p class="text-gray-500 mx-auto text-center mt-2">
+          you have no saved songs
+        </p>
+      {/if}
+      {#each $songs as song}
+        <div
+          in:slide
+          class="text-left px-2 mx-4 border-b-2 border-gray-400 py-2 mb-2 flex space-x-4"
+        >
+          <a href={song.url} class="flex-grow">
+            <h1 class={`text-${getPlatformColor($user.musicPlatform)}`}>
+              {song.name}
+            </h1>
+            <p class="text-white">
+              {song.artist}
+            </p>
+            <p class="text-sm text-gray-500">
+              <!-- todo: make this show the person who's submission the song was saved from -->
+              {formatDurationPlayed(song.length)}
+            </p>
+          </a>
+          <div class="flex-grow-0 flex-shrink">
+            <svg
+              on:click={() => toggleSong(song)}
+              on:keypress={() => toggleSong(song)}
+              class="w-6 h-6 ml-auto flex-grow-0 flex-shrink text-pink-500"
+              fill="currentColor"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              /></svg
+            >
+          </div>
         </div>
-      </div>
-    {/each}
-  </div>
+      {/each}
+    </div>
+  {/if}
 </div>

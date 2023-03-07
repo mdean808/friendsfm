@@ -1,6 +1,6 @@
 import { getAuth } from 'firebase-admin/auth';
 import * as functions from 'firebase-functions';
-import { createUser, getUserById } from '../lib/db';
+import { createUser, getUserById, getUserSongs } from '../lib/db';
 import { User } from '../types';
 
 const auth = getAuth();
@@ -17,12 +17,17 @@ export const loginUser = functions.https.onRequest(async (req, res) => {
     if (userRes) {
       // user has already been registered, send success
       functions.logger.info(`User ${userRes.id} already registered`);
-      res.status(200).json({ type: 'success', message: userRes });
+      const songs = await getUserSongs(user.id);
+      res
+        .status(200)
+        .json({ type: 'success', message: { user: userRes, songs } });
     } else {
       try {
         const userRes = await createUser(user);
         //store user to the database and return id
-        res.status(200).json({ type: 'success', message: userRes });
+        res
+          .status(200)
+          .json({ type: 'success', message: { user: userRes, songs: [] } });
       } catch (e) {
         functions.logger.info('Error in createUser.');
         functions.logger.error(e);

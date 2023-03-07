@@ -14,4 +14,11 @@ export const getPlatform = action(platform, 'get-platform', async (store) => {
   store.set(info.platform);
 });
 
+export const FIREBASE_URL = atom<string>(
+  // import.meta.env.DEV
+  //   ? 'http://localhost:5001/friendsfm/us-central1'
+  //   : 'https://us-central1-friendsfm.cloudfunctions.net'
+  'https://us-central1-friendsfm.cloudfunctions.net'
+);
+
 //TODO: request friend submissions, user data every 30(?) seconds

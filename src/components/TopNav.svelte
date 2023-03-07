@@ -4,7 +4,12 @@
   import { statusBarHeight, user } from '../store';
 </script>
 
-<div style={`height: ${55 + $statusBarHeight}px`} class={`bg-gray-900 w-full`}>
+<div
+  style={`height: ${
+    55 + $statusBarHeight
+  }px; padding-top: ${$statusBarHeight}px`}
+  class={`bg-gray-900 z-30 w-full`}
+>
   <div
     class={`w-full flex p-3 flex-row justify-between items-center text-${getPlatformColor(
       $user?.musicPlatform

@@ -44,5 +44,9 @@
         on:click={setUsername}>next</Button
       >
     </div>
+    <button
+      on:click={() => goto('/new_user')}
+      class="mx-auto text-blue-500 underline text-center mt-10">go back</button
+    >
   </div>
 </main>

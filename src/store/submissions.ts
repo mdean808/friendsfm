@@ -1,8 +1,7 @@
 import { action, atom, map } from 'nanostores';
-import type { Submission } from '../types';
-import { Geolocation } from '@capacitor/geolocation';
-import { handleApiResponse } from '../lib';
-import { authToken } from '.';
+import type { Audial, Submission } from '../types';
+import { goto, handleApiResponse } from '../lib';
+import { authToken, FIREBASE_URL, loading } from '.';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 
 export const userSubmission = map<Submission>();
@@ -12,23 +11,20 @@ export const generateSubmission = action(
   'generate-submission',
   async (store) => {
     let location: GeolocationPosition;
-    try {
-      await Geolocation.requestPermissions();
-      location = await Geolocation.getCurrentPosition();
-    } catch (e) {
-      console.log(e);
-    }
-    const res = await fetch(
-      'https://us-central1-friendsfm.cloudfunctions.net/createNewUserSubmission',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          authToken: authToken.get(),
-          latitude: location ? location.coords.latitude : undefined,
-          longitude: location ? location.coords.longitude : undefined,
-        }),
-      }
-    );
+    // try {
+    //   await Geolocation.requestPermissions();
+    //   location = await Geolocation.getCurrentPosition();
+    // } catch (e) {
+    //   console.log(e);
+    // }
+    const res = await fetch(FIREBASE_URL.get() + '/createNewUserSubmission', {
+      method: 'POST',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+        latitude: location ? location.coords.latitude : undefined,
+        longitude: location ? location.coords.longitude : undefined,
+      }),
+    });
     const json = await handleApiResponse(res);
     if (!json) {
       // failed to set new music platform
@@ -47,7 +43,7 @@ export const getSubmissionStatus = action(
   'get-submission-status',
   async (store) => {
     const res = await fetch(
-      'https://us-central1-friendsfm.cloudfunctions.net/getCurrentSubmissionStatus',
+      FIREBASE_URL.get() + '/getCurrentSubmissionStatus',
       {
         method: 'POST',
         body: JSON.stringify({
@@ -62,5 +58,44 @@ export const getSubmissionStatus = action(
     }
     store.set(json.message.friends as Submission[]);
     if (json.message.user) userSubmission.set(json.message.user as Submission);
+  }
+);
+
+export const shareAudial = action(
+  userSubmission,
+  'share-submission-audial',
+  async (store, audial: string | Audial) => {
+    const sub = store.get();
+    loading.set(true);
+    let number: number;
+    let score: string;
+    if (typeof audial !== 'string') {
+      number = audial.number;
+      score = audial.score;
+    } else {
+      const split = audial.split('\n');
+      number = parseInt(split[0].split('#')[1]) as number;
+      score = split[1] ? split[1] : audial;
+    }
+    const res = await fetch(
+      FIREBASE_URL.get() + '/setCurrentSubmissionAudialScore',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          authToken: authToken.get(),
+          submissionId: sub.id,
+          parsedAudial: { number, score },
+        }),
+      }
+    );
+    const json = await handleApiResponse(res);
+    loading.set(false);
+    if (!json) {
+      // failed to set new music platform
+      return false;
+    }
+    sub.audial = { number, score };
+    store.set(sub);
+    goto('/');
   }
 );

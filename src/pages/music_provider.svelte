@@ -82,9 +82,6 @@
           >
         </div>
       </div>
-      <p class="text-sm text-gray-400 text-left pl-1">
-        So and so is a registered trademark of so and so
-      </p>
     </div>
     <div class="mt-20 w-full">
       <Button
@@ -100,5 +97,9 @@
         on:click={setProvider}>Finish Up</Button
       >
     </div>
+    <button
+      on:click={() => goto('/new_user')}
+      class="mx-auto text-blue-500 underline text-center mt-10">go back</button
+    >
   </div>
 </main>

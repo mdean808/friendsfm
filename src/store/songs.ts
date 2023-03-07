@@ -2,19 +2,17 @@ import { action, atom } from 'nanostores';
 import { handleApiResponse } from '../lib';
 import type { Song } from '../types';
 import { authToken } from './auth';
+import { FIREBASE_URL } from './misc';
 
 export const songs = atom<Song[]>([]);
 
 export const loadSongs = action(songs, 'load-songs', async (store) => {
-  const res = await fetch(
-    'https://us-central1-friendsfm.cloudfunctions.net/getSongs',
-    {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-      }),
-    }
-  );
+  const res = await fetch(FIREBASE_URL.get() + '/getSongs', {
+    method: 'POST',
+    body: JSON.stringify({
+      authToken: authToken.get(),
+    }),
+  });
   const json = await handleApiResponse(res);
   if (!json) {
     // failed to set new music platform
@@ -37,16 +35,13 @@ export const toggleSong = action(
       s = s.filter((s) => s.name !== song.name);
       store.set(s);
       // save to backend
-      const res = await fetch(
-        'https://us-central1-friendsfm.cloudfunctions.net/deleteSong',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            authToken: authToken.get(),
-            song,
-          }),
-        }
-      );
+      const res = await fetch(FIREBASE_URL.get() + '/deleteSong', {
+        method: 'POST',
+        body: JSON.stringify({
+          authToken: authToken.get(),
+          song,
+        }),
+      });
       const json = await handleApiResponse(res);
       if (!json) {
         // failed to set new music platform
@@ -54,16 +49,13 @@ export const toggleSong = action(
       }
     } else {
       // save to the backend
-      const res = await fetch(
-        'https://us-central1-friendsfm.cloudfunctions.net/saveSong',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            authToken: authToken.get(),
-            song,
-          }),
-        }
-      );
+      const res = await fetch(FIREBASE_URL.get() + '/saveSong', {
+        method: 'POST',
+        body: JSON.stringify({
+          authToken: authToken.get(),
+          song,
+        }),
+      });
       const json = await handleApiResponse(res);
       if (!json) {
         // failed to set new music platform
