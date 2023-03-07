@@ -124,7 +124,7 @@
         </span>
       {:else}
         <span class="text-sm text-red-500">
-          {convertDateToLateString(new Date($userSubmission.time))}
+          {convertDateToLateString(new Date($userSubmission.lateTime))}
           <!-- {new Date($userSubmission.time).toLocaleString('en-US', { -->
           <!--   hour: 'numeric', -->
           <!--   minute: 'numeric', -->

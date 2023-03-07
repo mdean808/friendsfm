@@ -22,6 +22,10 @@ export const getUserSubmission = async (user: User) => {
     (submissionData.time as Timestamp).seconds,
     (submissionData.time as Timestamp).nanoseconds
   ).toDate();
+  submissionData.lateTime = new Timestamp(
+    (submissionData.lateTime as Timestamp).seconds,
+    (submissionData.lateTime as Timestamp).nanoseconds
+  ).toDate();
   return { ...submissionData, user: { username, musicPlatform } };
 };
 
@@ -57,14 +61,11 @@ export const generateUserSubmission = async (
     timestamp: currentSong.timestamp || 0,
   };
   // check for a late submission
-  const notificationTime = new Timestamp(
-    notificationTimestamp.seconds,
-    notificationTimestamp.nanoseconds
-  ).toDate();
+  const notificationTime = notificationTimestamp.toDate();
 
   let late = false;
-  let lateTime: Date | null = null;
-  if (notificationTime.getTime() > new Date().getTime()) {
+  let lateTime: Date | Timestamp = new Date();
+  if (notificationTime > new Date()) {
     // the current date is before the current notification time, so we use the previous time.
     const prevTime = (notificationsRef.get('prevTime') as Timestamp).toDate();
     const difference = new Date().getTime() - prevTime.getTime(); // This will give difference in milliseconds
@@ -83,9 +84,11 @@ export const generateUserSubmission = async (
     }
   }
   let time = Timestamp.fromDate(new Date());
+  lateTime = Timestamp.fromDate(lateTime);
   const submission: Submission = {
     time,
     late,
+    lateTime,
     number: currentSubmissionCount,
     audial: { number: -1, score: '' },
     song,
@@ -98,9 +101,10 @@ export const generateUserSubmission = async (
     (submission.time as Timestamp).seconds,
     (submission.time as Timestamp).nanoseconds
   ).toDate();
-  if (late && lateTime) {
-    submission.time = lateTime;
-  }
+  submission.lateTime = new Timestamp(
+    (submission.lateTime as Timestamp).seconds,
+    (submission.lateTime as Timestamp).nanoseconds
+  ).toDate();
   return { ...submission, user: { username, musicPlatform } };
 };
 
@@ -109,16 +113,6 @@ export const getFriendSubmissions = async (user: User) => {
   const currentSubmissionCount = (
     await db.collection('misc').doc('notifications').get()
   ).get('count');
-  // load notification information for late logic
-  const notificationsRef = await db
-    .collection('misc')
-    .doc('notifications')
-    .get();
-  const notificationTimestamp = notificationsRef.get('time');
-  const notificationTime = new Timestamp(
-    (notificationTimestamp as Timestamp).seconds,
-    (notificationTimestamp as Timestamp).nanoseconds
-  ).toDate();
   const friendSubmissions: Submission[] = [];
   for (const friend of user.friends) {
     const friendRef = db.collection('users').doc(friend.id);
@@ -129,16 +123,14 @@ export const getFriendSubmissions = async (user: User) => {
     const musicPlatform = (await friendRef.get()).get('musicPlatform');
     if (!friendSubmission.empty) {
       const friendSub = friendSubmission.docs[0].data() as Submission;
-      if (friendSub.late) {
-        friendSub.time = new Date(
-          new Date().getMilliseconds() - notificationTime.getMilliseconds()
-        );
-      } else {
-        friendSub.time = new Timestamp(
-          (friendSub.time as Timestamp).seconds,
-          (friendSub.time as Timestamp).nanoseconds
-        ).toDate();
-      }
+      friendSub.time = new Timestamp(
+        (friendSub.time as Timestamp).seconds,
+        (friendSub.time as Timestamp).nanoseconds
+      ).toDate();
+      friendSub.lateTime = new Timestamp(
+        (friendSub.lateTime as Timestamp).seconds,
+        (friendSub.lateTime as Timestamp).nanoseconds
+      ).toDate();
       friendSubmissions.push({
         ...friendSub,
         user: { username: friend.username, musicPlatform },

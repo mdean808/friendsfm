@@ -41,7 +41,7 @@
           </span>
         {:else}
           <span class="text-sm text-red-500">
-            {convertDateToLateString(new Date(data.time))}
+            {convertDateToLateString(new Date(data.lateTime))}
             <!-- {new Date(data.time).toLocaleString('en-US', { -->
             <!--   hour: 'numeric', -->
             <!--   minute: 'numeric', -->

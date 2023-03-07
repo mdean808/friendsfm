@@ -24,13 +24,13 @@ const config: CapacitorConfig = {
       resizeOnFullScreen: true,
     },
   },
-  // server: {
-  //   // url: 'http://206.12.70.138:8080',
-  //   // url: 'http://10.0.0.128:8080',
-  //   // url: 'http://172.20.10.6:8080',
-  //   url: 'http://192.168.1.81:8080',
-  //   cleartext: true,
-  // },
+  server: {
+    // url: 'http://206.12.70.138:8080',
+    url: 'http://10.0.0.128:8080',
+    // url: 'http://172.20.10.6:8080',
+    // url: 'http://192.168.1.81:8080',
+    cleartext: true,
+  },
 };
 
 export default config;

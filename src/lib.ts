@@ -73,12 +73,22 @@ export const formatTimePlayed = (time: number = Date.now()) => {
 };
 
 export const convertDateToLateString = (date: Date) => {
-  const time = date.toLocaleTimeString().split(' ')[0];
-  const hours = parseInt(time.split(':')[0]);
-  const minutes = parseInt(time.split(':')[1]);
-  const seconds = parseInt(time.split(':')[2]);
+  console.log(date);
+  if (isNaN(date.getTime())) return 'infinitely late';
+  const rootDate = new Date(0);
+  const days = date.getDate() - rootDate.getDate();
+  const hours = date.getHours() - rootDate.getHours();
+  const minutes = date.getMinutes() - rootDate.getMinutes();
+  const seconds = date.getSeconds() - rootDate.getSeconds();
+  // const time = date.toLocaleTimeString().split(' ')[0];
+  // const hours = parseInt(time.split(':')[0]);
+  // const minutes = parseInt(time.split(':')[1]);
+  // const seconds = parseInt(time.split(':')[2]);
   let res = '';
-  if (hours === 0 && minutes === 0) res = seconds + 's late';
+  if ((days > 0 && hours < 4) || hours > 20) res = days + 'd late';
+  else if (days > 0 && hours > 3 && hours < 21)
+    res = days + 'd ' + hours + 'h late';
+  else if (hours === 0 && minutes === 0) res = seconds + 's late';
   else if (hours === 0) res = minutes + 'm late';
   else if (minutes > 20 && minutes < 45)
     res = hours + 'h ' + minutes + 'm late';

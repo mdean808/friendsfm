@@ -55,6 +55,7 @@ export interface Submission {
   };
   song: Song;
   time: Date;
+  lateTime: Date;
   audial: Audial;
 }
 

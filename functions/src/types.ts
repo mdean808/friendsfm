@@ -1,4 +1,4 @@
-import type { Timestamp } from 'firebase-admin/firestore';
+import { Timestamp } from 'firebase-admin/firestore';
 
 export interface User {
   email: string;
@@ -52,6 +52,7 @@ export interface Submission {
     longitude: number;
     latitude: number;
   };
+  lateTime: Date | Timestamp;
 }
 
 export interface Audial {
