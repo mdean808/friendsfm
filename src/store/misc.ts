@@ -20,5 +20,3 @@ export const FIREBASE_URL = atom<string>(
   //   : 'https://us-central1-friendsfm.cloudfunctions.net'
   'https://us-central1-friendsfm.cloudfunctions.net'
 );
-
-//TODO: request friend submissions, user data every 30(?) seconds
