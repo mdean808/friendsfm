@@ -101,7 +101,7 @@ export const refreshUser = action(user, 'get-user-data', async (_store) => {
   } catch (e) {
     console.log(e);
   }
-  await getNewAuthToken();
+  // await getNewAuthToken();
   const res = await fetch(FIREBASE_URL.get() + '/getUser', {
     method: 'POST',
     body: JSON.stringify({

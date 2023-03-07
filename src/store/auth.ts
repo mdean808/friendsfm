@@ -16,7 +16,7 @@ import type { Song, User } from '../types';
 
 // refresh every 30 seconds
 export const userRefreshInterval = map<NodeJS.Timer>(
-  setInterval(() => refreshUser(), 30 * 1000)
+  setInterval(refreshUser, 30 * 1000)
 );
 
 export const stopRefreshInterval = action(
