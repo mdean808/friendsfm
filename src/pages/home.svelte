@@ -74,7 +74,8 @@
       swipePosCurrent.y = touch.screenY;
     }
     const changeInY = swipePosCurrent.y - swipePosStart.y;
-    if (document.getElementById('home')?.scrollTop <= 0 && changeInY > 100)
+    //todo: make scroll to refresh more similar to the iOS native functionality
+    if (document.getElementById('home')?.scrollTop <= 0 && changeInY > 275)
       shouldRefreshOnSwipeEnd = true;
     else shouldRefreshOnSwipeEnd = false;
   };
