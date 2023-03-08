@@ -55,7 +55,22 @@ export const setUserUsername = async (id: string, username: string) => {
   if ((await usersRef.where('username', '==', username).get()).docs[0]) {
     throw new Error('Username taken. Please try another.');
   } else {
-    //todo: update user's friends stored username for this user
+    const userFriends = (await user.get()).get('friends') as {
+      id: string;
+      username: string;
+    }[];
+    for (const friend of userFriends) {
+      const friendRef = usersRef.doc(friend.id);
+      const friendFriends = (await friendRef.get()).get('friends') as {
+        id: string;
+        username: string;
+      }[];
+      for (const userWithinFriendFriends of friendFriends) {
+        if (userWithinFriendFriends.id === id)
+          userWithinFriendFriends.username = username;
+      }
+      friendRef.update({ friends: friendFriends });
+    }
     await user.update({ username });
   }
 };
