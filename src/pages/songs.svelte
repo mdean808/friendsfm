@@ -42,7 +42,6 @@
               {song.artist}
             </p>
             <p class="text-sm text-gray-500">
-              <!-- todo: make this show the person who's submission the song was saved from -->
               {#if song.user?.username}
                 {song.user?.username}
               {:else}

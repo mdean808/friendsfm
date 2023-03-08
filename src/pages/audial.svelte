@@ -2,7 +2,6 @@
   import { bottomInset, statusBarHeight } from '../store';
 </script>
 
-<!-- todo: actually implement audial locally instead of iframing -->
 <iframe
   allow="clipboard-read; clipboard-write"
   class="w-full"
