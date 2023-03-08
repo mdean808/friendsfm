@@ -47,7 +47,10 @@ export const generateUserSubmission: (
     .doc('notifications')
     .get();
   const currentSubmissionCount = notificationsRef.get('count');
-  //TODO: check if there is already a submission with this count in the user's submissions
+  const existingSubmission = await submissionsRef
+    .where('number', '==', currentSubmissionCount)
+    .get();
+  if (!existingSubmission.empty) throw new Error('User already submitted.');
   const notificationTimestamp = notificationsRef.get('time') as Timestamp;
   const accessCode = await checkSpotifyAccessCode(
     (await userRef.get()).get('musicPlatformAuth'),
