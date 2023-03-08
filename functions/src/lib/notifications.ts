@@ -14,11 +14,14 @@ export const sendDaily = async () => {
     topic: 'all',
     android: {
       priority: 'high',
+      notification: {
+        priority: 'high',
+      },
     },
     apns: {
       payload: {
         aps: {
-          'interruption-level': 'time_sensitive',
+          'interruption-level': 'time-sensitive',
         },
       },
     },
