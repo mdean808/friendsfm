@@ -85,7 +85,7 @@
   });
 </script>
 
-<div id="friends">
+<div id="friends" class="h-full">
   <div
     class="w-full flex border-b-white border-b-2 flex-row justify-between items-center h-[55px] px-2"
   >
@@ -134,7 +134,7 @@
       {/if}
     </div>
   {/if}
-  <div class="bg-gray-800">
+  <div class="bg-gray-800 max-h-[50%] h-auto overflow-scroll">
     {#each $user.friends as friend}
       <div transition:slide class="w-full border-b-white border-b-2 py-1 px-3">
         <span class="text-gray-200 text-xl inline-block">@</span><span
@@ -200,15 +200,15 @@
       {/if}
     </div>
   </div>
-  {#if $user.friendRequests.length > 0}
+  {#if $user.friendRequests.concat(['user']).length > 0}
     <div class="bg-gray-900 border-white">
       <p
         class="text-2xl mx-auto text-center pt-3 pb-2 w-full border-b-2 border-white"
       >
         friend requests
       </p>
-      <div class="bg-gray-800">
-        {#each $user.friendRequests as username}
+      <div class="bg-gray-800 max-h-[150px] h-auto overflow-scroll">
+        {#each $user.friendRequests.concat(['user']) as username}
           <div
             transition:slide
             class="w-full border-b-white text-lg border-b-2 py-1 px-3 flex"
