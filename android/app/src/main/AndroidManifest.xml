@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
   package="xyz.mogdan.friendsfm">
 
   <application
@@ -11,12 +12,16 @@
     android:theme="@style/AppTheme">
 
     <activity
-      android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
       android:name="xyz.mogdan.friendsfm.MainActivity"
+      android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
+      android:exported="true"
       android:label="@string/title_activity_main"
-      android:theme="@style/AppTheme.NoActionBarLaunch"
       android:launchMode="singleTask"
-      android:exported="true">
+      android:theme="@style/AppTheme.NoActionBarLaunch">
+
+      <meta-data
+        android:name="com.google.firebase.messaging.default_notification_icon"
+        android:resource="@mipmap/ic_launcher" />
 
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -28,9 +33,9 @@
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
         <!-- Accepts URIs that begin with "http://audial.mogdan.xyz/friendsfm/spotify” -->
-        <data android:scheme="https"
-          android:host="audial.mogdan.xyz"
-          android:pathPrefix="/friendsfm/spotify" />
+        <data android:scheme="https" />
+        <data android:host="audial.mogdan.xyz" />
+        <data android:pathPrefix="/friendsfm" />
         <!-- note that the leading "/" is required for pathPrefix-->
       </intent-filter>
 
@@ -38,7 +43,9 @@
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
-        <data android:scheme="https" android:host="friendsfm.mogdan.xyz" />
+        <!-- Accepts URIs that begin with "https://friendsfm.mogdan.xyz” -->
+        <data android:scheme="https" />
+        <data android:host="friendsfm.mogdan.xyz" />
       </intent-filter>
     </activity>
 
@@ -49,18 +56,21 @@
       android:grantUriPermissions="true">
       <meta-data
         android:name="android.support.FILE_PROVIDER_PATHS"
-        android:resource="@xml/file_paths"></meta-data>
+        android:resource="@xml/file_paths" />
     </provider>
   </application>
 
-  <uses-sdk android:minSdkVersion="27" android:targetSdkVersion="32" />
+  <uses-sdk
+    android:minSdkVersion="27"
+    android:targetSdkVersion="33"
+    tools:ignore="GradleOverrides,ManifestOrder" />
 
   <!-- Permissions -->
 
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
   <uses-feature android:name="android.hardware.location.gps" />
-  <meta-data android:name="com.google.firebase.messaging.default_notification_icon"
-    android:resource="@mipmap/ic_launcher" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 </manifest>
