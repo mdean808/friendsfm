@@ -68,6 +68,7 @@
         on:click={() => shareAudial(res)}>share</Button
       >
     {/if}
+    <br />
     <button
       on:click={() => goto('/')}
       class="underline text-blue-500 mt-10 text-center mx-auto">go back</button
