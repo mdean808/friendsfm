@@ -200,7 +200,7 @@
       {/if}
     </div>
   </div>
-  {#if $user.friendRequests.concat(['user']).length > 0}
+  {#if $user.friendRequests.length > 0}
     <div class="bg-gray-900 border-white">
       <p
         class="text-2xl mx-auto text-center pt-3 pb-2 w-full border-b-2 border-white"
@@ -208,7 +208,7 @@
         friend requests
       </p>
       <div class="bg-gray-800 max-h-[150px] h-auto overflow-scroll">
-        {#each $user.friendRequests.concat(['user']) as username}
+        {#each $user.friendRequests as username}
           <div
             transition:slide
             class="w-full border-b-white text-lg border-b-2 py-1 px-3 flex"
