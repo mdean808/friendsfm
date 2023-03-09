@@ -74,13 +74,12 @@
       swipePosCurrent.y = touch.screenY;
     }
     const changeInY = swipePosCurrent.y - swipePosStart.y;
-    //todo: make scroll to refresh more similar to the iOS native functionality
-    if (document.getElementById('home')?.scrollTop <= 0 && changeInY > 275)
+    if (document.getElementById('home')?.scrollTop <= 0 && changeInY > 100)
       shouldRefreshOnSwipeEnd = true;
     else shouldRefreshOnSwipeEnd = false;
   };
 
-  const swipeEnd = async () => {
+  const swipeEnd = async (e: TouchEvent) => {
     if (shouldRefreshOnSwipeEnd && !loadingSubmissions) {
       loadingSubmissions = true;
       await getSubmissionStatus();
@@ -111,7 +110,7 @@
   };
 </script>
 
-<div id="home" class="text-center w-full py-2 px-4 overflow-y-auto">
+<div id="home" class="text-center w-full py-2 px-4 overflow-y-auto h-full">
   {#if shouldRefreshOnSwipeEnd && !loadingSubmissions}
     <div transition:slide class="mx-auto">
       <p class="mx-auto w-fit py-0.5 px-3 rounded-lg bg-gray-900 animate-pulse">

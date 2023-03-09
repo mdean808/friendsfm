@@ -73,7 +73,6 @@ export const formatTimePlayed = (time: number = Date.now()) => {
 };
 
 export const convertDateToLateString = (date: Date) => {
-  console.log(date);
   if (isNaN(date.getTime())) return 'infinitely late';
   const rootDate = new Date(0);
   const days = date.getDate() - rootDate.getDate();
