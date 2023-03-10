@@ -25,10 +25,17 @@
     formatTimePlayed,
     goto,
   } from '../lib';
-  import type { SavedSong } from '../types';
+  import type { SavedSong, Submission as SubmissionType } from '../types';
 
   // GLOBALS
   let loadingSubmissions = true;
+  let sortedSubmissions: SubmissionType[] = [];
+
+  friendSubmissions.subscribe((val) => {
+    sortedSubmissions = [...val].sort(
+      (a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()
+    );
+  });
 
   onMount(async () => {
     // setup pull to refresh
@@ -49,6 +56,8 @@
       loadingSubmissions = true;
       await getSubmissionStatus();
     }
+    // Hide splash screen
+    await SplashScreen.hide();
     loadingSubmissions = false;
   });
 
@@ -82,7 +91,7 @@
     else shouldRefreshOnSwipeEnd = false;
   };
 
-  const swipeEnd = async (e: TouchEvent) => {
+  const swipeEnd = async () => {
     if (shouldRefreshOnSwipeEnd && !loadingSubmissions) {
       loadingSubmissions = true;
       await getSubmissionStatus();
@@ -240,7 +249,7 @@
         on:click={createSubmission}>Share Current Song</Button
       >
     {:else}
-      {#each $friendSubmissions as submission}
+      {#each sortedSubmissions as submission}
         <div class="my-2">
           <Submission data={submission} />
         </div>

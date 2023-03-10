@@ -83,10 +83,13 @@ export const convertDateToLateString = (date: Date) => {
   // const hours = parseInt(time.split(':')[0]);
   // const minutes = parseInt(time.split(':')[1]);
   // const seconds = parseInt(time.split(':')[2]);
+  const alternateHours = rootDate.getHours() - date.getHours();
   let res = '';
   if ((days > 0 && hours < 4) || hours > 20) res = days + 'd late';
   else if (days > 0 && hours > 3 && hours < 21)
     res = days + 'd ' + hours + 'h late';
+  else if (days < 0 && alternateHours > 3 && alternateHours < 21)
+    res = '1d ' + (rootDate.getHours() - date.getHours()) + 'h late';
   else if (hours === 0 && minutes === 0) res = seconds + 's late';
   else if (hours === 0) res = minutes + 'm late';
   else if (minutes > 20 && minutes < 45)
