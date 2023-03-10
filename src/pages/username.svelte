@@ -1,10 +1,16 @@
 <script lang="ts">
   import { toast } from '@zerodevx/svelte-toast';
+  import { onMount } from 'svelte';
+  import { SplashScreen } from '@capacitor/splash-screen';
   import Button from '../components/Button.svelte';
   import Input from '../components/Input.svelte';
   import { goto } from '../lib';
 
   import { updateUsername, loading, user } from '../store';
+
+  onMount(async () => {
+    await SplashScreen.hide();
+  });
 
   let username: string;
   const setUsername = async () => {

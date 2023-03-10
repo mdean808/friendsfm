@@ -1,6 +1,7 @@
 <script lang="ts">
   // IMPORTS
   import { onMount, onDestroy } from 'svelte';
+  import { SplashScreen } from '@capacitor/splash-screen';
   import {
     friendSubmissions,
     loading,
@@ -40,6 +41,8 @@
           loadingSubmissions = true;
           await getSubmissionStatus();
           loadingSubmissions = false;
+          // Hide splash screen
+          await SplashScreen.hide();
         }
       });
     } else if (!userSubmission.get()?.song) {

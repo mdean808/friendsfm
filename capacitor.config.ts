@@ -1,3 +1,6 @@
+/// <reference types="@capacitor/splash-screen" />
+/// <reference types="@capacitor-firebase/authentication" />
+/// <reference types="@capacitor-firebase/messaging" />
 import { CapacitorConfig } from '@capacitor/cli';
 import { KeyboardResize, KeyboardStyle } from '@capacitor/keyboard';
 
@@ -11,6 +14,10 @@ const config: CapacitorConfig = {
     scrollEnabled: false,
   },
   plugins: {
+    SplashScreen: {
+      launchAutoHide: false,
+      backgroundColor: '#1f2937',
+    },
     FirebaseAuthentication: {
       skipNativeAuth: false,
       providers: ['apple.com', 'google.com'],

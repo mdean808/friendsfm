@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from '../components/Button.svelte';
+  import { SplashScreen } from '@capacitor/splash-screen';
 
   import { MusicPlatform } from '../types';
   import {
@@ -14,7 +15,8 @@
 
   let platform: MusicPlatform;
 
-  onMount(() => {
+  onMount(async () => {
+    await SplashScreen.hide();
     if (!user.get().username) goto('/username');
   });
 

@@ -1,5 +1,7 @@
 <script lang="ts">
   import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
+  import { SplashScreen } from '@capacitor/splash-screen';
+  import { onMount } from 'svelte';
   import { goto } from '../lib';
   import {
     authToken,
@@ -10,6 +12,10 @@
     updateUser,
     user,
   } from '../store';
+
+  onMount(async () => {
+    await SplashScreen.hide();
+  });
 
   const signInWithGoogle = async () => {
     loading.set(true);

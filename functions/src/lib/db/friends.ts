@@ -32,6 +32,18 @@ export const acceptFriendRequest = async (
     friendFriends.push({ username: user.username, id: user.id });
     const friendRef = usersRef.doc(friend.uid);
     await friendRef.update({ friends: friendFriends });
+
+    // send notification
+    if (friend.messagingToken) {
+      const message: Message = {
+        notification: {
+          title: user.username + ' accepted your friend request!',
+          body: "tap to see what they're listening to",
+        },
+        token: friend.messagingToken,
+      };
+      newNotification(message);
+    }
     return (await userRef.get()).data() as User;
   } else {
     throw new Error('Friend request does not exist.');
@@ -80,9 +92,30 @@ export const sendFriendRequest = async (user: User, friendUsername: string) => {
     const message: Message = {
       notification: {
         title: user.username + ' added you as a friend!',
-        body: 'open the app to accept their request',
+        body: 'tap to accept their request',
       },
       token: friend.messagingToken,
+    };
+    newNotification(message);
+  }
+};
+
+export const sendNotificationToFriends = async (
+  user: User,
+  title: string,
+  body: string
+) => {
+  for (const f of user.friends) {
+    const friendRef = db.collection('users').doc(f.id);
+    const friend = await friendRef.get();
+    const friendMessagingToken = friend.get('messagingToken');
+    if (!friendMessagingToken) continue;
+    const message: Message = {
+      notification: {
+        title: title,
+        body: body,
+      },
+      token: friendMessagingToken,
     };
     await newNotification(message);
   }

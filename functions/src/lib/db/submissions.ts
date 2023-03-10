@@ -1,6 +1,7 @@
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { Audial, Song, Submission, User } from '../../types';
 import { checkSpotifyAccessCode, getCurrentSpotifySong } from '../spotify';
+import { sendNotificationToFriends } from './friends';
 
 const db = getFirestore();
 
@@ -20,14 +21,8 @@ export const getUserSubmission: (
   const submissionData = submission.docs[0].data() as Submission;
   const username = user.username;
   const musicPlatform = user.musicPlatform;
-  submissionData.time = new Timestamp(
-    (submissionData.time as Timestamp).seconds,
-    (submissionData.time as Timestamp).nanoseconds
-  ).toDate();
-  submissionData.lateTime = new Timestamp(
-    (submissionData.lateTime as Timestamp).seconds,
-    (submissionData.lateTime as Timestamp).nanoseconds
-  ).toDate();
+  submissionData.time = (submissionData.time as Timestamp).toDate();
+  submissionData.lateTime = (submissionData.lateTime as Timestamp).toDate();
   return {
     ...submissionData,
     user: { username, musicPlatform, id: user.id },
@@ -41,24 +36,26 @@ export const generateUserSubmission: (
 ) => Promise<Submission> = async (id, latitude = 0, longitude = 0) => {
   if (!id) throw new Error('No user provided.');
   const userRef = db.collection('users').doc(id);
-  const submissionsRef = userRef.collection('submissions');
+  const user = await userRef.get();
+
+  // perform verification checks for this new submission
   const notificationsRef = await db
     .collection('misc')
     .doc('notifications')
     .get();
   const currentSubmissionCount = notificationsRef.get('count');
+  const submissionsRef = userRef.collection('submissions');
   const existingSubmission = await submissionsRef
     .where('number', '==', currentSubmissionCount)
     .get();
   if (!existingSubmission.empty) throw new Error('User already submitted.');
-  const notificationTimestamp = notificationsRef.get('time') as Timestamp;
+
+  // get the most recently listend to song for this user
   const accessCode = await checkSpotifyAccessCode(
-    (await userRef.get()).get('musicPlatformAuth'),
+    user.get('musicPlatformAuth'),
     userRef
   );
-
   const currentSong = await getCurrentSpotifySong(accessCode);
-
   const song: Song = {
     id: '',
     name: currentSong.item.name,
@@ -68,9 +65,10 @@ export const generateUserSubmission: (
     durationElapsed: currentSong.progress_ms / 1000,
     timestamp: currentSong.timestamp || 0,
   };
-  // check for a late submission
-  const notificationTime = notificationTimestamp.toDate();
 
+  // check for a late submission
+  const notificationTimestamp = notificationsRef.get('time') as Timestamp;
+  const notificationTime = notificationTimestamp.toDate();
   let late = false;
   let lateTime: Date | Timestamp = new Date();
   if (notificationTime > new Date()) {
@@ -91,6 +89,8 @@ export const generateUserSubmission: (
       lateTime = new Date(new Date().getTime() - notificationTime.getTime());
     }
   }
+
+  // create and store the submission
   let time = Timestamp.fromDate(new Date());
   lateTime = Timestamp.fromDate(lateTime);
   const submission: Submission = {
@@ -103,16 +103,20 @@ export const generateUserSubmission: (
     location: { latitude, longitude },
   };
   await submissionsRef.add(submission);
-  const username = (await userRef.get()).get('username');
-  const musicPlatform = (await userRef.get()).get('musicPlatform');
-  submission.time = new Timestamp(
-    (submission.time as Timestamp).seconds,
-    (submission.time as Timestamp).nanoseconds
-  ).toDate();
-  submission.lateTime = new Timestamp(
-    (submission.lateTime as Timestamp).seconds,
-    (submission.lateTime as Timestamp).nanoseconds
-  ).toDate();
+  const username = user.get('username');
+  const musicPlatform = user.get('musicPlatform');
+
+  // send notification on late submission
+  if (late)
+    sendNotificationToFriends(
+      user.data() as User,
+      'late submission',
+      `${username} just shared what they're listening to.`
+    );
+
+  // adjust time and lateTime for a frontend-readable format
+  submission.time = time.toDate();
+  submission.lateTime = lateTime.toDate();
   return { ...submission, user: { username, musicPlatform, id } };
 };
 
@@ -133,14 +137,8 @@ export const getFriendSubmissions: (
     const musicPlatform = (await friendRef.get()).get('musicPlatform');
     if (!friendSubmission.empty) {
       const friendSub = friendSubmission.docs[0].data() as Submission;
-      friendSub.time = new Timestamp(
-        (friendSub.time as Timestamp).seconds,
-        (friendSub.time as Timestamp).nanoseconds
-      ).toDate();
-      friendSub.lateTime = new Timestamp(
-        (friendSub.lateTime as Timestamp).seconds,
-        (friendSub.lateTime as Timestamp).nanoseconds
-      ).toDate();
+      friendSub.time = (friendSub.time as Timestamp).toDate();
+      friendSub.lateTime = (friendSub.lateTime as Timestamp).toDate();
       friendSubmissions.push({
         ...friendSub,
         user: { username: friend.username, musicPlatform, id: friend.id },
