@@ -94,7 +94,6 @@ export const convertDateToLateString = (date: Date) => {
   else if (hours === 0) res = minutes + 'm late';
   else if (minutes > 20 && minutes < 45)
     res = hours + 'h ' + minutes + 'm late';
-  else if (minutes > 45) res = hours + 1 + 'h late';
   else res = hours + 'h late';
   return res;
 };

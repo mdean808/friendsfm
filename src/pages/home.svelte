@@ -33,7 +33,9 @@
 
   friendSubmissions.subscribe((val) => {
     sortedSubmissions = [...val].sort(
-      (a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()
+      (a, b) =>
+        new Date(b.lateTime || b.time).getTime() -
+        new Date(a.lateTime || a.time).getTime()
     );
   });
 
