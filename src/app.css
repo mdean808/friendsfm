@@ -23,4 +23,6 @@ body {
   --toastWidth: 100vw;
   --toastBarBackground: theme('colors.white');
   --toastBackground: theme('colors.gray.900');
+  --ion-background-color: theme('colors.gray.800') !important;
+  --ion-text-color: theme('colors.white') !important;
 }
