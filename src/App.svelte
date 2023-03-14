@@ -1,6 +1,7 @@
 <script lang="ts">
   import { FirebaseMessaging } from '@capacitor-firebase/messaging';
   import { SvelteToast } from '@zerodevx/svelte-toast';
+  import { Capacitor } from '@capacitor/core';
 
   import Home from './pages/home.svelte';
   import NewUser from './pages/new_user.svelte';
@@ -22,6 +23,8 @@
     getNewAuthToken,
     getUserFromPreferences,
     loggedIn,
+    refreshUser,
+    getSubmissionStatus,
   } from './store';
   import { goto } from './lib';
   import Loading from './components/Loading.svelte';
@@ -40,8 +43,16 @@
   import { IonSpinner } from '@ionic/core/components/ion-spinner';
   import { IonApp } from '@ionic/core/components/ion-app';
   import { IonContent } from '@ionic/core/components/ion-content';
+  import { PushNotifications } from '@capacitor/push-notifications';
+  import OSLogger from './plugins/OSLogger';
+  import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 
   onMount(async () => {
+    // window.onunhandledrejection = handleError;
+    if (Capacitor.isPluginAvailable('OSLogger')) {
+      await OSLogger.log({ message: 'starting app' });
+    }
+
     initialize();
     // The rest of the ion-elements can be defined as below
     tryDefine('ion-refresher', IonRefresher);
@@ -61,6 +72,42 @@
     document.documentElement.classList.add('ion-ce');
     loading.set(false);
 
+    if (Capacitor.isPluginAvailable('PushNotifications')) {
+      PushNotifications.addListener(
+        'pushNotificationActionPerformed',
+        async (notification) => {
+          let title = '';
+          try {
+            // todo: don't crash wehn this is called with the app closed
+            title = notification.notification.title;
+            if (title.includes('added you as a friend')) {
+              await refreshUser();
+              goto('/friends');
+            } else if (
+              title.includes('FriendsFM') ||
+              title.includes('late submission')
+            ) {
+              //todo: refresh home
+              await getSubmissionStatus();
+              goto('/home');
+            } else if (title.includes('accepted your friend request')) {
+              await refreshUser();
+              goto('/friends');
+            }
+          } catch (e) {
+            const error = e as Error;
+            console.log(error);
+            await FirebaseCrashlytics.log({
+              message: `Handling Notification Open: ${title}`,
+            });
+            await FirebaseCrashlytics.recordException({
+              message: e.name + ': ' + error.message,
+            });
+          }
+        }
+      );
+      await PushNotifications.removeAllDeliveredNotifications();
+    }
     await getStatusBarHeight();
     await getBottomInset();
     // request permissions

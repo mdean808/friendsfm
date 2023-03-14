@@ -3,6 +3,9 @@ import { currPath, getNewAuthToken, logout, prevPath } from './store';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
+import { App } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 
 export const getPlatformColor = (platform: MusicPlatform) => {
   switch (platform) {
@@ -96,4 +99,16 @@ export const convertDateToLateString = (date: Date) => {
     res = hours + 'h ' + minutes + 'm late';
   else res = hours + 'h late';
   return res;
+};
+
+export const handleError = (e: PromiseRejectionEvent) => {
+  FirebaseCrashlytics.recordException({ message: e.type });
+};
+
+export const getAppVersion = async () => {
+  try {
+    return (await App.getInfo()).version;
+  } catch (e) {
+    return 'web';
+  }
 };

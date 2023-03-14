@@ -8,6 +8,10 @@ import { Capacitor } from '@capacitor/core';
 import { initializeApp } from 'firebase/app';
 // import { getAnalytics } from 'firebase/analytics';
 import { spotifyAuthCode } from './store';
+import * as Sentry from '@sentry/capacitor';
+import * as SentrySvelte from '@sentry/svelte';
+import { BrowserTracing } from '@sentry/tracing';
+import { getAppVersion } from './lib';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -17,8 +21,8 @@ const firebaseConfig = {
   projectId: 'friendsfm',
   storageBucket: 'friendsfm.appspot.com',
   messagingSenderId: '611764643709',
-  appId: '1:611764643709:web:5356e1828d9a0f46348e14',
-  measurementId: 'G-6RD7JFYB8D',
+  appId: '1:611764643709:web:d86a26a4918d29f9348e14',
+  measurementId: 'G-HQGHCKN11Z',
 };
 initializeApp(firebaseConfig);
 
@@ -48,5 +52,22 @@ CapacitorApp.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
   if (url.pathname.includes('apple-music-login')) {
   }
 });
+
+// Initialize Sentry
+//
+//
+
+Sentry.init(
+  {
+    dsn: 'https://6b81e7dbc9474aa9bb64e2b24652684d@o4504839408844801.ingest.sentry.io/4504839411400704',
+    // Set your release version, such as 'getsentry@1.0.0'
+    release: `friendsfm@${await getAppVersion()}`,
+    integrations: [new BrowserTracing()] as any[],
+    // Set your dist version, such as "1"
+    dist: '1',
+    tracesSampleRate: import.meta.env.DEV ? 1.0 : 1.0,
+  },
+  SentrySvelte.init
+);
 
 export default app;

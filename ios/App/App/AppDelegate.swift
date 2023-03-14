@@ -2,6 +2,7 @@ import UIKit
 import Capacitor
 import FirebaseAuth
 import Firebase
+import os
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

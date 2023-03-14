@@ -26,25 +26,26 @@
   } from '../lib';
   import type { SavedSong, Submission as SubmissionType } from '../types';
   import type { IonRefresher } from '@ionic/core/components/ion-refresher';
+  import { Capacitor } from '@capacitor/core';
 
   // GLOBALS
   let loadingSubmissions = true;
   let sortedSubmissions: SubmissionType[] = [];
 
   friendSubmissions.subscribe((val) => {
-    sortedSubmissions = [...val].sort(
-      (a, b) =>
-        new Date(b.lateTime || b.time).getTime() -
-        new Date(a.lateTime || a.time).getTime()
-    );
+    if (val)
+      sortedSubmissions = [...val].sort(
+        (a, b) =>
+          new Date(b.lateTime || b.time).getTime() -
+          new Date(a.lateTime || a.time).getTime()
+      );
   });
 
   onMount(async () => {
-    const refresher = document.getElementById('refresher') as IonRefresher;
-    // refresher.addEventListener('ionRefresh', () => {
-    //   console.log('refreshing');
-    // });
-    refresher.addEventListener('ionRefresh', handleRefresh);
+    if (Capacitor.getPlatform() !== 'ios') {
+      const refresher = document.getElementById('refresher') as IonRefresher;
+      refresher.addEventListener('ionRefresh', handleRefresh);
+    }
     // setup pull to refresh
     if (!authToken.get()) {
       authToken.listen(async (value) => {
@@ -52,16 +53,15 @@
           loadingSubmissions = true;
           await getSubmissionStatus();
           loadingSubmissions = false;
-          // Hide splash screen
           await SplashScreen.hide();
         }
       });
     } else if (!userSubmission.get()?.song) {
       loadingSubmissions = true;
       await getSubmissionStatus();
+      loadingSubmissions = false;
+      await SplashScreen.hide();
     }
-    // Hide splash screen
-    await SplashScreen.hide();
     loadingSubmissions = false;
   });
 

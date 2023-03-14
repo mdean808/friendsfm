@@ -45,7 +45,7 @@ export const getNewAuthToken = action(
       // user isn't logged in anymore
       loggedIn.set(false);
       goto('/new_user');
-      throw new Error('Error grabbing new authToken. User must sign in.');
+      console.log('Error grabbing new authToken. User must sign in.');
     }
   }
 );
