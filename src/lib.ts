@@ -76,14 +76,13 @@ export const formatTimePlayed = (time: number = Date.now()) => {
 export const getDaysAgo = (date: Date) => {
   const currDate = new Date();
   const diffDays = currDate.getDate() - date.getDate();
-  console.log(diffDays);
   switch (diffDays) {
     case 0:
       return 'today';
     case 1:
       return 'yesterday';
     default:
-      return `${diffDays} ago`;
+      return `${diffDays} days ago`;
   }
 };
 
