@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "cap:build": "vite build && npx cap sync",
     "ios:build": "vite build && npx cap sync ios",
     "ios:open": "npx cap open ios",
     "ios:run": "yarn ios:build && npx cap run ios --target 0F14861A-995E-4B36-AA3F-14F1367CF132",

@@ -54,20 +54,22 @@ CapacitorApp.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
 });
 
 // Initialize Sentry
-//
-//
 
-Sentry.init(
-  {
-    dsn: 'https://6b81e7dbc9474aa9bb64e2b24652684d@o4504839408844801.ingest.sentry.io/4504839411400704',
-    // Set your release version, such as 'getsentry@1.0.0'
-    release: `friendsfm@${await getAppVersion()}`,
-    integrations: [new BrowserTracing()] as any[],
-    // Set your dist version, such as "1"
-    dist: '1',
-    tracesSampleRate: import.meta.env.DEV ? 1.0 : 1.0,
-  },
-  SentrySvelte.init
-);
+if (import.meta.env.PROD) {
+  (async () => {
+    Sentry.init(
+      {
+        dsn: 'https://6b81e7dbc9474aa9bb64e2b24652684d@o4504839408844801.ingest.sentry.io/4504839411400704',
+        // Set your release version, such as 'getsentry@1.0.0'
+        release: `friendsfm@${await getAppVersion()}`,
+        integrations: [new BrowserTracing()] as any[],
+        // Set your dist version, such as "1"
+        dist: '1',
+        tracesSampleRate: 0.25,
+      },
+      SentrySvelte.init
+    );
+  })();
+}
 
 export default app;

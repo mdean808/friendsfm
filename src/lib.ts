@@ -64,15 +64,27 @@ export const handleApiResponse = async (res: Response) => {
 };
 
 export const formatDurationPlayed = (duration: number) => {
-  const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, duration * 1000)),
-    // Pull out parts of interest
-    parts = [d.getUTCMinutes(), d.getUTCSeconds()];
-  return parts.map((s) => String(s).padStart(2, '')).join(':');
+  const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, duration * 1000));
+  return d.toLocaleTimeString([], { minute: '2-digit', second: '2-digit' });
 };
 
 export const formatTimePlayed = (time: number = Date.now()) => {
   const date = new Date(time);
   return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+};
+
+export const getDaysAgo = (date: Date) => {
+  const currDate = new Date();
+  const diffDays = currDate.getDate() - date.getDate();
+  console.log(diffDays);
+  switch (diffDays) {
+    case 0:
+      return 'today';
+    case 1:
+      return 'yesterday';
+    default:
+      return `${diffDays} ago`;
+  }
 };
 
 export const convertDateToLateString = (date: Date) => {

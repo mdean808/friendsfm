@@ -4,6 +4,7 @@
     formatDurationPlayed,
     formatTimePlayed,
     convertDateToLateString,
+    getDaysAgo,
   } from '../lib';
   import MusicPlatformIcon from './MusicPlatformIcon.svelte';
   import type { SavedSong, Submission } from '../types';
@@ -64,7 +65,9 @@
         <p>{data.song.artist}</p>
         <p class="text-gray-400 w-8/12 text-sm">
           {#if data.song.timestamp > 0}
-            song played at {formatTimePlayed(data.song?.timestamp)}
+            song played {getDaysAgo(new Date(data.song?.timestamp))} at {formatTimePlayed(
+              data.song?.timestamp
+            )}
           {/if}
         </p>
       </a>

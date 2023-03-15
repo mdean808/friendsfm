@@ -22,6 +22,7 @@
     convertDateToLateString,
     formatDurationPlayed,
     formatTimePlayed,
+    getDaysAgo,
     goto,
   } from '../lib';
   import type { SavedSong, Submission as SubmissionType } from '../types';
@@ -42,7 +43,10 @@
   });
 
   onMount(async () => {
-    if (Capacitor.getPlatform() !== 'ios') {
+    if (
+      Capacitor.getPlatform() !== 'ios' ||
+      Capacitor.getPlatform() !== 'android'
+    ) {
       const refresher = document.getElementById('refresher') as IonRefresher;
       refresher.addEventListener('ionRefresh', handleRefresh);
     }
@@ -173,7 +177,8 @@
         {/if}
         <p class="text-gray-400 ">
           {#if $userSubmission.song.timestamp > 0}
-            song played at {formatTimePlayed($userSubmission.song.timestamp)}
+            song played {getDaysAgo(new Date($userSubmission.song?.timestamp))} at
+            {formatTimePlayed($userSubmission.song?.timestamp)}
           {:else}
             <div class="flex items-center my-2">
               <span class="h-5"

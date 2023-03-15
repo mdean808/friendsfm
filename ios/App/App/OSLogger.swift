@@ -12,11 +12,23 @@ import Capacitor
 @objc(OSLoggerPlugin)
 public class OSLoggerPlugin: CAPPlugin {
     @objc func log(_ call: CAPPluginCall) {
-        let value = call.getString("message") ?? ""
+        let message = call.getString("message") ?? ""
         let level = call.getString("level") ?? "log"
-        print("OSLoggerPlusinLog: \(value)")
         let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "os_logger")
-        logger.log("JS Log: \(value)")
-        call.resolve(["message": value])
+        switch (level) {
+        case "debug":
+            logger.debug("JS Log: \(message)")
+            break
+        case "info":
+            logger.info("JS Log: \(message)")
+            break
+        case "error":
+            logger.error("JS Log: \(message)")
+            break
+        default:
+            logger.log("JS Log: \(message)")
+            break
+        }
+        call.resolve(["message": message])
     }
 }
