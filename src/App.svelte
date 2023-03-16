@@ -23,10 +23,11 @@
     getNewAuthToken,
     getUserFromPreferences,
     loggedIn,
+    notificationAction,
     refreshUser,
     getSubmissionStatus,
   } from './store';
-  import { goto } from './lib';
+  import { getAppVersion, goto } from './lib';
   import Loading from './components/Loading.svelte';
   import Friends from './pages/friends.svelte';
   import { fade, fly } from 'svelte/transition';
@@ -43,16 +44,46 @@
   import { IonSpinner } from '@ionic/core/components/ion-spinner';
   import { IonApp } from '@ionic/core/components/ion-app';
   import { IonContent } from '@ionic/core/components/ion-content';
-  import { PushNotifications } from '@capacitor/push-notifications';
   import OSLogger from './plugins/OSLogger';
-  import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
+  import { PushNotifications } from '@capacitor/push-notifications';
+  import { SplashScreen } from '@capacitor/splash-screen';
+  import * as Sentry from '@sentry/capacitor';
+  import * as SentrySvelte from '@sentry/svelte';
+  import { BrowserTracing } from '@sentry/tracing';
+
+  notificationAction.subscribe(async (notif) => {
+    const title = notif.title;
+    await getUserFromPreferences();
+    if (title.includes('added you as a friend')) {
+      await refreshUser();
+      goto('/friends');
+    } else if (
+      title.includes('FriendsFM') ||
+      title.includes('late submission')
+    ) {
+      await getSubmissionStatus();
+      goto('/');
+    } else if (title.includes('accepted your friend request')) {
+      await refreshUser();
+      goto('/friends');
+    }
+    await OSLogger.log({ message: currPath.get() + ' ' + title });
+    await SplashScreen.hide();
+  });
 
   onMount(async () => {
-    // window.onunhandledrejection = handleError;
     if (Capacitor.isPluginAvailable('OSLogger')) {
       await OSLogger.log({ message: 'starting app' });
     }
 
+    if (Capacitor.isPluginAvailable('PushNotifications')) {
+      PushNotifications.addListener(
+        'pushNotificationActionPerformed',
+        ({ notification }) => {
+          notificationAction.set(notification);
+        }
+      );
+    }
     initialize();
     // The rest of the ion-elements can be defined as below
     tryDefine('ion-refresher', IonRefresher);
@@ -72,42 +103,6 @@
     document.documentElement.classList.add('ion-ce');
     loading.set(false);
 
-    if (Capacitor.isPluginAvailable('PushNotifications')) {
-      PushNotifications.addListener(
-        'pushNotificationActionPerformed',
-        async (notification) => {
-          let title = '';
-          try {
-            // todo: don't crash wehn this is called with the app closed
-            title = notification.notification.title;
-            if (title.includes('added you as a friend')) {
-              await refreshUser();
-              goto('/friends');
-            } else if (
-              title.includes('FriendsFM') ||
-              title.includes('late submission')
-            ) {
-              //todo: refresh home
-              await getSubmissionStatus();
-              goto('/home');
-            } else if (title.includes('accepted your friend request')) {
-              await refreshUser();
-              goto('/friends');
-            }
-          } catch (e) {
-            const error = e as Error;
-            console.log(error);
-            await FirebaseCrashlytics.log({
-              message: `Handling Notification Open: ${title}`,
-            });
-            await FirebaseCrashlytics.recordException({
-              message: e.name + ': ' + error.message,
-            });
-          }
-        }
-      );
-      await PushNotifications.removeAllDeliveredNotifications();
-    }
     await getStatusBarHeight();
     await getBottomInset();
     // request permissions
@@ -126,6 +121,20 @@
       goto('/music_provider');
     } else {
       goto('/new_user');
+    }
+    if (import.meta.env.PROD) {
+      Sentry.init(
+        {
+          dsn: 'https://6b81e7dbc9474aa9bb64e2b24652684d@o4504839408844801.ingest.sentry.io/4504839411400704',
+          // Set your release version, such as 'getsentry@1.0.0'
+          release: `friendsfm@${await getAppVersion()}`,
+          integrations: [new BrowserTracing()] as any[],
+          // Set your dist version, such as "1"
+          dist: '1',
+          tracesSampleRate: 0.25,
+        },
+        SentrySvelte.init
+      );
     }
   });
 </script>

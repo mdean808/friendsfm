@@ -5,7 +5,6 @@ import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { App } from '@capacitor/app';
-import { Capacitor } from '@capacitor/core';
 
 export const getPlatformColor = (platform: MusicPlatform) => {
   switch (platform) {
@@ -89,26 +88,15 @@ export const getDaysAgo = (date: Date) => {
 export const convertDateToLateString = (date: Date) => {
   if (isNaN(date.getTime())) return 'infinitely late';
   const rootDate = new Date(0);
-  const days = date.getDate() - rootDate.getDate();
-  const hours = date.getHours() - rootDate.getHours();
+  const hours = Math.floor(
+    Math.abs(rootDate.getTime() - date.getTime()) / 36e5
+  );
   const minutes = date.getMinutes() - rootDate.getMinutes();
   const seconds = date.getSeconds() - rootDate.getSeconds();
-  // const time = date.toLocaleTimeString().split(' ')[0];
-  // const hours = parseInt(time.split(':')[0]);
-  // const minutes = parseInt(time.split(':')[1]);
-  // const seconds = parseInt(time.split(':')[2]);
-  const alternateHours = rootDate.getHours() - date.getHours();
   let res = '';
-  if ((days > 0 && hours < 4) || hours > 20) res = days + 'd late';
-  else if (days > 0 && hours > 3 && hours < 21)
-    res = days + 'd ' + hours + 'h late';
-  else if (days < 0 && alternateHours > 3 && alternateHours < 21)
-    res = '1d ' + (rootDate.getHours() - date.getHours()) + 'h late';
-  else if (hours === 0 && minutes === 0) res = seconds + 's late';
-  else if (hours === 0) res = minutes + 'm late';
-  else if (minutes > 20 && minutes < 45)
-    res = hours + 'h ' + minutes + 'm late';
-  else res = hours + 'h late';
+  if (hours === 0 && minutes === 0) res = seconds + 's late';
+  else if (hours === 0) res = minutes + ' min late';
+  else res = hours + ' hr late';
   return res;
 };
 

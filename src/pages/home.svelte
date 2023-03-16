@@ -54,17 +54,11 @@
     if (!authToken.get()) {
       authToken.listen(async (value) => {
         if (value && currPath.get() == '/') {
-          loadingSubmissions = true;
-          await getSubmissionStatus();
-          loadingSubmissions = false;
-          await SplashScreen.hide();
+          await load();
         }
       });
     } else if (!userSubmission.get()?.song) {
-      loadingSubmissions = true;
-      await getSubmissionStatus();
-      loadingSubmissions = false;
-      await SplashScreen.hide();
+      await load();
     }
     loadingSubmissions = false;
   });
@@ -73,6 +67,13 @@
     const refresher = document.getElementById('refresher') as IonRefresher;
     refresher?.removeEventListener('ionRefresh', handleRefresh);
   });
+
+  const load = async () => {
+    loadingSubmissions = true;
+    await getSubmissionStatus();
+    loadingSubmissions = false;
+    await SplashScreen.hide();
+  };
 
   const handleRefresh = async () => {
     const refresher = document.getElementById('refresher') as IonRefresher;
