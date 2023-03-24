@@ -5,6 +5,7 @@ import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { App } from '@capacitor/app';
+import { Dialog } from '@capacitor/dialog';
 
 export const getPlatformColor = (platform: MusicPlatform) => {
   switch (platform) {
@@ -53,6 +54,20 @@ export const handleApiResponse = async (res: Response) => {
       goto('/new_user');
     } else if (json.message === 'Authentication Failed.') {
       await getNewAuthToken();
+    } else if (json.message.includes('Spotify 403 Forbidden')) {
+      const { value } = await Dialog.confirm({
+        title: 'Spotify Authentication',
+        message:
+          'You need to re-authenticate with Spotify to proceed. Continue?',
+      });
+      if (value) {
+        const spotifyUrl = `https://accounts.spotify.com/authorize?client_id=${
+          import.meta.env.VITE_SPOTIFY_CLIENT_ID
+        }&response_type=code&redirect_uri=${
+          import.meta.env.VITE_SPOTIFY_REDIRECT_URL
+        }&scope=user-read-private%20user-read-currently-playing%20user-read-recently-played%20playlist-modify-private%20playlist-modify-public`;
+        window.location.href = spotifyUrl;
+      }
     } else {
       toast.push('Error: ' + json.message, toastError);
     }

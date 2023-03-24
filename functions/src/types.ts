@@ -99,6 +99,8 @@ export interface SpotifyTrack {
   external_urls: {
     spotify: string;
   };
+  id: string;
+  uri: string;
   href: string; // api url
   name: string;
   preview_url: string;
@@ -112,6 +114,16 @@ export interface SpotifyRecentlyPlayedRes {
       played_at: Date;
     }
   ];
+}
+
+export interface SpotifySearchRes {
+  href: string;
+  limit: number;
+  next: string;
+  offset: number;
+  previous: string;
+  total: number;
+  items: SpotifyTrack[];
 }
 
 export interface SpotifyPlaylistRes {

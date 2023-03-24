@@ -6,6 +6,7 @@ import {
   SpotifyCurrentlyPlayingRes,
   SpotifyPlaylistRes,
   SpotifyRecentlyPlayedRes,
+  SpotifySearchRes,
 } from '../types';
 
 const SPOTIFY_AUTH = Buffer.from(
@@ -128,7 +129,10 @@ export const getSpotifyUser = async (spotifyAuth: MusicPlatformAuth) => {
 
 export const createSpotifyPlaylist = async (
   spotifyAuth: MusicPlatformAuth,
-  songs: SavedSong[] = []
+  songs: SavedSong[] | Song[] = [],
+  name: string,
+  description: string,
+  playlistPublic: boolean = true
 ) => {
   if (!spotifyAuth) throw Error('User not signed into spotify.');
   // get user's spotify id from the api
@@ -144,9 +148,9 @@ export const createSpotifyPlaylist = async (
         Authorization: 'Bearer ' + spotifyAuth.access_token,
       },
       body: JSON.stringify({
-        name: 'friendsfm saved songs',
-        description: 'all the songs liked from friendsfm',
-        public: true,
+        name,
+        description,
+        public: playlistPublic,
       }),
     }
   );
@@ -158,17 +162,61 @@ export const createSpotifyPlaylist = async (
     const playlist = (await res.json()) as SpotifyPlaylistRes;
     // add the saved songs to the spotify playlist
     // we don't await this iteration because we want to get a response back to hte user ASPA
-    for (const song of songs) {
-      addSongToSpotifyPlaylist(song, playlist.id, spotifyAuth);
-    }
+    addSongsToSpotifyPlaylist(songs, playlist.id, spotifyAuth);
     return playlist.id;
   }
 };
 
-export const addSongToSpotifyPlaylist = async (
-  song: SavedSong | Song,
+export const addSongsToSpotifyPlaylist = async (
+  songs: Song[] | SavedSong[],
   playlistId: string,
   spotifyAuth: MusicPlatformAuth
 ) => {
   if (!spotifyAuth) throw Error('User not signed into spotify.');
+  const songUris = [];
+  for (const song of songs) {
+    const uri = (await getSpotifySong(song, spotifyAuth)).uri;
+    songUris.push(uri);
+  }
+
+  const res = await fetch(
+    `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+    {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + spotifyAuth.access_token,
+      },
+      body: JSON.stringify({
+        uris: songUris,
+      }),
+    }
+  );
+  if (res.status === 403) {
+    throw new Error(
+      'Spotify 403 Forbidden: Please re-link the Spotify account.'
+    );
+  }
+};
+
+const getSpotifySong = async (
+  song: Song | SavedSong,
+  spotifyAuth: MusicPlatformAuth
+) => {
+  if (!spotifyAuth) throw Error('User not signed into spotify.');
+  const res = await fetch(
+    `https://api.spotify.com/v1/search?type=track&limit=1&q=${encodeURI(
+      `track:${song.name} artist:${song.artist}`
+    )}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + spotifyAuth.access_token,
+      },
+    }
+  );
+  const json = (await res.json()) as SpotifySearchRes;
+
+  return json.items[0];
 };

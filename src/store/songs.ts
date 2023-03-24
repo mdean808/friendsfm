@@ -1,6 +1,6 @@
 import { action, atom } from 'nanostores';
 import { handleApiResponse } from '../lib';
-import type { SavedSong } from '../types';
+import type { NetworkResponse, SavedSong } from '../types';
 import { authToken } from './auth';
 import { FIREBASE_URL } from './misc';
 
@@ -62,5 +62,25 @@ export const toggleSong = action(
       s.push(json.message as SavedSong);
       store.set(s);
     }
+  }
+);
+
+export const createSongsSpotifyPlaylist = action(
+  songs,
+  'create-songs-playlist',
+  async () => {
+    const res = await fetch(FIREBASE_URL.get() + '/createLikedSongsPlaylist', {
+      method: 'POST',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+      }),
+    });
+    const json = await handleApiResponse(res);
+    if (!json) {
+      //api response failed
+      return;
+    }
+    // return the playlist id
+    return json.message;
   }
 );

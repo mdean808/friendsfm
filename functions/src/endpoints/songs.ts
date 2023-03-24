@@ -122,7 +122,10 @@ export const createLikedSongsPlaylist = functions.https.onRequest(
           musicPlatformAuth.access_token = accessCode;
           const playlistUrl = await createSpotifyPlaylist(
             musicPlatformAuth,
-            songs
+            songs,
+            'friendsfm saved songs',
+            'all the songs liked from friendsfm',
+            true
           );
           res
             .status(200)
