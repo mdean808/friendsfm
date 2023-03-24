@@ -7,6 +7,7 @@
     prevPath,
     rejectFriendRequest,
     refreshUser,
+    appLoading,
   } from '../store';
   import Input from '../components/Input.svelte';
   import Button from '../components/Button.svelte';
@@ -14,6 +15,7 @@
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { slide } from 'svelte/transition';
+  import { SplashScreen } from '@capacitor/splash-screen';
   let newUsername = '';
   let loading = false;
 
@@ -77,6 +79,8 @@
     document.addEventListener('touchstart', swipeStart, false);
     document.addEventListener('touchmove', swipeMove, false);
     document.addEventListener('touchend', swipeEnd, false);
+    await refreshUser();
+    appLoading.set(false);
   });
   onDestroy(() => {
     document.addEventListener('touchstart', swipeStart, false);

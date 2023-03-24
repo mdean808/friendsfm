@@ -49,6 +49,4 @@ CapacitorApp.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
   }
 });
 
-// Initialize Sentry
-
 export default app;

@@ -1,7 +1,5 @@
 <script lang="ts">
   import Button from '../components/Button.svelte';
-  import { SplashScreen } from '@capacitor/splash-screen';
-
   import { MusicPlatform } from '../types';
   import {
     updateMusicPlatform,
@@ -16,7 +14,6 @@
   let platform: MusicPlatform;
 
   onMount(async () => {
-    await SplashScreen.hide();
     if (!user.get().username) goto('/username');
   });
 
@@ -31,7 +28,7 @@
         import.meta.env.VITE_SPOTIFY_CLIENT_ID
       }&response_type=code&redirect_uri=${
         import.meta.env.VITE_SPOTIFY_REDIRECT_URL
-      }&scope=user-read-private%20user-read-currently-playing%20user-read-recently-played`;
+      }&scope=user-read-private%20user-read-currently-playing%20user-read-recently-played%20playlist-modify-private%20playlist-modify-public`;
       window.location.href = spotifyUrl;
     } else if (platform === MusicPlatform.appleMusic) {
       loading.set(false);

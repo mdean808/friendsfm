@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
-  import LoadingIndicator from '../components/LoadingIndicator.svelte';
   import { formatDurationPlayed, getPlatformColor } from '../lib';
   import { loadSongs, songs, toggleSong, user } from '../store';
 
@@ -14,6 +13,7 @@
   });
 </script>
 
+<!-- TODO: add button for spotify creating spotify playlist (make sure to handle adding new scopes) -->
 <div>
   <div class="mx-4 py-1 text-center border-b-2 border-gray-400">
     <h1 class="text-xl">songs</h1>

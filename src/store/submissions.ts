@@ -10,29 +10,27 @@ export const generateSubmission = action(
   userSubmission,
   'generate-submission',
   async (store) => {
-    let location: GeolocationPosition;
-    // try {
-    //   await Geolocation.requestPermissions();
-    //   location = await Geolocation.getCurrentPosition();
-    // } catch (e) {
-    //   console.log(e);
-    // }
-    const res = await fetch(FIREBASE_URL.get() + '/createNewUserSubmission', {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-        latitude: location ? location.coords.latitude : undefined,
-        longitude: location ? location.coords.longitude : undefined,
-      }),
-    });
-    const json = await handleApiResponse(res);
-    if (!json) {
-      // failed to set new music platform
-      return false;
+    try {
+      let location: GeolocationPosition;
+      const res = await fetch(FIREBASE_URL.get() + '/createNewUserSubmission', {
+        method: 'POST',
+        body: JSON.stringify({
+          authToken: authToken.get(),
+          latitude: location ? location.coords.latitude : undefined,
+          longitude: location ? location.coords.longitude : undefined,
+        }),
+      });
+      const json = await handleApiResponse(res);
+      if (!json) {
+        // failed to set new music platform
+        return false;
+      }
+      store.set(json.message.user as Submission);
+      friendSubmissions.set(json.message.friends as Submission[]);
+      FirebaseAnalytics.logEvent({ name: 'generate_submission' });
+    } catch (e) {
+      console.log(e);
     }
-    store.set(json.message.user as Submission);
-    friendSubmissions.set(json.message.friends as Submission[]);
-    FirebaseAnalytics.logEvent({ name: 'generate-submission' });
   }
 );
 

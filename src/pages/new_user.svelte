@@ -1,9 +1,8 @@
 <script lang="ts">
   import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
-  import { SplashScreen } from '@capacitor/splash-screen';
-  import { onMount } from 'svelte';
   import { goto } from '../lib';
   import {
+    appLoading,
     authToken,
     getNewAuthToken,
     loading,
@@ -13,68 +12,74 @@
     user,
   } from '../store';
   import Icon from '../assets/icon.png';
+  import { onMount } from 'svelte';
 
-  onMount(async () => {
-    await SplashScreen.hide();
+  onMount(() => {
+    appLoading.set(false);
   });
 
   const signInWithGoogle = async () => {
     loading.set(true);
-    // if (import.meta.env.DEV) {
-    //   await useEmulator().then(() => console.log('Using firebase emulator.'));
-    // }
-    const res = await FirebaseAuthentication.signInWithGoogle();
-    await getNewAuthToken();
-    if (res.user.email)
-      await updateUser({
-        ...res.user,
-        id: res.user.uid,
-        username: undefined,
-        friends: [],
-        friendRequests: [],
-        authToken: authToken.get(),
-      });
-    // send login information to the backend
-    if (!(await loginUser())) {
-      // don't goto username
-    } else {
-      const u = user.get();
-      if (!u) return;
-      if (!u.username || u.username === u.id) goto('/username');
-      else if (!u.musicPlatform) goto('/music_provider');
-      else goto('/');
+    try {
+      const res = await FirebaseAuthentication.signInWithGoogle();
+      await getNewAuthToken();
+      if (res.user.email)
+        await updateUser({
+          ...res.user,
+          id: res.user.uid,
+          username: undefined,
+          friends: [],
+          friendRequests: [],
+          authToken: authToken.get(),
+        });
+      // send login information to the backend
+      if (!(await loginUser())) {
+        // don't goto username
+      } else {
+        const u = user.get();
+        if (!u) return;
+        if (!u.username || u.username === u.id) goto('/username');
+        else if (!u.musicPlatform) goto('/music_provider');
+        else goto('/');
+      }
+    } catch (e) {
+      console.log(e);
     }
     loading.set(false);
   };
 
   const signInWithApple = async () => {
     loading.set(true);
-    const res = await FirebaseAuthentication.signInWithApple();
-    await getNewAuthToken();
-    if (res.user.email)
-      await updateUser({
-        ...res.user,
-        id: res.user.uid,
-        username: undefined,
-        friends: [],
-        friendRequests: [],
-        authToken: authToken.get(),
-      });
-    // send login information to the backend
-    if (!(await loginUser())) {
-      // don't goto username
-    } else {
-      const u = user.get();
-      if (!u.username || u.username === u.id) goto('/username');
-      else if (!u.musicPlatform) goto('/music_provider');
-      else goto('/');
+    try {
+      const res = await FirebaseAuthentication.signInWithApple();
+      await getNewAuthToken();
+      if (res.user.email)
+        await updateUser({
+          ...res.user,
+          id: res.user.uid,
+          username: undefined,
+          friends: [],
+          friendRequests: [],
+          authToken: authToken.get(),
+        });
+      // send login information to the backend
+      if (!(await loginUser())) {
+        // don't goto username
+      } else {
+        const u = user.get();
+        if (!u.username || u.username === u.id) goto('/username');
+        else if (!u.musicPlatform) goto('/music_provider');
+        else goto('/');
+      }
+    } catch (e) {
+      console.log(e);
     }
     loading.set(false);
   };
 </script>
 
 <main class="text-center">
-  <img src={Icon} alt="FriendsFM Logo" class="mx-auto mt-10 w-32 h-32" />
+  <img src={Icon} alt="FriendsFM Logo" class="mx-auto mt-16 w-44 h-44" />
   <div class="mx-auto py-6 px-4 w-full">
     <h1 class="text-4xl">FriendsFM</h1>
     <p class="text-lg text-gray-400">

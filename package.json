@@ -33,7 +33,6 @@
     "@capacitor/ios": "^4.7.0",
     "@capacitor/keyboard": "^4.1.1",
     "@capacitor/preferences": "^4.0.2",
-    "@capacitor/push-notifications": "^4.1.2",
     "@capacitor/splash-screen": "^4.2.0",
     "@capacitor/status-bar": "^4.1.0",
     "@capgo/nativegeocoder": "^0.1.32",

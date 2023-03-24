@@ -21,7 +21,7 @@ export const sendFriendRequest = action(
       // failed to send request
       return false;
     }
-    FirebaseAnalytics.logEvent({ name: 'send-friend-request' });
+    FirebaseAnalytics.logEvent({ name: 'send_friend_request' });
     return true;
   }
 );
@@ -44,7 +44,7 @@ export const acceptFriendRequest = action(
     }
     store.set(json.message as User);
     updateUser(json.message);
-    FirebaseAnalytics.logEvent({ name: 'accept-friend-request' });
+    FirebaseAnalytics.logEvent({ name: 'accept_friend_request' });
     return true;
   }
 );
@@ -67,7 +67,7 @@ export const rejectFriendRequest = action(
     }
     store.set(json.message as User);
     updateUser(json.message);
-    FirebaseAnalytics.logEvent({ name: 'reject-friend-request' });
+    FirebaseAnalytics.logEvent({ name: 'reject_friend_request' });
     return true;
   }
 );

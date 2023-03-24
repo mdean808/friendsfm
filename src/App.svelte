@@ -26,8 +26,9 @@
     notificationAction,
     refreshUser,
     getSubmissionStatus,
+    appLoading,
   } from './store';
-  import { getAppVersion, goto } from './lib';
+  import { goto } from './lib';
   import Loading from './components/Loading.svelte';
   import Friends from './pages/friends.svelte';
   import { fade, fly } from 'svelte/transition';
@@ -45,11 +46,11 @@
   import { IonApp } from '@ionic/core/components/ion-app';
   import { IonContent } from '@ionic/core/components/ion-content';
   import OSLogger from './plugins/OSLogger';
-  import { PushNotifications } from '@capacitor/push-notifications';
   import { SplashScreen } from '@capacitor/splash-screen';
   import * as Sentry from '@sentry/capacitor';
   import * as SentrySvelte from '@sentry/svelte';
   import { BrowserTracing } from '@sentry/tracing';
+  import AnimatedSplashScreen from './components/AnimatedSplashScreen.svelte';
 
   notificationAction.subscribe(async (notif) => {
     const title = notif.title;
@@ -67,18 +68,20 @@
       await refreshUser();
       goto('/friends');
     }
-    await OSLogger.log({ message: currPath.get() + ' ' + title });
-    await SplashScreen.hide();
+    if (Capacitor.isPluginAvailable('OSLogger')) {
+      await OSLogger.log({ message: currPath.get() + ' ' + title });
+    }
   });
 
   onMount(async () => {
+    SplashScreen.hide();
     if (Capacitor.isPluginAvailable('OSLogger')) {
       await OSLogger.log({ message: 'starting app' });
     }
 
-    if (Capacitor.isPluginAvailable('PushNotifications')) {
-      PushNotifications.addListener(
-        'pushNotificationActionPerformed',
+    if (Capacitor.isPluginAvailable('FirebaseMessaging')) {
+      FirebaseMessaging.addListener(
+        'notificationActionPerformed',
         ({ notification }) => {
           notificationAction.set(notification);
         }
@@ -122,24 +125,32 @@
     } else {
       goto('/new_user');
     }
-    if (import.meta.env.PROD) {
-      Sentry.init(
-        {
-          dsn: 'https://6b81e7dbc9474aa9bb64e2b24652684d@o4504839408844801.ingest.sentry.io/4504839411400704',
-          // Set your release version, such as 'getsentry@1.0.0'
-          release: `friendsfm@${await getAppVersion()}`,
-          integrations: [new BrowserTracing()] as any[],
-          // Set your dist version, such as "1"
-          dist: '1',
-          tracesSampleRate: 0.25,
-        },
-        SentrySvelte.init
-      );
-    }
+    // if (import.meta.env.PROD) {
+    //   Sentry.init(
+    //     {
+    //       dsn: 'https://6b81e7dbc9474aa9bb64e2b24652684d@o4504839408844801.ingest.sentry.io/4504839411400704',
+    //       // Set your release version, such as 'getsentry@1.0.0'
+    //       release: `friendsfm@0.0.4`,
+    //       integrations: [new BrowserTracing()] as any[],
+    //       // Set your dist version, such as "1"
+    //       dist: '1',
+    //       tracesSampleRate: 0.25,
+    //     },
+    //     SentrySvelte.init
+    //   );
+    // }
   });
 </script>
 
 <!-- Navigation -->
+<svelte:head>
+  <title>{$currPath?.split('/')[1] || 'home'}</title>
+</svelte:head>
+{#if $appLoading}
+  <div transition:fade={{ duration: 100 }}>
+    <AnimatedSplashScreen />
+  </div>
+{/if}
 <ion-app>
   <div class="overflow-y-hidden">
     <div class="absolute" style={`bottom: calc(110px + ${$bottomInset}px); `}>
@@ -154,6 +165,7 @@
         <Loading />
       </div>
     {/if}
+
     <div>
       {#if $loggedIn && $user.username && $user.musicPlatform}
         <TopNav />

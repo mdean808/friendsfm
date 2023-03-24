@@ -1,12 +1,14 @@
 import { action, atom, map } from 'nanostores';
 import { Device } from '@capacitor/device';
-import type { PushNotificationSchema } from '@capacitor/push-notifications';
+import type { Notification } from '@capacitor-firebase/messaging';
 
 export const currPath = atom<string>('/');
 
 export const prevPath = atom<string>('');
 
 export const loading = atom<boolean>(false);
+
+export const appLoading = atom<boolean>(true);
 
 export const platform = atom<string>('');
 
@@ -22,4 +24,4 @@ export const FIREBASE_URL = atom<string>(
   'https://us-central1-friendsfm.cloudfunctions.net'
 );
 
-export const notificationAction = map<PushNotificationSchema>();
+export const notificationAction = map<Notification>();

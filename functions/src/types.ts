@@ -113,3 +113,71 @@ export interface SpotifyRecentlyPlayedRes {
     }
   ];
 }
+
+export interface SpotifyPlaylistRes {
+  collaborative: boolean;
+  description: string;
+  external_urls: {
+    spotify: string;
+  };
+  followers: {
+    href: string;
+    total: number;
+  };
+  href: string;
+  id: string;
+  images: [
+    {
+      url: string;
+      height: number;
+      width: number;
+    }
+  ];
+  name: string;
+  owner: {
+    external_urls: {
+      spotify: string;
+    };
+    followers: {
+      href: string;
+      total: number;
+    };
+    href: string;
+    id: string;
+    type: string;
+    uri: string;
+    display_name: string;
+  };
+  public: boolean;
+  snapshot_id: string;
+  tracks: {
+    href: string;
+    limit: number;
+    next: string;
+    offset: number;
+    previous: string;
+    total: number;
+    items: [
+      {
+        added_at: Date;
+        added_by: {
+          external_urls: {
+            spotify: string;
+          };
+          followers: {
+            href: string;
+            total: number;
+          };
+          href: string;
+          id: string;
+          type: string;
+          uri: string;
+        };
+        is_local: true;
+        track: SpotifyTrack[];
+      }
+    ];
+  };
+  type: string;
+  uri: string;
+}

@@ -1,7 +1,5 @@
 <script lang="ts">
-  // IMPORTS
   import { onMount, onDestroy } from 'svelte';
-  import { SplashScreen } from '@capacitor/splash-screen';
   import {
     friendSubmissions,
     loading,
@@ -13,6 +11,7 @@
     user,
     toggleSong,
     songs,
+    appLoading,
   } from '../store';
   import Button from '../components/Button.svelte';
   import Submission from '../components/Submission.svelte';
@@ -28,6 +27,7 @@
   import type { SavedSong, Submission as SubmissionType } from '../types';
   import type { IonRefresher } from '@ionic/core/components/ion-refresher';
   import { Capacitor } from '@capacitor/core';
+  import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 
   // GLOBALS
   let loadingSubmissions = true;
@@ -61,6 +61,7 @@
       await load();
     }
     loadingSubmissions = false;
+    FirebaseMessaging.removeAllDeliveredNotifications();
   });
 
   onDestroy(() => {
@@ -72,7 +73,7 @@
     loadingSubmissions = true;
     await getSubmissionStatus();
     loadingSubmissions = false;
-    await SplashScreen.hide();
+    appLoading.set(false);
   };
 
   const handleRefresh = async () => {

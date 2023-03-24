@@ -1,7 +1,10 @@
 import { Timestamp } from 'firebase-admin/firestore';
 import {
   MusicPlatformAuth,
+  SavedSong,
+  Song,
   SpotifyCurrentlyPlayingRes,
+  SpotifyPlaylistRes,
   SpotifyRecentlyPlayedRes,
 } from '../types';
 
@@ -104,4 +107,68 @@ export const getRecentlyPlayedSpotifySongs = async (accessToken: string) => {
     };
     return currentlyPlaying;
   }
+};
+
+export const getSpotifyUser = async (spotifyAuth: MusicPlatformAuth) => {
+  if (!spotifyAuth) throw Error('User not signed into spotify.');
+  const res = await fetch('https://api.spotify.com/v1/me', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + spotifyAuth.access_token,
+    },
+  });
+  if (res.status === 403) {
+    throw Error('Spotify 403 Forbidden: Please re-link the Spotify account.');
+  } else {
+    const json = await res.json();
+    return json;
+  }
+};
+
+export const createSpotifyPlaylist = async (
+  spotifyAuth: MusicPlatformAuth,
+  songs: SavedSong[] = []
+) => {
+  if (!spotifyAuth) throw Error('User not signed into spotify.');
+  // get user's spotify id from the api
+  const spotify_id = (await getSpotifyUser(spotifyAuth)).id;
+  // create a new playlist for the user
+  const res = await fetch(
+    `https://api.spotify.com/v1/users/${spotify_id}/playlists`,
+    {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + spotifyAuth.access_token,
+      },
+      body: JSON.stringify({
+        name: 'friendsfm saved songs',
+        description: 'all the songs liked from friendsfm',
+        public: true,
+      }),
+    }
+  );
+  if (res.status === 403) {
+    throw new Error(
+      'Spotify 403 Forbidden: Please re-link the Spotify account.'
+    );
+  } else {
+    const playlist = (await res.json()) as SpotifyPlaylistRes;
+    // add the saved songs to the spotify playlist
+    // we don't await this iteration because we want to get a response back to hte user ASPA
+    for (const song of songs) {
+      addSongToSpotifyPlaylist(song, playlist.id, spotifyAuth);
+    }
+    return playlist.id;
+  }
+};
+
+export const addSongToSpotifyPlaylist = async (
+  song: SavedSong | Song,
+  playlistId: string,
+  spotifyAuth: MusicPlatformAuth
+) => {
+  if (!spotifyAuth) throw Error('User not signed into spotify.');
 };

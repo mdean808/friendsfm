@@ -8,10 +8,6 @@
 
   import { updateUsername, loading, user } from '../store';
 
-  onMount(async () => {
-    await SplashScreen.hide();
-  });
-
   let username: string;
   const setUsername = async () => {
     if (!username) return;

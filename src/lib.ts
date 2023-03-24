@@ -16,9 +16,9 @@ export const getPlatformColor = (platform: MusicPlatform) => {
 };
 
 export const goto = (url: string) => {
-  FirebaseAnalytics.setCurrentScreen({ screenName: url.split('/')[1] });
   prevPath.set(currPath.get());
   currPath.set(url);
+  FirebaseAnalytics.setCurrentScreen({ screenName: url.split('/')[1] });
 };
 
 export const registerForNotifications = async () => {
