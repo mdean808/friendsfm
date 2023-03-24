@@ -41,6 +41,13 @@ export const acceptFriendRequest = async (
           body: "tap to see what they're listening to",
         },
         token: friend.messagingToken,
+        apns: {
+          payload: {
+            aps: {
+              badge: 1,
+            },
+          },
+        },
       };
       newNotification(message);
     }
@@ -95,6 +102,13 @@ export const sendFriendRequest = async (user: User, friendUsername: string) => {
         body: 'tap to accept their request',
       },
       token: friend.messagingToken,
+      apns: {
+        payload: {
+          aps: {
+            badge: 1,
+          },
+        },
+      },
     };
     newNotification(message);
   }
@@ -116,6 +130,13 @@ export const sendNotificationToFriends = async (
         body: body,
       },
       token: friendMessagingToken,
+      apns: {
+        payload: {
+          aps: {
+            badge: 1,
+          },
+        },
+      },
     };
     await newNotification(message);
   }

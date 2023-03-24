@@ -22,6 +22,7 @@ export const sendDaily = async () => {
       payload: {
         aps: {
           'interruption-level': 'time-sensitive',
+          badge: 1,
         },
       },
     },
