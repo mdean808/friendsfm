@@ -27,6 +27,7 @@
     refreshUser,
     getSubmissionStatus,
     appLoading,
+    platform,
   } from './store';
   import { goto } from './lib';
   import Loading from './components/Loading.svelte';
@@ -74,6 +75,7 @@
   });
 
   onMount(async () => {
+    platform.set(Capacitor.getPlatform());
     SplashScreen.hide();
     if (Capacitor.isPluginAvailable('OSLogger')) {
       await OSLogger.log({ message: 'starting app' });
