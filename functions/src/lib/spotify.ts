@@ -17,10 +17,14 @@ export const checkSpotifyAccessCode = async (
   data: MusicPlatformAuth,
   userRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>
 ) => {
-  data.expires_at = new Timestamp(
-    (data.expires_at as Timestamp).seconds,
-    (data.expires_at as Timestamp).nanoseconds
-  ).toDate();
+  if ((data.expires_at as Timestamp).seconds) {
+    data.expires_at = new Timestamp(
+      (data.expires_at as Timestamp).seconds,
+      (data.expires_at as Timestamp).nanoseconds
+    ).toDate();
+  } else {
+    data.expires_at = new Date(data.expires_at as Date);
+  }
   if (new Date(data.expires_at) < new Date()) {
     const body = new URLSearchParams();
     body.append('grant_type', 'refresh_token');
@@ -218,6 +222,49 @@ const getSpotifySong = async (
   const json = (await res.json()) as SpotifySearchRes;
 
   return json.tracks.items[0];
+};
+
+export const removeAllSongsFromSpotifyPlaylist = async (
+  playlistId: string,
+  spotifyAuth: MusicPlatformAuth
+) => {
+  const songsRes = await fetch(
+    `https://api.spotify.com/v1/playlists/${encodeURI(
+      playlistId
+    )}/tracks?fields=items(track(uri))`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + spotifyAuth.access_token,
+      },
+    }
+  );
+  if (songsRes.status === 403) {
+    throw new Error(
+      'Spotify 403 Forbidden: Please re-link the Spotify account.'
+    );
+  }
+  const json = (await songsRes.json()) as {
+    items: { track: { uri: string } }[];
+  };
+  const songUris: string[] = json.items.map((t) => t.track.uri);
+  const res = await fetch(
+    `https://api.spotify.com/v1/playlists/${encodeURI(playlistId)}/tracks`,
+    {
+      method: 'DELETE',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + spotifyAuth.access_token,
+      },
+      body: JSON.stringify({ tracks: songUris }),
+    }
+  );
+  if (res.status === 403) {
+    throw new Error(
+      'Spotify 403 Forbidden: Please re-link the Spotify account.'
+    );
+  }
 };
 
 export const removeSongsFromSpotifyPlaylist = async (

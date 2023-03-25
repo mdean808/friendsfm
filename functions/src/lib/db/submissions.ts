@@ -1,9 +1,10 @@
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
-import { Audial, Song, Submission, User } from '../../types';
+import { Audial, MusicPlatformAuth, Song, Submission, User } from '../../types';
 import {
   addSongsToSpotifyPlaylist,
   checkSpotifyAccessCode,
   getCurrentSpotifySong,
+  removeAllSongsFromSpotifyPlaylist,
 } from '../spotify';
 import { sendNotificationToFriends } from './friends';
 
@@ -121,8 +122,11 @@ export const generateUserSubmission: (
   // adjust time and lateTime for a frontend-readable format
   submission.time = time.toDate();
   submission.lateTime = lateTime.toDate();
-  //todo: update the submissionPlaylist for this user and this user's friends who also have submissionPlaylist
-  updateRelatedSubmissionPlaylists(user.data() as User);
+  try {
+    await updateRelatedSubmissionPlaylists(user.data() as User);
+  } catch (e) {
+    console.log(e);
+  }
   return { ...submission, user: { username, musicPlatform, id } };
 };
 
@@ -176,21 +180,55 @@ export const setUserCurrentSubmissionAudialScore = async (
 
 export const updateRelatedSubmissionPlaylists = async (user: User) => {
   if (!user) throw new Error('No user provided.');
-  if (!user.submissionsPlaylist) return;
   const userRef = db.collection('users').doc(user.id);
   const musicPlatformAuth = user.musicPlatformAuth;
   const accessCode = await checkSpotifyAccessCode(musicPlatformAuth, userRef);
-  const songs: Song[] = [];
-  const song = (await getUserSubmission(user))?.song || null;
-  if (song) songs.push(song);
-  const friendSubmissions = await getFriendSubmissions(user);
-  for (const sub of friendSubmissions) {
-    songs.push(sub.song);
-  }
   musicPlatformAuth.access_token = accessCode;
-  await addSongsToSpotifyPlaylist(
-    songs,
-    user.submissionsPlaylist,
-    musicPlatformAuth
-  );
+  // Add the user's song and the user's friends's submissions songs to their playlist
+  const song = (await getUserSubmission(user))?.song || null;
+  const friendSubmissions = await getFriendSubmissions(user);
+  if (user.submissionsPlaylist) {
+    // reset user's submission playlist
+    await removeAllSongsFromSpotifyPlaylist(
+      user.submissionsPlaylist,
+      musicPlatformAuth
+    );
+    const songs: Song[] = [];
+    if (song) songs.push(song);
+    for (const sub of friendSubmissions) {
+      songs.push(sub.song);
+    }
+    await addSongsToSpotifyPlaylist(
+      songs,
+      user.submissionsPlaylist,
+      musicPlatformAuth
+    );
+  }
+  // Add the user's song to their friend's playlists
+  const friendIds = [];
+  for (const sub of friendSubmissions) {
+    if (sub.user) friendIds.push(sub.user?.id);
+  }
+  for (const fid of friendIds) {
+    const friendRef = db.collection('users').doc(fid);
+    const friendDoc = await friendRef.get();
+    const friendSubmissionPlaylist = friendDoc.get(
+      'submissionsPlaylist'
+    ) as string;
+    const friendMusicPlatformAuth = friendDoc.get(
+      'musicPlatformAuth'
+    ) as MusicPlatformAuth;
+    const accessCode = await checkSpotifyAccessCode(
+      friendMusicPlatformAuth,
+      userRef
+    );
+    friendMusicPlatformAuth.access_token = accessCode;
+    if (song) {
+      await addSongsToSpotifyPlaylist(
+        [song],
+        friendSubmissionPlaylist,
+        friendMusicPlatformAuth
+      );
+    }
+  }
 };
