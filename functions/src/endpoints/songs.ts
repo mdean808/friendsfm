@@ -123,10 +123,11 @@ export const createLikedSongsPlaylist = functions.https.onRequest(
           const playlistUrl = await createSpotifyPlaylist(
             musicPlatformAuth,
             songs,
-            'friendsfm saved songs',
-            'all the songs liked from friendsfm',
+            'friendsfm - saved songs',
+            'all your saved friendsfm songs',
             true
           );
+          userRef.update({ likedSongsPlaylist: playlistUrl });
           res
             .status(200)
             .type('json')

@@ -13,7 +13,6 @@
   });
 </script>
 
-<!-- TODO: add button for spotify creating spotify playlist (make sure to handle adding new scopes) -->
 <div>
   <div class="mx-4 py-1 text-center border-b-2 border-gray-400">
     <h1 class="text-xl">songs</h1>

@@ -2,6 +2,7 @@ import { Timestamp } from 'firebase-admin/firestore';
 
 export interface User {
   email: string;
+  likedSongsPlaylist?: string;
   displayName?: string;
   photoURL?: string;
   uid: string;
@@ -117,13 +118,69 @@ export interface SpotifyRecentlyPlayedRes {
 }
 
 export interface SpotifySearchRes {
-  href: string;
-  limit: number;
-  next: string;
-  offset: number;
-  previous: string;
-  total: number;
-  items: SpotifyTrack[];
+  tracks: {
+    href: string;
+    limit: number;
+    next: string;
+    offset: number;
+    previous: string;
+    total: number;
+    items: SpotifyTrack[];
+  };
+  artists: {
+    href: string;
+    limit: number;
+    next: string;
+    offset: number;
+    previous: string;
+    total: number;
+    items: SpotifyTrack[];
+  };
+  playlists: {
+    href: string;
+    limit: number;
+    next: string;
+    offset: number;
+    previous: string;
+    total: number;
+    items: SpotifyTrack[];
+  };
+  shows: {
+    href: string;
+    limit: number;
+    next: string;
+    offset: number;
+    previous: string;
+    total: number;
+    items: SpotifyTrack[];
+  };
+  episodes: {
+    href: string;
+    limit: number;
+    next: string;
+    offset: number;
+    previous: string;
+    total: number;
+    items: SpotifyTrack[];
+  };
+  albums: {
+    href: string;
+    limit: number;
+    next: string;
+    offset: number;
+    previous: string;
+    total: number;
+    items: SpotifyTrack[];
+  };
+  audiobooks: {
+    href: string;
+    limit: number;
+    next: string;
+    offset: number;
+    previous: string;
+    total: number;
+    items: SpotifyTrack[];
+  };
 }
 
 export interface SpotifyPlaylistRes {

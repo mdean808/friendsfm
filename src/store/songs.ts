@@ -1,8 +1,11 @@
+import { Dialog } from '@capacitor/dialog';
+import { toast } from '@zerodevx/svelte-toast';
 import { action, atom } from 'nanostores';
+import { user } from '.';
 import { handleApiResponse } from '../lib';
-import type { NetworkResponse, SavedSong } from '../types';
+import type { SavedSong } from '../types';
 import { authToken } from './auth';
-import { FIREBASE_URL } from './misc';
+import { FIREBASE_URL, loading } from './misc';
 
 export const songs = atom<SavedSong[]>([]);
 
@@ -69,6 +72,19 @@ export const createSongsSpotifyPlaylist = action(
   songs,
   'create-songs-playlist',
   async () => {
+    const u = user.get();
+    if (u.likedSongsPlaylist) {
+      window.location.href =
+        'https://open.spotify.com/playlist/' + u.likedSongsPlaylist;
+      return;
+    }
+    const { value } = await Dialog.confirm({
+      title: 'Create Spotify Playlist',
+      message:
+        'This will create a new spotify playlist of your saved songs. Proceed?',
+    });
+    if (!value) return;
+    loading.set(true);
     const res = await fetch(FIREBASE_URL.get() + '/createLikedSongsPlaylist', {
       method: 'POST',
       body: JSON.stringify({
@@ -76,10 +92,14 @@ export const createSongsSpotifyPlaylist = action(
       }),
     });
     const json = await handleApiResponse(res);
+    loading.set(false);
     if (!json) {
       //api response failed
+      toast.push('playlist creation failed. please try again.');
       return;
     }
+    // goto the playlist!
+    window.location.href = 'https://open.spotify.com/playlist/' + json.message;
     // return the playlist id
     return json.message;
   }

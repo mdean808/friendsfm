@@ -48,9 +48,6 @@
   import { IonContent } from '@ionic/core/components/ion-content';
   import OSLogger from './plugins/OSLogger';
   import { SplashScreen } from '@capacitor/splash-screen';
-  import * as Sentry from '@sentry/capacitor';
-  import * as SentrySvelte from '@sentry/svelte';
-  import { BrowserTracing } from '@sentry/tracing';
   import AnimatedSplashScreen from './components/AnimatedSplashScreen.svelte';
 
   notificationAction.subscribe(async (notif) => {
@@ -127,20 +124,6 @@
     } else {
       goto('/new_user');
     }
-    // if (import.meta.env.PROD) {
-    //   Sentry.init(
-    //     {
-    //       dsn: 'https://6b81e7dbc9474aa9bb64e2b24652684d@o4504839408844801.ingest.sentry.io/4504839411400704',
-    //       // Set your release version, such as 'getsentry@1.0.0'
-    //       release: `friendsfm@0.0.4`,
-    //       integrations: [new BrowserTracing()] as any[],
-    //       // Set your dist version, such as "1"
-    //       dist: '1',
-    //       tracesSampleRate: 0.25,
-    //     },
-    //     SentrySvelte.init
-    //   );
-    // }
   });
 </script>
 

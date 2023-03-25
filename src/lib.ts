@@ -1,11 +1,20 @@
 import { MusicPlatform, ResponseType, type NetworkResponse } from './types';
-import { currPath, getNewAuthToken, logout, prevPath } from './store';
+import {
+  currPath,
+  getNewAuthToken,
+  logout,
+  prevPath,
+  spotifyAuthCode,
+  updateMusicPlatform,
+} from './store';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { App } from '@capacitor/app';
 import { Dialog } from '@capacitor/dialog';
+
+let spotifySet;
 
 export const getPlatformColor = (platform: MusicPlatform) => {
   switch (platform) {
@@ -54,13 +63,23 @@ export const handleApiResponse = async (res: Response) => {
       goto('/new_user');
     } else if (json.message === 'Authentication Failed.') {
       await getNewAuthToken();
-    } else if (json.message.includes('Spotify 403 Forbidden')) {
+    } else if (
+      json.message.includes('Spotify 403 Forbidden') ||
+      json.message.includes('Spotify token refresh error')
+    ) {
       const { value } = await Dialog.confirm({
         title: 'Spotify Authentication',
         message:
           'You need to re-authenticate with Spotify to proceed. Continue?',
       });
       if (value) {
+        spotifySet = false;
+        spotifyAuthCode.listen(async (value: string) => {
+          if (!spotifySet) {
+            await updateMusicPlatform(MusicPlatform.spotify, value);
+            spotifySet = true;
+          }
+        });
         const spotifyUrl = `https://accounts.spotify.com/authorize?client_id=${
           import.meta.env.VITE_SPOTIFY_CLIENT_ID
         }&response_type=code&redirect_uri=${

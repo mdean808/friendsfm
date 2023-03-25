@@ -1,5 +1,9 @@
 import { getFirestore } from 'firebase-admin/firestore';
-import { SavedSong } from '../../types';
+import { MusicPlatform, MusicPlatformAuth, SavedSong } from '../../types';
+import {
+  addSongsToSpotifyPlaylist,
+  removeSongsFromSpotifyPlaylist,
+} from '../spotify';
 const db = getFirestore();
 
 export const getUserSongs: (id: string) => Promise<SavedSong[]> = async (
@@ -28,6 +32,19 @@ export const addSong: (
   const songRes = await songRef.get();
   const songData = { ...songRes.data(), id: songRes.id } as SavedSong;
 
+  const user = await userRef.get();
+
+  // add the new song to the playlist
+  if (user.get('likedSongsPlaylist')) {
+    if (user.get('musicPlatform') === MusicPlatform.spotify) {
+      await addSongsToSpotifyPlaylist(
+        [song],
+        user.get('likedSongsPlaylist'),
+        user.get('musicPlatformAuth') as MusicPlatformAuth
+      );
+    }
+  }
+
   return songData;
 };
 
@@ -37,6 +54,19 @@ export const removeSong = async (id: string, song: SavedSong) => {
   const userRef = db.collection('users').doc(id);
   const songsRef = userRef.collection('songs');
   const songRef = songsRef.doc(song.id);
+
+  const user = await userRef.get();
+
+  // remove the song from the playlist
+  if (user.get('likedSongsPlaylist')) {
+    if (user.get('musicPlatform') === MusicPlatform.spotify) {
+      await removeSongsFromSpotifyPlaylist(
+        [song],
+        user.get('likedSongsPlaylist'),
+        user.get('musicPlatformAuth') as MusicPlatformAuth
+      );
+    }
+  }
 
   await songRef.delete();
 };
