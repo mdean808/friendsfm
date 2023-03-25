@@ -101,6 +101,7 @@ export const createSongsSpotifyPlaylist = action(
     // goto the playlist!
     window.location.href = 'https://open.spotify.com/playlist/' + json.message;
     // return the playlist id
+    toast.push('playlist successfully created!');
     return json.message;
   }
 );

@@ -23,6 +23,7 @@
     if (platform == MusicPlatform.spotify) {
       spotifyAuthCode.listen(async (value: string) => {
         if (await updateMusicPlatform(platform, value)) goto('/');
+        loading.set(false);
       });
       const spotifyUrl = `https://accounts.spotify.com/authorize?client_id=${
         import.meta.env.VITE_SPOTIFY_CLIENT_ID
@@ -36,7 +37,6 @@
       //todo: authenticate with appleMusic
       // if (await updateMusicPlatform(platform)) goto('/');
     }
-    loading.set(false);
   };
 </script>
 
@@ -44,7 +44,7 @@
   <div class="mx-auto py-6 px-4 w-full">
     <h1 class="text-4xl">Select a Platform</h1>
     <p class="text-lg text-gray-400">
-      Choose the service you use to listen to music the most.
+      choose the service you use to listen to music.
     </p>
     <div class="w-full mt-8">
       <div class="grid grid-cols-2 space-x-2 rounded-xl bg-gray-900 p-2">

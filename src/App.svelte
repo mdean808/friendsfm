@@ -152,12 +152,15 @@
     {/if}
 
     <div>
-      {#if $loggedIn && $user.username && $user.musicPlatform}
+      {#if $loggedIn && $user.username && $user.musicPlatform && $currPath !== '/audial'}
         <TopNav />
       {/if}
       <main
         style={`height: calc(100vh - ${
-          110 + $bottomInset + $statusBarHeight
+          55 +
+          ($currPath === '/audial' ? 0 : 55) +
+          $bottomInset +
+          $statusBarHeight
         }px)`}
       >
         {#if $currPath === '/'}
@@ -177,10 +180,7 @@
             <Songs />
           </div>
         {:else if $currPath === '/audial'}
-          <div
-            style="height: inherit;"
-            in:fly={{ x: document.body.clientWidth }}
-          >
+          <div in:fly={{ x: document.body.clientWidth }}>
             <Audial />
           </div>
         {:else if $currPath === '/new_user'}
