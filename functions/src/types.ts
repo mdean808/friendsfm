@@ -3,6 +3,8 @@ import { Timestamp } from 'firebase-admin/firestore';
 export interface User {
   email: string;
   likedSongsPlaylist?: string;
+  submissionsPlaylist?: string;
+  musicPlatformAuth: MusicPlatformAuth;
   displayName?: string;
   photoURL?: string;
   uid: string;

@@ -1,6 +1,10 @@
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { Audial, Song, Submission, User } from '../../types';
-import { checkSpotifyAccessCode, getCurrentSpotifySong } from '../spotify';
+import {
+  addSongsToSpotifyPlaylist,
+  checkSpotifyAccessCode,
+  getCurrentSpotifySong,
+} from '../spotify';
 import { sendNotificationToFriends } from './friends';
 
 const db = getFirestore();
@@ -117,6 +121,8 @@ export const generateUserSubmission: (
   // adjust time and lateTime for a frontend-readable format
   submission.time = time.toDate();
   submission.lateTime = lateTime.toDate();
+  //todo: update the submissionPlaylist for this user and this user's friends who also have submissionPlaylist
+  updateRelatedSubmissionPlaylists(user.data() as User);
   return { ...submission, user: { username, musicPlatform, id } };
 };
 
@@ -166,4 +172,25 @@ export const setUserCurrentSubmissionAudialScore = async (
     .get();
   if (submissionRef.empty) throw new Error('No current submission.');
   submissionRef.docs[0].ref.update({ audial: audial });
+};
+
+export const updateRelatedSubmissionPlaylists = async (user: User) => {
+  if (!user) throw new Error('No user provided.');
+  if (!user.submissionsPlaylist) return;
+  const userRef = db.collection('users').doc(user.id);
+  const musicPlatformAuth = user.musicPlatformAuth;
+  const accessCode = await checkSpotifyAccessCode(musicPlatformAuth, userRef);
+  const songs: Song[] = [];
+  const song = (await getUserSubmission(user))?.song || null;
+  if (song) songs.push(song);
+  const friendSubmissions = await getFriendSubmissions(user);
+  for (const sub of friendSubmissions) {
+    songs.push(sub.song);
+  }
+  musicPlatformAuth.access_token = accessCode;
+  await addSongsToSpotifyPlaylist(
+    songs,
+    user.submissionsPlaylist,
+    musicPlatformAuth
+  );
 };

@@ -3,6 +3,7 @@ import type { Adress as Address } from '@capgo/nativegeocoder';
 export interface User {
   email: string;
   likedSongsPlaylist?: string;
+  submissionsPlaylist?: string;
   displayName?: string;
   photoURL?: string;
   uid: string;

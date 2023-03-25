@@ -1,8 +1,10 @@
 import { action, atom, map } from 'nanostores';
 import type { Audial, Submission } from '../types';
 import { goto, handleApiResponse } from '../lib';
-import { authToken, FIREBASE_URL, loading } from '.';
+import { authToken, FIREBASE_URL, loading, user } from '.';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { Dialog } from '@capacitor/dialog';
+import { toast } from '@zerodevx/svelte-toast';
 
 export const userSubmission = map<Submission>();
 
@@ -95,5 +97,41 @@ export const shareAudial = action(
     sub.audial = { number, score };
     store.set(sub);
     goto('/');
+  }
+);
+
+export const createSubmissionsPlaylist = action(
+  user,
+  'create-submissions-playlist',
+  async (u) => {
+    if (u.get().submissionsPlaylist) {
+      window.location.href =
+        'https://open.spotify.com/playlist/' + u.get().submissionsPlaylist;
+      return;
+    }
+    const { value } = await Dialog.confirm({
+      title: 'Create Spotify Playlist',
+      message:
+        'This will create a new spotify playlist of the songs on your friends submissions each day. Proceed?',
+    });
+    if (!value) return;
+    loading.set(true);
+    const res = await fetch(FIREBASE_URL.get() + '/createSubmissionsPlaylist', {
+      method: 'POST',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+      }),
+    });
+    const json = await handleApiResponse(res);
+    loading.set(false);
+    if (!json) {
+      //api response failed
+      toast.push('playlist creation failed. please try again.');
+      return;
+    }
+    // goto the playlist!
+    window.location.href = 'https://open.spotify.com/playlist/' + json.message;
+    // return the playlist id
+    return json.message;
   }
 );

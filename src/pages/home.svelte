@@ -11,6 +11,7 @@
     user,
     toggleSong,
     songs,
+    createSubmissionsPlaylist,
     appLoading,
   } from '../store';
   import Button from '../components/Button.svelte';
@@ -237,6 +238,22 @@
             class="mx-auto text-center text-blue-500 underline"
           >
             add friends for more submissions.
+          </p>
+        {/if}
+        {#if $user.submissionsPlaylist}
+          <a
+            href={`https://open.spotify.com/playlist/${$user.submissionsPlaylist}`}
+            class="mx-auto text-center mt-3 text-blue-500 underline"
+          >
+            open your submissions playlist
+          </a>
+        {:else}
+          <p
+            on:keyup={createSubmissionsPlaylist}
+            on:click={createSubmissionsPlaylist}
+            class="mx-auto text-center mt-3 text-blue-500 underline"
+          >
+            create your dynamic friendsfm playlist.
           </p>
         {/if}
       {/if}
