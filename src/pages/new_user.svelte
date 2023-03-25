@@ -83,14 +83,14 @@
   <div class="mx-auto py-6 px-4 w-full">
     <h1 class="text-4xl">FriendsFM</h1>
     <p class="text-lg text-gray-400">
-      Some really good description/tagline that makes me want to sign up!
+      the social way for you and your friends to enjoy music
     </p>
   </div>
   <div class="mx-auto w-full mt-48">
     <button
       type="button"
       on:click={signInWithGoogle}
-      class="my-1 mx-auto text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55"
+      class="my-1 mx-auto text-white w-[175px] bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55"
     >
       <svg
         class="mr-2 -ml-1 w-4 h-4"
@@ -113,7 +113,7 @@
       <button
         on:click={signInWithApple}
         type="button"
-        class="my-1 mx-auto text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30"
+        class="my-1 mx-auto text-white w-[175px] bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30"
       >
         <svg
           class="mr-2 -ml-1 w-5 h-5"
