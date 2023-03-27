@@ -17,6 +17,8 @@
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
 		AC42C85729BFE16100902F1B /* OSLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = AC42C85629BFE16100902F1B /* OSLogger.m */; };
 		AC42C85929BFE17500902F1B /* OSLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C85829BFE17500902F1B /* OSLogger.swift */; };
+		AC42C85B29CF66C400902F1B /* AppleMusic.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C85A29CF66C400902F1B /* AppleMusic.swift */; };
+		AC42C85F29CF6ACB00902F1B /* AppleMusic.m in Sources */ = {isa = PBXBuildFile; fileRef = AC42C85E29CF6ACB00902F1B /* AppleMusic.m */; };
 		ACA0E7C52990EB3400B47C81 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = ACA0E7C42990EB3400B47C81 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
@@ -34,6 +36,8 @@
 		AC42C85529BFE16000902F1B /* FriendsFM-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FriendsFM-Bridging-Header.h"; sourceTree = "<group>"; };
 		AC42C85629BFE16100902F1B /* OSLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OSLogger.m; sourceTree = "<group>"; };
 		AC42C85829BFE17500902F1B /* OSLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSLogger.swift; sourceTree = "<group>"; };
+		AC42C85A29CF66C400902F1B /* AppleMusic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusic.swift; sourceTree = "<group>"; };
+		AC42C85E29CF6ACB00902F1B /* AppleMusic.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleMusic.m; sourceTree = "<group>"; };
 		ACA0E7C42990EB3400B47C81 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		ACA0E7C72990ECC100B47C81 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 		AF51FD2D460BCFE21FA515B2 /* Pods-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.release.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.release.xcconfig"; sourceTree = "<group>"; };
@@ -95,7 +99,9 @@
 				50B271D01FEDC1A000F3C39B /* public */,
 				AC42C85629BFE16100902F1B /* OSLogger.m */,
 				AC42C85529BFE16000902F1B /* FriendsFM-Bridging-Header.h */,
+				AC42C85E29CF6ACB00902F1B /* AppleMusic.m */,
 				AC42C85829BFE17500902F1B /* OSLogger.swift */,
+				AC42C85A29CF66C400902F1B /* AppleMusic.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -246,7 +252,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				AC42C85729BFE16100902F1B /* OSLogger.m in Sources */,
+				AC42C85F29CF6ACB00902F1B /* AppleMusic.m in Sources */,
 				AC42C85929BFE17500902F1B /* OSLogger.swift in Sources */,
+				AC42C85B29CF66C400902F1B /* AppleMusic.swift in Sources */,
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -394,7 +402,7 @@
 				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = FriendsFM;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 0.0.5;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
@@ -421,7 +429,7 @@
 				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = FriendsFM;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 0.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.mogdan.friendsfm;

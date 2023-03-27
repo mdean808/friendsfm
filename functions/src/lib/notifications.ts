@@ -37,6 +37,9 @@ export const sendDaily = async () => {
 };
 
 export const newNotification = async (message: Message) => {
-  const res = await messaging.send(message);
-  functions.logger.info('Sent message to morgan', res);
+  try {
+    await messaging.send(message);
+  } catch (e) {
+    functions.logger.info('Error sending notification');
+  }
 };

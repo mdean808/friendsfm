@@ -30,6 +30,8 @@ export const createNewUserSubmission = functions.https.onRequest(
         try {
           const userSub = await generateUserSubmission(id, latitude, longitude);
           const friendSubs: Submission[] = await getFriendSubmissions(userRes);
+          // because some of our functions aren't running synchronously
+          if (res.headersSent) return;
           res.status(200).json({
             type: 'success',
             message: { user: userSub || {}, friends: friendSubs || [] },
@@ -38,7 +40,9 @@ export const createNewUserSubmission = functions.https.onRequest(
           functions.logger.info(
             'Error in generateUserSubmission or getFriendSubmissions.'
           );
-          functions.logger.error(e);
+          functions.logger.error((e as Error).message);
+          // because some of our functions aren't running synchronously
+          if (res.headersSent) return;
           res
             .status(400)
             .json({ type: 'error', message: (e as Error).message });

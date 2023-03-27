@@ -220,7 +220,7 @@ export const updateRelatedSubmissionPlaylists = async (user: User) => {
     ) as MusicPlatformAuth;
     const accessCode = await checkSpotifyAccessCode(
       friendMusicPlatformAuth,
-      userRef
+      friendRef
     );
     friendMusicPlatformAuth.access_token = accessCode;
     if (song) {

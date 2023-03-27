@@ -182,7 +182,6 @@ export const addSongsToSpotifyPlaylist = async (
     const uri = (await getSpotifySong(song, spotifyAuth)).uri;
     songUris.push(uri);
   }
-
   const res = await fetch(
     `https://api.spotify.com/v1/playlists/${encodeURI(
       playlistId
@@ -191,14 +190,14 @@ export const addSongsToSpotifyPlaylist = async (
       method: 'POST',
       headers: {
         Accept: 'application/json',
-        'Content-Type': 'application/json',
         Authorization: 'Bearer ' + spotifyAuth.access_token,
       },
     }
   );
   if (res.status === 403) {
+    console.log(res.statusText);
     throw new Error(
-      'Spotify 403 Forbidden: Please re-link the Spotify account.'
+      'Spotify 403 Forbidden: Adding Songs failed. Please re-link the Spotify account.'
     );
   }
 };
@@ -241,13 +240,18 @@ export const removeAllSongsFromSpotifyPlaylist = async (
   );
   if (songsRes.status === 403) {
     throw new Error(
-      'Spotify 403 Forbidden: Please re-link the Spotify account.'
+      'Spotify 403 Forbidden: Get Songs Failed. Please re-link the Spotify account.'
     );
   }
   const json = (await songsRes.json()) as {
     items: { track: { uri: string } }[];
   };
-  const songUris: string[] = json.items.map((t) => t.track.uri);
+  const songUris: { uri: string }[] = json.items.map((t) => {
+    return {
+      uri: t.track.uri,
+    };
+  });
+  console.log('deleting the songs from the playlist!');
   const res = await fetch(
     `https://api.spotify.com/v1/playlists/${encodeURI(playlistId)}/tracks`,
     {
@@ -260,9 +264,10 @@ export const removeAllSongsFromSpotifyPlaylist = async (
       body: JSON.stringify({ tracks: songUris }),
     }
   );
+  console.log(res.statusText, res.status);
   if (res.status === 403) {
     throw new Error(
-      'Spotify 403 Forbidden: Please re-link the Spotify account.'
+      'Spotify 403 Forbidden: Delete Songs Failed. Please re-link the Spotify account.'
     );
   }
 };

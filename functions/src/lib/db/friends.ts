@@ -138,6 +138,6 @@ export const sendNotificationToFriends = async (
         },
       },
     };
-    await newNotification(message);
+    newNotification(message);
   }
 };

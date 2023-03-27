@@ -8,7 +8,7 @@
     user,
   } from '../store';
   import { goto } from '../lib';
-  import { toast } from '@zerodevx/svelte-toast';
+  import AppleMusic from '../plugins/AppleMusic';
   import { onMount } from 'svelte';
 
   let platform: MusicPlatform;
@@ -33,8 +33,11 @@
       window.location.href = spotifyUrl;
     } else if (platform === MusicPlatform.appleMusic) {
       loading.set(false);
-      return toast.push('Apple music support coming soon!');
+      // return toast.push('Apple music support coming soon!');
       //todo: authenticate with appleMusic
+      console.log(await AppleMusic.checkPermissions());
+      console.log(await AppleMusic.getUserSubscriptionStatus());
+      console.log(await AppleMusic.getNowPlaying());
       // if (await updateMusicPlatform(platform)) goto('/');
     }
   };
