@@ -4,7 +4,6 @@ import {
   addSongsToSpotifyPlaylist,
   checkSpotifyAccessCode,
   getCurrentSpotifySong,
-  removeAllSongsFromSpotifyPlaylist,
 } from '../spotify';
 import { sendNotificationToFriends } from './friends';
 
@@ -69,6 +68,7 @@ export const generateUserSubmission: (
     length: currentSong.item.duration_ms / 1000,
     durationElapsed: currentSong.progress_ms / 1000,
     timestamp: currentSong.timestamp || 0,
+    genre: currentSong.item.albums[0]?.genres[0] || 'unknown',
   };
 
   // check for a late submission
@@ -189,10 +189,10 @@ export const updateRelatedSubmissionPlaylists = async (user: User) => {
   const friendSubmissions = await getFriendSubmissions(user);
   if (user.submissionsPlaylist) {
     // reset user's submission playlist
-    await removeAllSongsFromSpotifyPlaylist(
+    /* await removeAllSongsFromSpotifyPlaylist(
       user.submissionsPlaylist,
       musicPlatformAuth
-    );
+    ); */
     const songs: Song[] = [];
     if (song) songs.push(song);
     for (const sub of friendSubmissions) {

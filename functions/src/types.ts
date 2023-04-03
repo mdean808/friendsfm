@@ -38,6 +38,7 @@ export interface Song {
   timestamp?: number; // the time the song was played in milliseconds
   url: string;
   id: string;
+  genre: string;
 }
 
 export interface SavedSong extends Song {
@@ -96,6 +97,11 @@ export interface SpotifyTrack {
   artists: [
     {
       name: string;
+    }
+  ];
+  albums: [
+    {
+      genres: string[];
     }
   ];
   duration_ms: number;
