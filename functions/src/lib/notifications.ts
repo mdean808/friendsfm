@@ -1,4 +1,4 @@
-import { getFirestore } from 'firebase-admin/firestore';
+import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { getMessaging, Message } from 'firebase-admin/messaging';
 import * as functions from 'firebase-functions';
 
@@ -31,8 +31,7 @@ export const sendDaily = async () => {
   // Send a message to devices subscribed to the provided topic.
   const res = await messaging.send(message);
   const notificationsRef = db.collection('misc').doc('notifications');
-  const prevCount = (await notificationsRef.get()).get('count');
-  await notificationsRef.update({ count: prevCount + 1 });
+  await notificationsRef.update({ count: FieldValue.increment(1) });
   functions.logger.info('Successfully sent message:', res);
 };
 
