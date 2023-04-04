@@ -2,11 +2,10 @@ import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { Audial, MusicPlatformAuth, Song, Submission, User } from '../../types';
 import {
   addSongsToSpotifyPlaylist,
-  checkSpotifyAccessCode,
+  refreshSpotifyAccessCode,
   getCurrentSpotifySong,
 } from '../spotify';
-import { sendNotificationToFriends } from './friends';
-import * as firebase from 'firebase-functions';
+import { _sendNotificationToFriends } from './friends';
 import { getTrackGenre } from '../gpt';
 
 const db = getFirestore();
@@ -35,7 +34,8 @@ export const getUserSubmission: (
   } as Submission;
 };
 
-export const generateUserSubmission: (
+//WARN: Deprecated
+export const _generateUserSubmission: (
   id: string,
   latitude: number,
   longitude: number
@@ -57,12 +57,11 @@ export const generateUserSubmission: (
   if (!existingSubmission.empty) throw new Error('User already submitted.');
 
   // get the most recently listend to song for this user
-  const accessCode = await checkSpotifyAccessCode(
+  const accessCode = await refreshSpotifyAccessCode(
     user.get('musicPlatformAuth'),
     userRef
   );
   const currentSong = await getCurrentSpotifySong(accessCode);
-  firebase.logger.debug(JSON.stringify(currentSong.item));
   const song: Song = {
     id: '',
     name: currentSong.item.name,
@@ -106,6 +105,7 @@ export const generateUserSubmission: (
   let time = Timestamp.fromDate(new Date());
   lateTime = Timestamp.fromDate(lateTime);
   const submission: Submission = {
+    id: '',
     time,
     late,
     lateTime,
@@ -120,7 +120,7 @@ export const generateUserSubmission: (
 
   // send notification on late submission
   if (late)
-    sendNotificationToFriends(
+    _sendNotificationToFriends(
       user.data() as User,
       'late submission',
       `${username} just shared what they're listening to.`
@@ -137,6 +137,7 @@ export const generateUserSubmission: (
   return { ...submission, user: { username, musicPlatform, id } };
 };
 
+//WARN: Deprecated => Phase out in progress
 export const getFriendSubmissions: (
   user: User
 ) => Promise<Submission[]> = async (user) => {
@@ -189,7 +190,7 @@ export const updateRelatedSubmissionPlaylists = async (user: User) => {
   if (!user) throw new Error('No user provided.');
   const userRef = db.collection('users').doc(user.id);
   const musicPlatformAuth = user.musicPlatformAuth;
-  const accessCode = await checkSpotifyAccessCode(musicPlatformAuth, userRef);
+  const accessCode = await refreshSpotifyAccessCode(musicPlatformAuth, userRef);
   musicPlatformAuth.access_token = accessCode;
   // Add the user's song and the user's friends's submissions songs to their playlist
   const song = (await getUserSubmission(user))?.song || null;
@@ -225,7 +226,7 @@ export const updateRelatedSubmissionPlaylists = async (user: User) => {
     const friendMusicPlatformAuth = friendDoc.get(
       'musicPlatformAuth'
     ) as MusicPlatformAuth;
-    const accessCode = await checkSpotifyAccessCode(
+    const accessCode = await refreshSpotifyAccessCode(
       friendMusicPlatformAuth,
       friendRef
     );

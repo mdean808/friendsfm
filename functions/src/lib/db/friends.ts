@@ -114,7 +114,8 @@ export const sendFriendRequest = async (user: User, friendUsername: string) => {
   }
 };
 
-export const sendNotificationToFriends = async (
+//WARN: Deprecated
+export const _sendNotificationToFriends = async (
   user: User,
   title: string,
   body: string

@@ -13,7 +13,7 @@ const SPOTIFY_AUTH = Buffer.from(
   process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET
 ).toString('base64');
 
-export const checkSpotifyAccessCode = async (
+export const refreshSpotifyAccessCode = async (
   data: MusicPlatformAuth,
   userRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>
 ) => {

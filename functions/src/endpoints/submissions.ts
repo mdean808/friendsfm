@@ -1,40 +1,53 @@
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
+import User from '../classes/user';
 
 const auth = getAuth();
 const db = getFirestore();
 
 import {
-  generateUserSubmission,
   getFriendSubmissions,
   getUserById,
   getUserSubmission,
   setUserCurrentSubmissionAudialScore,
 } from '../lib/db';
-import { checkSpotifyAccessCode, createSpotifyPlaylist } from '../lib/spotify';
+import {
+  refreshSpotifyAccessCode,
+  createSpotifyPlaylist,
+} from '../lib/spotify';
 
-import { Audial, MusicPlatformAuth, Song, Submission, User } from '../types';
+import {
+  Audial,
+  MusicPlatformAuth,
+  Song,
+  Submission,
+  User as UserType,
+} from '../types';
 export const createNewUserSubmission = functions.https.onRequest(
   async (req, res) => {
     res.set('Access-Control-Allow-Origin', '*');
     const { latitude, longitude, authToken } = JSON.parse(req.body);
     try {
       const id = (await auth.verifyIdToken(authToken)).uid;
-      const userRes = await getUserById(id);
-      if (!userRes) {
+      const user = new User(id, authToken);
+      await user.load();
+      if (!user.exists) {
         res
           .status(400)
           .json({ type: 'error', message: 'User does not exist.' });
       } else {
         try {
-          const userSub = await generateUserSubmission(id, latitude, longitude);
-          const friendSubs: Submission[] = await getFriendSubmissions(userRes);
+          const userSub = await user.createSubmission(latitude, longitude);
+          const friendSubmissions = await user.getFriendSubmissions();
           // because some of our functions aren't running synchronously
           if (res.headersSent) return;
           res.status(200).json({
             type: 'success',
-            message: { user: userSub || {}, friends: friendSubs || [] },
+            message: {
+              user: userSub.json || {},
+              friends: friendSubmissions.map((s) => s.json) || [],
+            },
           });
         } catch (e) {
           functions.logger.info(
@@ -163,16 +176,16 @@ export const createSubmissionsPlaylist = functions.https.onRequest(
           const musicPlatformAuth = user.get(
             'musicPlatformAuth'
           ) as MusicPlatformAuth;
-          const accessCode = await checkSpotifyAccessCode(
+          const accessCode = await refreshSpotifyAccessCode(
             musicPlatformAuth,
             userRef
           );
           const songs: Song[] = [];
           const song =
-            (await getUserSubmission(user.data() as User))?.song || null;
+            (await getUserSubmission(user.data() as UserType))?.song || null;
           if (song) songs.push(song);
           const friendSubmissions = await getFriendSubmissions(
-            user.data() as User
+            user.data() as UserType
           );
           for (const sub of friendSubmissions) {
             songs.push(sub.song);

@@ -2,7 +2,10 @@ import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
 import { addSong, getUserSongs, removeSong } from '../lib/db';
-import { checkSpotifyAccessCode, createSpotifyPlaylist } from '../lib/spotify';
+import {
+  refreshSpotifyAccessCode,
+  createSpotifyPlaylist,
+} from '../lib/spotify';
 import { MusicPlatformAuth, SavedSong } from '../types';
 
 const auth = getAuth();
@@ -114,7 +117,7 @@ export const createLikedSongsPlaylist = functions.https.onRequest(
           const musicPlatformAuth = user.get(
             'musicPlatformAuth'
           ) as MusicPlatformAuth;
-          const accessCode = await checkSpotifyAccessCode(
+          const accessCode = await refreshSpotifyAccessCode(
             musicPlatformAuth,
             userRef
           );
