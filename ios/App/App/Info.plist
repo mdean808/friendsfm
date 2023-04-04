@@ -38,9 +38,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>To display currently playing songs.</string>
+	<string>We need Apple Music access to easily share what you are currently listenting to.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Please share your location.</string>
+	<string>We need your location to help you share music with nearby friends.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UISceneConfigurations</key>
