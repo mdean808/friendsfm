@@ -99,11 +99,7 @@ export interface SpotifyTrack {
       name: string;
     }
   ];
-  albums: [
-    {
-      genres: string[];
-    }
-  ];
+  album: any;
   duration_ms: number;
   external_urls: {
     spotify: string;

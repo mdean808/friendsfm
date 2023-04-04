@@ -6,6 +6,8 @@ import {
   getCurrentSpotifySong,
 } from '../spotify';
 import { sendNotificationToFriends } from './friends';
+import * as firebase from 'firebase-functions';
+import { getTrackGenre } from '../gpt';
 
 const db = getFirestore();
 
@@ -60,6 +62,7 @@ export const generateUserSubmission: (
     userRef
   );
   const currentSong = await getCurrentSpotifySong(accessCode);
+  firebase.logger.debug(JSON.stringify(currentSong.item));
   const song: Song = {
     id: '',
     name: currentSong.item.name,
@@ -68,7 +71,11 @@ export const generateUserSubmission: (
     length: currentSong.item.duration_ms / 1000,
     durationElapsed: currentSong.progress_ms / 1000,
     timestamp: currentSong.timestamp || 0,
-    genre: currentSong.item.albums[0]?.genres[0] || 'unknown',
+    genre:
+      (await getTrackGenre(
+        currentSong.item.name,
+        currentSong.item.artists[0]?.name
+      )) || 'unkown',
   };
 
   // check for a late submission
