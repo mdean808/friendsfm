@@ -5,6 +5,7 @@ import { authToken, FIREBASE_URL, loading, user } from '.';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Dialog } from '@capacitor/dialog';
 import { toast } from '@zerodevx/svelte-toast';
+import { Geolocation, type Position } from '@capacitor/geolocation';
 
 export const userSubmission = map<Submission>();
 
@@ -13,7 +14,15 @@ export const generateSubmission = action(
   'generate-submission',
   async (store) => {
     try {
-      let location: GeolocationPosition;
+      let location: Position;
+      try {
+        await Geolocation.checkPermissions().catch(
+          async () => await Geolocation.requestPermissions()
+        );
+        location = await Geolocation.getCurrentPosition();
+      } catch (e) {
+        console.log('Location permissions rejected.');
+      }
       const res = await fetch(FIREBASE_URL.get() + '/createNewUserSubmission', {
         method: 'POST',
         body: JSON.stringify({
