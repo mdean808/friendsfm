@@ -1,8 +1,10 @@
 import { DocumentReference, getFirestore } from 'firebase-admin/firestore';
 import { Message } from 'firebase-admin/messaging';
+import { SPOTIFY_AUTH } from '../lib/db';
 import { getTrackGenre } from '../lib/gpt';
 import { newNotification } from '../lib/notifications';
 import {
+  addSongsToSpotifyPlaylist,
   getCurrentSpotifySong,
   refreshSpotifyAccessCode,
 } from '../lib/spotify';
@@ -10,8 +12,11 @@ import {
   Friend,
   MusicPlatform,
   MusicPlatformAuth,
+  SavedSong,
   Song,
+  SpotifyAuthRes,
   Submission as SubmissionType,
+  User as UserType,
 } from '../types';
 import Submission from './submission';
 
@@ -19,27 +24,27 @@ const db = getFirestore();
 
 export default class User {
   id: string;
-  email?: string;
-  likedSongsPlaylist?: string;
-  submissionsPlaylist?: string;
-  musicPlatformAuth?: MusicPlatformAuth;
-  displayName?: string;
-  photoURL?: string;
-  username?: string;
-  musicPlatform?: MusicPlatform;
+  email: string = '';
+  likedSongsPlaylist: string = '';
+  submissionsPlaylist: string = '';
+  musicPlatformAuth: MusicPlatformAuth = {} as MusicPlatformAuth;
+  displayName: string = '';
+  photoURL: string = '';
+  username: string = '';
+  musicPlatform: MusicPlatform = MusicPlatform.spotify;
   friends: Friend[] = [];
   friendRequests: string[] = []; // usernames
   submissions: string[] = []; // submission ids
   savedSongs: string[] = []; // song ids
-  messagingToken?: string;
-  authToken?: string;
+  messagingToken: string = '';
+  authToken: string = '';
   musicPlatformAcessCode?: string;
   loaded = false;
 
   constructor(id: string, authToken?: string) {
     if (!id) throw Error('No user id passed to constructor');
     this.id = id;
-    this.authToken = authToken;
+    this.authToken = authToken || '';
   }
 
   public async load(): Promise<User> {
@@ -49,6 +54,105 @@ export default class User {
     }
     this.loaded = true;
     return this;
+  }
+
+  public get json() {
+    return {
+      id: this.id,
+      email: this.email,
+      likedSongsPlaylist: this.likedSongsPlaylist,
+      submissionsPlaylist: this.likedSongsPlaylist,
+      musicPlatformAuth: this.musicPlatformAuth,
+      displayName: this.displayName,
+      photoURL: this.photoURL,
+      username: this.username,
+      musicPlatform: this.musicPlatform,
+      friends: this.friends,
+      friendRequests: this.friendRequests,
+      submissions: this.submissions,
+      savedSongs: this.savedSongs,
+      messagingToken: this.messagingToken,
+      authToken: this.authToken,
+    } as UserType;
+  }
+
+  public async setMessagingToken(token: string) {
+    if (!this.exists) throw Error('User not loaded.');
+    if (!token) throw Error('No messaging token provided.');
+    await this.dbRef.update({ token });
+  }
+
+  public async getSongs() {
+    if (!this.exists) throw Error('User not loaded.');
+    const songs: SavedSong[] = [];
+    const songsRef = this.dbRef.collection('songs');
+    (await songsRef.get()).forEach((doc) => {
+      const song = doc.data() as SavedSong;
+      songs.push({ ...song, id: doc.id });
+    });
+    return songs;
+  }
+
+  public async setUsername(username: string) {
+    const usersRef = db.collection('users');
+    if ((await usersRef.where('username', '==', username).get()).docs[0]) {
+      throw new Error('Username taken. Please try another.');
+    } else {
+      const userFriends = this.friends as {
+        id: string;
+        username: string;
+      }[];
+      for (const friend of userFriends) {
+        const f = new User(friend.id);
+        await f.load();
+        const friendFriends = f.friends as {
+          id: string;
+          username: string;
+        }[];
+        for (const userWithinFriendFriends of friendFriends) {
+          if (userWithinFriendFriends.id === this.id)
+            userWithinFriendFriends.username = username;
+        }
+        f.dbRef.update({ friends: friendFriends });
+      }
+      await this.dbRef.update({ username });
+    }
+  }
+
+  public async setMusicPlatform(
+    musicPlatform: MusicPlatform,
+    authCode: string
+  ) {
+    if (musicPlatform === MusicPlatform.spotify) {
+      const body = new URLSearchParams();
+      body.append('grant_type', 'authorization_code');
+      body.append('code', authCode);
+      body.append('redirect_uri', process.env.SPOTIFY_REDIRECT_URL || '');
+
+      const res = await fetch('https://accounts.spotify.com/api/token', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: 'Basic ' + SPOTIFY_AUTH,
+        },
+        method: 'post',
+        body,
+      });
+      if (res.status !== 200) {
+      } else {
+        const spotifyAuthRes: SpotifyAuthRes = await res.json();
+        const musicPlatformAuth = {
+          expires_at: new Date(Date.now() + spotifyAuthRes.expires_in * 1000),
+          access_token: spotifyAuthRes.access_token,
+          refresh_token: spotifyAuthRes.refresh_token,
+        };
+        await this.dbRef.update({
+          musicPlatform,
+          musicPlatformAuth,
+        });
+      }
+    } else {
+      // apple music
+    }
   }
 
   public async updateMusicAuth(): Promise<string> {
@@ -161,6 +265,41 @@ export default class User {
       );
     }
 
+    try {
+      // Add submission song + friend submission songs to user's playlist
+      const friendSubmissions = await this.getFriendSubmissions();
+      if (this.submissionsPlaylist) {
+        const songs: Song[] = [];
+        if (song) songs.push(song);
+        for (const sub of friendSubmissions) {
+          songs.push(sub.song);
+        }
+        await addSongsToSpotifyPlaylist(
+          songs,
+          this.submissionsPlaylist,
+          this.musicPlatformAuth
+        );
+      }
+      // Add submission song to their friend's playlists
+      const friendIds = [];
+      for (const sub of friendSubmissions) {
+        friendIds.push(sub.user.id);
+      }
+      for (const fid of friendIds) {
+        const friend = new User(fid);
+        await friend.load();
+        await friend.updateMusicAuth();
+        if (song) {
+          await addSongsToSpotifyPlaylist(
+            [song],
+            friend.submissionsPlaylist,
+            friend.musicPlatformAuth
+          );
+        }
+      }
+    } catch (e) {
+      console.log(e);
+    }
     // return a new submission class from the result
     return new Submission(
       newSubmissionId,

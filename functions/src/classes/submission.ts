@@ -103,6 +103,12 @@ export default class Submission {
     );
   }
 
+  public async setAudial(audial: Audial) {
+    if (!audial || !audial.score || !audial.number)
+      throw new Error('Invalid audial provided');
+    await this.dbRef.update({ audial });
+  }
+
   public static async canCreate(
     userRef: DocumentReference,
     notificationsSnapshot: DocumentSnapshot

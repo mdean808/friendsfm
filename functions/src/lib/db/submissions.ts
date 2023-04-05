@@ -10,7 +10,8 @@ import { getTrackGenre } from '../gpt';
 
 const db = getFirestore();
 
-export const getUserSubmission: (
+//WARN: Deprecated
+export const _getUserSubmission: (
   user: User
 ) => Promise<Submission | undefined> = async (user) => {
   if (!user) throw new Error('No user provided.');
@@ -130,15 +131,15 @@ export const _generateUserSubmission: (
   submission.time = time.toDate();
   submission.lateTime = lateTime.toDate();
   try {
-    await updateRelatedSubmissionPlaylists(user.data() as User);
+    await _updateRelatedSubmissionPlaylists(user.data() as User);
   } catch (e) {
     console.log(e);
   }
   return { ...submission, user: { username, musicPlatform, id } };
 };
 
-//WARN: Deprecated => Phase out in progress
-export const getFriendSubmissions: (
+//WARN: Deprecated
+export const _getFriendSubmissions: (
   user: User
 ) => Promise<Submission[]> = async (user) => {
   if (!user) throw new Error('No user provided.');
@@ -167,7 +168,8 @@ export const getFriendSubmissions: (
   return friendSubmissions;
 };
 
-export const setUserCurrentSubmissionAudialScore = async (
+//WARN: Deprecated
+export const _setUserCurrentSubmissionAudialScore = async (
   id: string,
   audial: Audial
 ) => {
@@ -186,15 +188,16 @@ export const setUserCurrentSubmissionAudialScore = async (
   submissionRef.docs[0].ref.update({ audial: audial });
 };
 
-export const updateRelatedSubmissionPlaylists = async (user: User) => {
+//WARN: Deprecated
+export const _updateRelatedSubmissionPlaylists = async (user: User) => {
   if (!user) throw new Error('No user provided.');
   const userRef = db.collection('users').doc(user.id);
   const musicPlatformAuth = user.musicPlatformAuth;
   const accessCode = await refreshSpotifyAccessCode(musicPlatformAuth, userRef);
   musicPlatformAuth.access_token = accessCode;
   // Add the user's song and the user's friends's submissions songs to their playlist
-  const song = (await getUserSubmission(user))?.song || null;
-  const friendSubmissions = await getFriendSubmissions(user);
+  const song = (await _getUserSubmission(user))?.song || null;
+  const friendSubmissions = await _getFriendSubmissions(user);
   if (user.submissionsPlaylist) {
     // reset user's submission playlist
     /* await removeAllSongsFromSpotifyPlaylist(

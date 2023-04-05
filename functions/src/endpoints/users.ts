@@ -1,12 +1,6 @@
 import { getAuth } from 'firebase-admin/auth';
 import * as functions from 'firebase-functions';
-import {
-  getUserById,
-  getUserSongs,
-  setUserMusicPlatform,
-  setUserUsername,
-  updateUserMessagingToken,
-} from '../lib/db';
+import User from '../classes/user';
 
 const auth = getAuth();
 
@@ -18,16 +12,19 @@ export const getUser = functions.https.onRequest(async (req, res) => {
   }: { messagingToken?: string; authToken: string } = JSON.parse(req.body);
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
-    const userRes = await getUserById(id);
-    if (!userRes) {
+    const user = new User(id);
+    await user.load();
+    if (!user.exists) {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
-      if (messagingToken) updateUserMessagingToken(id, messagingToken);
-      const songs = await getUserSongs(id);
+      if (messagingToken) {
+        await user.setUsername(messagingToken);
+      }
+      const songs = await user.getSongs();
       res
         .status(200)
         .type('json')
-        .send({ type: 'success', message: { user: userRes, songs: songs } });
+        .send({ type: 'success', message: { user: user.json, songs: songs } });
     }
   } catch (e) {
     // firebase authnetication error
@@ -45,12 +42,13 @@ export const setUsername = functions.https.onRequest(async (req, res) => {
   const { username, authToken } = JSON.parse(req.body);
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
-    const userRes = await getUserById(id);
-    if (!userRes) {
+    const user = new User(id);
+    await user.load();
+    if (!user.exists) {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       try {
-        await setUserUsername(id, username);
+        await user.setUsername(username);
         res
           .status(200)
           .type('json')
@@ -77,12 +75,13 @@ export const setMusicPlatform = functions.https.onRequest(async (req, res) => {
   const { musicPlatform, platformAuthCode, authToken } = JSON.parse(req.body);
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
-    const userRes = await getUserById(id);
-    if (!userRes) {
+    const user = new User(id);
+    await user.load();
+    if (!user.exists) {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       try {
-        await setUserMusicPlatform(id, musicPlatform, platformAuthCode);
+        await user.setMusicPlatform(musicPlatform, platformAuthCode);
         res.status(200).json({ type: 'success', message: musicPlatform });
       } catch (e) {
         functions.logger.info('Error in setMusicPlatform.');

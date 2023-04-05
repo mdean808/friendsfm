@@ -2,13 +2,14 @@ import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
 import { MusicPlatform, SpotifyAuthRes, User } from '../../types';
 
-const SPOTIFY_AUTH = Buffer.from(
+export const SPOTIFY_AUTH = Buffer.from(
   process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET
 ).toString('base64');
 
 const db = getFirestore();
 
-export const updateUserMessagingToken = async (
+//WARN: Deprecated
+export const _updateUserMessagingToken = async (
   id: string,
   messagingToken: string
 ) => {
@@ -17,7 +18,7 @@ export const updateUserMessagingToken = async (
   const usersRef = db.collection('users');
   const res = usersRef.doc(id);
   if (!(await res.get()).exists)
-    throw new Error('User of given id does not exit.');
+    throw new Error('User of given id does not exist.');
   await res.update({ messagingToken });
 };
 
@@ -49,7 +50,8 @@ export const createUser = async (user: User) => {
   return user;
 };
 
-export const setUserUsername = async (id: string, username: string) => {
+//WARN: Deprecated
+export const _setUserUsername = async (id: string, username: string) => {
   const usersRef = db.collection('users');
   const user = usersRef.doc(id);
   if ((await usersRef.where('username', '==', username).get()).docs[0]) {
@@ -75,7 +77,8 @@ export const setUserUsername = async (id: string, username: string) => {
   }
 };
 
-export const setUserMusicPlatform = async (
+//WARN: Deprecated
+export const _setUserMusicPlatform = async (
   id: string,
   musicPlatform: string,
   platformAuthCode: string
