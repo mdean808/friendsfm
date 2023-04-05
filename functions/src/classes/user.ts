@@ -1,12 +1,13 @@
 import { DocumentReference, getFirestore } from 'firebase-admin/firestore';
 import { Message } from 'firebase-admin/messaging';
-import { SPOTIFY_AUTH } from '../lib/db';
+import { SPOTIFY_AUTH } from '../lib/spotify';
 import { getTrackGenre } from '../lib/gpt';
 import { newNotification } from '../lib/notifications';
 import {
   addSongsToSpotifyPlaylist,
   getCurrentSpotifySong,
   refreshSpotifyAccessCode,
+  removeSongsFromSpotifyPlaylist,
 } from '../lib/spotify';
 import {
   Friend,
@@ -49,10 +50,14 @@ export default class User {
 
   public async load(): Promise<User> {
     const res = await this.dbRef.get();
-    for (const key in this) {
-      this[key] = res.get(key) || this[key];
+    if (res.exists) {
+      for (const key in this) {
+        this[key] = res.get(key) || this[key];
+      }
+      this.loaded = true;
+    } else {
+      this.loaded = false;
     }
-    this.loaded = true;
     return this;
   }
 
@@ -171,6 +176,49 @@ export default class User {
     } else {
       throw Error('Unknown music platform.');
     }
+  }
+
+  public async saveSong(song: SavedSong): Promise<SavedSong> {
+    if (!this.exists) throw Error('User not loaded.');
+    const songsRef = this.dbRef.collection('songs');
+
+    const songRef = await songsRef.add(song);
+    const songRes = await songRef.get();
+    const songData = { ...songRes.data(), id: songRes.id } as SavedSong;
+
+    // add the new song to the playlist
+    if (this.likedSongsPlaylist) {
+      if (this.musicPlatform === MusicPlatform.spotify) {
+        await this.updateMusicAuth();
+        await addSongsToSpotifyPlaylist(
+          [song],
+          this.likedSongsPlaylist,
+          this.musicPlatformAuth
+        );
+      }
+    }
+
+    return songData;
+  }
+
+  public async unsaveSong(song: SavedSong) {
+    if (!this.exists) throw Error('User not loaded.');
+    if (!song?.id) throw new Error('No song provided.');
+    const songsRef = this.dbRef.collection('songs');
+    const songRef = songsRef.doc(song.id);
+
+    // remove the song from the playlist
+    if (this.likedSongsPlaylist) {
+      if (this.musicPlatform === MusicPlatform.spotify) {
+        await removeSongsFromSpotifyPlaylist(
+          [song],
+          this.likedSongsPlaylist,
+          this.musicPlatformAuth
+        );
+      }
+    }
+
+    await songRef.delete();
   }
 
   public async getRecentSong(): Promise<Song> {

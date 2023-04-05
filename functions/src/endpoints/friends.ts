@@ -1,8 +1,8 @@
 import { getAuth } from 'firebase-admin/auth';
 import * as functions from 'firebase-functions';
+import User from '../classes/user';
 import {
   acceptFriendRequest,
-  getUserById,
   rejectFriendRequest,
   sendFriendRequest,
 } from '../lib/db';
@@ -14,12 +14,12 @@ export const acceptFriend = functions.https.onRequest(async (req, res) => {
   const { requester, authToken } = JSON.parse(req.body);
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
-    const userRes = await getUserById(id);
-    if (!userRes) {
+    const user = new User(id);
+    if (!user.exists) {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       try {
-        const friend = await acceptFriendRequest(userRes, requester);
+        const friend = await acceptFriendRequest(user.json, requester);
         res.status(200).type('json').send({ type: 'success', message: friend });
       } catch (e) {
         functions.logger.info('Error in acceptFriendRequest.');
@@ -43,12 +43,12 @@ export const requestFriend = functions.https.onRequest(async (req, res) => {
   const { friend, authToken } = JSON.parse(req.body);
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
-    const userRes = await getUserById(id);
-    if (!userRes) {
+    const user = new User(id);
+    if (!user.exists) {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       try {
-        await sendFriendRequest(userRes, friend);
+        await sendFriendRequest(user.json, friend);
         res
           .status(200)
           .type('json')
@@ -75,12 +75,12 @@ export const rejectRequest = functions.https.onRequest(async (req, res) => {
   const { requester, authToken } = JSON.parse(req.body);
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
-    const userRes = await getUserById(id);
-    if (!userRes) {
+    const user = new User(id);
+    if (!user.exists) {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       try {
-        await rejectFriendRequest(userRes, requester);
+        await rejectFriendRequest(user.json, requester);
         res
           .status(200)
           .type('json')

@@ -1,26 +1,23 @@
 import { getAuth } from 'firebase-admin/auth';
-import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
-import { addSong, getUserSongs, removeSong } from '../lib/db';
-import {
-  refreshSpotifyAccessCode,
-  createSpotifyPlaylist,
-} from '../lib/spotify';
-import { MusicPlatformAuth, SavedSong } from '../types';
+import User from '../classes/user';
+import { createSpotifyPlaylist } from '../lib/spotify';
+import { SavedSong } from '../types';
 
 const auth = getAuth();
-const db = getFirestore();
 
 export const getSongs = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   const { authToken }: { authToken: string } = JSON.parse(req.body);
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
-    if (!id) {
+    const user = new User(id);
+    await user.load();
+    if (!user.exists) {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       try {
-        const songs = await getUserSongs(id);
+        const songs = await user.getSongs();
         res.status(200).type('json').send({ type: 'success', message: songs });
       } catch (e) {
         functions.logger.info('Error in saveSong.');
@@ -45,11 +42,13 @@ export const saveSong = functions.https.onRequest(async (req, res) => {
     JSON.parse(req.body);
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
-    if (!id) {
+    const user = new User(id);
+    await user.load();
+    if (!user.exists) {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       try {
-        const likedSong = await addSong(id, song);
+        const likedSong = await user.saveSong(song);
         res
           .status(200)
           .type('json')
@@ -77,11 +76,13 @@ export const deleteSong = functions.https.onRequest(async (req, res) => {
     JSON.parse(req.body);
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
-    if (!id) {
+    const user = new User(id);
+    await user.load();
+    if (!user.exists) {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       try {
-        await removeSong(id, song);
+        user.unsaveSong(song);
         res.status(200).type('json').send({ type: 'success', message: '' });
       } catch (e) {
         functions.logger.info('Error in saveSong.');
@@ -106,31 +107,24 @@ export const createLikedSongsPlaylist = functions.https.onRequest(
     const { authToken }: { authToken: string } = JSON.parse(req.body);
     try {
       const id = (await auth.verifyIdToken(authToken)).uid;
-      if (!id) {
+      const user = new User(id);
+      await user.load();
+      if (!user.exists) {
         res
           .status(400)
           .json({ type: 'error', message: 'User does not exist.' });
       } else {
         try {
-          const userRef = db.collection('users').doc(id);
-          const user = await userRef.get();
-          const musicPlatformAuth = user.get(
-            'musicPlatformAuth'
-          ) as MusicPlatformAuth;
-          const accessCode = await refreshSpotifyAccessCode(
-            musicPlatformAuth,
-            userRef
-          );
-          const songs = await getUserSongs(id);
-          musicPlatformAuth.access_token = accessCode;
+          await user.updateMusicAuth();
+          const songs = await user.getSongs();
           const playlistUrl = await createSpotifyPlaylist(
-            musicPlatformAuth,
+            user.musicPlatformAuth,
             songs,
             'friendsfm - saved songs',
             'all your saved friendsfm songs',
             true
           );
-          userRef.update({ likedSongsPlaylist: playlistUrl });
+          user.dbRef.update({ likedSongsPlaylist: playlistUrl });
           res
             .status(200)
             .type('json')

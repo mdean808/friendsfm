@@ -1,30 +1,31 @@
 import { getAuth } from 'firebase-admin/auth';
 import * as functions from 'firebase-functions';
-import { createUser, getUserById, getUserSongs } from '../lib/db';
-import { User } from '../types';
+import User from '../classes/user';
+import { createUser } from '../lib/db';
+import { User as UserType } from '../types';
 
 const auth = getAuth();
 
 export const loginUser = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
-  const user: User = JSON.parse(req.body);
-
+  const user: UserType = JSON.parse(req.body);
   try {
     // verify the auth token with firebase's backend
     const decodedTokenData = await auth.verifyIdToken(user.authToken);
     user.id = decodedTokenData.uid;
-    const userRes = await getUserById(user.id);
-    if (userRes) {
+    const userClass = new User(user.id);
+    await userClass.load();
+    if (userClass.exists) {
       // user has already been registered, send success
-      functions.logger.info(`User ${userRes.id} already registered`);
-      const songs = await getUserSongs(user.id);
+      functions.logger.info(`User ${userClass.id} already registered`);
+      const songs = userClass.getSongs();
       res
         .status(200)
-        .json({ type: 'success', message: { user: userRes, songs } });
+        .json({ type: 'success', message: { user: userClass.json, songs } });
     } else {
       try {
+        //store user to the database and return user object
         const userRes = await createUser(user);
-        //store user to the database and return id
         res
           .status(200)
           .json({ type: 'success', message: { user: userRes, songs: [] } });
