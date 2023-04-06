@@ -62,8 +62,8 @@
       refresher.addEventListener('ionRefresh', handleRefresh);
     }
     if (
-      !friendSubmissions.get().length ||
-      !Object.keys(userSubmission.get()).length
+      !friendSubmissions.get()?.length ||
+      !Object.keys(userSubmission.get())?.length
     )
       await load();
     loadingSubmissions = false;
