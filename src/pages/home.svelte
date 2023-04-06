@@ -53,7 +53,6 @@
   });
 
   onMount(async () => {
-    if (!loggedIn.get()) return goto('/');
     if (
       Capacitor.getPlatform() !== 'ios' ||
       Capacitor.getPlatform() !== 'android'
