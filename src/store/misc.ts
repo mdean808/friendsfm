@@ -18,10 +18,10 @@ export const getPlatform = action(platform, 'get-platform', async (store) => {
 });
 
 export const FIREBASE_URL = atom<string>(
-  // import.meta.env.DEV
-  //   ? 'http://localhost:5001/friendsfm/us-central1'
-  //   : 'https://us-central1-friendsfm.cloudfunctions.net'
-  'https://us-central1-friendsfm.cloudfunctions.net'
+  import.meta.env.DEV
+    ? 'http://localhost:5001/friendsfm/us-central1'
+    : 'https://us-central1-friendsfm.cloudfunctions.net'
+  // 'https://us-central1-friendsfm.cloudfunctions.net'
 );
 
 export const notificationAction = map<Notification>();

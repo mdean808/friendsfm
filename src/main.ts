@@ -3,6 +3,7 @@ import App from './App.svelte';
 import { App as CapacitorApp, type URLOpenListenerEvent } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 // import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { Capacitor } from '@capacitor/core';
 import { initializeApp } from 'firebase/app';
@@ -21,6 +22,16 @@ const firebaseConfig = {
   measurementId: 'G-HQGHCKN11Z',
 };
 initializeApp(firebaseConfig);
+
+if (import.meta.env.DEV) {
+  (async () => {
+    console.log('Setting up emulator');
+    await FirebaseAuthentication.useEmulator({
+      host: 'http://127.0.0.1',
+      port: 9099,
+    }).catch(console.log);
+  })();
+}
 
 FirebaseAnalytics.setEnabled({ enabled: true });
 

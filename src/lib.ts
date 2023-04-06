@@ -2,6 +2,7 @@ import { MusicPlatform, ResponseType, type NetworkResponse } from './types';
 import {
   currPath,
   getNewAuthToken,
+  loggedIn,
   logout,
   prevPath,
   spotifyAuthCode,
@@ -63,7 +64,12 @@ export const handleApiResponse = async (res: Response) => {
       logout();
       goto('/new_user');
     } else if (json.message === 'Authentication Failed.') {
-      await getNewAuthToken();
+      if (json.error.includes('Decoding Firebase ID token')) {
+        logout();
+        goto('/new_user');
+      } else {
+        await getNewAuthToken();
+      }
     } else if (
       json.message.includes('Spotify 403 Forbidden') ||
       json.message.includes('Spotify token refresh error')
