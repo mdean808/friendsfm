@@ -1,10 +1,8 @@
 import { getAuth } from 'firebase-admin/auth';
-import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
 import User from '../classes/user';
 
 const auth = getAuth();
-const db = getFirestore();
 
 export const getUser = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
@@ -116,16 +114,16 @@ export const unlinkMusicPlatform = functions.https.onRequest(
     const { authToken } = JSON.parse(req.body);
     try {
       const id = (await auth.verifyIdToken(authToken)).uid;
-      const userRes = await getUserById(id);
-      if (!userRes) {
+      const user = new User(id);
+      await user.load();
+      if (!user.exists) {
         res
           .status(400)
           .json({ type: 'error', message: 'User does not exist.' });
       } else {
         try {
-          const userRef = db.collection('users').doc(id);
-          await userRef.update({ musicPlatform: '' });
-          await userRef.update({ musicPlatformAuth: {} });
+          await user.dbRef.update({ musicPlatform: '' });
+          await user.dbRef.update({ musicPlatformAuth: {} });
           res.status(200).json({ type: 'success', message: '' });
         } catch (e) {
           functions.logger.info('Error in setMusicPlatform.');
