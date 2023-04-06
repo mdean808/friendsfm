@@ -1,4 +1,5 @@
 import { getAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
 import {
   getUserById,
@@ -9,6 +10,7 @@ import {
 } from '../lib/db';
 
 const auth = getAuth();
+const db = getFirestore();
 
 export const getUser = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
@@ -100,3 +102,40 @@ export const setMusicPlatform = functions.https.onRequest(async (req, res) => {
     });
   }
 });
+
+export const unlinkMusicPlatform = functions.https.onRequest(
+  async (req, res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    const { authToken } = JSON.parse(req.body);
+    try {
+      const id = (await auth.verifyIdToken(authToken)).uid;
+      const userRes = await getUserById(id);
+      if (!userRes) {
+        res
+          .status(400)
+          .json({ type: 'error', message: 'User does not exist.' });
+      } else {
+        try {
+          const userRef = db.collection('users').doc(id);
+          await userRef.update({ musicPlatform: '' });
+          await userRef.update({ musicPlatformAuth: {} });
+          res.status(200).json({ type: 'success', message: '' });
+        } catch (e) {
+          functions.logger.info('Error in setMusicPlatform.');
+          functions.logger.error(e);
+          res
+            .status(400)
+            .json({ type: 'error', message: (e as Error).message });
+        }
+      }
+    } catch (e) {
+      // firebase authnetication error
+      functions.logger.error(e);
+      res.status(401).json({
+        type: 'error',
+        message: 'Authentication Failed.',
+        error: (e as Error).message,
+      });
+    }
+  }
+);

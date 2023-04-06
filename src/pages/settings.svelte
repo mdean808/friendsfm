@@ -1,8 +1,9 @@
 <script>
+  import { Dialog } from '@capacitor/dialog';
   import Button from '../components/Button.svelte';
   import { goto } from '../lib';
 
-  import { logout, prevPath } from '../store';
+  import { loading, logout, prevPath, unlinkMusicProvider } from '../store';
 </script>
 
 <div>
@@ -49,6 +50,24 @@
       on:click={async () => {
         goto('/username');
       }}>change username</Button
+    >
+    <br />
+    <Button
+      className="mt-2 mx-auto"
+      type="primary"
+      title="reset"
+      on:click={async () => {
+        const confirm = await Dialog.confirm({
+          title: 'Unlink Music Provider',
+          message:
+            'Are you sure? You will have to re-link a music provider again.',
+        });
+        if (!confirm.value) return;
+        loading.set(true);
+        await unlinkMusicProvider();
+        loading.set(false);
+        goto('/music_provider');
+      }}>unlink music provider</Button
     >
     <br />
     <Button

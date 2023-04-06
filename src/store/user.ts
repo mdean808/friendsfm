@@ -117,3 +117,24 @@ export const refreshUser = action(user, 'get-user-data', async (_store) => {
   songs.set(json.message.songs as SavedSong[]);
   await updateUser(json.message.user as User);
 });
+
+export const unlinkMusicProvider = action(
+  user,
+  'unlink-music-provider',
+  async (store) => {
+    const res = await fetch(FIREBASE_URL.get() + '/unlinkMusicPlatform', {
+      method: 'POST',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+      }),
+    });
+    const json = await handleApiResponse(res);
+    if (!json) {
+      // failed to unlink provider
+      return false;
+    }
+    const u = store.get();
+    u.musicPlatform = null;
+    await updateUser(u);
+  }
+);
