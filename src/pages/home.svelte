@@ -12,6 +12,8 @@
     notificationAction,
     createSubmissionsPlaylist,
     appLoading,
+    currPath,
+    loggedIn,
   } from '../store';
   import Button from '../components/Button.svelte';
   import Submission from '../components/Submission.svelte';
@@ -43,6 +45,7 @@
   });
 
   notificationAction.subscribe(async (notif) => {
+    if (!notif || !notif.title) return;
     const title = notif.title;
     if (title.includes('FriendsFM') || title.includes('late submission')) {
       await load();
@@ -58,8 +61,8 @@
       refresher.addEventListener('ionRefresh', handleRefresh);
     }
     if (
-      !friendSubmissions.get().length ||
-      !Object.keys(userSubmission.get()).length
+      !friendSubmissions.get()?.length ||
+      !Object.keys(userSubmission.get())?.length
     )
       await load();
     loadingSubmissions = false;
