@@ -2,7 +2,7 @@ import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { Preferences } from '@capacitor/preferences';
 import { map, action } from 'nanostores';
-import { authToken, FIREBASE_URL, loggedIn, songs } from '.';
+import { appCheckToken, authToken, FIREBASE_URL, loggedIn, songs } from '.';
 import { goto, handleApiResponse } from '../lib';
 import type { MusicPlatform, SavedSong, User } from '../types';
 export const user = map<User>({} as User);
@@ -46,6 +46,7 @@ export const updateUsername = action(
         authToken: authToken.get(),
         username: newUsername,
       }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
     });
     if (!(await handleApiResponse(res))) {
       // failed to set new username
@@ -72,6 +73,7 @@ export const updateMusicPlatform = action(
         musicPlatform: newMusicPlatform,
         platformAuthCode: authCode,
       }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
     });
     if (!(await handleApiResponse(res))) {
       // failed to set new music platform
@@ -108,6 +110,7 @@ export const refreshUser = action(user, 'get-user-data', async (_store) => {
       authToken: authToken.get(),
       messagingToken,
     }),
+    headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
   });
   const json = await handleApiResponse(res);
   if (!json) {
@@ -127,6 +130,7 @@ export const unlinkMusicProvider = action(
       body: JSON.stringify({
         authToken: authToken.get(),
       }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
     });
     const json = await handleApiResponse(res);
     if (!json) {

@@ -1,6 +1,6 @@
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { action } from 'nanostores';
-import { authToken, FIREBASE_URL, updateUser, user } from '.';
+import { appCheckToken, authToken, FIREBASE_URL, updateUser, user } from '.';
 import { handleApiResponse } from '../lib';
 import type { User } from '../types';
 
@@ -15,6 +15,7 @@ export const sendFriendRequest = action(
         authToken: authToken.get(),
         friend,
       }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
     });
     const json = await handleApiResponse(res);
     if (!json) {
@@ -36,6 +37,7 @@ export const acceptFriendRequest = action(
         authToken: authToken.get(),
         requester,
       }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
     });
     const json = await handleApiResponse(res);
     if (!json) {
@@ -59,6 +61,7 @@ export const rejectFriendRequest = action(
         authToken: authToken.get(),
         requester,
       }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
     });
     const json = await handleApiResponse(res);
     if (!json) {

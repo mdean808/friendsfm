@@ -7,6 +7,11 @@
   resolved "https://registry.yarnpkg.com/@capacitor-firebase/analytics/-/analytics-1.3.0.tgz#8aad6a46e41bdea43041e95bbbad1222880c5bf8"
   integrity sha512-JYo6QQsRpoA/SHBvO9Qp/2MMNQdhTX9hK+/50BmtYkWtL+1cBw89wE1dn1ZuAA7xgdqDHkRI8Ceq5OB9wqISWw==
 
+"@capacitor-firebase/app-check@^1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@capacitor-firebase/app-check/-/app-check-1.4.0.tgz#4e06d9e65c7599ce9bfbd6bc82bcff2cfff63d0a"
+  integrity sha512-TqLFPVv0VTF8JZREttwmTxSkmKPD5np5XtV4NGuCFIDy9/lp4Qfs0fJH1Kf+QoX5LaTvdhlTg7uDmMt9wOqDxg==
+
 "@capacitor-firebase/authentication@^1.3.0":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@capacitor-firebase/authentication/-/authentication-1.3.0.tgz#b690e93038175c22b06787160e9858ca3957856b"

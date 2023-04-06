@@ -72,4 +72,5 @@ if (import.meta.env.PROD) {
     tracesSampleRate: 0.25,
   });
 }
+
 export default app;

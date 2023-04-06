@@ -4,7 +4,7 @@ import { action, atom } from 'nanostores';
 import { user } from '.';
 import { handleApiResponse } from '../lib';
 import type { SavedSong } from '../types';
-import { authToken } from './auth';
+import { appCheckToken, authToken } from './auth';
 import { FIREBASE_URL, loading } from './misc';
 
 export const songs = atom<SavedSong[]>([]);
@@ -15,6 +15,7 @@ export const loadSongs = action(songs, 'load-songs', async (store) => {
     body: JSON.stringify({
       authToken: authToken.get(),
     }),
+    headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
   });
   const json = await handleApiResponse(res);
   if (!json) {
@@ -42,6 +43,7 @@ export const toggleSong = action(
           authToken: authToken.get(),
           song,
         }),
+        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
       });
       const json = await handleApiResponse(res);
       if (!json) {
@@ -56,6 +58,7 @@ export const toggleSong = action(
           authToken: authToken.get(),
           song,
         }),
+        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
       });
       const json = await handleApiResponse(res);
       if (!json) {
@@ -90,6 +93,7 @@ export const createSongsSpotifyPlaylist = action(
       body: JSON.stringify({
         authToken: authToken.get(),
       }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
     });
     const json = await handleApiResponse(res);
     loading.set(false);

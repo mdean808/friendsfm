@@ -1,7 +1,14 @@
 import { action, atom, map } from 'nanostores';
 import type { Audial, Submission } from '../types';
 import { goto, handleApiResponse } from '../lib';
-import { authToken, FIREBASE_URL, getNewAuthToken, loading, user } from '.';
+import {
+  appCheckToken,
+  authToken,
+  FIREBASE_URL,
+  getNewAuthToken,
+  loading,
+  user,
+} from '.';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Dialog } from '@capacitor/dialog';
 import { toast } from '@zerodevx/svelte-toast';
@@ -30,6 +37,7 @@ export const generateSubmission = action(
           latitude: location ? location.coords.latitude : undefined,
           longitude: location ? location.coords.longitude : undefined,
         }),
+        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
       });
       const json = await handleApiResponse(res);
       if (!json) {
@@ -59,6 +67,7 @@ export const getSubmissionStatus = action(
         body: JSON.stringify({
           authToken: authToken.get(),
         }),
+        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
       }
     );
     const json = await handleApiResponse(res);
@@ -96,6 +105,7 @@ export const shareAudial = action(
           submissionId: sub.id,
           parsedAudial: { number, score },
         }),
+        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
       }
     );
     const json = await handleApiResponse(res);
@@ -131,6 +141,7 @@ export const createSubmissionsPlaylist = action(
       body: JSON.stringify({
         authToken: authToken.get(),
       }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
     });
     const json = await handleApiResponse(res);
     loading.set(false);
