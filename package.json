@@ -1,7 +1,7 @@
 {
   "name": "friends-fm",
   "private": true,
-  "version": "0.0.3",
+  "version": "0.0.6",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^4.7.0",
+    "@sentry/vite-plugin": "^0.5.1",
     "@sveltejs/vite-plugin-svelte": "^1.1.0",
     "@tsconfig/svelte": "^3.0.0",
     "autoprefixer": "^10.4.13",
