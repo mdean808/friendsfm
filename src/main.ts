@@ -66,6 +66,7 @@ if (import.meta.env.PROD) {
   Sentry.init({
     dsn: 'https://6b81e7dbc9474aa9bb64e2b24652684d@o4504839408844801.ingest.sentry.io/4504839411400704',
     integrations: [new BrowserTracing()] as any[],
+    release: 'friendsfm@' + import.meta.env.VITE_RELEASE,
     // Set your dist version, such as "1"
     dist: '1',
     tracesSampleRate: 0.25,

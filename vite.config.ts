@@ -18,7 +18,7 @@ export default defineConfig({
       authToken: process.env.SENTRY_AUTH_TOKEN,
 
       // Optionally uncomment the line below to override automatic release name detection
-      release: 'friendsfm@' + process.env.RELEASE,
+      release: 'friendsfm@' + process.env.VITE_RELEASE,
       telemetry: false,
     }),
   ],

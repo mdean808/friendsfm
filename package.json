@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "rm -rf ./dist && vite build",
+    "build": "vite build",
     "cap:build": "yarn build && npx cap sync",
     "ios:build": "yarn build && npx cap sync ios",
     "ios:open": "npx cap open ios",
