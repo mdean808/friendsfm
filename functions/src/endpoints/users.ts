@@ -1,22 +1,12 @@
-import { getAuth } from 'firebase-admin/auth';
 import * as functions from 'firebase-functions';
-import User from '../classes/user';
+import { authMiddleware } from './middleware';
 
-const auth = getAuth();
-
-export const getUser = functions.https.onRequest(async (req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  const {
-    messagingToken,
-    authToken,
-  }: { messagingToken?: string; authToken: string } = JSON.parse(req.body);
-  try {
-    const id = (await auth.verifyIdToken(authToken)).uid;
-    const user = new User(id);
-    await user.load();
-    if (!user.exists) {
-      res.status(400).json({ type: 'error', message: 'User does not exist.' });
-    } else {
+export const getUser = functions.https.onRequest(
+  authMiddleware(async (req, res, user) => {
+    try {
+      const { messagingToken }: { messagingToken?: string } = JSON.parse(
+        req.body
+      );
       if (messagingToken) {
         await user.setMessagingToken(messagingToken);
       }
@@ -24,125 +14,72 @@ export const getUser = functions.https.onRequest(async (req, res) => {
       res
         .status(200)
         .type('json')
-        .send({ type: 'success', message: { user: user.json, songs: songs } });
-    }
-  } catch (e) {
-    // firebase authnetication error
-    functions.logger.error(e);
-    res.status(401).json({
-      type: 'error',
-      message: 'Authentication Failed.',
-      error: (e as Error).message,
-    });
-  }
-});
-
-export const setUsername = functions.https.onRequest(async (req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  const { username, authToken } = JSON.parse(req.body);
-  try {
-    const id = (await auth.verifyIdToken(authToken)).uid;
-    const user = new User(id);
-    await user.load();
-    if (!user.exists) {
-      res.status(400).json({ type: 'error', message: 'User does not exist.' });
-    } else {
-      try {
-        await user.setUsername(username);
-        res
-          .status(200)
-          .type('json')
-          .send({ type: 'success', message: username });
-      } catch (e) {
-        functions.logger.info('Error in setUserUsername.');
-        functions.logger.error(e);
-        res.status(400).json({
-          type: 'error',
-          message: 'Something went wrong. Please try again.',
-          error: (e as Error).message,
+        .send({
+          type: 'success',
+          message: { user: user.json, songs: songs },
         });
-      }
-    }
-  } catch (e) {
-    // firebase authnetication error
-    functions.logger.error(e);
-    res.status(401).json({
-      type: 'error',
-      message: 'Authentication Failed.',
-      error: (e as Error).message,
-    });
-  }
-});
-
-export const setMusicPlatform = functions.https.onRequest(async (req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  const { musicPlatform, platformAuthCode, authToken } = JSON.parse(req.body);
-  try {
-    const id = (await auth.verifyIdToken(authToken)).uid;
-    const user = new User(id);
-    await user.load();
-    if (!user.exists) {
-      res.status(400).json({ type: 'error', message: 'User does not exist.' });
-    } else {
-      try {
-        await user.setMusicPlatform(musicPlatform, platformAuthCode);
-        res.status(200).json({ type: 'success', message: musicPlatform });
-      } catch (e) {
-        functions.logger.info('Error in setMusicPlatform.');
-        functions.logger.error(e);
-        res.status(400).json({
-          type: 'error',
-          message: 'Something went wrong. Please try again.',
-          error: (e as Error).message,
-        });
-      }
-    }
-  } catch (e) {
-    // firebase authnetication error
-    functions.logger.error(e);
-    res.status(401).json({
-      type: 'error',
-      message: 'Authentication Failed.',
-      error: (e as Error).message,
-    });
-  }
-});
-
-export const unlinkMusicPlatform = functions.https.onRequest(
-  async (req, res) => {
-    res.set('Access-Control-Allow-Origin', '*');
-    const { authToken } = JSON.parse(req.body);
-    try {
-      const id = (await auth.verifyIdToken(authToken)).uid;
-      const user = new User(id);
-      await user.load();
-      if (!user.exists) {
-        res
-          .status(400)
-          .json({ type: 'error', message: 'User does not exist.' });
-      } else {
-        try {
-          await user.dbRef.update({ musicPlatform: '' });
-          await user.dbRef.update({ musicPlatformAuth: {} });
-          res.status(200).json({ type: 'success', message: '' });
-        } catch (e) {
-          functions.logger.info('Error in setMusicPlatform.');
-          functions.logger.error(e);
-          res.status(400).json({
-            type: 'error',
-            message: 'Something went wrong. Please try again.',
-            error: (e as Error).message,
-          });
-        }
-      }
     } catch (e) {
-      // firebase authnetication error
+      functions.logger.info('Error in setMessagingToken.');
       functions.logger.error(e);
-      res.status(401).json({
+      res.status(400).json({
         type: 'error',
-        message: 'Authentication Failed.',
+        message: 'Something went wrong. Please try again.',
         error: (e as Error).message,
       });
     }
-  }
+  })
+);
+
+export const setUsername = functions.https.onRequest(
+  authMiddleware(async (req, res, user) => {
+    try {
+      const { username } = JSON.parse(req.body);
+      await user.setUsername(username);
+      res.status(200).type('json').send({ type: 'success', message: username });
+    } catch (e) {
+      functions.logger.info('Error in setUserUsername.');
+      functions.logger.error(e);
+      res.status(400).json({
+        type: 'error',
+        message: 'Something went wrong. Please try again.',
+        error: (e as Error).message,
+      });
+    }
+  })
+);
+
+export const setMusicPlatform = functions.https.onRequest(
+  authMiddleware(async (req, res, user) => {
+    try {
+      const { musicPlatform, platformAuthCode } = JSON.parse(req.body);
+      await user.setMusicPlatform(musicPlatform, platformAuthCode);
+      res.status(200).json({ type: 'success', message: musicPlatform });
+    } catch (e) {
+      functions.logger.info('Error in setMusicPlatform.');
+      functions.logger.error(e);
+      res.status(400).json({
+        type: 'error',
+        message: 'Something went wrong. Please try again.',
+        error: (e as Error).message,
+      });
+    }
+  })
+);
+
+export const unlinkMusicPlatform = functions.https.onRequest(
+  authMiddleware(async (_req, res, user) => {
+    try {
+      await user.dbRef.update({ musicPlatform: '' });
+      await user.dbRef.update({ musicPlatformAuth: {} });
+      res.status(200).json({ type: 'success', message: '' });
+    } catch (e) {
+      functions.logger.info('Error in unlinkMusicPlatform.');
+      functions.logger.error(e);
+      res.status(400).json({
+        type: 'error',
+        message: 'Something went wrong. Please try again.',
+        error: (e as Error).message,
+      });
+    }
+  })
 );
