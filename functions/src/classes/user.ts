@@ -48,19 +48,6 @@ export default class User {
     this.authToken = authToken || '';
   }
 
-  public async load(): Promise<User> {
-    const res = await this.dbRef.get();
-    if (res.exists) {
-      for (const key in this) {
-        this[key] = res.get(key) || this[key];
-      }
-      this.loaded = true;
-    } else {
-      this.loaded = false;
-    }
-    return this;
-  }
-
   public get json() {
     return {
       id: this.id,
@@ -81,21 +68,23 @@ export default class User {
     } as UserType;
   }
 
+  public async load(): Promise<User> {
+    const res = await this.dbRef.get();
+    if (res.exists) {
+      for (const key in this) {
+        this[key] = res.get(key) || this[key];
+      }
+      this.loaded = true;
+    } else {
+      this.loaded = false;
+    }
+    return this;
+  }
+
   public async setMessagingToken(token: string) {
     if (!this.exists) throw Error('User not loaded.');
     if (!token) throw Error('No messaging token provided.');
     await this.dbRef.update({ token });
-  }
-
-  public async getSongs() {
-    if (!this.exists) throw Error('User not loaded.');
-    const songs: SavedSong[] = [];
-    const songsRef = this.dbRef.collection('songs');
-    (await songsRef.get()).forEach((doc) => {
-      const song = doc.data() as SavedSong;
-      songs.push({ ...song, id: doc.id });
-    });
-    return songs;
   }
 
   public async setUsername(username: string) {
@@ -221,6 +210,18 @@ export default class User {
     await songRef.delete();
   }
 
+  // GETTERS
+  public async getSongs() {
+    if (!this.exists) throw Error('User not loaded.');
+    const songs: SavedSong[] = [];
+    const songsRef = this.dbRef.collection('songs');
+    (await songsRef.get()).forEach((doc) => {
+      const song = doc.data() as SavedSong;
+      songs.push({ ...song, id: doc.id });
+    });
+    return songs;
+  }
+
   public async getRecentSong(): Promise<Song> {
     if (!this.exists) throw Error('User not loaded.');
     if (!this.musicPlatformAcessCode)
@@ -250,6 +251,56 @@ export default class User {
     }
   }
 
+  public async getCurrentSubmission(): Promise<Submission> {
+    if (!this.exists) throw Error('User not loaded.');
+    const submissionRef = this.dbRef
+      .collection('submissions')
+      .where('number', '==', await Submission.getCurrentCount());
+    const submissionRes = await submissionRef.get();
+    if (submissionRes.empty) throw Error('No Current Submission');
+    const submissionData = submissionRes.docs[0].data() as SubmissionType;
+    return new Submission(
+      submissionData.id,
+      submissionData.number,
+      submissionData.song,
+      submissionData.audial,
+      submissionData.location,
+      submissionData.late,
+      submissionData.time,
+      submissionData.lateTime,
+      this
+    );
+  }
+
+  public async getFriendSubmissions(): Promise<Submission[]> {
+    if (!this.exists) throw Error('User not loaded.');
+    const friendSubmissions: Submission[] = [];
+    for (const localFriend of this.friends) {
+      const friend = new User(localFriend.id);
+      await friend.load();
+      try {
+        const friendSub = await friend.getCurrentSubmission();
+        friendSub.formatDatesForFrontend();
+        friendSubmissions.push(friendSub);
+      } catch (e) {
+        if (!(e as Error).message.includes('No Current Submission')) {
+          console.error(e);
+        }
+      }
+    }
+
+    return friendSubmissions;
+  }
+
+  public get dbRef(): DocumentReference {
+    return db.collection('users').doc(this.id);
+  }
+
+  public get exists(): boolean {
+    return this.loaded;
+  }
+
+  // METHODS
   public async sendNotification(title: string, body: string) {
     if (!this.exists) throw Error('User not loaded.');
     if (!this.messagingToken) throw Error('User has no notification support.');
@@ -306,7 +357,7 @@ export default class User {
     ).id;
     // send notification on late submission
     if (late) {
-      //  don't await this becuase we don't want to make the user wait even more!
+      // don't await so it happens asynchonously
       this.sendNotificationToFriends(
         'late submission',
         `${this.username} just shared what they're listening to.`
@@ -314,37 +365,40 @@ export default class User {
     }
 
     try {
-      // Add submission song + friend submission songs to user's playlist
-      const friendSubmissions = await this.getFriendSubmissions();
-      if (this.submissionsPlaylist) {
-        const songs: Song[] = [];
-        if (song) songs.push(song);
-        for (const sub of friendSubmissions) {
-          songs.push(sub.song);
-        }
-        await addSongsToSpotifyPlaylist(
-          songs,
-          this.submissionsPlaylist,
-          this.musicPlatformAuth
-        );
-      }
-      // Add submission song to their friend's playlists
-      const friendIds = [];
-      for (const sub of friendSubmissions) {
-        friendIds.push(sub.user.id);
-      }
-      for (const fid of friendIds) {
-        const friend = new User(fid);
-        await friend.load();
-        await friend.updateMusicAuth();
-        if (song) {
+      // wrap this so it happens asynchonously
+      (async () => {
+        // Add submission song + friend submission songs to user's playlist
+        const friendSubmissions = await this.getFriendSubmissions();
+        if (this.submissionsPlaylist) {
+          const songs: Song[] = [];
+          if (song) songs.push(song);
+          for (const sub of friendSubmissions) {
+            songs.push(sub.song);
+          }
           await addSongsToSpotifyPlaylist(
-            [song],
-            friend.submissionsPlaylist,
-            friend.musicPlatformAuth
+            songs,
+            this.submissionsPlaylist,
+            this.musicPlatformAuth
           );
         }
-      }
+        // Add submission song to their friend's playlists
+        const friendIds = [];
+        for (const sub of friendSubmissions) {
+          friendIds.push(sub.user.id);
+        }
+        for (const fid of friendIds) {
+          const friend = new User(fid);
+          await friend.load();
+          await friend.updateMusicAuth();
+          if (song) {
+            await addSongsToSpotifyPlaylist(
+              [song],
+              friend.submissionsPlaylist,
+              friend.musicPlatformAuth
+            );
+          }
+        }
+      })();
     } catch (e) {
       console.log(e);
     }
@@ -372,52 +426,92 @@ export default class User {
     }
   }
 
-  public async getCurrentSubmission(): Promise<Submission> {
-    if (!this.exists) throw Error('User not loaded.');
-    const submissionRef = this.dbRef
-      .collection('submissions')
-      .where('number', '==', await Submission.getCurrentCount());
-    const submissionRes = await submissionRef.get();
-    if (submissionRes.empty) throw Error('No Current Submission');
-    const submissionData = submissionRes.docs[0].data() as SubmissionType;
-    return new Submission(
-      submissionData.id,
-      submissionData.number,
-      submissionData.song,
-      submissionData.audial,
-      submissionData.location,
-      submissionData.late,
-      submissionData.time,
-      submissionData.lateTime,
-      this
+  public async acceptRequest(requester: string) {
+    if (!requester) throw new Error('No requester provided');
+    const usersRef = db.collection('users');
+    const friendQuery = usersRef.where('username', '==', requester);
+    const friend = (await friendQuery.get()).docs[0]?.data() as UserType;
+    // if we have such a friend and there is an actual request from them to the user
+    if (!friend || !this.friendRequests.find((u) => u === friend.username))
+      throw new Error('Friend request does not exist.');
+    // update user friends
+    const userFriends = this.friends;
+    this.friends.push({ username: friend.username, id: friend.id });
+    await this.dbRef.update({ friends: userFriends });
+    // remove from friend request array
+    const userFriendRequests = this.friendRequests;
+    const updatedRequests = userFriendRequests.filter(
+      (u) => u !== friend.username
     );
+    await this.dbRef.update({ friendRequests: updatedRequests });
+
+    // update friend friends
+    const friendFriends = friend.friends;
+    friendFriends.push({ username: this.username, id: this.id });
+    const friendRef = usersRef.doc(friend.uid);
+    await friendRef.update({ friends: friendFriends });
+
+    // send notification
+    if (!friend.messagingToken) return;
+    const message: Message = {
+      notification: {
+        title: this.username + ' accepted your friend request!',
+        body: "tap to see what they're listening to",
+      },
+      token: friend.messagingToken,
+      apns: {
+        payload: {
+          aps: {
+            badge: 1,
+          },
+        },
+      },
+    };
+    newNotification(message);
+    return this.json;
   }
 
-  public async getFriendSubmissions(): Promise<Submission[]> {
-    if (!this.exists) throw Error('User not loaded.');
-    const friendSubmissions: Submission[] = [];
-    for (const localFriend of this.friends) {
-      const friend = new User(localFriend.id);
-      await friend.load();
-      try {
-        const friendSub = await friend.getCurrentSubmission();
-        friendSub.formatDatesForFrontend();
-        friendSubmissions.push(friendSub);
-      } catch (e) {
-        if (!(e as Error).message.includes('No Current Submission')) {
-          console.error(e);
-        }
-      }
-    }
-
-    return friendSubmissions;
+  public async rejectRequest(requester: string) {
+    if (!requester) throw new Error('No requester provided');
+    const usersRef = db.collection('users');
+    const friendQuery = usersRef.where('username', '==', requester);
+    const friend = (await friendQuery.get()).docs[0]?.data() as UserType;
+    // if we have such a friend and there is an actual request from them to the user
+    if (!friend || !this.friendRequests.find((u) => u === friend.username))
+      throw new Error('Friend request does not exist.');
+    // remove from friend request array
+    const userFriendRequests = this.friendRequests;
+    const updatedRequests = userFriendRequests.filter(
+      (u) => u !== friend.username
+    );
+    await this.dbRef.update({ friendRequests: updatedRequests });
+    return this.json;
   }
 
-  public get dbRef(): DocumentReference {
-    return db.collection('users').doc(this.id);
-  }
-
-  public get exists(): boolean {
-    return this.loaded;
+  public async sendRequest(username: string) {
+    if (!username) throw new Error('No username provided');
+    const usersRef = db.collection('users');
+    const friendQuery = usersRef.where('username', '==', username);
+    const friend = (await friendQuery.get()).docs[0]?.data() as User;
+    if (!friend) throw new Error('No user with provided username.');
+    const friendRef = usersRef.doc(friend.id);
+    const requests = [...friend.friendRequests, this.username];
+    await friendRef.update({ friendRequests: requests });
+    if (!friend.messagingToken) return;
+    const message: Message = {
+      notification: {
+        title: this.username + ' added you as a friend!',
+        body: 'tap to accept their request',
+      },
+      token: friend.messagingToken,
+      apns: {
+        payload: {
+          aps: {
+            badge: 1,
+          },
+        },
+      },
+    };
+    newNotification(message);
   }
 }

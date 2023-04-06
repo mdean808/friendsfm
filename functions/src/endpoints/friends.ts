@@ -1,11 +1,6 @@
 import { getAuth } from 'firebase-admin/auth';
 import * as functions from 'firebase-functions';
 import User from '../classes/user';
-import {
-  acceptFriendRequest,
-  rejectFriendRequest,
-  sendFriendRequest,
-} from '../lib/db';
 
 const auth = getAuth();
 
@@ -15,11 +10,12 @@ export const acceptFriend = functions.https.onRequest(async (req, res) => {
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
     const user = new User(id);
+    await user.load();
     if (!user.exists) {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       try {
-        const friend = await acceptFriendRequest(user.json, requester);
+        const friend = await user.acceptRequest(requester);
         res.status(200).type('json').send({ type: 'success', message: friend });
       } catch (e) {
         functions.logger.info('Error in acceptFriendRequest.');
@@ -44,11 +40,12 @@ export const requestFriend = functions.https.onRequest(async (req, res) => {
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
     const user = new User(id);
+    await user.load();
     if (!user.exists) {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       try {
-        await sendFriendRequest(user.json, friend);
+        await user.acceptRequest(friend);
         res
           .status(200)
           .type('json')
@@ -76,11 +73,12 @@ export const rejectRequest = functions.https.onRequest(async (req, res) => {
   try {
     const id = (await auth.verifyIdToken(authToken)).uid;
     const user = new User(id);
+    await user.load();
     if (!user.exists) {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       try {
-        await rejectFriendRequest(user.json, requester);
+        await user.rejectRequest(requester);
         res
           .status(200)
           .type('json')
