@@ -211,7 +211,7 @@ export default class User {
   }
 
   // GETTERS
-  public async getSongs() {
+  public async getSongs(): Promise<SavedSong[]> {
     if (!this.exists) throw Error('User not loaded.');
     const songs: SavedSong[] = [];
     const songsRef = this.dbRef.collection('songs');

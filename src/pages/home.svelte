@@ -12,6 +12,8 @@
     notificationAction,
     createSubmissionsPlaylist,
     appLoading,
+    currPath,
+    loggedIn,
   } from '../store';
   import Button from '../components/Button.svelte';
   import Submission from '../components/Submission.svelte';
@@ -43,6 +45,7 @@
   });
 
   notificationAction.subscribe(async (notif) => {
+    if (!notif || !notif.title) return;
     const title = notif.title;
     if (title.includes('FriendsFM') || title.includes('late submission')) {
       await load();
@@ -50,6 +53,7 @@
   });
 
   onMount(async () => {
+    if (!loggedIn.get()) return goto('/');
     if (
       Capacitor.getPlatform() !== 'ios' ||
       Capacitor.getPlatform() !== 'android'

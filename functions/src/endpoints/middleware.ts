@@ -13,6 +13,7 @@ export const authMiddleware =
     ) => Promise<any>
   ) =>
   async (req: functions.https.Request, res: functions.Response) => {
+    res.set('Access-Control-Allow-Origin', '*');
     const { authToken }: { authToken: string } = JSON.parse(req.body);
     try {
       // load and authenticate user

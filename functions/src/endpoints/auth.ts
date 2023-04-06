@@ -17,7 +17,7 @@ export const loginUser = functions.https.onRequest(async (req, res) => {
     if (userClass.exists) {
       // user has already been registered, send success
       functions.logger.info(`User ${userClass.id} already registered`);
-      const songs = userClass.getSongs();
+      const songs = await userClass.getSongs();
       res
         .status(200)
         .json({ type: 'success', message: { user: userClass.json, songs } });
