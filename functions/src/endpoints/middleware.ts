@@ -1,6 +1,7 @@
 import { getAuth } from 'firebase-admin/auth';
 import * as functions from 'firebase-functions';
 import User from '../classes/user';
+import * as cors from 'cors';
 
 const auth = getAuth();
 
@@ -13,9 +14,13 @@ export const authMiddleware =
     ) => Promise<any>
   ) =>
   async (req: functions.https.Request, res: functions.Response) => {
-    res.set('Access-Control-Allow-Origin', '*');
-    const { authToken }: { authToken: string } = JSON.parse(req.body);
+    cors()(req, res, async () => {
+      res.set('Access-Control-Allow-Origin', '*');
+    });
     try {
+      req.body =
+        typeof req.body === 'object' ? JSON.stringify(req.body) : req.body;
+      const { authToken }: { authToken: string } = JSON.parse(req.body);
       // load and authenticate user
       const id = (await auth.verifyIdToken(authToken)).uid;
       const user = new User(id);

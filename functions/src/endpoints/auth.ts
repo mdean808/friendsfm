@@ -2,13 +2,18 @@ import { getAuth } from 'firebase-admin/auth';
 import * as functions from 'firebase-functions';
 import User from '../classes/user';
 import { User as UserType } from '../types';
+import * as cors from 'cors';
 
 const auth = getAuth();
 
 export const loginUser = functions.https.onRequest(async (req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  const user: UserType = JSON.parse(req.body);
+  cors()(req, res, async () => {
+    res.set('Access-Control-Allow-Origin', '*');
+  });
   try {
+    req.body =
+      typeof req.body === 'object' ? JSON.stringify(req.body) : req.body;
+    const user: UserType = JSON.parse(req.body);
     // verify the auth token with firebase's backend
     const decodedTokenData = await auth.verifyIdToken(user.authToken);
     user.id = decodedTokenData.uid;
