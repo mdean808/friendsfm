@@ -16,22 +16,23 @@ export const corsMiddleware =
   ) =>
   async (req: functions.https.Request, res: functions.Response) => {
     cors()(req, res, async () => {
-      const appCheckToken = req.get('x-firebase-appcheck');
-      try {
-        if (appCheckToken) {
-          await appCheck.verifyToken(appCheckToken);
-          return handler(req, res);
-        } else {
-          throw Error('No App Check token provided');
-        }
-      } catch (e) {
-        console.log('App Check Failed:', e);
-        res.status(401).json({
-          type: 'error',
-          message: 'App Check Failed.',
-        });
-      }
+      res.set('Access-Control-Allow-Origin', '*');
     });
+    const appCheckToken = req.get('x-firebase-appcheck');
+    try {
+      if (appCheckToken) {
+        await appCheck.verifyToken(appCheckToken);
+        return handler(req, res);
+      } else {
+        throw Error('No App Check token provided');
+      }
+    } catch (e) {
+      console.log('App Check Failed:', e);
+      res.status(401).json({
+        type: 'error',
+        message: 'App Check Failed.',
+      });
+    }
   };
 
 export const authMiddleware = (
