@@ -1,7 +1,6 @@
 import { getAuth } from 'firebase-admin/auth';
 import * as functions from 'firebase-functions';
 import User from '../classes/user';
-import { createUser } from '../lib/db';
 import { User as UserType } from '../types';
 
 const auth = getAuth();
@@ -25,7 +24,7 @@ export const loginUser = functions.https.onRequest(async (req, res) => {
     } else {
       try {
         //store user to the database and return user object
-        const userRes = await createUser(user);
+        const userRes = await User.create(user);
         res
           .status(200)
           .json({ type: 'success', message: { user: userRes, songs: [] } });

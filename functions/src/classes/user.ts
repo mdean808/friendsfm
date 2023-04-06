@@ -514,4 +514,25 @@ export default class User {
     };
     newNotification(message);
   }
+  //STATIC METHODS
+  static async create(user: UserType) {
+    // check if the email. username already exists
+    const usersRef = db.collection('users');
+    if ((await usersRef.where('email', '==', user.email).get()).docs[0]) {
+      throw new Error(`Email '${user.email}' already registered.`);
+    }
+
+    if ((await usersRef.doc(user.id).get()).exists) {
+      throw new Error(
+        'User ID taken. (Perhaps the user has already registered.)'
+      );
+    }
+
+    const newUserRef = db.collection('users').doc(user.id);
+    user.friends = [];
+    user.username = user.id;
+    user.friendRequests = [];
+    await newUserRef.set(user);
+    return user;
+  }
 }
