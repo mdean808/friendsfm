@@ -32,7 +32,11 @@ export const loginUser = functions.https.onRequest(async (req, res) => {
         functions.logger.info('Error in createUser.');
         functions.logger.error(e);
         // error with creating the user
-        res.status(400).json({ type: 'error', message: (e as Error).message });
+        res.status(400).json({
+          type: 'error',
+          message: 'Something went wrong. Please try again.',
+          error: (e as Error).message,
+        });
         return;
       }
     }

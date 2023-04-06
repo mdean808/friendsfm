@@ -60,7 +60,11 @@ export const setUsername = functions.https.onRequest(async (req, res) => {
       } catch (e) {
         functions.logger.info('Error in setUserUsername.');
         functions.logger.error(e);
-        res.status(400).json({ type: 'error', message: (e as Error).message });
+        res.status(400).json({
+          type: 'error',
+          message: 'Something went wrong. Please try again.',
+          error: (e as Error).message,
+        });
       }
     }
   } catch (e) {
@@ -89,7 +93,11 @@ export const setMusicPlatform = functions.https.onRequest(async (req, res) => {
       } catch (e) {
         functions.logger.info('Error in setMusicPlatform.');
         functions.logger.error(e);
-        res.status(400).json({ type: 'error', message: (e as Error).message });
+        res.status(400).json({
+          type: 'error',
+          message: 'Something went wrong. Please try again.',
+          error: (e as Error).message,
+        });
       }
     }
   } catch (e) {
@@ -123,9 +131,11 @@ export const unlinkMusicPlatform = functions.https.onRequest(
         } catch (e) {
           functions.logger.info('Error in setMusicPlatform.');
           functions.logger.error(e);
-          res
-            .status(400)
-            .json({ type: 'error', message: (e as Error).message });
+          res.status(400).json({
+            type: 'error',
+            message: 'Something went wrong. Please try again.',
+            error: (e as Error).message,
+          });
         }
       }
     } catch (e) {

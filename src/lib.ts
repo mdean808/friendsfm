@@ -13,8 +13,9 @@ import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { App } from '@capacitor/app';
 import { Dialog } from '@capacitor/dialog';
+import * as Sentry from '@sentry/svelte';
 
-let spotifySet;
+let spotifySet: boolean;
 
 export const getPlatformColor = (platform: MusicPlatform) => {
   switch (platform) {
@@ -88,6 +89,7 @@ export const handleApiResponse = async (res: Response) => {
         window.location.href = spotifyUrl;
       }
     } else {
+      Sentry.captureException(json.error);
       toast.push('Error: ' + json.message, toastError);
     }
     return false;

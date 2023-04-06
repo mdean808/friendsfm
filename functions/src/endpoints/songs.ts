@@ -22,7 +22,11 @@ export const getSongs = functions.https.onRequest(async (req, res) => {
       } catch (e) {
         functions.logger.info('Error in saveSong.');
         functions.logger.error(e);
-        res.status(400).json({ type: 'error', message: (e as Error).message });
+        res.status(400).json({
+          type: 'error',
+          message: 'Something went wrong. Please try again.',
+          error: (e as Error).message,
+        });
       }
     }
   } catch (e) {
@@ -54,7 +58,11 @@ export const saveSong = functions.https.onRequest(async (req, res) => {
       } catch (e) {
         functions.logger.info('Error in saveSong.');
         functions.logger.error(e);
-        res.status(400).json({ type: 'error', message: (e as Error).message });
+        res.status(400).json({
+          type: 'error',
+          message: 'Something went wrong. Please try again.',
+          error: (e as Error).message,
+        });
       }
     }
   } catch (e) {
@@ -83,7 +91,11 @@ export const deleteSong = functions.https.onRequest(async (req, res) => {
       } catch (e) {
         functions.logger.info('Error in saveSong.');
         functions.logger.error(e);
-        res.status(400).json({ type: 'error', message: (e as Error).message });
+        res.status(400).json({
+          type: 'error',
+          message: 'Something went wrong. Please try again.',
+          error: (e as Error).message,
+        });
       }
     }
   } catch (e) {
@@ -135,9 +147,11 @@ export const createLikedSongsPlaylist = functions.https.onRequest(
         } catch (e) {
           functions.logger.info('Error in createLikedSongsPlaylist.');
           functions.logger.error(e);
-          res
-            .status(400)
-            .json({ type: 'error', message: (e as Error).message });
+          res.status(400).json({
+            type: 'error',
+            message: 'Something went wrong. Please try again.',
+            error: (e as Error).message,
+          });
         }
       }
     } catch (e) {

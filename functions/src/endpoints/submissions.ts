@@ -43,9 +43,11 @@ export const createNewUserSubmission = functions.https.onRequest(
           functions.logger.error((e as Error).message);
           // because some of our functions aren't running synchronously
           if (res.headersSent) return;
-          res
-            .status(400)
-            .json({ type: 'error', message: (e as Error).message });
+          res.status(400).json({
+            type: 'error',
+            message: 'Something went wrong. Please try again.',
+            error: (e as Error).message,
+          });
         }
       }
     } catch (e) {
@@ -85,10 +87,11 @@ export const getCurrentSubmissionStatus = functions.https.onRequest(
             'Error in getUserSubmission or getFriendSubmissions.'
           );
           functions.logger.error(e);
-          res
-            .status(400)
-            .type('json')
-            .send({ type: 'error', message: (e as Error).message });
+          res.status(400).json({
+            type: 'error',
+            message: 'Something went wrong. Please try again.',
+            error: (e as Error).message,
+          });
         }
       }
     } catch (e) {
@@ -128,10 +131,11 @@ export const setCurrentSubmissionAudialScore = functions.https.onRequest(
             'Error in getUserSubmission or getFriendSubmissions.'
           );
           functions.logger.error(e);
-          res
-            .status(400)
-            .type('json')
-            .send({ type: 'error', message: (e as Error).message });
+          res.status(400).json({
+            type: 'error',
+            message: 'Something went wrong. Please try again.',
+            error: (e as Error).message,
+          });
         }
       }
     } catch (e) {
@@ -193,9 +197,11 @@ export const createSubmissionsPlaylist = functions.https.onRequest(
         } catch (e) {
           functions.logger.info('Error in createLikedSongsPlaylist.');
           functions.logger.error(e);
-          res
-            .status(400)
-            .json({ type: 'error', message: (e as Error).message });
+          res.status(400).json({
+            type: 'error',
+            message: 'Something went wrong. Please try again.',
+            error: (e as Error).message,
+          });
         }
       }
     } catch (e) {

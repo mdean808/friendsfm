@@ -24,7 +24,11 @@ export const acceptFriend = functions.https.onRequest(async (req, res) => {
       } catch (e) {
         functions.logger.info('Error in acceptFriendRequest.');
         functions.logger.error(e);
-        res.status(400).json({ type: 'error', message: (e as Error).message });
+        res.status(400).json({
+          type: 'error',
+          message: 'Something went wrong. Please try again.',
+          error: (e as Error).message,
+        });
       }
     }
   } catch (e) {
@@ -56,7 +60,11 @@ export const requestFriend = functions.https.onRequest(async (req, res) => {
       } catch (e) {
         functions.logger.info('Error in sendFriendRequest.');
         functions.logger.error(e);
-        res.status(400).json({ type: 'error', message: (e as Error).message });
+        res.status(400).json({
+          type: 'error',
+          message: 'Something went wrong. Please try again.',
+          error: (e as Error).message,
+        });
       }
     }
   } catch (e) {
@@ -88,7 +96,11 @@ export const rejectRequest = functions.https.onRequest(async (req, res) => {
       } catch (e) {
         functions.logger.info('Error in removeFriendRequest.');
         functions.logger.error(e);
-        res.status(400).json({ type: 'error', message: (e as Error).message });
+        res.status(400).json({
+          type: 'error',
+          message: 'Something went wrong. Please try again.',
+          error: (e as Error).message,
+        });
       }
     }
   } catch (e) {
