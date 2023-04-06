@@ -6,11 +6,10 @@
     generateSubmission,
     userSubmission,
     getSubmissionStatus,
-    authToken,
-    currPath,
     user,
     toggleSong,
     songs,
+    notificationAction,
     createSubmissionsPlaylist,
     appLoading,
   } from '../store';
@@ -43,6 +42,13 @@
       );
   });
 
+  notificationAction.subscribe(async (notif) => {
+    const title = notif.title;
+    if (title.includes('FriendsFM') || title.includes('late submission')) {
+      await load();
+    }
+  });
+
   onMount(async () => {
     if (
       Capacitor.getPlatform() !== 'ios' ||
@@ -51,16 +57,11 @@
       const refresher = document.getElementById('refresher') as IonRefresher;
       refresher.addEventListener('ionRefresh', handleRefresh);
     }
-    // setup pull to refresh
-    if (!authToken.get()) {
-      authToken.listen(async (value) => {
-        if (value && currPath.get() == '/') {
-          await load();
-        }
-      });
-    } else if (!userSubmission.get()?.song) {
+    if (
+      !friendSubmissions.get().length ||
+      !Object.keys(userSubmission.get()).length
+    )
       await load();
-    }
     loadingSubmissions = false;
     FirebaseMessaging.removeAllDeliveredNotifications();
   });

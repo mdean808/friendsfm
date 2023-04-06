@@ -60,7 +60,6 @@
       title.includes('FriendsFM') ||
       title.includes('late submission')
     ) {
-      await getSubmissionStatus();
       goto('/');
     } else if (title.includes('accepted your friend request')) {
       await refreshUser();

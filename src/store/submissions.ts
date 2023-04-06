@@ -1,7 +1,7 @@
 import { action, atom, map } from 'nanostores';
 import type { Audial, Submission } from '../types';
 import { goto, handleApiResponse } from '../lib';
-import { authToken, FIREBASE_URL, loading, user } from '.';
+import { authToken, FIREBASE_URL, getNewAuthToken, loading, user } from '.';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Dialog } from '@capacitor/dialog';
 import { toast } from '@zerodevx/svelte-toast';
@@ -51,6 +51,7 @@ export const getSubmissionStatus = action(
   friendSubmissions,
   'get-submission-status',
   async (store) => {
+    await getNewAuthToken();
     const res = await fetch(
       FIREBASE_URL.get() + '/getCurrentSubmissionStatus',
       {

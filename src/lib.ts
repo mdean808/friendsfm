@@ -2,7 +2,6 @@ import { MusicPlatform, ResponseType, type NetworkResponse } from './types';
 import {
   currPath,
   getNewAuthToken,
-  loggedIn,
   logout,
   prevPath,
   spotifyAuthCode,
