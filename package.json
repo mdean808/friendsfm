@@ -39,7 +39,6 @@
     "@capacitor/status-bar": "^4.1.0",
     "@capgo/nativegeocoder": "^0.1.32",
     "@ionic/core": "^6.6.1",
-    "@sentry/capacitor": "^0.11.2",
     "@sentry/svelte": "^7.43.0",
     "@sentry/tracing": "^7.43.0",
     "@zerodevx/svelte-toast": "^0.8.2",
