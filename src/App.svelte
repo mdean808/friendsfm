@@ -51,6 +51,7 @@
   import AnimatedSplashScreen from './components/AnimatedSplashScreen.svelte';
 
   notificationAction.subscribe(async (notif) => {
+    if (!notif || !notif.title) return;
     const title = notif.title;
     await getUserFromPreferences();
     if (title.includes('added you as a friend')) {
