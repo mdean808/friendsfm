@@ -1,9 +1,8 @@
 import * as functions from 'firebase-functions';
-
 import { createSpotifyPlaylist } from '../lib/spotify';
-
 import { Audial, Song } from '../types';
 import { authMiddleware } from './middleware';
+
 export const createNewUserSubmission = functions.https.onRequest(
   authMiddleware(async (req, res, user) => {
     try {
