@@ -8,7 +8,7 @@ import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { Capacitor } from '@capacitor/core';
 import { initializeApp } from 'firebase/app';
 // import { getAnalytics } from 'firebase/analytics';
-import { spotifyAuthCode } from './store';
+import { initAppCheck, spotifyAuthCode } from './store';
 
 // Initialize Firebase
 const firebaseConfig = {

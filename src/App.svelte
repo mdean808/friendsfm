@@ -25,9 +25,9 @@
     loggedIn,
     notificationAction,
     refreshUser,
-    getSubmissionStatus,
     appLoading,
     platform,
+    initAppCheck,
   } from './store';
   import { goto } from './lib';
   import Loading from './components/Loading.svelte';
@@ -72,6 +72,7 @@
   });
 
   onMount(async () => {
+    await initAppCheck();
     platform.set(Capacitor.getPlatform());
     SplashScreen.hide();
     if (Capacitor.isPluginAvailable('OSLogger')) {

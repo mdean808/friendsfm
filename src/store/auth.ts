@@ -57,7 +57,7 @@ export const loginUser = action(user, 'login-user', async (store) => {
   const res = await fetch(FIREBASE_URL.get() + '/loginUser', {
     method: 'POST',
     body: JSON.stringify(u),
-    headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+    headers: { 'x-firebase-appcheck': appCheckToken.get() },
   });
 
   const json = await handleApiResponse(res);
