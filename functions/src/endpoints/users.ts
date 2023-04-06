@@ -18,7 +18,7 @@ export const getUser = functions.https.onRequest(async (req, res) => {
       res.status(400).json({ type: 'error', message: 'User does not exist.' });
     } else {
       if (messagingToken) {
-        await user.setUsername(messagingToken);
+        await user.setMessagingToken(messagingToken);
       }
       const songs = await user.getSongs();
       res
