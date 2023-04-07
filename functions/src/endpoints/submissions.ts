@@ -43,7 +43,7 @@ export const getCurrentSubmissionStatus = functions.https.onRequest(
       res.status(200).json({
         type: 'success',
         message: {
-          user: userSub.json || {},
+          user: userSub ? userSub.json : {},
           friends: friendSubmissions.map((s) => s.json) || [],
         },
       });
@@ -65,7 +65,7 @@ export const setCurrentSubmissionAudialScore = functions.https.onRequest(
   authMiddleware(async (req, res, user) => {
     try {
       const { parsedAudial }: { parsedAudial: Audial } = JSON.parse(req.body);
-      (await user.getCurrentSubmission()).setAudial(parsedAudial);
+      (await user.getCurrentSubmission())?.setAudial(parsedAudial);
       res.status(200).json({
         type: 'success',
         message: 'success',

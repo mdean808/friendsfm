@@ -251,13 +251,13 @@ export default class User {
     }
   }
 
-  public async getCurrentSubmission(): Promise<Submission> {
+  public async getCurrentSubmission(): Promise<Submission | undefined> {
     if (!this.exists) throw Error('User not loaded.');
     const submissionRef = this.dbRef
       .collection('submissions')
       .where('number', '==', await Submission.getCurrentCount());
     const submissionRes = await submissionRef.get();
-    if (submissionRes.empty) throw Error('No Current Submission');
+    if (submissionRes.empty) return;
     const submissionData = submissionRes.docs[0].data() as SubmissionType;
     return new Submission(
       submissionData.id,
@@ -280,6 +280,7 @@ export default class User {
       await friend.load();
       try {
         const friendSub = await friend.getCurrentSubmission();
+        if (!friendSub) continue;
         friendSub.formatDatesForFrontend();
         friendSubmissions.push(friendSub);
       } catch (e) {
@@ -350,7 +351,7 @@ export default class User {
       number: notificationsSnapshot.get('count'),
       audial: { number: -1, score: '' },
       song,
-      location: { latitude, longitude },
+      location: { latitude: latitude || 135, longitude: longitude || 90.0 },
     };
     const newSubmissionId = (
       await this.dbRef.collection('submissions').add(newSubmission)
