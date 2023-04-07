@@ -17,21 +17,13 @@ export const authMiddleware =
     cors()(req, res, async () => {
       res.set('Access-Control-Allow-Origin', '*');
     });
+    let id = '';
     try {
       req.body =
         typeof req.body === 'object' ? JSON.stringify(req.body) : req.body;
       const { authToken }: { authToken: string } = JSON.parse(req.body);
       // load and authenticate user
-      const id = (await auth.verifyIdToken(authToken)).uid;
-      const user = new User(id);
-      await user.load();
-      if (!user.exists) {
-        res
-          .status(400)
-          .json({ type: 'error', message: 'User does not exist.' });
-      } else {
-        return handler(req, res, user);
-      }
+      id = (await auth.verifyIdToken(authToken)).uid;
     } catch (e) {
       // Firebase authentication error
       res.status(401).json({
@@ -39,5 +31,12 @@ export const authMiddleware =
         message: 'Authentication Failed.',
         error: (e as Error).message,
       });
+    }
+    const user = new User(id);
+    await user.load();
+    if (!user.exists) {
+      res.status(400).json({ type: 'error', message: 'User does not exist.' });
+    } else {
+      return handler(req, res, user);
     }
   };
