@@ -46,7 +46,6 @@ export const registerForNotifications = async () => {
 };
 
 export const handleApiResponse = async (res: Response) => {
-  const json = (await res.json()) as NetworkResponse;
   const toastError: SvelteToastOptions = {
     theme: {
       '--toastColor': 'white',
@@ -54,6 +53,13 @@ export const handleApiResponse = async (res: Response) => {
       '--toastBarBackground': 'white',
     },
   };
+  if (res.status >= 500) {
+    return toast.push(
+      'Error ' + res.status + ': ' + res.statusText,
+      toastError
+    );
+  }
+  const json = (await res.json()) as NetworkResponse;
   if (res.status !== 200 && !json) {
     toast.push('Error ' + res.status + ': ' + res.statusText, toastError);
     return false;
