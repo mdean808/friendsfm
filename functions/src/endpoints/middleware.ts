@@ -14,9 +14,12 @@ export const authMiddleware =
     ) => Promise<any>
   ) =>
   async (req: functions.https.Request, res: functions.Response) => {
-    cors()(req, res, async () => {
-      res.set('Access-Control-Allow-Origin', '*');
-    });
+    // handle preflight requests
+    if (req.method == 'OPTIONS') {
+      return cors()(req, res, async () => {
+        res.set('Access-Control-Allow-Origin', '*');
+      });
+    }
     let id = '';
     try {
       req.body =
