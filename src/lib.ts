@@ -54,10 +54,8 @@ export const handleApiResponse = async (res: Response) => {
     },
   };
   if (res.status >= 500) {
-    return toast.push(
-      'Error ' + res.status + ': ' + res.statusText,
-      toastError
-    );
+    toast.push('Error ' + res.status + ': ' + res.statusText, toastError);
+    return;
   }
   const json = (await res.json()) as NetworkResponse;
   if (res.status !== 200 && !json) {
