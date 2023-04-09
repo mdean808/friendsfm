@@ -26,7 +26,7 @@ export const authMiddleware =
       id = (await auth.verifyIdToken(authToken)).uid;
     } catch (e) {
       // Firebase authentication error
-      res.status(401).json({
+      return res.status(401).json({
         type: 'error',
         message: 'Authentication Failed.',
         error: (e as Error).message,
