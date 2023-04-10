@@ -31,12 +31,11 @@ export const corsMiddleware =
       }
     } catch (e) {
       console.log('App Check Failed:', e);
-      res.status(401).json({
+      return res.status(401).json({
         type: 'error',
         message: 'App Check Failed.',
       });
     }
-    return handler(req, res);
   };
 
 export const authMiddleware = (
@@ -55,7 +54,7 @@ export const authMiddleware = (
         const user = new User(id);
         await user.load();
         if (!user.exists) {
-          res
+          return res
             .status(400)
             .json({ type: 'error', message: 'User does not exist.' });
         } else {
