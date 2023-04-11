@@ -84,6 +84,7 @@ export default class Submission {
   }
 
   public get json(): SubmissionType {
+    this.formatDatesForFrontend();
     return {
       id: this.id,
       number: this.number,

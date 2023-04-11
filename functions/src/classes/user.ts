@@ -53,7 +53,7 @@ export default class User {
       id: this.id,
       email: this.email,
       likedSongsPlaylist: this.likedSongsPlaylist,
-      submissionsPlaylist: this.likedSongsPlaylist,
+      submissionsPlaylist: this.submissionsPlaylist,
       musicPlatformAuth: this.musicPlatformAuth,
       displayName: this.displayName,
       photoURL: this.photoURL,
@@ -179,7 +179,8 @@ export default class User {
     if (this.likedSongsPlaylist) {
       if (this.musicPlatform === MusicPlatform.spotify) {
         await this.updateMusicAuth();
-        await addSongsToSpotifyPlaylist(
+        // this doesn't need to be synchronous
+        addSongsToSpotifyPlaylist(
           [song],
           this.likedSongsPlaylist,
           this.musicPlatformAuth
@@ -199,7 +200,9 @@ export default class User {
     // remove the song from the playlist
     if (this.likedSongsPlaylist) {
       if (this.musicPlatform === MusicPlatform.spotify) {
-        await removeSongsFromSpotifyPlaylist(
+        await this.updateMusicAuth();
+        // this doesn't need to synchronous
+        removeSongsFromSpotifyPlaylist(
           [song],
           this.likedSongsPlaylist,
           this.musicPlatformAuth
@@ -251,11 +254,13 @@ export default class User {
     }
   }
 
-  public async getCurrentSubmission(): Promise<Submission | undefined> {
-    if (!this.exists) throw Error('User not loaded.');
+  public async getCurrentSubmission(
+    number?: number
+  ): Promise<Submission | undefined> {
+    if (!this.id) throw Error('User not loaded.');
     const submissionRef = this.dbRef
       .collection('submissions')
-      .where('number', '==', await Submission.getCurrentCount());
+      .where('number', '==', number || (await Submission.getCurrentCount()));
     const submissionRes = await submissionRef.get();
     if (submissionRes.empty) return;
     const submissionData = submissionRes.docs[0].data() as SubmissionType;
@@ -272,14 +277,14 @@ export default class User {
     );
   }
 
-  public async getFriendSubmissions(): Promise<Submission[]> {
+  public async getFriendSubmissions(number?: number): Promise<Submission[]> {
     if (!this.exists) throw Error('User not loaded.');
     const friendSubmissions: Submission[] = [];
     for (const localFriend of this.friends) {
       const friend = new User(localFriend.id);
       await friend.load();
       try {
-        const friendSub = await friend.getCurrentSubmission();
+        const friendSub = await friend.getCurrentSubmission(number);
         if (!friendSub) continue;
         friendSub.formatDatesForFrontend();
         friendSubmissions.push(friendSub);
@@ -438,19 +443,22 @@ export default class User {
     // update user friends
     const userFriends = this.friends;
     this.friends.push({ username: friend.username, id: friend.id });
-    await this.dbRef.update({ friends: userFriends });
+    // doesn't need to be synchronous
+    this.dbRef.update({ friends: userFriends });
     // remove from friend request array
     const userFriendRequests = this.friendRequests;
     const updatedRequests = userFriendRequests.filter(
       (u) => u !== friend.username
     );
-    await this.dbRef.update({ friendRequests: updatedRequests });
+    // doesn't need to be synchronous
+    this.dbRef.update({ friendRequests: updatedRequests });
 
     // update friend friends
     const friendFriends = friend.friends;
     friendFriends.push({ username: this.username, id: this.id });
     const friendRef = usersRef.doc(friend.uid);
-    await friendRef.update({ friends: friendFriends });
+    // doesn't need to be synchronous
+    friendRef.update({ friends: friendFriends });
 
     // send notification
     if (!friend.messagingToken) return;
@@ -468,6 +476,7 @@ export default class User {
         },
       },
     };
+    // does'nt need to be synchronous
     newNotification(message);
     return this.json;
   }
@@ -485,7 +494,8 @@ export default class User {
     const updatedRequests = userFriendRequests.filter(
       (u) => u !== friend.username
     );
-    await this.dbRef.update({ friendRequests: updatedRequests });
+    // doesn't need to be synchronous
+    this.dbRef.update({ friendRequests: updatedRequests });
     return this.json;
   }
 
@@ -497,7 +507,8 @@ export default class User {
     if (!friend) throw new Error('No user with provided username.');
     const friendRef = usersRef.doc(friend.id);
     const requests = [...friend.friendRequests, this.username];
-    await friendRef.update({ friendRequests: requests });
+    // doesn't need to be synchronous
+    friendRef.update({ friendRequests: requests });
     if (!friend.messagingToken) return;
     const message: Message = {
       notification: {
@@ -513,6 +524,7 @@ export default class User {
         },
       },
     };
+    // doesn't need to be synchronous
     newNotification(message);
   }
   //STATIC METHODS
