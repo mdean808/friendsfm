@@ -1,8 +1,10 @@
 import { getAuth } from 'firebase-admin/auth';
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import * as cors from 'cors';
 import User from '../classes/user';
+import * as _cors from 'cors';
+
+const cors = _cors({ origin: true });
 
 const auth = getAuth();
 const appCheck = admin.appCheck();
@@ -16,26 +18,23 @@ export const corsMiddleware =
   ) =>
   async (req: functions.https.Request, res: functions.Response) => {
     // handle preflight requests
-    if (req.method == 'OPTIONS') {
-      return cors()(req, res, async () => {
-        res.set('Access-Control-Allow-Origin', '*');
-      });
-    }
-    const appCheckToken = req.get('x-firebase-appcheck');
-    try {
-      if (appCheckToken) {
-        await appCheck.verifyToken(appCheckToken);
-        return handler(req, res);
-      } else {
-        throw Error('No App Check token provided');
+    cors(req, res, async () => {
+      const appCheckToken = req.get('x-firebase-appcheck');
+      try {
+        if (appCheckToken) {
+          await appCheck.verifyToken(appCheckToken);
+          return handler(req, res);
+        } else {
+          throw Error('No App Check token provided');
+        }
+      } catch (e) {
+        console.log('App Check Failed:', e);
+        return res.status(401).json({
+          type: 'error',
+          message: 'App Check Failed.',
+        });
       }
-    } catch (e) {
-      console.log('App Check Failed:', e);
-      return res.status(401).json({
-        type: 'error',
-        message: 'App Check Failed.',
-      });
-    }
+    });
   };
 
 export const authMiddleware = (

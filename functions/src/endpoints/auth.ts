@@ -8,8 +8,10 @@ const auth = getAuth();
 
 export const loginUser = functions.https.onRequest(
   corsMiddleware(async (req, res) => {
-    const user: UserType = JSON.parse(req.body);
     try {
+      req.body =
+        typeof req.body === 'object' ? JSON.stringify(req.body) : req.body;
+      const user: UserType = JSON.parse(req.body);
       // verify the auth token with firebase's backend
       const decodedTokenData = await auth.verifyIdToken(user.authToken);
       user.id = decodedTokenData.uid;
