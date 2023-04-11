@@ -1,7 +1,9 @@
 import { getAuth } from 'firebase-admin/auth';
 import * as functions from 'firebase-functions';
 import User from '../classes/user';
-import * as cors from 'cors';
+import * as _cors from 'cors';
+
+const cors = _cors({ origin: true });
 
 const auth = getAuth();
 
@@ -14,13 +16,7 @@ export const authMiddleware =
     ) => Promise<any>
   ) =>
   async (req: functions.https.Request, res: functions.Response) => {
-    // handle preflight requests
-    if (req.method == 'OPTIONS') {
-      cors()(req, res, async () => {
-        res.set('Access-Control-Allow-Origin', '*');
-      });
-      return () => {};
-    } else {
+    cors(req, res, async () => {
       let id = '';
       try {
         req.body =
@@ -45,5 +41,5 @@ export const authMiddleware =
       } else {
         return handler(req, res, user);
       }
-    }
+    });
   };
