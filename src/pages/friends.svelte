@@ -8,6 +8,8 @@
     rejectFriendRequest,
     refreshUser,
     appLoading,
+    appCheckToken,
+    getAppCheckToken,
   } from '../store';
   import Input from '../components/Input.svelte';
   import Button from '../components/Button.svelte';
@@ -75,6 +77,7 @@
     }
   };
   onMount(async () => {
+    if (!appCheckToken.get()) await getAppCheckToken();
     // setup pull to refresh
     document.addEventListener('touchstart', swipeStart, false);
     document.addEventListener('touchmove', swipeMove, false);

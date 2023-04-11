@@ -14,6 +14,8 @@
     appLoading,
     currPath,
     loggedIn,
+    appCheckToken,
+    getAppCheckToken,
   } from '../store';
   import Button from '../components/Button.svelte';
   import Submission from '../components/Submission.svelte';
@@ -53,6 +55,7 @@
   });
 
   onMount(async () => {
+    if (!appCheckToken.get()) await getAppCheckToken();
     if (
       Capacitor.getPlatform() !== 'ios' ||
       Capacitor.getPlatform() !== 'android'

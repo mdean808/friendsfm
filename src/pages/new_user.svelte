@@ -2,8 +2,10 @@
   import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
   import { goto } from '../lib';
   import {
+    appCheckToken,
     appLoading,
     authToken,
+    getAppCheckToken,
     getNewAuthToken,
     loading,
     loginUser,
@@ -14,7 +16,8 @@
   import Icon from '../assets/icon.png';
   import { onMount } from 'svelte';
 
-  onMount(() => {
+  onMount(async () => {
+    if (!appCheckToken.get()) await getAppCheckToken();
     appLoading.set(false);
   });
 

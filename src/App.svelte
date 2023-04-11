@@ -74,7 +74,6 @@
 
   onMount(async () => {
     await initAppCheck();
-    await getAppCheckToken();
     platform.set(Capacitor.getPlatform());
     SplashScreen.hide();
     if (Capacitor.isPluginAvailable('OSLogger')) {
