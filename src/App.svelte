@@ -28,6 +28,7 @@
     appLoading,
     platform,
     initAppCheck,
+    getAppCheckToken,
   } from './store';
   import { goto } from './lib';
   import Loading from './components/Loading.svelte';
@@ -73,6 +74,7 @@
 
   onMount(async () => {
     await initAppCheck();
+    await getAppCheckToken();
     platform.set(Capacitor.getPlatform());
     SplashScreen.hide();
     if (Capacitor.isPluginAvailable('OSLogger')) {
