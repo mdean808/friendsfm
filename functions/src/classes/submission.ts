@@ -67,12 +67,16 @@ export default class Submission {
   }
 
   public formatDatesForFrontend() {
-    this.time = (this.time as Timestamp).toDate();
-    this.lateTime = (this.lateTime as Timestamp).toDate();
+    if ((this.time as Timestamp).toDate)
+      this.time = (this.time as Timestamp).toDate();
+    if ((this.lateTime as Timestamp).toDate)
+      this.lateTime = (this.lateTime as Timestamp).toDate();
   }
   public formatDatesForFirebase() {
-    this.time = Timestamp.fromDate(this.time as Date);
-    this.lateTime = Timestamp.fromDate(this.lateTime as Date);
+    if (!(this.time as Timestamp).toDate)
+      this.time = Timestamp.fromDate(this.time as Date);
+    if (!(this.lateTime as Timestamp).toDate)
+      this.lateTime = Timestamp.fromDate(this.lateTime as Date);
   }
 
   public get dbRef(): DocumentReference {
