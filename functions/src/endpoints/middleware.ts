@@ -1,13 +1,13 @@
 import { getAuth } from 'firebase-admin/auth';
 import * as functions from 'firebase-functions';
-import * as admin from 'firebase-admin';
+// import * as admin from 'firebase-admin';
 import User from '../classes/user';
 import * as _cors from 'cors';
 
 const cors = _cors({ origin: true });
 
 const auth = getAuth();
-const appCheck = admin.appCheck();
+// const appCheck = admin.appCheck();
 
 export const corsMiddleware =
   (
@@ -19,7 +19,7 @@ export const corsMiddleware =
   async (req: functions.https.Request, res: functions.Response) => {
     // handle preflight requests
     cors(req, res, async () => {
-      const appCheckToken = req.get('x-firebase-appcheck');
+      /*const appCheckToken = req.get('x-firebase-appcheck');
       try {
         if (appCheckToken) {
           await appCheck.verifyToken(appCheckToken);
@@ -33,7 +33,8 @@ export const corsMiddleware =
           type: 'error',
           message: 'App Check Failed.',
         });
-      }
+      }*/
+      return handler(req, res);
     });
   };
 
