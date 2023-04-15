@@ -106,6 +106,7 @@ export const initAppCheck = action(
   'init-app-check',
   async (store) => {
     await FirebaseAppCheck.initialize({
+      debug: import.meta.env.DEV,
       isTokenAutoRefreshEnabled: true,
       siteKey: '6LfulmYlAAAAAJwLoH096WItcxGwHy-CpQPU-aQG',
     });

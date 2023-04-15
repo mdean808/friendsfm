@@ -6,7 +6,7 @@ android {
         applicationId "xyz.mogdan.friendsfm"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 8
+        versionCode 10 
         versionName "0.0.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
@@ -40,7 +40,9 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
     implementation 'com.google.firebase:firebase-auth'
-    implementation 'com.google.android.gms:play-services-auth:20.4.1'     
+    implementation 'com.google.android.gms:play-services-auth:20.4.1'
+    implementation 'com.google.firebase:firebase-appcheck-playintegrity'
+    implementation 'com.google.firebase:firebase-appcheck-debug'
 }
 
 apply from: 'capacitor.build.gradle'
@@ -50,6 +52,7 @@ try {
     if (servicesJSON.text) {
         apply plugin: 'com.google.gms.google-services'
         apply plugin: 'com.google.firebase.crashlytics'
+        apply plugin: 'com.google.firebase-appcheck-playintegrity'
     }
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")

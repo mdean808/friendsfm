@@ -8,8 +8,6 @@
     rejectFriendRequest,
     refreshUser,
     appLoading,
-    appCheckToken,
-    getAppCheckToken,
   } from '../store';
   import Input from '../components/Input.svelte';
   import Button from '../components/Button.svelte';
@@ -17,7 +15,6 @@
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { slide } from 'svelte/transition';
-  import { SplashScreen } from '@capacitor/splash-screen';
   let newUsername = '';
   let loading = false;
 
@@ -77,7 +74,7 @@
     }
   };
   onMount(async () => {
-    if (!appCheckToken.get()) await getAppCheckToken();
+    // if (!appCheckToken.get()) await getAppCheckToken();
     // setup pull to refresh
     document.addEventListener('touchstart', swipeStart, false);
     document.addEventListener('touchmove', swipeMove, false);
