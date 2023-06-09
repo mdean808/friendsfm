@@ -8,7 +8,7 @@ export const getUser = functions.https.onRequest(
         req.body
       );
       if (messagingToken) {
-        await user.setMessagingToken(messagingToken);
+        user.setMessagingToken(messagingToken);
       }
       const songs = await user.getSongs();
       res
@@ -34,7 +34,7 @@ export const setUsername = functions.https.onRequest(
   authMiddleware(async (req, res, user) => {
     try {
       const { username } = JSON.parse(req.body);
-      await user.setUsername(username);
+      user.setUsername(username);
       res.status(200).type('json').send({ type: 'success', message: username });
     } catch (e) {
       functions.logger.info('Error in setUserUsername.');
@@ -52,7 +52,7 @@ export const setMusicPlatform = functions.https.onRequest(
   authMiddleware(async (req, res, user) => {
     try {
       const { musicPlatform, platformAuthCode } = JSON.parse(req.body);
-      await user.setMusicPlatform(musicPlatform, platformAuthCode);
+      user.setMusicPlatform(musicPlatform, platformAuthCode);
       res.status(200).json({ type: 'success', message: musicPlatform });
     } catch (e) {
       functions.logger.info('Error in setMusicPlatform.');
@@ -69,8 +69,8 @@ export const setMusicPlatform = functions.https.onRequest(
 export const unlinkMusicPlatform = functions.https.onRequest(
   authMiddleware(async (_req, res, user) => {
     try {
-      await user.dbRef.update({ musicPlatform: '' });
-      await user.dbRef.update({ musicPlatformAuth: {} });
+      user.dbRef.update({ musicPlatform: '' });
+      user.dbRef.update({ musicPlatformAuth: {} });
       res.status(200).json({ type: 'success', message: '' });
     } catch (e) {
       functions.logger.info('Error in unlinkMusicPlatform.');

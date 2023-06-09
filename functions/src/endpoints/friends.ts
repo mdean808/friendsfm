@@ -23,7 +23,7 @@ export const requestFriend = functions.https.onRequest(
   authMiddleware(async (req, res, user) => {
     try {
       const { friend } = JSON.parse(req.body);
-      await user.acceptRequest(friend);
+      await user.sendRequest(friend);
       res
         .status(200)
         .type('json')
@@ -44,7 +44,7 @@ export const rejectRequest = functions.https.onRequest(
   authMiddleware(async (req, res, user) => {
     try {
       const { requester } = JSON.parse(req.body);
-      await user.rejectRequest(requester);
+      user.rejectRequest(requester);
       res
         .status(200)
         .type('json')
