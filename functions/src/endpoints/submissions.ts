@@ -122,7 +122,7 @@ export const createSubmissionsPlaylist = functions.https.onRequest(
 export const submissionMigration = functions.https.onRequest(
   async (req, res) => {
     res.set('Access-Control-Allow-Origin', '*');
-    const data = req.body;
+    const data = JSON.parse(req.body);
     if (!data) {
       res.status(400).end();
       return;

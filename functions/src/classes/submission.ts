@@ -80,11 +80,7 @@ export default class Submission {
   }
 
   public get dbRef(): DocumentReference {
-    return db
-      .collection('users')
-      .doc(this.user.id)
-      .collection('submissions')
-      .doc(this.id);
+    return db.collection('submissions').doc(this.id);
   }
 
   public get json(): SubmissionType {
@@ -99,6 +95,7 @@ export default class Submission {
       time: this.time,
       lateTime: this.lateTime,
       user: this.user,
+      userId: this.user.id,
     };
   }
 
@@ -115,12 +112,13 @@ export default class Submission {
   }
 
   public static async canCreate(
-    userRef: DocumentReference,
+    userId: string,
     notificationsSnapshot: DocumentSnapshot
   ): Promise<boolean> {
     const currentSubmissionCount = notificationsSnapshot.get('count');
-    const submissionsRef = userRef.collection('submissions');
+    const submissionsRef = db.collection('submissions');
     const existingSubmission = await submissionsRef
+      .where('userId', '==', userId)
       .where('number', '==', currentSubmissionCount)
       .get();
     return existingSubmission.empty;

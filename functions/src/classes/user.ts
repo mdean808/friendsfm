@@ -258,14 +258,14 @@ export default class User {
     number?: number
   ): Promise<Submission | undefined> {
     if (!this.id) throw Error('User not loaded.');
-    const submissionRef = this.dbRef
+    const submissionRef = db
       .collection('submissions')
       .where('number', '==', number || (await Submission.getCurrentCount()));
     const submissionRes = await submissionRef.get();
     if (submissionRes.empty) return;
     const submissionData = submissionRes.docs[0].data() as SubmissionType;
     return new Submission(
-      submissionData.id,
+      submissionData.id || '',
       submissionData.number,
       submissionData.song,
       submissionData.audial,
@@ -337,7 +337,7 @@ export default class User {
       .collection('misc')
       .doc('notifications')
       .get();
-    if (!(await Submission.canCreate(this.dbRef, notificationsSnapshot))) {
+    if (!(await Submission.canCreate(this.id, notificationsSnapshot))) {
       throw new Error('User already submitted.');
     }
     // make sure we have the latest access tokens for the user's music oauth before we get their song
@@ -349,7 +349,7 @@ export default class User {
       notificationsSnapshot
     );
     // create and store the submission
-    const newSubmission = {
+    const newSubmission: SubmissionType = {
       time,
       late,
       lateTime,
@@ -357,9 +357,10 @@ export default class User {
       audial: { number: -1, score: '' },
       song,
       location: { latitude: latitude || 135, longitude: longitude || 90.0 },
+      userId: this.id,
     };
     const newSubmissionId = (
-      await this.dbRef.collection('submissions').add(newSubmission)
+      await db.collection('submissions').add(newSubmission)
     ).id;
     // send notification on late submission
     if (late) {
