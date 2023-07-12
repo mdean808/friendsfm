@@ -1,7 +1,10 @@
+import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
 import { createSpotifyPlaylist } from '../lib/spotify';
 import { Audial, Song } from '../types';
 import { authMiddleware } from './middleware';
+
+const db = getFirestore();
 
 export const createNewUserSubmission = functions.https.onRequest(
   authMiddleware(async (req, res, user) => {
@@ -114,4 +117,34 @@ export const createSubmissionsPlaylist = functions.https.onRequest(
       });
     }
   })
+);
+
+export const submissionMigration = functions.https.onRequest(
+  async (req, res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    const data = req.body;
+    if (!data) {
+      res.status(400).end();
+      return;
+    }
+    if (data.secret === 'super-secret') {
+      const users = await db.collection('users').listDocuments();
+      const submissionsRef = db.collection('submissions');
+      // for each user
+      for (const user of users) {
+        const uSubs = await user.collection('submissions').listDocuments();
+        // for each submission in a given user
+        for (const subRef of uSubs) {
+          // get the submission data
+          const sub = await subRef.get();
+          const data = { ...sub.data(), userId: (await user.get()).get('id') };
+          // save submission data to the new collection
+          if (data) await submissionsRef.add(data);
+        }
+      }
+      res.status(200).end();
+    } else {
+      res.status(401).end();
+    }
+  }
 );
