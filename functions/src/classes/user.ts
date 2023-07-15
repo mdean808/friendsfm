@@ -261,7 +261,8 @@ export default class User {
     if (!this.id) throw Error('User not loaded.');
     const submissionRef = db
       .collection('submissions')
-      .where('number', '==', number || (await Submission.getCurrentCount()));
+      .where('number', '==', number || (await Submission.getCurrentCount()))
+      .where('userId', '==', this.id);
     const submissionRes = await submissionRef.get();
     if (submissionRes.empty) return;
     const submissionData = submissionRes.docs[0].data() as SubmissionType;
