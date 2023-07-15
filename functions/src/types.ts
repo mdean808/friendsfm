@@ -36,6 +36,7 @@ export interface Song {
   length: number; // in seconds
   durationElapsed: number; // in seconds
   timestamp?: number; // the time the song was played in milliseconds
+  albumArtwork?: string;
   url: string;
   id: string;
   genre: string;
@@ -100,7 +101,16 @@ export interface SpotifyTrack {
       name: string;
     }
   ];
-  album: any;
+  album: {
+    id: string;
+    images: [
+      {
+        url: string;
+        height: number;
+        width: number;
+      }
+    ];
+  };
   duration_ms: number;
   external_urls: {
     spotify: string;

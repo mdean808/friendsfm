@@ -44,6 +44,7 @@ export interface Song {
   length: number; // in seconds
   durationElapsed: number; // in seconds
   timestamp?: number; // date (milliseconds) when it was played
+  albumArtwork?: string;
   url: string;
   id: string;
 }

@@ -59,10 +59,23 @@
         {/if}
       </h4>
       <a href={data.song.url}>
-        <p class={`text-${getPlatformColor(data.user.musicPlatform)}`}>
-          {data.song.name}
-        </p>
-        <p>{data.song.artist}</p>
+        <div class="flex mb-1">
+          {#if data.song.albumArtwork}
+            <img
+              alt="Album Artwork"
+              class="w-12 h-12 mr-2"
+              src={data.song.albumArtwork}
+            />
+          {/if}
+          <div class={data.song.albumArtwork ? 'w-64' : 'w-72'}>
+            <p class={`truncate text-${data.user.musicPlatform}`}>
+              {data.song.name}
+            </p>
+            <p class="truncate">
+              {data.song.artist}
+            </p>
+          </div>
+        </div>
         <p class="text-gray-400 w-8/12 text-sm">
           {#if data.song.timestamp > 0}
             song played {getDaysAgo(new Date(data.song?.timestamp))} at {formatTimePlayed(

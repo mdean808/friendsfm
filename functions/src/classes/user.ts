@@ -240,6 +240,7 @@ export default class User {
         url: currentSong.item.external_urls.spotify,
         length: currentSong.item.duration_ms / 1000,
         durationElapsed: currentSong.progress_ms / 1000,
+        albumArtwork: currentSong.item.album.images[0]?.url,
         timestamp: currentSong.timestamp || 0,
         genre:
           (await getTrackGenre(

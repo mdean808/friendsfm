@@ -59,13 +59,17 @@
       const refresher = document.getElementById('refresher') as IonRefresher;
       refresher.addEventListener('ionRefresh', handleRefresh);
     }
+
+    if (Capacitor.getPlatform() != 'web') {
+      FirebaseMessaging.removeAllDeliveredNotifications();
+    }
+
     if (
       !friendSubmissions.get()?.length ||
       !Object.keys(userSubmission.get())?.length
     )
       await load();
     loadingSubmissions = false;
-    FirebaseMessaging.removeAllDeliveredNotifications();
   });
 
   onDestroy(() => {
@@ -133,12 +137,23 @@
         <div
           class="border-2 w-full border-gray-600 rounded-md mx-auto my-1 py-2 text-left space-x-4 flex px-2"
         >
-          <a href={$userSubmission.song.url} class="flex-grow">
-            <div class="flex-col flex h-full">
-              <p class={`flex-grow text-${$user.musicPlatform}`}>
+          <a
+            href={$userSubmission.song.url}
+            class="flex flex-grow items-center"
+          >
+            {#if $userSubmission.song.albumArtwork}
+              <div>
+                <img
+                  class="w-12 h-12 mr-2"
+                  src={$userSubmission.song.albumArtwork}
+                />
+              </div>
+            {/if}
+            <div class={$userSubmission.song.albumArtwork ? 'w-40' : 'w-52'}>
+              <p class={`truncate text-${$user.musicPlatform}`}>
                 {$userSubmission.song.name}
               </p>
-              <p class="">{$userSubmission.song.artist}</p>
+              <p class="truncate">{$userSubmission.song.artist}</p>
             </div>
           </a>
           <div class="flex-grow-0 text-right">
@@ -146,7 +161,7 @@
               <svg
                 on:click={toggleHeart}
                 on:keypress={toggleHeart}
-                class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
+                class={`w-6 h-6 ml-auto -mt-1 flex-grow-0 flex-shrink ${
                   loadingHeart ? 'animate-ping text-pink-500' : ''
                 } ${
                   $songs.find((s) => s.name === $userSubmission.song.name)
@@ -223,9 +238,9 @@
       {:else if !loadingSubmissions && !$userSubmission.song}
         <Button
           type="primary"
-          className="mb-2"
+          className="mb-2 bg-blue-500"
           title="Share current song."
-          on:click={createSubmission}>Share Current Song</Button
+          on:click={createSubmission}>share</Button
         >
       {:else}
         {#each sortedSubmissions as submission}
