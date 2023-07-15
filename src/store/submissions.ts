@@ -45,7 +45,6 @@ export const generateSubmission = action(
         return false;
       }
       store.set(json.message.user as Submission);
-      friendSubmissions.set(json.message.friends as Submission[]);
       FirebaseAnalytics.logEvent({ name: 'generate_submission' });
     } catch (e) {
       console.log(e);
@@ -53,10 +52,8 @@ export const generateSubmission = action(
   }
 );
 
-export const friendSubmissions = atom<Submission[]>([]);
-
 export const getSubmissionStatus = action(
-  friendSubmissions,
+  userSubmission,
   'get-submission-status',
   async (store) => {
     await getNewAuthToken();
@@ -75,8 +72,30 @@ export const getSubmissionStatus = action(
       // failed to set new music platform
       return false;
     }
+    if (json.message.user) store.set(json.message.user as Submission);
+  }
+);
+
+export const friendSubmissions = atom<Submission[]>([]);
+
+export const getFriendSubmissions = action(
+  friendSubmissions,
+  'get-submission-status',
+  async (store) => {
+    await getNewAuthToken();
+    const res = await fetch(FIREBASE_URL.get() + '/getFriendSubmissions', {
+      method: 'POST',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+      }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+    });
+    const json = await handleApiResponse(res);
+    if (!json) {
+      // failed to set new music platform
+      return false;
+    }
     store.set(json.message.friends as Submission[]);
-    if (json.message.user) userSubmission.set(json.message.user as Submission);
   }
 );
 

@@ -11,20 +11,16 @@ export const createNewUserSubmission = functions.https.onRequest(
     try {
       const { latitude, longitude } = JSON.parse(req.body);
       const userSub = await user.createSubmission(latitude, longitude);
-      const friendSubmissions = await user.getFriendSubmissions();
       // because some of our functions aren't running synchronously
       if (res.headersSent) return;
       res.status(200).json({
         type: 'success',
         message: {
           user: userSub.json || {},
-          friends: friendSubmissions.map((s) => s.json) || [],
         },
       });
     } catch (e) {
-      functions.logger.info(
-        'Error in generateUserSubmission or getFriendSubmissions.'
-      );
+      functions.logger.info('Error in generateUserSubmission.');
       functions.logger.error((e as Error).message);
       // because some of our functions aren't running synchronously
       if (res.headersSent) return;
@@ -41,18 +37,36 @@ export const getCurrentSubmissionStatus = functions.https.onRequest(
   authMiddleware(async (_req, res, user) => {
     try {
       const userSub = await user.getCurrentSubmission();
-      const friendSubmissions = await user.getFriendSubmissions();
       res.status(200).json({
         type: 'success',
         message: {
           user: userSub ? userSub.json : {},
+        },
+      });
+    } catch (e) {
+      functions.logger.info('Error in getUserSubmission.');
+      functions.logger.error(e);
+      res.status(400).json({
+        type: 'error',
+        message: 'Something went wrong. Please try again.',
+        error: (e as Error).message,
+      });
+    }
+  })
+);
+
+export const getFriendSubmissions = functions.https.onRequest(
+  authMiddleware(async (_req, res, user) => {
+    try {
+      const friendSubmissions = await user.getFriendSubmissions();
+      res.status(200).json({
+        type: 'success',
+        message: {
           friends: friendSubmissions.map((s) => s.json) || [],
         },
       });
     } catch (e) {
-      functions.logger.info(
-        'Error in getUserSubmission or getFriendSubmissions.'
-      );
+      functions.logger.info('Error in getFriendSubmissions.');
       functions.logger.error(e);
       res.status(400).json({
         type: 'error',
@@ -127,7 +141,7 @@ export const submissionMigration = functions.https.onRequest(
       res.status(400).end();
       return;
     }
-    if (data.secret === 'super-secret') {
+    if (data.secret === process.env.SECRET) {
       const users = await db.collection('users').listDocuments();
       const submissionsRef = db.collection('submissions');
       // for each user

@@ -6,6 +6,7 @@
     generateSubmission,
     userSubmission,
     getSubmissionStatus,
+    getFriendSubmissions,
     user,
     toggleSong,
     songs,
@@ -31,6 +32,7 @@
 
   // GLOBALS
   let loadingSubmissions = true;
+  let loadingFriendSubmissions = true;
   let sortedSubmissions: SubmissionType[] = [];
 
   friendSubmissions.subscribe((val) => {
@@ -82,6 +84,8 @@
     await getSubmissionStatus();
     loadingSubmissions = false;
     appLoading.set(false);
+    await getFriendSubmissions();
+    loadingFriendSubmissions = false;
   };
 
   const handleRefresh = async () => {
@@ -91,9 +95,12 @@
   };
 
   const createSubmission = async () => {
+    loadingFriendSubmissions = true;
     loading.set(true);
     await generateSubmission();
     loading.set(false);
+    await getFriendSubmissions();
+    loadingFriendSubmissions = false;
   };
 
   let loadingHeart = false;
@@ -145,6 +152,7 @@
               <div>
                 <img
                   class="w-12 h-12 mr-2"
+                  alt="Album Artwork"
                   src={$userSubmission.song.albumArtwork}
                 />
               </div>
@@ -233,7 +241,7 @@
     {/if}
     <span class="border-white border-t-2 block w-full" />
     <div class="my-2">
-      {#if loadingSubmissions}
+      {#if loadingFriendSubmissions}
         <SkeletonSubmission />
       {:else if !loadingSubmissions && !$userSubmission.song}
         <Button
@@ -255,7 +263,7 @@
             on:click={() => goto('/friends')}
             class="mx-auto text-center text-blue-500 underline"
           >
-            add friends for more submissions.
+            add friends.
           </p>
         {/if}
         {#if $user.submissionsPlaylist}
