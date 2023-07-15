@@ -13,6 +13,7 @@
     notificationAction,
     createSubmissionsPlaylist,
     appLoading,
+    loggedIn,
   } from '../store';
   import Button from '../components/Button.svelte';
   import Submission from '../components/Submission.svelte';
@@ -48,7 +49,8 @@
     if (!notif || !notif.title) return;
     const title = notif.title;
     if (title.includes('FriendsFM') || title.includes('late submission')) {
-      await load();
+      load();
+      loadFriends();
     }
   });
 
@@ -67,11 +69,16 @@
     }
 
     if (
-      !friendSubmissions.get()?.length ||
-      !Object.keys(userSubmission.get())?.length
-    )
-      await load();
-    loadingSubmissions = false;
+      (!friendSubmissions.get()?.length ||
+        !Object.keys(userSubmission.get())?.length) &&
+      loggedIn.get()
+    ) {
+      load();
+      loadFriends();
+    } else {
+      loadingSubmissions = false;
+      loadingFriendSubmissions = false;
+    }
   });
 
   onDestroy(() => {
@@ -84,8 +91,12 @@
     await getSubmissionStatus();
     loadingSubmissions = false;
     appLoading.set(false);
+  };
+
+  const loadFriends = async (hideLoadingIndicator?: boolean) => {
+    if (!hideLoadingIndicator) loadingFriendSubmissions = true;
     await getFriendSubmissions();
-    loadingFriendSubmissions = false;
+    if (!hideLoadingIndicator) loadingFriendSubmissions = false;
   };
 
   const handleRefresh = async () => {
@@ -95,12 +106,10 @@
   };
 
   const createSubmission = async () => {
-    loadingFriendSubmissions = true;
     loading.set(true);
+    loadFriends(false);
     await generateSubmission();
     loading.set(false);
-    await getFriendSubmissions();
-    loadingFriendSubmissions = false;
   };
 
   let loadingHeart = false;
@@ -124,7 +133,7 @@
     <ion-refresher-content />
   </ion-refresher>
   <div id="home" class="text-center w-full py-2 px-4 overflow-y-auto h-full">
-    <div class="mb-3 w-3/4 mx-auto">
+    <div class="mb-3 px-5 mx-auto">
       {#if loadingSubmissions}
         <LoadingIndicator className={'mx-auto w-16 h-16'} />
       {:else if $userSubmission.song}
@@ -151,8 +160,8 @@
             {#if $userSubmission.song.albumArtwork}
               <div>
                 <img
-                  class="w-12 h-12 mr-2"
                   alt="Album Artwork"
+                  class="w-12 h-12 mr-3 rounded-sm"
                   src={$userSubmission.song.albumArtwork}
                 />
               </div>
@@ -242,6 +251,8 @@
     <span class="border-white border-t-2 block w-full" />
     <div class="my-2">
       {#if loadingFriendSubmissions}
+        <SkeletonSubmission />
+        <SkeletonSubmission />
         <SkeletonSubmission />
       {:else if !loadingSubmissions && !$userSubmission.song}
         <Button

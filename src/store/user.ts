@@ -1,5 +1,6 @@
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
+import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { map, action } from 'nanostores';
 import { appCheckToken, authToken, FIREBASE_URL, loggedIn, songs } from '.';
@@ -96,10 +97,12 @@ export const refreshUser = action(user, 'get-user-data', async (_store) => {
   if (!loggedIn.get()) return false;
   let messagingToken = '';
   try {
-    await FirebaseMessaging.checkPermissions().catch(
-      async () => await FirebaseMessaging.requestPermissions()
-    );
-    messagingToken = (await FirebaseMessaging.getToken())?.token;
+    if (Capacitor.getPlatform() !== 'web') {
+      await FirebaseMessaging.checkPermissions().catch(
+        async () => await FirebaseMessaging.requestPermissions()
+      );
+      messagingToken = (await FirebaseMessaging.getToken())?.token;
+    }
   } catch (e) {
     console.log(e);
   }

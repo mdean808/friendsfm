@@ -1,4 +1,4 @@
-<main class="border-2 border-gray-600 rounded-md">
+<main class="border-2 mb-4 border-gray-600 rounded-md">
   <div class="animate-pulse flex py-4 px-4">
     <div class="flex-grow text-left mate-pulse mr-2">
       <p class="text-xl mb-2 h-6 rounded-md bg-gray-700" />
