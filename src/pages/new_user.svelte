@@ -13,6 +13,7 @@
   } from '../store';
   import Icon from '../assets/icon.png';
   import { onMount } from 'svelte';
+  import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
 
   onMount(async () => {
     // if (!appCheckToken.get()) await getAppCheckToken();
@@ -44,7 +45,18 @@
         else goto('/');
       }
     } catch (e) {
-      console.log(e);
+      if (!e.message.includes('closed-by-user')) {
+        const toastError: SvelteToastOptions = {
+          theme: {
+            '--toastColor': 'white',
+            '--toastBackground': '#ad2626',
+            '--toastBarBackground': 'white',
+          },
+        };
+        loading.set(false);
+        toast.push('Something went wrong. Please try again.', toastError);
+        console.log(e.message);
+      }
     }
     loading.set(false);
   };
