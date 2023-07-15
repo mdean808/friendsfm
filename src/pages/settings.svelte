@@ -13,7 +13,7 @@
     <button on:click={() => goto(prevPath.get())} class="flex-grow-0">
       <svg
         fill="none"
-        class="w-8 h-8"
+        class="w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-spotify"
         stroke="currentColor"
         stroke-width="1.5"
         viewBox="0 0 24 24"
@@ -23,7 +23,7 @@
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
-          d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5"
+          d="M8.25 4.5l7.5 7.5-7.5 7.5"
         />
       </svg>
     </button>

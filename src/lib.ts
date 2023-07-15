@@ -133,17 +133,24 @@ export const getDaysAgo = (date: Date) => {
 export const convertDateToLateString = (date: Date) => {
   if (isNaN(date.getTime())) return 'infinitely late';
   const rootDate = new Date(0);
+  const days = daysBetweenDates(rootDate, date);
   const hours = Math.floor(
     Math.abs(rootDate.getTime() - date.getTime()) / 36e5
   );
   const minutes = date.getMinutes() - rootDate.getMinutes();
   const seconds = date.getSeconds() - rootDate.getSeconds();
   let res = '';
-  if (hours === 0 && minutes === 0) res = seconds + 's late';
-  else if (hours === 0) res = minutes + ' min late';
-  else res = hours + ' hr late';
+  if (days <= 2 && hours === 0 && minutes === 0) res = seconds + 's late';
+  else if (days <= 2 && hours === 0) res = minutes + ' min late';
+  else if (days <= 2) res = hours + ' hr late';
+  else res = days + ' days late';
   return res;
 };
+
+export const daysBetweenDates = (date1: Date, date2: Date) =>
+  Math.ceil(
+    Math.abs(date2.getTime() - date1.getTime()) / (1000 * 60 * 60 * 24)
+  );
 
 export const handleError = (e: PromiseRejectionEvent) => {
   FirebaseCrashlytics.recordException({ message: e.type });

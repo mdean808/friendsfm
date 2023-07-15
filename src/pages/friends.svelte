@@ -109,8 +109,8 @@
     </h1>
     <button on:click={() => goto(prevPath.get())} class="flex-grow-0">
       <svg
+        class="w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-spotify"
         fill="none"
-        class="w-8 h-8 mx-auto"
         stroke="currentColor"
         stroke-width="1.5"
         viewBox="0 0 24 24"
@@ -120,7 +120,7 @@
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
-          d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5"
+          d="M8.25 4.5l7.5 7.5-7.5 7.5"
         />
       </svg>
     </button>
@@ -180,7 +180,7 @@
           type="primary"
           title="Add friend"
           on:click={() => addFriend()}
-          className="w-full mx-1 px-0 py-0 h-full my-auto text-3xl"
+          className="w-full mx-1 px-0 py-0 h-full rounded-md my-auto text-3xl"
           ><svg
             fill="none"
             class="w-6 h-6 mx-auto"
@@ -227,7 +227,7 @@
                 type="breaking"
                 title="Add friend"
                 on:click={() => rejectRequest(username)}
-                className="w-2/12 mr-2 h-full my-auto text-3xl"
+                className="w-2/12 mr-2 rounded-md h-full my-auto text-3xl"
               >
                 <svg
                   fill="none"

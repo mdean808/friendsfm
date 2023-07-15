@@ -6,7 +6,7 @@
 
   switch (type) {
     case 'primary':
-      buttonCSS = 'bg-blue-600 hover:bg-blue-500';
+      buttonCSS = 'bg-blue-600 hover:bg-blue-500 shadow-md';
       break;
 
     case 'submit':
@@ -34,7 +34,7 @@
 <button
   on:click
   {title}
-  class={`p-2 text-white ${buttonCSS} rounded-md shadow hover:shadow-lg transition-all duration-200 ${className}`}
+  class={`p-2 text-white ${buttonCSS} w-full rounded-3xl shadow hover:shadow-lg transition-all duration-200 ${className}`}
 >
   <slot />
 </button>

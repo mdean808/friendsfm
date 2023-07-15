@@ -230,6 +230,7 @@
       Hidden div for Tailwind JIT
       <span class="text-spotify" />
       <span class="text-apple-music" />
+      <span class="border-spotify" />
     </div>
   </div>
 </ion-app>

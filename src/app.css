@@ -16,6 +16,10 @@ body {
   color: theme('colors.gray.200');
 }
 
+input, textarea, button, select, a {
+  -webkit-tap-highlight-color: transparent;
+}
+
 :root {
   --toastContainerTop: auto;
   --toastContainerRight: auto;
