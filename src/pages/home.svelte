@@ -271,7 +271,7 @@
             title="Share current song."
             on:click={createSubmission}>share</Button
           >
-        {:else}
+        {:else if !loadingSubmission}
           {#each sortedSubmissions as submission}
             <div class="my-2">
               <Submission data={submission} />
