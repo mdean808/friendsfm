@@ -10,6 +10,8 @@ export const loading = atom<boolean>(false);
 
 export const appLoading = atom<boolean>(true);
 
+export const homepageLoaded = atom<boolean>(false);
+
 export const platform = atom<string>('');
 
 export const getPlatform = action(platform, 'get-platform', async (store) => {

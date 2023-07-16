@@ -13,6 +13,7 @@ import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Dialog } from '@capacitor/dialog';
 import { toast } from '@zerodevx/svelte-toast';
 import { Geolocation, type Position } from '@capacitor/geolocation';
+import { Preferences } from '@capacitor/preferences';
 
 export const userSubmission = map<Submission>();
 
@@ -46,6 +47,10 @@ export const generateSubmission = action(
       }
       store.set(json.message.user as Submission);
       FirebaseAnalytics.logEvent({ name: 'generate_submission' });
+      // await Preferences.set({
+      //   key: 'submission',
+      //   value: JSON.stringify(userSubmission.get() || {}),
+      // });
     } catch (e) {
       console.log(e);
     }
@@ -73,6 +78,10 @@ export const getSubmissionStatus = action(
       return false;
     }
     if (json.message.user) store.set(json.message.user as Submission);
+    // await Preferences.set({
+    //   key: 'submission',
+    //   value: JSON.stringify(userSubmission.get() || {}),
+    // });
   }
 );
 
@@ -96,6 +105,10 @@ export const getFriendSubmissions = action(
       return false;
     }
     store.set(json.message.friends as Submission[]);
+    await Preferences.set({
+      key: 'friend-submissions',
+      value: JSON.stringify(friendSubmissions.get() || []),
+    });
   }
 );
 
@@ -135,6 +148,10 @@ export const shareAudial = action(
     }
     sub.audial = { number, score };
     store.set(sub);
+    // await Preferences.set({
+    //   key: 'submission',
+    //   value: JSON.stringify(userSubmission.get() || {}),
+    // });
     goto('/');
   }
 );

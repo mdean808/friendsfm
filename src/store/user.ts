@@ -3,9 +3,24 @@ import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { map, action } from 'nanostores';
-import { appCheckToken, authToken, FIREBASE_URL, loggedIn, songs } from '.';
+import {
+  appCheckToken,
+  authToken,
+  FIREBASE_URL,
+  friendSubmissions,
+  getFriendSubmissions,
+  loggedIn,
+  songs,
+  userSubmission,
+} from '.';
 import { goto, handleApiResponse } from '../lib';
-import type { MusicPlatform, SavedSong, User } from '../types';
+import type {
+  MusicPlatform,
+  SavedSong,
+  Song,
+  Submission,
+  User,
+} from '../types';
 export const user = map<User>({} as User);
 
 // Load user from preferences
@@ -19,8 +34,20 @@ export const getUserFromPreferences = action(
       return {} as User;
     }
     const u = JSON.parse(res.value) as User;
-    loggedIn.set(true);
     store.set(u);
+
+    const res2 = await Preferences.get({ key: 'loggedIn' });
+    loggedIn.set(res2.value === '1' ? true : false);
+
+    const res3 = await Preferences.get({ key: 'songs' });
+    songs.set(JSON.parse(res3.value || '[]') as SavedSong[]);
+
+    // const res4 = await Preferences.get({ key: 'submission' });
+    // userSubmission.set(JSON.parse(res4.value || '{}') as Submission);
+
+    const res5 = await Preferences.get({ key: 'friendSubmissions' });
+    friendSubmissions.set(JSON.parse(res5.value || '[]') as Submission[]);
+
     return u;
   }
 );
@@ -31,7 +58,22 @@ export const updateUser = action(
   'update',
   async (store, newUser: User) => {
     await Preferences.set({ key: 'user', value: JSON.stringify(newUser) });
-    await Preferences.set({ key: 'songs', value: JSON.stringify(songs.get()) });
+    await Preferences.set({
+      key: 'songs',
+      value: JSON.stringify(songs.get() || []),
+    });
+    await Preferences.set({
+      key: 'loggedIn',
+      value: loggedIn.get() ? '1' : '0',
+    });
+    // await Preferences.set({
+    //   key: 'submission',
+    //   value: JSON.stringify(userSubmission.get() || {}),
+    // });
+    await Preferences.set({
+      key: 'friend-submissions',
+      value: JSON.stringify(friendSubmissions.get() || []),
+    });
     store.set(newUser);
   }
 );
@@ -122,6 +164,8 @@ export const refreshUser = action(user, 'get-user-data', async (_store) => {
   }
   songs.set(json.message.songs as SavedSong[]);
   await updateUser(json.message.user as User);
+  // also update friend submissions
+  await getFriendSubmissions();
 });
 
 export const unlinkMusicProvider = action(

@@ -6,6 +6,7 @@ import { atom, action, map } from 'nanostores';
 import {
   FIREBASE_URL,
   friendSubmissions,
+  homepageLoaded,
   refreshUser,
   songs,
   updateUser,
@@ -82,12 +83,16 @@ export const logout = action(user, 'logout', async (store) => {
   });
   await FirebaseAuthentication.signOut();
   loggedIn.set(false);
+  homepageLoaded.set(false);
   store.set(null);
   userSubmission.set(null);
   friendSubmissions.set(null);
   authToken.set(null);
   await Preferences.remove({ key: 'user' });
   await Preferences.remove({ key: 'songs' });
+  await Preferences.remove({ key: 'loggedIn' });
+  await Preferences.remove({ key: 'submission' });
+  await Preferences.remove({ key: 'friend-submissions' });
 });
 
 export const appCheckToken = atom<string>('');

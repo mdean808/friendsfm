@@ -1,4 +1,5 @@
 import { Dialog } from '@capacitor/dialog';
+import { Preferences } from '@capacitor/preferences';
 import { toast } from '@zerodevx/svelte-toast';
 import { action, atom } from 'nanostores';
 import { user } from '.';
@@ -67,6 +68,10 @@ export const toggleSong = action(
       }
       s.push(json.message as SavedSong);
       store.set(s);
+      await Preferences.set({
+        key: 'songs',
+        value: JSON.stringify(s || []),
+      });
     }
   }
 );

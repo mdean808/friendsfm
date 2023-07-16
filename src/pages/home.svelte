@@ -7,6 +7,7 @@
     userSubmission,
     getSubmissionStatus,
     getFriendSubmissions,
+    homepageLoaded,
     user,
     toggleSong,
     songs,
@@ -32,8 +33,8 @@
   import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 
   // GLOBALS
-  let loadingSubmissions = true;
-  let loadingFriendSubmissions = true;
+  let loadingSubmission = false;
+  let loadingFriendSubmissions = false;
   let sortedSubmissions: SubmissionType[] = [];
 
   friendSubmissions.subscribe((val) => {
@@ -55,7 +56,6 @@
   });
 
   onMount(async () => {
-    // if (!appCheckToken.get()) await getAppCheckToken();
     if (
       Capacitor.getPlatform() !== 'ios' ||
       Capacitor.getPlatform() !== 'android'
@@ -69,15 +69,17 @@
     }
 
     if (
-      (!friendSubmissions.get()?.length ||
-        !Object.keys(userSubmission.get())?.length) &&
-      loggedIn.get()
+      (!userSubmission.get() || !Object.keys(userSubmission.get())?.length) &&
+      loggedIn.get() &&
+      !homepageLoaded.get()
     ) {
       load();
       loadFriends();
     } else {
-      loadingSubmissions = false;
+      if (loggedIn.get() && !homepageLoaded.get()) loadFriends(true);
+      loadingSubmission = false;
       loadingFriendSubmissions = false;
+      appLoading.set(false);
     }
   });
 
@@ -87,10 +89,14 @@
   });
 
   const load = async () => {
-    loadingSubmissions = true;
+    loadingSubmission = true;
     await getSubmissionStatus();
-    loadingSubmissions = false;
+    loadingSubmission = false;
+    if (!userSubmission.get() || !userSubmission.get().song) {
+      loadingFriendSubmissions = false;
+    }
     appLoading.set(false);
+    homepageLoaded.set(true);
   };
 
   const loadFriends = async (hideLoadingIndicator?: boolean) => {
@@ -101,13 +107,14 @@
 
   const handleRefresh = async () => {
     const refresher = document.getElementById('refresher') as IonRefresher;
-    await getSubmissionStatus();
+    getSubmissionStatus();
+    await loadFriends(true);
     refresher.complete();
   };
 
   const createSubmission = async () => {
     loading.set(true);
-    loadFriends(false);
+    loadFriends(true);
     await generateSubmission();
     loading.set(false);
   };
@@ -132,168 +139,186 @@
   <ion-refresher id="refresher" slot="fixed">
     <ion-refresher-content />
   </ion-refresher>
-  <div id="home" class="text-center w-full py-2 px-4 overflow-y-auto h-full">
-    <div class="mb-3 px-5 mx-auto">
-      {#if loadingSubmissions}
-        <LoadingIndicator className={'mx-auto w-16 h-16'} />
-      {:else if $userSubmission.song}
-        {#if !$userSubmission.late}
-          <span class="text-sm text-gray-400"
-            >{new Date($userSubmission.time).toLocaleString('en-US', {
-              hour: 'numeric',
-              minute: 'numeric',
-              hour12: true,
-            })}
-          </span>
-        {:else}
-          <span class="text-sm text-red-500">
-            {convertDateToLateString(new Date($userSubmission.lateTime))}
-          </span>
-        {/if}
-        <div
-          class="border-2 w-full border-gray-600 rounded-md mx-auto my-1 py-2 text-left space-x-4 flex px-2"
-        >
-          <a
-            href={$userSubmission.song.url}
-            class="flex flex-grow items-center"
+  {#if $userSubmission}
+    <div id="home" class="text-center w-full py-2 px-4 overflow-y-auto h-full">
+      <div class="mb-3 px-5 mx-auto">
+        {#if loadingSubmission}
+          <LoadingIndicator className={'mx-auto w-16 h-16'} />
+        {:else if $userSubmission.song}
+          {#if !$userSubmission.late}
+            <span class="text-sm text-gray-400"
+              >{new Date($userSubmission.time).toLocaleString('en-US', {
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: true,
+              })}
+            </span>
+          {:else}
+            <span class="text-sm text-red-500">
+              {convertDateToLateString(new Date($userSubmission.lateTime))}
+            </span>
+          {/if}
+          <div
+            class="border-2 w-full border-gray-600 rounded-md mx-auto my-1 py-2 text-left space-x-4 flex px-2"
           >
-            {#if $userSubmission.song.albumArtwork}
-              <div>
-                <img
-                  alt="Album Artwork"
-                  class="w-12 h-12 mr-3 rounded-sm"
-                  src={$userSubmission.song.albumArtwork}
-                />
+            <a
+              href={$userSubmission.song.url}
+              class="flex flex-grow items-center"
+            >
+              {#if $userSubmission.song.albumArtwork}
+                <div>
+                  <img
+                    alt="Album Artwork"
+                    class="w-12 h-12 mr-3 rounded-sm"
+                    src={$userSubmission.song.albumArtwork}
+                  />
+                </div>
+              {/if}
+              <div class={$userSubmission.song.albumArtwork ? 'w-40' : 'w-52'}>
+                <p class={`truncate text-${$user.musicPlatform}`}>
+                  {$userSubmission.song.name}
+                </p>
+                <p class="truncate">{$userSubmission.song.artist}</p>
+              </div>
+            </a>
+            <div class="flex-grow-0 text-right">
+              <div class="h-full flex flex-col flex-nowrap justify-between">
+                <svg
+                  on:click={toggleHeart}
+                  on:keypress={toggleHeart}
+                  class={`w-6 h-6 ml-auto -mt-1 flex-grow-0 flex-shrink ${
+                    loadingHeart ? 'animate-ping text-pink-500' : ''
+                  } ${
+                    $songs.find((s) => s.name === $userSubmission.song.name)
+                      ? 'text-pink-500'
+                      : ''
+                  } `}
+                  fill={$songs.find((s) => s.name === $userSubmission.song.name)
+                    ? 'currentColor'
+                    : 'none'}
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  ><path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  /></svg
+                >
+                <div class="flex-grow-0 flex-shrink" />
+              </div>
+            </div>
+          </div>
+          {#if $userSubmission.audial && $userSubmission.audial.number != -1}
+            <div class="text-sm">
+              <p>audial #{$userSubmission.audial.number}</p>
+              {$userSubmission.audial.score}
+            </div>
+          {:else}
+            <button
+              class="text-blue-500 text-sm underline"
+              on:click={() => goto('/paste_audial')}>share audial score</button
+            >
+          {/if}
+          <p class="text-gray-400 ">
+            {#if $userSubmission.song.timestamp > 0}
+              song played {getDaysAgo(
+                new Date($userSubmission.song?.timestamp)
+              )} at
+              {formatTimePlayed($userSubmission.song?.timestamp)}
+            {:else}
+              <div class="flex items-center my-2">
+                <span class="h-5"
+                  >{formatDurationPlayed(
+                    $userSubmission.song.durationElapsed
+                  )}</span
+                >
+                <div
+                  class="w-full mx-2 my-auto ray-200 rounded-full h-1 bg-gray-600"
+                >
+                  <div
+                    class="bg-blue-500 h-1 rounded-full"
+                    style={`width: ${
+                      ($userSubmission.song.durationElapsed /
+                        $userSubmission.song.length) *
+                      100
+                    }%`}
+                  />
+                </div>
+                <span class="h-5"
+                  >{formatDurationPlayed($userSubmission.song.length)}</span
+                >
               </div>
             {/if}
-            <div class={$userSubmission.song.albumArtwork ? 'w-40' : 'w-52'}>
-              <p class={`truncate text-${$user.musicPlatform}`}>
-                {$userSubmission.song.name}
-              </p>
-              <p class="truncate">{$userSubmission.song.artist}</p>
-            </div>
-          </a>
-          <div class="flex-grow-0 text-right">
-            <div class="h-full flex flex-col flex-nowrap justify-between">
-              <svg
-                on:click={toggleHeart}
-                on:keypress={toggleHeart}
-                class={`w-6 h-6 ml-auto -mt-1 flex-grow-0 flex-shrink ${
-                  loadingHeart ? 'animate-ping text-pink-500' : ''
-                } ${
-                  $songs.find((s) => s.name === $userSubmission.song.name)
-                    ? 'text-pink-500'
-                    : ''
-                } `}
-                fill={$songs.find((s) => s.name === $userSubmission.song.name)
-                  ? 'currentColor'
-                  : 'none'}
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                ><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                /></svg
-              >
-              <div class="flex-grow-0 flex-shrink" />
-            </div>
-          </div>
-        </div>
-        {#if $userSubmission.audial && $userSubmission.audial.number != -1}
-          <div class="text-sm">
-            <p>audial #{$userSubmission.audial.number}</p>
-            {$userSubmission.audial.score}
-          </div>
-        {:else}
-          <button
-            class="text-blue-500 text-sm underline"
-            on:click={() => goto('/paste_audial')}>share audial score</button
-          >
+          </p>
         {/if}
-        <p class="text-gray-400 ">
-          {#if $userSubmission.song.timestamp > 0}
-            song played {getDaysAgo(new Date($userSubmission.song?.timestamp))} at
-            {formatTimePlayed($userSubmission.song?.timestamp)}
-          {:else}
-            <div class="flex items-center my-2">
-              <span class="h-5"
-                >{formatDurationPlayed(
-                  $userSubmission.song.durationElapsed
-                )}</span
-              >
-              <div
-                class="w-full mx-2 my-auto ray-200 rounded-full h-1 bg-gray-600"
-              >
-                <div
-                  class="bg-blue-500 h-1 rounded-full"
-                  style={`width: ${
-                    ($userSubmission.song.durationElapsed /
-                      $userSubmission.song.length) *
-                    100
-                  }%`}
-                />
-              </div>
-              <span class="h-5"
-                >{formatDurationPlayed($userSubmission.song.length)}</span
-              >
+      </div>
+      {#if !loadingSubmission && !$userSubmission.song}
+        <h3>you haven't shared what you're listening to yet.</h3>
+        <h4 class="mb-2">submit to see what your friends are playing!</h4>
+      {/if}
+      <span class="border-white border-t-2 block w-full" />
+      <div class="my-2">
+        {#if loadingFriendSubmissions}
+          <SkeletonSubmission />
+          <SkeletonSubmission />
+          <SkeletonSubmission />
+        {:else if !loadingSubmission && !$userSubmission.song}
+          <Button
+            type="primary"
+            className="mb-2 bg-blue-500"
+            title="Share current song."
+            on:click={createSubmission}>share</Button
+          >
+        {:else}
+          {#each sortedSubmissions as submission}
+            <div class="my-2">
+              <Submission data={submission} />
             </div>
+          {/each}
+          {#if $friendSubmissions.length === 0}
+            <p class="mx-auto text-center mt-3">
+              nobody else has submitted yet.
+            </p>
+            <p
+              on:keyup={() => goto('/friends')}
+              on:click={() => goto('/friends')}
+              class="mx-auto text-center text-blue-500 underline"
+            >
+              add friends.
+            </p>
           {/if}
-        </p>
-      {/if}
-    </div>
-    {#if !loadingSubmissions && !$userSubmission.song}
-      <h3>you haven't shared what you're listening to yet.</h3>
-      <h4 class="mb-2">submit to see what your friends are playing!</h4>
-    {/if}
-    <span class="border-white border-t-2 block w-full" />
-    <div class="my-2">
-      {#if loadingFriendSubmissions}
-        <SkeletonSubmission />
-        <SkeletonSubmission />
-        <SkeletonSubmission />
-      {:else if !loadingSubmissions && !$userSubmission.song}
-        <Button
-          type="primary"
-          className="mb-2 bg-blue-500"
-          title="Share current song."
-          on:click={createSubmission}>share</Button
-        >
-      {:else}
-        {#each sortedSubmissions as submission}
-          <div class="my-2">
-            <Submission data={submission} />
-          </div>
-        {/each}
-        {#if $friendSubmissions.length === 0}
-          <p class="mx-auto text-center mt-3">nobody else has submitted yet.</p>
-          <p
-            on:keyup={() => goto('/friends')}
-            on:click={() => goto('/friends')}
-            class="mx-auto text-center text-blue-500 underline"
-          >
-            add friends.
-          </p>
+          {#if $user.submissionsPlaylist}
+            <a
+              href={`https://open.spotify.com/playlist/${$user.submissionsPlaylist}`}
+              class="mx-auto text-center mt-3 text-blue-500 underline"
+            >
+              open your submissions playlist
+            </a>
+          {:else}
+            <p
+              on:keyup={createSubmissionsPlaylist}
+              on:click={createSubmissionsPlaylist}
+              class="mx-auto text-center mt-3 text-blue-500 underline"
+            >
+              create your dynamic friendsfm playlist.
+            </p>
+          {/if}
         {/if}
-        {#if $user.submissionsPlaylist}
-          <a
-            href={`https://open.spotify.com/playlist/${$user.submissionsPlaylist}`}
-            class="mx-auto text-center mt-3 text-blue-500 underline"
-          >
-            open your submissions playlist
-          </a>
-        {:else}
-          <p
-            on:keyup={createSubmissionsPlaylist}
-            on:click={createSubmissionsPlaylist}
-            class="mx-auto text-center mt-3 text-blue-500 underline"
-          >
-            create your dynamic friendsfm playlist.
-          </p>
-        {/if}
-      {/if}
+      </div>
     </div>
-  </div>
+  {:else}
+    <div id="home" class="text-center w-full py-2 px-4 overflow-y-auto h-full">
+      <div class="mb-3 px-5 mx-auto">
+        <LoadingIndicator className={'mx-auto w-16 h-16'} />
+      </div>
+      <span class="border-white border-t-2 block w-full" />
+      <div class="my-2">
+        <SkeletonSubmission />
+        <SkeletonSubmission />
+        <SkeletonSubmission />
+      </div>
+    </div>
+  {/if}
 </ion-content>
