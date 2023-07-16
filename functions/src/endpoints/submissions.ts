@@ -58,7 +58,9 @@ export const getCurrentSubmissionStatus = functions.https.onRequest(
 export const getFriendSubmissions = functions.https.onRequest(
   authMiddleware(async (_req, res, user) => {
     try {
-      const friendSubmissions = await user.getFriendSubmissions();
+      const friendSubmissions = (await user.getCurrentSubmission())
+        ? await user.getFriendSubmissions()
+        : [];
       res.status(200).json({
         type: 'success',
         message: {
