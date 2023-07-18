@@ -14,6 +14,7 @@
   import Icon from '../assets/icon.png';
   import { onMount } from 'svelte';
   import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
+  import { captureException } from '@sentry/svelte';
 
   onMount(async () => {
     // if (!appCheckToken.get()) await getAppCheckToken();
@@ -55,7 +56,7 @@
         };
         loading.set(false);
         toast.push('Something went wrong. Please try again.', toastError);
-        console.log(e.message);
+        captureException(e.message);
       }
     }
     loading.set(false);
@@ -85,6 +86,7 @@
         else goto('/');
       }
     } catch (e) {
+      captureException(e.message);
       console.log(e);
     }
     loading.set(false);

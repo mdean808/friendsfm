@@ -39,6 +39,6 @@ export const newNotification = async (message: Message) => {
   try {
     await messaging.send(message);
   } catch (e) {
-    functions.logger.info('Error sending notification');
+    functions.logger.info('Error sending notification:', e);
   }
 };

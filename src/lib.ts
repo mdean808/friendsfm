@@ -41,6 +41,7 @@ export const registerForNotifications = async () => {
     await FirebaseMessaging.subscribeToTopic({ topic: 'all' });
     return (await FirebaseMessaging.getToken()).token;
   } catch (e) {
+    Sentry.captureException(`Error registering for notifications: ${e}`);
     console.log(`Error registering for notifications: ${e}`);
   }
 };

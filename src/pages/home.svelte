@@ -15,6 +15,7 @@
     createSubmissionsPlaylist,
     appLoading,
     loggedIn,
+    getUserFromPreferences,
   } from '../store';
   import Button from '../components/Button.svelte';
   import Submission from '../components/Submission.svelte';
@@ -68,6 +69,7 @@
       FirebaseMessaging.removeAllDeliveredNotifications();
     }
 
+    await getUserFromPreferences();
     if (
       (!userSubmission.get() || !Object.keys(userSubmission.get())?.length) &&
       loggedIn.get() &&
@@ -81,6 +83,13 @@
       loadingFriendSubmissions = false;
       appLoading.set(false);
     }
+    if (!sortedSubmissions && friendSubmissions.get()) {
+      sortedSubmissions = [...friendSubmissions.get()].sort(
+        (a, b) =>
+          new Date(b.lateTime || b.time).getTime() -
+          new Date(a.lateTime || a.time).getTime()
+      );
+    }
   });
 
   onDestroy(() => {
@@ -89,6 +98,7 @@
   });
 
   const load = async () => {
+    homepageLoaded.set(false);
     loadingSubmission = true;
     await getSubmissionStatus();
     loadingSubmission = false;
@@ -254,7 +264,7 @@
           </p>
         {/if}
       </div>
-      {#if !loadingSubmission && !$userSubmission.song}
+      {#if !$userSubmission.song}
         <h3>you haven't shared what you're listening to yet.</h3>
         <h4 class="mb-2">submit to see what your friends are playing!</h4>
       {/if}
@@ -264,7 +274,7 @@
           <SkeletonSubmission />
           <SkeletonSubmission />
           <SkeletonSubmission />
-        {:else if !loadingSubmission && !$userSubmission.song}
+        {:else if !$userSubmission.song}
           <Button
             type="primary"
             className="mb-2 bg-blue-500"

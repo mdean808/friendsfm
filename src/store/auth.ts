@@ -90,7 +90,7 @@ export const logout = action(user, 'logout', async (store) => {
   authToken.set(null);
   await Preferences.remove({ key: 'user' });
   await Preferences.remove({ key: 'songs' });
-  await Preferences.remove({ key: 'loggedIn' });
+  await Preferences.set({ key: 'logged_in', value: '0' });
   await Preferences.remove({ key: 'submission' });
   await Preferences.remove({ key: 'friend-submissions' });
 });

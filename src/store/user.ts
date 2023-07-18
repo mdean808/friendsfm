@@ -2,6 +2,7 @@ import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
+import { captureException } from '@sentry/svelte';
 import { map, action } from 'nanostores';
 import {
   appCheckToken,
@@ -11,16 +12,9 @@ import {
   getFriendSubmissions,
   loggedIn,
   songs,
-  userSubmission,
 } from '.';
 import { goto, handleApiResponse } from '../lib';
-import type {
-  MusicPlatform,
-  SavedSong,
-  Song,
-  Submission,
-  User,
-} from '../types';
+import type { MusicPlatform, SavedSong, Submission, User } from '../types';
 export const user = map<User>({} as User);
 
 // Load user from preferences
@@ -36,7 +30,7 @@ export const getUserFromPreferences = action(
     const u = JSON.parse(res.value) as User;
     store.set(u);
 
-    const res2 = await Preferences.get({ key: 'loggedIn' });
+    const res2 = await Preferences.get({ key: 'logged-in' });
     loggedIn.set(res2.value === '1' ? true : false);
 
     const res3 = await Preferences.get({ key: 'songs' });
@@ -63,7 +57,7 @@ export const updateUser = action(
       value: JSON.stringify(songs.get() || []),
     });
     await Preferences.set({
-      key: 'loggedIn',
+      key: 'logged-in',
       value: loggedIn.get() ? '1' : '0',
     });
     // await Preferences.set({
@@ -146,6 +140,7 @@ export const refreshUser = action(user, 'get-user-data', async (_store) => {
       messagingToken = (await FirebaseMessaging.getToken())?.token;
     }
   } catch (e) {
+    captureException(e.message);
     console.log(e);
   }
   // await getNewAuthToken();

@@ -27,6 +27,7 @@
     refreshUser,
     appLoading,
     platform,
+    homepageLoaded,
   } from './store';
   import { goto } from './lib';
   import Loading from './components/Loading.svelte';
