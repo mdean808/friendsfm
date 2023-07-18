@@ -61,12 +61,14 @@ export interface Submission {
     musicPlatform: MusicPlatform;
     id: string;
   };
-  location: {
-    longitude: number;
-    latitude: number;
-  };
+  location: Location;
   lateTime: Date | Timestamp;
   userId: string;
+}
+
+export interface Location {
+  longitude: number;
+  latitude: number;
 }
 
 export interface Audial {

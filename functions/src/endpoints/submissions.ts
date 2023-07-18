@@ -1,5 +1,6 @@
 import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
+import { getNearbySubmissions } from '../lib/location';
 import { createSpotifyPlaylist } from '../lib/spotify';
 import { Audial, Song } from '../types';
 import { authMiddleware } from './middleware';
@@ -164,3 +165,20 @@ export const submissionMigration = functions.https.onRequest(
     }
   }
 );
+
+export const nearbySubmissions = functions.https.onRequest(async (req, res) => {
+  //todo: decide if we need auth.
+  res.set('Access-Control-Allow-Origin', '*');
+  if (!req.body) res.status(400).end();
+  try {
+    const data = JSON.parse(req.body);
+    if (!data) {
+      res.status(400).end();
+      return;
+    }
+    const nearbySubs = await getNearbySubmissions(data.location, 20);
+    res
+      .status(200)
+      .json({ type: 'success', message: nearbySubs.map((s) => s.song.genre) });
+  } catch (e) {}
+});
