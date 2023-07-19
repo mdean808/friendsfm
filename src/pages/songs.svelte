@@ -56,20 +56,33 @@
           in:slide
           class="text-left px-2 mx-4 border-b-2 border-gray-400 py-2 mb-2 flex space-x-4"
         >
-          <a href={song.url} class="flex-grow">
-            <h1 class={`text-${getPlatformColor($user.musicPlatform)}`}>
-              {song.name}
-            </h1>
-            <p class="text-white">
-              {song.artist}
-            </p>
-            <p class="text-sm text-gray-500">
-              {#if song.user?.username}
-                {song.user?.username}
-              {:else}
-                {formatDurationPlayed(song.length)}
-              {/if}
-            </p>
+          <a href={song.url} class="flex flex-grow items-center">
+            {#if song.albumArtwork}
+              <div>
+                <img
+                  alt="Album Artwork"
+                  class="w-16 h-16 mr-3 rounded-sm"
+                  src={song.albumArtwork}
+                />
+              </div>
+            {/if}
+            <div class={song.albumArtwork ? 'w-52' : 'w-64'}>
+              <h1
+                class={`truncate text-${getPlatformColor($user.musicPlatform)}`}
+              >
+                {song.name} lsdf aksdl jfla dfdkf fd asdfs
+              </h1>
+              <p class="text-white truncate">
+                {song.artist}
+              </p>
+              <p class="text-sm truncate text-gray-500">
+                {#if song.user?.username}
+                  {song.user?.username}
+                {:else}
+                  {formatDurationPlayed(song.length)}
+                {/if}
+              </p>
+            </div>
           </a>
           <div class="flex-grow-0 flex-shrink">
             <svg
