@@ -177,8 +177,10 @@ export const nearbySubmissions = functions.https.onRequest(async (req, res) => {
       return;
     }
     const nearbySubs = await getNearbySubmissions(data.location, 20);
-    res
-      .status(200)
-      .json({ type: 'success', message: nearbySubs.map((s) => s.song.genre) });
+    // sanitize so only user.username, user.id, user.musicplaform, and song and audial data is sent
+    const sanitizedSubs = nearbySubs.map((s) => {
+      return { song: s.song, user: s.user, audial: s.audial };
+    });
+    res.status(200).json({ type: 'success', message: sanitizedSubs });
   } catch (e) {}
 });
