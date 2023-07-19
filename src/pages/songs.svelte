@@ -70,7 +70,7 @@
               <h1
                 class={`truncate text-${getPlatformColor($user.musicPlatform)}`}
               >
-                {song.name} lsdf aksdl jfla dfdkf fd asdfs
+                {song.name}
               </h1>
               <p class="text-white truncate">
                 {song.artist}
