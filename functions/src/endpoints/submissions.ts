@@ -7,9 +7,10 @@ import { authMiddleware, sentryWrapper } from './middleware';
 
 // const db = getFirestore();
 
-export const createNewUserSubmission = sentryWrapper(
-  'create-new-user-submission',
-  functions.https.onRequest(
+export const createNewUserSubmission = functions.https.onRequest(
+  sentryWrapper(
+    'create-new-user-submission',
+
     authMiddleware(async (req, res, user) => {
       const { latitude, longitude } = JSON.parse(req.body);
       const userSub = await user.createSubmission(latitude, longitude);
@@ -25,9 +26,10 @@ export const createNewUserSubmission = sentryWrapper(
   )
 );
 
-export const getCurrentSubmissionStatus = sentryWrapper(
-  'get-current-submission-status',
-  functions.https.onRequest(
+export const getCurrentSubmissionStatus = functions.https.onRequest(
+  sentryWrapper(
+    'get-current-submission-status',
+
     authMiddleware(async (_req, res, user) => {
       const userSub = await user.getCurrentSubmission();
       res.status(200).json({
@@ -40,9 +42,10 @@ export const getCurrentSubmissionStatus = sentryWrapper(
   )
 );
 
-export const getFriendSubmissions = sentryWrapper(
-  'get-friend-submissions',
-  functions.https.onRequest(
+export const getFriendSubmissions = functions.https.onRequest(
+  sentryWrapper(
+    'get-friend-submissions',
+
     authMiddleware(async (_req, res, user) => {
       const friendSubmissions = (await user.getCurrentSubmission())
         ? await user.getFriendSubmissions()
@@ -57,9 +60,10 @@ export const getFriendSubmissions = sentryWrapper(
   )
 );
 
-export const setCurrentSubmissionAudialScore = sentryWrapper(
-  'set-current-submission-audial-score',
-  functions.https.onRequest(
+export const setCurrentSubmissionAudialScore = functions.https.onRequest(
+  sentryWrapper(
+    'set-current-submission-audial-score',
+
     authMiddleware(async (req, res, user) => {
       const { parsedAudial }: { parsedAudial: Audial } = JSON.parse(req.body);
       (await user.getCurrentSubmission())?.setAudial(parsedAudial);
@@ -71,9 +75,10 @@ export const setCurrentSubmissionAudialScore = sentryWrapper(
   )
 );
 
-export const createSubmissionsPlaylist = sentryWrapper(
-  'create-submissions-playlist',
-  functions.https.onRequest(
+export const createSubmissionsPlaylist = functions.https.onRequest(
+  sentryWrapper(
+    'create-submissions-playlist',
+
     authMiddleware(async (_req, res, user) => {
       const songs: Song[] = [];
       const song = (await user.getCurrentSubmission())?.song || null;
@@ -129,9 +134,8 @@ export const createSubmissionsPlaylist = sentryWrapper(
   }
 ); */
 
-export const nearbySubmissions = sentryWrapper(
-  'nearby-submissions',
-  functions.https.onRequest(async (req, res) => {
+export const nearbySubmissions = functions.https.onRequest(
+  sentryWrapper('nearby-submissions', async (req, res) => {
     //todo: decide if we need auth.
     res.set('Access-Control-Allow-Origin', '*');
     console.log(req.body);

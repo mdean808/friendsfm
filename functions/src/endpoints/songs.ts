@@ -3,9 +3,10 @@ import { createSpotifyPlaylist } from '../lib/spotify';
 import { SavedSong } from '../types';
 import { authMiddleware, sentryWrapper } from './middleware';
 
-export const getSongs = sentryWrapper(
-  'get-songs',
-  functions.https.onRequest(
+export const getSongs = functions.https.onRequest(
+  sentryWrapper(
+    'get-songs',
+
     authMiddleware(async (_req, res, user) => {
       const songs = await user.getSongs();
       res.status(200).type('json').send({ type: 'success', message: songs });
@@ -13,9 +14,10 @@ export const getSongs = sentryWrapper(
   )
 );
 
-export const saveSong = sentryWrapper(
-  'save-song',
-  functions.https.onRequest(
+export const saveSong = functions.https.onRequest(
+  sentryWrapper(
+    'save-song',
+
     authMiddleware(async (req, res, user) => {
       const { song }: { song: SavedSong } = JSON.parse(req.body);
       const likedSong = await user.saveSong(song);
@@ -27,30 +29,22 @@ export const saveSong = sentryWrapper(
   )
 );
 
-export const deleteSong = sentryWrapper(
-  'delete-song',
-  functions.https.onRequest(
+export const deleteSong = functions.https.onRequest(
+  sentryWrapper(
+    'delete-song',
+
     authMiddleware(async (req, res, user) => {
-      try {
-        const { song }: { song: SavedSong } = JSON.parse(req.body);
-        user.unsaveSong(song);
-        res.status(200).type('json').send({ type: 'success', message: '' });
-      } catch (e) {
-        functions.logger.info('Error in saveSong.');
-        functions.logger.error(e);
-        res.status(400).json({
-          type: 'error',
-          message: 'Something went wrong. Please try again.',
-          error: (e as Error).message,
-        });
-      }
+      const { song }: { song: SavedSong } = JSON.parse(req.body);
+      user.unsaveSong(song);
+      res.status(200).type('json').send({ type: 'success', message: '' });
     })
   )
 );
 
-export const createLikedSongsPlaylist = sentryWrapper(
-  'create-liked-songs-playlist',
-  functions.https.onRequest(
+export const createLikedSongsPlaylist = functions.https.onRequest(
+  sentryWrapper(
+    'create-liked-songs-playlist',
+
     authMiddleware(async (_req, res, user) => {
       await user.updateMusicAuth();
       const songs = await user.getSongs();

@@ -1,9 +1,10 @@
 import * as functions from 'firebase-functions';
 import { authMiddleware, sentryWrapper } from './middleware';
 
-export const acceptFriend = sentryWrapper(
-  'accept-friend',
-  functions.https.onRequest(
+export const acceptFriend = functions.https.onRequest(
+  sentryWrapper(
+    'accept-friend',
+
     authMiddleware(async (req, res, user) => {
       const { requester } = JSON.parse(req.body);
       const friend = await user.acceptRequest(requester);
@@ -12,9 +13,10 @@ export const acceptFriend = sentryWrapper(
   )
 );
 
-export const requestFriend = sentryWrapper(
-  'request-friend',
-  functions.https.onRequest(
+export const requestFriend = functions.https.onRequest(
+  sentryWrapper(
+    'request-friend',
+
     authMiddleware(async (req, res, user) => {
       const { friend } = JSON.parse(req.body);
       await user.sendRequest(friend);
@@ -26,9 +28,10 @@ export const requestFriend = sentryWrapper(
   )
 );
 
-export const rejectRequest = sentryWrapper(
-  'reject-friend-request',
-  functions.https.onRequest(
+export const rejectRequest = functions.https.onRequest(
+  sentryWrapper(
+    'reject-friend-request',
+
     authMiddleware(async (req, res, user) => {
       const { requester } = JSON.parse(req.body);
       user.rejectRequest(requester);

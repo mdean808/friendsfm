@@ -1,6 +1,7 @@
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { getMessaging, Message } from 'firebase-admin/messaging';
 import * as functions from 'firebase-functions';
+import * as Sentry from '@sentry/node';
 
 const messaging = getMessaging();
 const db = getFirestore();
@@ -36,9 +37,19 @@ export const sendDaily = async () => {
 };
 
 export const newNotification = async (message: Message) => {
+  const transaction = Sentry.startTransaction({
+    op: 'notifications.newNotification',
+    name: 'send-notification',
+  });
   try {
     await messaging.send(message);
   } catch (e) {
     functions.logger.info('Error sending notification:', e);
+    transaction.setContext('Notification context', {
+      message,
+    });
+    Sentry.captureException(e);
+  } finally {
+    transaction.finish();
   }
 };

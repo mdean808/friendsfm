@@ -19,8 +19,8 @@ export const corsMiddleware =
     ) => Promise<any>
   ) =>
   async (req: functions.https.Request, res: functions.Response) => {
-    // handle preflight requests
     cors(req, res, async () => {
+      // handle preflight requests
       /*const appCheckToken = req.get('x-firebase-appcheck');
       try {
         if (appCheckToken) {
@@ -73,18 +73,19 @@ export const authMiddleware = (
     }
   );
 
-export const sentryWrapper = async (
-  name: string,
-  handler: (
-    req: functions.https.Request,
-    res: functions.Response
-  ) => any | Promise<any>
-) => {
-  return async (req: functions.https.Request, res: functions.Response) => {
+export const sentryWrapper =
+  (
+    name: string,
+    handler: (
+      req: functions.https.Request,
+      res: functions.Response
+    ) => Promise<any>
+  ) =>
+  async (req: functions.https.Request, res: functions.Response) => {
     // 1. Start the Sentry transaction
     const transaction = Sentry.startTransaction({
       name,
-      op: 'functions.https.onCall',
+      op: 'functions.https.onRequest',
     });
 
     // 2. Set the transaction context
@@ -116,4 +117,3 @@ export const sentryWrapper = async (
       transaction.finish();
     }
   };
-};

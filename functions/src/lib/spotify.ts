@@ -195,7 +195,6 @@ export const addSongsToSpotifyPlaylist = async (
     }
   );
   if (res.status === 403) {
-    console.log(res.statusText);
     throw new Error(
       'Spotify 403 Forbidden: Adding Songs failed. Please re-link the Spotify account.'
     );
@@ -264,7 +263,6 @@ export const removeAllSongsFromSpotifyPlaylist = async (
       body: JSON.stringify({ tracks: songUris }),
     }
   );
-  console.log(res.statusText, res.status);
   if (res.status === 403) {
     throw new Error(
       'Spotify 403 Forbidden: Delete Songs Failed. Please re-link the Spotify account.'
