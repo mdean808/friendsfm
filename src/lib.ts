@@ -13,7 +13,7 @@ import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { App } from '@capacitor/app';
 import { Dialog } from '@capacitor/dialog';
-import * as Sentry from '@sentry/svelte';
+import * as Sentry from '@sentry/capacitor';
 
 let spotifySet: boolean;
 

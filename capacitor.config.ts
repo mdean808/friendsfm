@@ -8,7 +8,6 @@ const config: CapacitorConfig = {
   appId: 'xyz.mogdan.friendsfm',
   appName: 'friends-fm',
   webDir: 'dist',
-  bundledWebRuntime: false,
   ios: {
     backgroundColor: '#1f2937',
     scrollEnabled: false,

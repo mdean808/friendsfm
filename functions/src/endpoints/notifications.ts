@@ -27,5 +27,5 @@ export const sendNotification = functions.https.onRequest(async (req, res) => {
 });
 
 export const generateNotificationTime = functions.pubsub
-  .schedule('0 0 * * *')
+  .schedule('0 0 * * *') // default timezone is America/Los_Angeles
   .onRun(createNotificationTask);

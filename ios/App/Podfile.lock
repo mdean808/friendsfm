@@ -186,6 +186,12 @@ PODS:
   - PromisesObjC (2.2.0)
   - PromisesSwift (2.2.0):
     - PromisesObjC (= 2.2.0)
+  - Sentry (7.27.1):
+    - Sentry/Core (= 7.27.1)
+  - Sentry/Core (7.27.1)
+  - SentryCapacitor (0.12.1):
+    - Capacitor
+    - Sentry (~> 7.27.1)
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
@@ -211,6 +217,7 @@ DEPENDENCIES:
   - "CapgoNativegeocoder (from `../../node_modules/@capgo/nativegeocoder`)"
   - FirebaseAuth
   - FirebaseCrashlytics
+  - "SentryCapacitor (from `../../node_modules/@sentry/capacitor`)"
 
 SPEC REPOS:
   trunk:
@@ -235,6 +242,7 @@ SPEC REPOS:
     - nanopb
     - PromisesObjC
     - PromisesSwift
+    - Sentry
 
 EXTERNAL SOURCES:
   Capacitor:
@@ -275,6 +283,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/status-bar"
   CapgoNativegeocoder:
     :path: "../../node_modules/@capgo/nativegeocoder"
+  SentryCapacitor:
+    :path: "../../node_modules/@sentry/capacitor"
 
 SPEC CHECKSUMS:
   AppAuth: 3bb1d1cd9340bd09f5ed189fb00b1cc28e1e8570
@@ -317,7 +327,9 @@ SPEC CHECKSUMS:
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
   PromisesObjC: 09985d6d70fbe7878040aa746d78236e6946d2ef
   PromisesSwift: cf9eb58666a43bbe007302226e510b16c1e10959
+  Sentry: bc644307e2eb6a4c9c55cf117a80b895bb2a25a7
+  SentryCapacitor: f31de50b1671f12c107f25f735937f196f87f9d2
 
-PODFILE CHECKSUM: 3555e5dd699cff47d6767a64162db27cbc446742
+PODFILE CHECKSUM: a7a46c272b552e8d9f10737cdb3563cc81ffb9d8
 
 COCOAPODS: 1.12.1

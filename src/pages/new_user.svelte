@@ -14,7 +14,7 @@
   import Icon from '../assets/icon.png';
   import { onMount } from 'svelte';
   import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
-  import { captureException } from '@sentry/svelte';
+  import { captureException } from '@sentry/capacitor';
 
   onMount(async () => {
     // if (!appCheckToken.get()) await getAppCheckToken();

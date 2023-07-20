@@ -5,10 +5,32 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 // import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
-import { Capacitor } from '@capacitor/core';
-import { initializeApp } from 'firebase/app';
 // import { getAnalytics } from 'firebase/analytics';
+import { initializeApp } from 'firebase/app';
+
+import * as Sentry from '@sentry/capacitor';
+import * as SentrySvelte from '@sentry/svelte';
+
+import { Capacitor } from '@capacitor/core';
 import { getAppCheckToken, initAppCheck, spotifyAuthCode } from './store';
+
+console.log(import.meta.env.npm_packge_version);
+// Initialize Sentry
+if (import.meta.env.PROD) {
+  Sentry.init(
+    {
+      dsn: 'https://6b81e7dbc9474aa9bb64e2b24652684d@o4504839408844801.ingest.sentry.io/4504839411400704',
+      integrations: [new SentrySvelte.BrowserTracing()] as any[],
+      // Set your dist version, such as "1"
+      dist: '1',
+      enableTracing: true,
+      tracesSampleRate: 0.25,
+      release: 'friendsfm@' + import.meta.env.npm_packge_version,
+      environment: 'production',
+    },
+    SentrySvelte.init
+  );
+}
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -59,17 +81,5 @@ CapacitorApp.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
   if (url.pathname.includes('apple-music-login')) {
   }
 });
-
-import * as Sentry from '@sentry/svelte';
-import { BrowserTracing } from '@sentry/tracing';
-if (import.meta.env.PROD) {
-  Sentry.init({
-    dsn: 'https://6b81e7dbc9474aa9bb64e2b24652684d@o4504839408844801.ingest.sentry.io/4504839411400704',
-    integrations: [new BrowserTracing()] as any[],
-    // Set your dist version, such as "1"
-    dist: '1',
-    tracesSampleRate: 0.25,
-  });
-}
 
 export default app;
