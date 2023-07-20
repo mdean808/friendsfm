@@ -60,10 +60,10 @@ export const createNotificationTask = async (checkInId: string) => {
   const request = { parent: parent, task: task };
   await client.createTask(request);
   functions.logger.info('Notification Task Created');
-  // let sentry know our task was successful
+  // 🟢 Notify Sentry job has completed successfully:
   Sentry.captureCheckIn({
     checkInId,
-    monitorSlug: 'daily-notification',
+    monitorSlug: 'generate-daily-notification-time',
     status: 'ok',
   });
 };
