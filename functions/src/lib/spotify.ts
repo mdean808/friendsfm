@@ -124,7 +124,7 @@ export const getSpotifyUser = async (spotifyAuth: MusicPlatformAuth) => {
     },
   });
   if (res.status === 403) {
-    throw Error('Spotify 403 Forbidden: Please re-link the Spotify account.');
+    throw Error('Spotify 403 Forbidden. Please re-link the Spotify account.');
   } else {
     const json = await res.json();
     return json;

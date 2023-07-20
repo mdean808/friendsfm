@@ -7,9 +7,8 @@ import { corsMiddleware, sentryWrapper } from './middleware';
 const auth = getAuth();
 
 export const loginUser = functions.https.onRequest(
-  sentryWrapper(
-    'login-user',
-    corsMiddleware(async (req, res) => {
+  corsMiddleware(
+    sentryWrapper('login-user', async (req, res) => {
       req.body =
         typeof req.body === 'object' ? JSON.stringify(req.body) : req.body;
       const user: UserType = JSON.parse(req.body);

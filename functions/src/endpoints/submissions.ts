@@ -3,15 +3,13 @@ import * as functions from 'firebase-functions';
 import { getNearbySubmissions } from '../lib/location';
 import { createSpotifyPlaylist } from '../lib/spotify';
 import { Audial, Song } from '../types';
-import { authMiddleware, sentryWrapper } from './middleware';
+import { authMiddleware, corsMiddleware, sentryWrapper } from './middleware';
 
 // const db = getFirestore();
 
 export const createNewUserSubmission = functions.https.onRequest(
-  sentryWrapper(
-    'create-new-user-submission',
-
-    authMiddleware(async (req, res, user) => {
+  authMiddleware(
+    sentryWrapper('create-new-user-submission', async (req, res, user) => {
       const { latitude, longitude } = JSON.parse(req.body);
       const userSub = await user.createSubmission(latitude, longitude);
       // because some of our functions aren't running synchronously
@@ -27,10 +25,8 @@ export const createNewUserSubmission = functions.https.onRequest(
 );
 
 export const getCurrentSubmissionStatus = functions.https.onRequest(
-  sentryWrapper(
-    'get-current-submission-status',
-
-    authMiddleware(async (_req, res, user) => {
+  authMiddleware(
+    sentryWrapper('get-current-submission-status', async (_req, res, user) => {
       const userSub = await user.getCurrentSubmission();
       res.status(200).json({
         type: 'success',
@@ -43,10 +39,8 @@ export const getCurrentSubmissionStatus = functions.https.onRequest(
 );
 
 export const getFriendSubmissions = functions.https.onRequest(
-  sentryWrapper(
-    'get-friend-submissions',
-
-    authMiddleware(async (_req, res, user) => {
+  authMiddleware(
+    sentryWrapper('get-friend-submissions', async (_req, res, user) => {
       const friendSubmissions = (await user.getCurrentSubmission())
         ? await user.getFriendSubmissions()
         : [];
@@ -61,25 +55,25 @@ export const getFriendSubmissions = functions.https.onRequest(
 );
 
 export const setCurrentSubmissionAudialScore = functions.https.onRequest(
-  sentryWrapper(
-    'set-current-submission-audial-score',
+  authMiddleware(
+    sentryWrapper(
+      'set-current-submission-audial-score',
 
-    authMiddleware(async (req, res, user) => {
-      const { parsedAudial }: { parsedAudial: Audial } = JSON.parse(req.body);
-      (await user.getCurrentSubmission())?.setAudial(parsedAudial);
-      res.status(200).json({
-        type: 'success',
-        message: 'success',
-      });
-    })
+      async (req, res, user) => {
+        const { parsedAudial }: { parsedAudial: Audial } = JSON.parse(req.body);
+        (await user.getCurrentSubmission())?.setAudial(parsedAudial);
+        res.status(200).json({
+          type: 'success',
+          message: 'success',
+        });
+      }
+    )
   )
 );
 
 export const createSubmissionsPlaylist = functions.https.onRequest(
-  sentryWrapper(
-    'create-submissions-playlist',
-
-    authMiddleware(async (_req, res, user) => {
+  authMiddleware(
+    sentryWrapper('create-submissions-playlist', async (_req, res, user) => {
       const songs: Song[] = [];
       const song = (await user.getCurrentSubmission())?.song || null;
       if (song) songs.push(song);
@@ -135,26 +129,27 @@ export const createSubmissionsPlaylist = functions.https.onRequest(
 ); */
 
 export const nearbySubmissions = functions.https.onRequest(
-  sentryWrapper('nearby-submissions', async (req, res) => {
-    //todo: decide if we need auth.
-    res.set('Access-Control-Allow-Origin', '*');
-    console.log(req.body);
-    if (!req.body) res.status(400).end();
-    try {
-      const data = JSON.parse(req.body);
-      if (!data) {
-        res.status(400).end();
-        return;
+  corsMiddleware(
+    sentryWrapper('nearby-submissions', async (req, res) => {
+      //todo: decide if we need auth.
+      res.set('Access-Control-Allow-Origin', '*');
+      if (!req.body) res.status(400).end();
+      try {
+        const data = JSON.parse(req.body);
+        if (!data) {
+          res.status(400).end();
+          return;
+        }
+        const nearbySubs = await getNearbySubmissions(data.location, 20);
+        // sanitize so only user.username, user.id, user.musicplaform, and song and audial data is sent
+        const sanitizedSubs = nearbySubs.map((s) => {
+          return { song: s.song, user: s.user, audial: s.audial };
+        });
+        res.status(200).json({ type: 'success', message: sanitizedSubs });
+      } catch (e) {
+        console.log(e);
+        res.status(500).end();
       }
-      const nearbySubs = await getNearbySubmissions(data.location, 20);
-      // sanitize so only user.username, user.id, user.musicplaform, and song and audial data is sent
-      const sanitizedSubs = nearbySubs.map((s) => {
-        return { song: s.song, user: s.user, audial: s.audial };
-      });
-      res.status(200).json({ type: 'success', message: sanitizedSubs });
-    } catch (e) {
-      console.log(e);
-      res.status(500).end();
-    }
-  })
+    })
+  )
 );

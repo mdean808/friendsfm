@@ -6,7 +6,11 @@
     "outDir": "bin",
     "sourceMap": true,
     "strict": true,
-    "target": "es2017"
+    "target": "es2017",
+    "inlineSources": true,
+    "sourceRoot": "/",
+    "noEmitHelpers": true,
+    "importHelpers": true
   },
   "compileOnSave": true,
   "include": [

@@ -4,10 +4,8 @@ import { SavedSong } from '../types';
 import { authMiddleware, sentryWrapper } from './middleware';
 
 export const getSongs = functions.https.onRequest(
-  sentryWrapper(
-    'get-songs',
-
-    authMiddleware(async (_req, res, user) => {
+  authMiddleware(
+    sentryWrapper('get-songs', async (_req, res, user) => {
       const songs = await user.getSongs();
       res.status(200).type('json').send({ type: 'success', message: songs });
     })
@@ -15,10 +13,8 @@ export const getSongs = functions.https.onRequest(
 );
 
 export const saveSong = functions.https.onRequest(
-  sentryWrapper(
-    'save-song',
-
-    authMiddleware(async (req, res, user) => {
+  authMiddleware(
+    sentryWrapper('save-song', async (req, res, user) => {
       const { song }: { song: SavedSong } = JSON.parse(req.body);
       const likedSong = await user.saveSong(song);
       res
@@ -30,10 +26,8 @@ export const saveSong = functions.https.onRequest(
 );
 
 export const deleteSong = functions.https.onRequest(
-  sentryWrapper(
-    'delete-song',
-
-    authMiddleware(async (req, res, user) => {
+  authMiddleware(
+    sentryWrapper('delete-song', async (req, res, user) => {
       const { song }: { song: SavedSong } = JSON.parse(req.body);
       user.unsaveSong(song);
       res.status(200).type('json').send({ type: 'success', message: '' });
@@ -42,10 +36,8 @@ export const deleteSong = functions.https.onRequest(
 );
 
 export const createLikedSongsPlaylist = functions.https.onRequest(
-  sentryWrapper(
-    'create-liked-songs-playlist',
-
-    authMiddleware(async (_req, res, user) => {
+  authMiddleware(
+    sentryWrapper('create-liked-songs-playlist', async (_req, res, user) => {
       await user.updateMusicAuth();
       const songs = await user.getSongs();
       const playlistUrl = await createSpotifyPlaylist(
