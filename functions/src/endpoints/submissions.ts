@@ -1,15 +1,16 @@
-import { getFirestore } from 'firebase-admin/firestore';
+// import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
 import { getNearbySubmissions } from '../lib/location';
 import { createSpotifyPlaylist } from '../lib/spotify';
 import { Audial, Song } from '../types';
-import { authMiddleware } from './middleware';
+import { authMiddleware, sentryWrapper } from './middleware';
 
-const db = getFirestore();
+// const db = getFirestore();
 
-export const createNewUserSubmission = functions.https.onRequest(
-  authMiddleware(async (req, res, user) => {
-    try {
+export const createNewUserSubmission = sentryWrapper(
+  'create-new-user-submission',
+  functions.https.onRequest(
+    authMiddleware(async (req, res, user) => {
       const { latitude, longitude } = JSON.parse(req.body);
       const userSub = await user.createSubmission(latitude, longitude);
       // because some of our functions aren't running synchronously
@@ -20,23 +21,14 @@ export const createNewUserSubmission = functions.https.onRequest(
           user: userSub.json || {},
         },
       });
-    } catch (e) {
-      functions.logger.info('Error in generateUserSubmission.');
-      functions.logger.error((e as Error).message);
-      // because some of our functions aren't running synchronously
-      if (res.headersSent) return;
-      res.status(400).json({
-        type: 'error',
-        message: 'Something went wrong. Please try again.',
-        error: (e as Error).message,
-      });
-    }
-  })
+    })
+  )
 );
 
-export const getCurrentSubmissionStatus = functions.https.onRequest(
-  authMiddleware(async (_req, res, user) => {
-    try {
+export const getCurrentSubmissionStatus = sentryWrapper(
+  'get-current-submission-status',
+  functions.https.onRequest(
+    authMiddleware(async (_req, res, user) => {
       const userSub = await user.getCurrentSubmission();
       res.status(200).json({
         type: 'success',
@@ -44,21 +36,14 @@ export const getCurrentSubmissionStatus = functions.https.onRequest(
           user: userSub ? userSub.json : {},
         },
       });
-    } catch (e) {
-      functions.logger.info('Error in getUserSubmission.');
-      functions.logger.error(e);
-      res.status(400).json({
-        type: 'error',
-        message: 'Something went wrong. Please try again.',
-        error: (e as Error).message,
-      });
-    }
-  })
+    })
+  )
 );
 
-export const getFriendSubmissions = functions.https.onRequest(
-  authMiddleware(async (_req, res, user) => {
-    try {
+export const getFriendSubmissions = sentryWrapper(
+  'get-friend-submissions',
+  functions.https.onRequest(
+    authMiddleware(async (_req, res, user) => {
       const friendSubmissions = (await user.getCurrentSubmission())
         ? await user.getFriendSubmissions()
         : [];
@@ -68,42 +53,28 @@ export const getFriendSubmissions = functions.https.onRequest(
           friends: friendSubmissions.map((s) => s.json) || [],
         },
       });
-    } catch (e) {
-      functions.logger.info('Error in getFriendSubmissions.');
-      functions.logger.error(e);
-      res.status(400).json({
-        type: 'error',
-        message: 'Something went wrong. Please try again.',
-        error: (e as Error).message,
-      });
-    }
-  })
+    })
+  )
 );
 
-export const setCurrentSubmissionAudialScore = functions.https.onRequest(
-  authMiddleware(async (req, res, user) => {
-    try {
+export const setCurrentSubmissionAudialScore = sentryWrapper(
+  'set-current-submission-audial-score',
+  functions.https.onRequest(
+    authMiddleware(async (req, res, user) => {
       const { parsedAudial }: { parsedAudial: Audial } = JSON.parse(req.body);
       (await user.getCurrentSubmission())?.setAudial(parsedAudial);
       res.status(200).json({
         type: 'success',
         message: 'success',
       });
-    } catch (e) {
-      functions.logger.info('Error in Submission.setAudial.');
-      functions.logger.error(e);
-      res.status(400).json({
-        type: 'error',
-        message: 'Something went wrong. Please try again.',
-        error: (e as Error).message,
-      });
-    }
-  })
+    })
+  )
 );
 
-export const createSubmissionsPlaylist = functions.https.onRequest(
-  authMiddleware(async (_req, res, user) => {
-    try {
+export const createSubmissionsPlaylist = sentryWrapper(
+  'create-submissions-playlist',
+  functions.https.onRequest(
+    authMiddleware(async (_req, res, user) => {
       const songs: Song[] = [];
       const song = (await user.getCurrentSubmission())?.song || null;
       if (song) songs.push(song);
@@ -124,19 +95,11 @@ export const createSubmissionsPlaylist = functions.https.onRequest(
         .status(200)
         .type('json')
         .send({ type: 'success', message: playlistUrl });
-    } catch (e) {
-      functions.logger.info('Error in createSubmissionsPlaylist.');
-      functions.logger.error(e);
-      res.status(400).json({
-        type: 'error',
-        message: 'Something went wrong. Please try again.',
-        error: (e as Error).message,
-      });
-    }
-  })
+    })
+  )
 );
 
-export const submissionMigration = functions.https.onRequest(
+/* export const submissionMigration = functions.https.onRequest(
   async (req, res) => {
     res.set('Access-Control-Allow-Origin', '*');
     const data = JSON.parse(req.body);
@@ -164,27 +127,30 @@ export const submissionMigration = functions.https.onRequest(
       res.status(401).end();
     }
   }
-);
+); */
 
-export const nearbySubmissions = functions.https.onRequest(async (req, res) => {
-  //todo: decide if we need auth.
-  res.set('Access-Control-Allow-Origin', '*');
-  console.log(req.body);
-  if (!req.body) res.status(400).end();
-  try {
-    const data = JSON.parse(req.body);
-    if (!data) {
-      res.status(400).end();
-      return;
+export const nearbySubmissions = sentryWrapper(
+  'nearby-submissions',
+  functions.https.onRequest(async (req, res) => {
+    //todo: decide if we need auth.
+    res.set('Access-Control-Allow-Origin', '*');
+    console.log(req.body);
+    if (!req.body) res.status(400).end();
+    try {
+      const data = JSON.parse(req.body);
+      if (!data) {
+        res.status(400).end();
+        return;
+      }
+      const nearbySubs = await getNearbySubmissions(data.location, 20);
+      // sanitize so only user.username, user.id, user.musicplaform, and song and audial data is sent
+      const sanitizedSubs = nearbySubs.map((s) => {
+        return { song: s.song, user: s.user, audial: s.audial };
+      });
+      res.status(200).json({ type: 'success', message: sanitizedSubs });
+    } catch (e) {
+      console.log(e);
+      res.status(500).end();
     }
-    const nearbySubs = await getNearbySubmissions(data.location, 20);
-    // sanitize so only user.username, user.id, user.musicplaform, and song and audial data is sent
-    const sanitizedSubs = nearbySubs.map((s) => {
-      return { song: s.song, user: s.user, audial: s.audial };
-    });
-    res.status(200).json({ type: 'success', message: sanitizedSubs });
-  } catch (e) {
-    console.log(e);
-    res.status(500).end();
-  }
-});
+  })
+);
