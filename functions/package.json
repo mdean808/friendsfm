@@ -3,8 +3,8 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "serve": "yarn build && firebase emulators:start --import=./data --export-on-exit",
-    "shell": "yarn build:watch && firebase functions:shell",
+    "serve": "yarn build:watch && firebase emulators:start --import=./data --export-on-exit",
+    "shell": "yarn build && firebase functions:shell",
     "start": "yarn shell",
     "deploy": "yarn sentry:sourcemaps && firebase deploy --only functions",
     "logs": "firebase functions:log",
