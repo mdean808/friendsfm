@@ -1,12 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+
+    namespace 'xyz.mogdan.friendsfm'
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "xyz.mogdan.friendsfm"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 11 
+        versionCode 13
         versionName "0.0.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {

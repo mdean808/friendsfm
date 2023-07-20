@@ -32,6 +32,7 @@
   import type { IonRefresher } from '@ionic/core/components/ion-refresher';
   import { Capacitor } from '@capacitor/core';
   import { FirebaseMessaging } from '@capacitor-firebase/messaging';
+  import Bubbles from '../components/Bubbles.svelte';
 
   // GLOBALS
   let loadingSubmission = false;
@@ -155,6 +156,7 @@
         {#if loadingSubmission}
           <LoadingIndicator className={'mx-auto w-16 h-16'} />
         {:else if $userSubmission.song}
+          <div><Bubbles /></div>
           {#if !$userSubmission.late}
             <span class="text-sm text-gray-400"
               >{new Date($userSubmission.time).toLocaleString('en-US', {

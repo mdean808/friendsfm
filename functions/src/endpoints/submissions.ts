@@ -169,6 +169,7 @@ export const submissionMigration = functions.https.onRequest(
 export const nearbySubmissions = functions.https.onRequest(async (req, res) => {
   //todo: decide if we need auth.
   res.set('Access-Control-Allow-Origin', '*');
+  console.log(req.body);
   if (!req.body) res.status(400).end();
   try {
     const data = JSON.parse(req.body);
@@ -182,5 +183,8 @@ export const nearbySubmissions = functions.https.onRequest(async (req, res) => {
       return { song: s.song, user: s.user, audial: s.audial };
     });
     res.status(200).json({ type: 'success', message: sanitizedSubs });
-  } catch (e) {}
+  } catch (e) {
+    console.log(e);
+    res.status(500).end();
+  }
 });
