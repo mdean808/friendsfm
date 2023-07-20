@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:release": "RELEASE=true vite build",
+    "build:release": "RELEASE=true vite build && node release_setup.js",
     "cap:build": "yarn build && npx cap sync",
     "ios:build": "yarn build && npx cap sync ios",
     "ios:build:release": "yarn build:release && npx cap sync ios",
@@ -45,6 +45,7 @@
     "@sentry/capacitor": "^0.12.1",
     "@sentry/svelte": "^7.59.3",
     "@sentry/vite-plugin": "^2.4.0",
+    "@trapezedev/configure": "^7.0.10",
     "@zerodevx/svelte-toast": "^0.8.2",
     "capacitor-plugin-safe-area": "^1.0.0",
     "firebase": "^9.17.1",
@@ -55,6 +56,7 @@
   "devDependencies": {
     "@capacitor/cli": "^5.0.0",
     "@sveltejs/vite-plugin-svelte": "^1.1.0",
+    "@trapezedev/project": "^7.0.10",
     "@tsconfig/svelte": "^3.0.0",
     "autoprefixer": "^10.4.13",
     "eslint": "^8.34.0",

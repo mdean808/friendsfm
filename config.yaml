@@ -1,0 +1,10 @@
+platforms:
+  android:
+    versionName: $VERSION
+    incrementVersionCode: true
+  ios:
+    targets:
+      App:
+        version: $VERSION
+        incrementBuild: true
+        displayName: FriendsFM
