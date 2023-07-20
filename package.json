@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:release": "RELEASE=true vite build && node release_setup.js",
+    "build:release": "RELEASE=true vite build",
     "cap:build": "yarn build && npx cap sync",
     "ios:build": "yarn build && npx cap sync ios",
     "ios:build:release": "yarn build:release && npx cap sync ios",

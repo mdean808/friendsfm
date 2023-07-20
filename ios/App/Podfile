@@ -1,6 +1,6 @@
 require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
 
-platform :ios, '13.0'
+platform :ios, '16.0'
 use_frameworks!
 
 # workaround to avoid Xcode caching of Pods that requires
@@ -35,7 +35,14 @@ target 'FriendsFM' do
   capacitor_pods
   pod 'CapacitorFirebaseAuthentication/Google', :path => '../../node_modules/@capacitor-firebase/authentication'
   pod 'CapacitorFirebaseAnalytics/Analytics', :path => '../../node_modules/@capacitor-firebase/analytics'
+  pod 'Firebase'
+  pod 'FirebaseCore'
+  pod 'FirebaseAnalytics'
   pod 'FirebaseAuth'
+  pod 'FirebaseAppCheck'
+  pod 'FirebaseMessaging'
+  pod 'FirebaseDynamicLinks'
+  pod 'FirebasePerformance'
   pod 'FirebaseCrashlytics'
 end
 
