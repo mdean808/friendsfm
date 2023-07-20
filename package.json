@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "release": "yarn build:release && npx cap sync android && npx cap sync ios",
     "build": "vite build",
     "build:release": "RELEASE=true vite build",
     "cap:build": "yarn build && npx cap sync",
