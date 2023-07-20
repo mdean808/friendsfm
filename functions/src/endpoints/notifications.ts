@@ -1,6 +1,8 @@
 import * as functions from 'firebase-functions';
 import { sendDaily } from '../lib/notifications';
 import { createNotificationTask } from '../lib/tasks';
+import * as Sentry from '@sentry/node';
+
 export const sendNotification = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   const data = req.body;
@@ -28,4 +30,17 @@ export const sendNotification = functions.https.onRequest(async (req, res) => {
 
 export const generateNotificationTime = functions.pubsub
   .schedule('0 0 * * *') // default timezone is America/Los_Angeles
-  .onRun(createNotificationTask);
+  .onRun(() => {
+    const checkInId = Sentry.captureCheckIn({
+      monitorSlug: 'daily-notification',
+      status: 'in_progress',
+    });
+    createNotificationTask(checkInId).catch((e) => {
+      console.log(e);
+      Sentry.captureCheckIn({
+        checkInId,
+        monitorSlug: 'daily-notification',
+        status: 'error',
+      });
+    });
+  });

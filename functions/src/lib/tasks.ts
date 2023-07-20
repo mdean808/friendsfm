@@ -1,10 +1,12 @@
 import * as functions from 'firebase-functions';
 import { CloudTasksClient } from '@google-cloud/tasks';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import * as Sentry from '@sentry/node';
+
 const db = getFirestore();
 const client = new CloudTasksClient();
 
-export const createNotificationTask = async () => {
+export const createNotificationTask = async (checkInId: string) => {
   const project = 'friendsfm';
   const queue = 'notification-time';
   const location = 'us-west1';
@@ -57,7 +59,13 @@ export const createNotificationTask = async () => {
   // Send create task request.
   const request = { parent: parent, task: task };
   await client.createTask(request);
-  functions.logger.info('Task Created');
+  functions.logger.info('Notification Task Created');
+  // let sentry know our task was successful
+  Sentry.captureCheckIn({
+    checkInId,
+    monitorSlug: 'daily-notification',
+    status: 'ok',
+  });
 };
 
 const getRandomDate = (from: Date, to: Date) => {
