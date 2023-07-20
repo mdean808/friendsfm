@@ -1,6 +1,7 @@
 import serviceAccount from '../firebase-auth';
 import { cert, initializeApp, ServiceAccount } from 'firebase-admin/app';
 import * as Sentry from '@sentry/node';
+import { ProfilingIntegration } from '@sentry/profiling-node';
 
 // Init Firebase Credentials
 initializeApp({
@@ -12,9 +13,9 @@ initializeApp({
 if (process.env.FUNCTIONS_EMULATOR !== 'true') {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
-    // We recommend adjusting this value in production, or using tracesSampler
-    // for finer control
+    integrations: [new ProfilingIntegration()],
     tracesSampleRate: 0.5,
+    profilesSampleRate: 0.5,
   });
 }
 
