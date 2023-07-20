@@ -10,6 +10,7 @@
         "firebase-debug.*.log"
       ],
       "predeploy": [
+        "npm --prefix . run build",
         "npm --prefix . run sentry:prepare"
       ]
     }
