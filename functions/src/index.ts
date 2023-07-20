@@ -16,6 +16,7 @@ if (process.env.FUNCTIONS_EMULATOR !== 'true') {
     integrations: [new ProfilingIntegration()],
     tracesSampleRate: 0.5,
     profilesSampleRate: 0.5,
+    release: process.env.COMMIT,
   });
 }
 

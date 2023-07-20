@@ -6,10 +6,11 @@
     "serve": "yarn build:watch && firebase emulators:start --import=./data --export-on-exit",
     "shell": "yarn build && firebase functions:shell",
     "start": "yarn shell",
-    "deploy": "yarn sentry:sourcemaps && firebase deploy --only functions",
+    "deploy": "yarn sentry:sourcemaps && COMMIT=${git rev-parse HEAD} firebase deploy --only functions",
     "logs": "firebase functions:log",
+    "sentry:release": "sentry-cli releases new $(git rev-parse HEAD)",
     "sentry:inject": "sentry-cli sourcemaps inject ./bin",
-    "sentry:upload": "sentry-cli sourcemaps upload ./bin",
+    "sentry:upload": "sentry-cli sourcemaps upload --release $(git rev-parse HEAD) ./bin",
     "sentry:sourcemaps": "yarn sentry:inject && yarn sentry:upload"
   },
   "engines": {
