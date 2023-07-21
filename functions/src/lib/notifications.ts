@@ -44,11 +44,12 @@ export const newNotification = async (message: Message) => {
   try {
     await messaging.send(message);
   } catch (e) {
+    //todo: handle FirebaseMessagingError: Requested entity was not found.
     functions.logger.info('Error sending notification:', e);
     transaction.setContext('Notification context', {
       message,
     });
-    Sentry.captureException(e);
+    Sentry.captureException(e, { extra: { message } });
   } finally {
     transaction.finish();
   }
