@@ -156,7 +156,7 @@
         {#if loadingSubmission}
           <LoadingIndicator className={'mx-auto w-16 h-16'} />
         {:else if $userSubmission.song}
-          <div><Bubbles /></div>
+          <!-- <div><Bubbles /></div> -->
           {#if !$userSubmission.late}
             <span class="text-sm text-gray-400"
               >{new Date($userSubmission.time).toLocaleString('en-US', {
@@ -233,7 +233,7 @@
               on:click={() => goto('/paste_audial')}>share audial score</button
             >
           {/if}
-          <p class="text-gray-400 ">
+          <p class="text-gray-400">
             {#if $userSubmission.song.timestamp > 0}
               song played {getDaysAgo(
                 new Date($userSubmission.song?.timestamp)

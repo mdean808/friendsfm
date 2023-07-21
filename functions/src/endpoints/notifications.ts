@@ -49,13 +49,15 @@ export const sendNotification = functions.https.onRequest(async (req, res) => {
 
 export const generateNotificationTime = functions.pubsub
   .schedule('0 0 * * *') // default timezone is America/Los_Angeles
-  .onRun(() => {
+  .onRun(async () => {
     // 🟡 Notify Sentry job is running:
     const checkInId = Sentry.captureCheckIn({
       monitorSlug: 'generate-daily-notification-time',
       status: 'in_progress',
     });
-    createNotificationTask(checkInId).catch((e) => {
+    try {
+      return await createNotificationTask(checkInId);
+    } catch (e) {
       console.log(e);
       // 🔴 Notify Sentry job has failed:
       Sentry.captureCheckIn({
@@ -63,5 +65,5 @@ export const generateNotificationTime = functions.pubsub
         monitorSlug: 'generate-daily-notification-time',
         status: 'error',
       });
-    });
+    }
   });
