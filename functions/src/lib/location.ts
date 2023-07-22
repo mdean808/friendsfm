@@ -1,4 +1,5 @@
 import { getFirestore } from 'firebase-admin/firestore';
+import * as functions from 'firebase-functions';
 import Submission from '../classes/submission';
 import type { Location, Submission as SubmissionType } from '../types';
 const db = getFirestore();
@@ -74,4 +75,28 @@ function deg2rad(deg: number) {
 }
 function rad2deg(rad: number) {
   return rad * (180 / Math.PI);
+}
+
+export function getLocationHeaders(req: functions.https.Request): {
+  country?: string;
+  ip?: string;
+} {
+  /**
+   * Checking order:
+   * Cloudflare: in case user is proxying functions through it
+   * Fastly: in case user is service functions through firebase hosting (Fastly is the default Firebase CDN)
+   * App Engine: in case user is serving functions directly through cloudfunctions.net
+   */
+  const ip =
+    req.header('Cf-Connecting-Ip') ||
+    req.header('Fastly-Client-Ip') ||
+    req.header('X-Appengine-User-Ip') ||
+    req.header('X-Forwarded-For')?.split(',')[0] ||
+    req.socket.remoteAddress;
+
+  const country =
+    req.header('Cf-Ipcountry') ||
+    req.header('X-Country-Code') ||
+    req.header('X-Appengine-Country');
+  return { ip: ip?.toString(), country: country?.toString() };
 }

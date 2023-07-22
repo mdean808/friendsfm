@@ -1,9 +1,7 @@
 import { getAuth } from 'firebase-admin/auth';
 import * as functions from 'firebase-functions';
-// import * as admin from 'firebase-admin';
 import User from '../classes/user';
 import * as _cors from 'cors';
-import * as Sentry from '@sentry/node';
 
 const cors = _cors({ origin: true });
 
@@ -105,14 +103,50 @@ export const sentryWrapper =
         functions.logger.error(err);
       }
     } else {
+      // dynamic imports to improve cold start times
+      const {
+        extractTraceparentData,
+        startTransaction,
+        configureScope,
+        setContext,
+        captureException,
+        flush,
+        addRequestDataToEvent,
+      } = await import('@sentry/node');
+      const { getLocationHeaders } = await import('../lib/location');
+      // Note: see https://gist.github.com/zanona/0f3d42093eaa8ac5c33286cc7eca1166 for parts of sentry wrapper implementation
       // 1. Start the Sentry transaction
-      const transaction = Sentry.startTransaction({
+      const traceparentData = extractTraceparentData(
+        req.header('sentry-trace') || ''
+      );
+      const transaction = startTransaction({
         name,
         op: 'functions.https.onRequest',
+        ...traceparentData,
       });
 
-      // 2. Set the transaction context
-      Sentry.setContext('Function context', {
+      // 2. Setup scope information
+      configureScope((scope) => {
+        scope.addEventProcessor((event) => {
+          addRequestDataToEvent(event, req);
+          const loc = getLocationHeaders(req);
+          if (loc.ip && event.user)
+            Object.assign(event.user, { ip_address: loc.ip });
+          if (loc.country && event.user)
+            Object.assign(event.user, { country: loc.country });
+          event.transaction = transaction.name;
+
+          const mechanism = event.exception?.values?.[0].mechanism;
+          if (mechanism && event.tags?.handled === false) {
+            mechanism.handled = false;
+          }
+          return event;
+        });
+        scope.setSpan(transaction);
+      });
+
+      // 3. Set the transaction context
+      setContext('Function context', {
         ...(req.body || req.query || {}),
         function: name,
         op: 'functions.https.onRequest',
@@ -122,11 +156,6 @@ export const sentryWrapper =
         // 3. Try calling the function handler itself
         return await handler(req, res, user);
       } catch (e) {
-        // 4. Send any errors to Sentry
-        Sentry.captureException(e);
-        await Sentry.flush(1000);
-
-        functions.logger.error('Sentry Error Handled: ' + e);
         // return error response
         if (!res.headersSent)
           res.status(500).json({
@@ -134,10 +163,15 @@ export const sentryWrapper =
             message: 'Something went wrong. Please try again later.',
             error: (e as Error).message,
           });
+        // 4. Send any errors to Sentry
+        captureException(e, { tags: { handled: false } });
+
+        functions.logger.error('Sentry Error Handled: ' + e);
       } finally {
         // 5. Finish the Sentry transaction
-        Sentry.configureScope((scope) => scope.clear());
+        configureScope((scope) => scope.clear());
         transaction.finish();
+        await flush(1000);
       }
     }
   };
