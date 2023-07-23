@@ -77,7 +77,7 @@ export const updateUsername = action(
   'update-username',
   async (store, newUsername: string) => {
     const u = store.get();
-    const res = await fetch(FIREBASE_URL.get() + '/setUsername', {
+    const res = await fetch(FIREBASE_URL.get() + '/setusername', {
       method: 'POST',
       body: JSON.stringify({
         authToken: authToken.get(),
@@ -103,7 +103,7 @@ export const updateMusicPlatform = action(
   'update-music-platform',
   async (store, newMusicPlatform: MusicPlatform, authCode?: string) => {
     const u = store.get();
-    const res = await fetch(FIREBASE_URL.get() + '/setMusicPlatform', {
+    const res = await fetch(FIREBASE_URL.get() + '/setmusicplatform', {
       method: 'POST',
       body: JSON.stringify({
         authToken: authToken.get(),
@@ -144,7 +144,7 @@ export const refreshUser = action(user, 'get-user-data', async (_store) => {
     console.log(e);
   }
   // await getNewAuthToken();
-  const res = await fetch(FIREBASE_URL.get() + '/getUser', {
+  const res = await fetch(FIREBASE_URL.get() + '/getuser', {
     method: 'POST',
     body: JSON.stringify({
       authToken: authToken.get(),
@@ -167,7 +167,7 @@ export const unlinkMusicProvider = action(
   user,
   'unlink-music-provider',
   async (store) => {
-    const res = await fetch(FIREBASE_URL.get() + '/unlinkMusicPlatform', {
+    const res = await fetch(FIREBASE_URL.get() + '/unlinkmusicplatform', {
       method: 'POST',
       body: JSON.stringify({
         authToken: authToken.get(),

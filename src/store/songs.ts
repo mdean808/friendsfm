@@ -11,7 +11,7 @@ import { FIREBASE_URL, loading } from './misc';
 export const songs = atom<SavedSong[]>([]);
 
 export const loadSongs = action(songs, 'load-songs', async (store) => {
-  const res = await fetch(FIREBASE_URL.get() + '/getSongs', {
+  const res = await fetch(FIREBASE_URL.get() + '/getsongs', {
     method: 'POST',
     body: JSON.stringify({
       authToken: authToken.get(),
@@ -38,7 +38,7 @@ export const toggleSong = action(
       s = s.filter((s) => s.name !== song.name);
       store.set(s);
       // save to backend
-      const res = await fetch(FIREBASE_URL.get() + '/deleteSong', {
+      const res = await fetch(FIREBASE_URL.get() + '/deletesong', {
         method: 'POST',
         body: JSON.stringify({
           authToken: authToken.get(),
@@ -53,7 +53,7 @@ export const toggleSong = action(
       }
     } else {
       // save to the backend
-      const res = await fetch(FIREBASE_URL.get() + '/saveSong', {
+      const res = await fetch(FIREBASE_URL.get() + '/savesong', {
         method: 'POST',
         body: JSON.stringify({
           authToken: authToken.get(),
@@ -93,7 +93,7 @@ export const createSongsSpotifyPlaylist = action(
     });
     if (!value) return;
     loading.set(true);
-    const res = await fetch(FIREBASE_URL.get() + '/createLikedSongsPlaylist', {
+    const res = await fetch(FIREBASE_URL.get() + '/createlikedsongsplaylist', {
       method: 'POST',
       body: JSON.stringify({
         authToken: authToken.get(),

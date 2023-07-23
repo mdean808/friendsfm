@@ -31,7 +31,7 @@ export const generateSubmission = action(
       } catch (e) {
         console.log('Location permissions rejected.');
       }
-      const res = await fetch(FIREBASE_URL.get() + '/createNewUserSubmission', {
+      const res = await fetch(FIREBASE_URL.get() + '/createnewusersubmission', {
         method: 'POST',
         body: JSON.stringify({
           authToken: authToken.get(),
@@ -63,7 +63,7 @@ export const getSubmissionStatus = action(
   async (store) => {
     await getNewAuthToken();
     const res = await fetch(
-      FIREBASE_URL.get() + '/getCurrentSubmissionStatus',
+      FIREBASE_URL.get() + '/getcurrentsubmissionstatus',
       {
         method: 'POST',
         body: JSON.stringify({
@@ -92,7 +92,7 @@ export const getFriendSubmissions = action(
   'get-submission-status',
   async (store) => {
     await getNewAuthToken();
-    const res = await fetch(FIREBASE_URL.get() + '/getFriendSubmissions', {
+    const res = await fetch(FIREBASE_URL.get() + '/getfriendsubmissions', {
       method: 'POST',
       body: JSON.stringify({
         authToken: authToken.get(),
@@ -129,7 +129,7 @@ export const shareAudial = action(
       score = split[1] ? split[1] : audial;
     }
     const res = await fetch(
-      FIREBASE_URL.get() + '/setCurrentSubmissionAudialScore',
+      FIREBASE_URL.get() + '/setcurrentsubmissionaudialscore',
       {
         method: 'POST',
         body: JSON.stringify({
@@ -172,7 +172,7 @@ export const createSubmissionsPlaylist = action(
     });
     if (!value) return;
     loading.set(true);
-    const res = await fetch(FIREBASE_URL.get() + '/createSubmissionsPlaylist', {
+    const res = await fetch(FIREBASE_URL.get() + '/createsubmissionsplaylist', {
       method: 'POST',
       body: JSON.stringify({
         authToken: authToken.get(),

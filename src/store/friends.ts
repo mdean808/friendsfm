@@ -9,7 +9,7 @@ export const sendFriendRequest = action(
   'send-friend-request',
   async (_store, friend: string) => {
     friend = friend.toLowerCase();
-    const res = await fetch(FIREBASE_URL.get() + '/requestFriend', {
+    const res = await fetch(FIREBASE_URL.get() + '/requestfriend', {
       method: 'POST',
       body: JSON.stringify({
         authToken: authToken.get(),
@@ -31,7 +31,7 @@ export const acceptFriendRequest = action(
   user,
   'accpet-friend-request',
   async (store, requester) => {
-    const res = await fetch(FIREBASE_URL.get() + '/acceptFriend', {
+    const res = await fetch(FIREBASE_URL.get() + '/acceptfriend', {
       method: 'POST',
       body: JSON.stringify({
         authToken: authToken.get(),
@@ -55,7 +55,7 @@ export const rejectFriendRequest = action(
   user,
   'accpet-friend-request',
   async (store, requester) => {
-    const res = await fetch(FIREBASE_URL.get() + '/rejectRequest', {
+    const res = await fetch(FIREBASE_URL.get() + '/rejectrequest', {
       method: 'POST',
       body: JSON.stringify({
         authToken: authToken.get(),

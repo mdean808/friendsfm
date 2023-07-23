@@ -55,7 +55,7 @@ export const getNewAuthToken = action(
 export const loginUser = action(user, 'login-user', async (store) => {
   const u = store.get();
   u.messagingToken = await registerForNotifications().catch();
-  const res = await fetch(FIREBASE_URL.get() + '/loginUser', {
+  const res = await fetch(FIREBASE_URL.get() + '/loginuser', {
     method: 'POST',
     body: JSON.stringify(u),
     headers: { 'x-firebase-appcheck': appCheckToken.get() },
