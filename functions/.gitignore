@@ -8,6 +8,6 @@ typings/
 # Node.js dependency directory
 node_modules/
 .env
-./firebase-auth.ts
+./src/firebase-auth.ts
 firebase-auth.ts
 data/

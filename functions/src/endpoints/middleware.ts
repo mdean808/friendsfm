@@ -1,85 +1,70 @@
-import { getAuth } from 'firebase-admin/auth';
-import * as functions from 'firebase-functions';
+import { logger as firebaseLog } from 'firebase-functions';
 import User from '../classes/user';
-import * as _cors from 'cors';
+import type { Request } from 'firebase-functions/v2/https';
+import type { Response } from 'firebase-functions';
 
-const cors = _cors({ origin: true });
-
-const auth = getAuth();
-// const appCheck = admin.appCheck();
-
-export const corsMiddleware =
-  (
-    handler: (
-      req: functions.https.Request,
-      res: functions.Response,
-      user: User
-    ) => Promise<any>
-  ) =>
-  async (req: functions.https.Request, res: functions.Response) => {
-    cors(req, res, async () => {
-      // handle preflight requests
-      /*const appCheckToken = req.get('x-firebase-appcheck');
-      try {
-        if (appCheckToken) {
-          await appCheck.verifyToken(appCheckToken);
-          return handler(req, res);
-        } else {
-          throw Error('No App Check token provided');
-        }
-      } catch (e) {
-        console.log('App Check Failed:', e);
-        return res.status(401).json({
-          type: 'error',
-          message: 'App Check Failed.',
-        });
-      }*/
-      return await handler(req, res, {} as User);
-    });
+export const emptyMiddleware =
+  (handler: (req: Request, res: Response, user: User) => Promise<any>) =>
+  async (req: Request, res: Response) => {
+    return await handler(req, res, {} as User);
   };
 
-export const authMiddleware = (
-  handler: (
-    req: functions.https.Request,
-    res: functions.Response,
-    user: User
-  ) => Promise<any>
-) =>
-  corsMiddleware(
-    async (req: functions.https.Request, res: functions.Response) => {
-      const { authToken }: { authToken: string } = JSON.parse(req.body);
-      // load and authenticate user
-      const decodedToken = await auth.verifyIdToken(authToken).catch((e) => {
-        // Firebase authentication error
-        res.status(401).json({
-          type: 'error',
-          message: 'Authentication Failed.',
-          error: (e as Error).message,
-        });
-      });
-      if (!decodedToken) return;
-      const user = new User(decodedToken.uid);
-      await user.load();
-      if (!user.exists) {
-        return res
-          .status(400)
-          .json({ type: 'error', message: 'User does not exist.' });
+export const appCheckMiddleware =
+  (handler: (req: Request, res: Response, user: User) => Promise<any>) =>
+  async (req: Request, res: Response) => {
+    const admin = await import('firebase-admin');
+    const appCheck = admin.appCheck();
+    const appCheckToken = req.get('x-firebase-appcheck');
+    try {
+      if (appCheckToken) {
+        await appCheck.verifyToken(appCheckToken);
+        return await handler(req, res, {} as User);
       } else {
-        return await handler(req, res, user);
+        throw Error('No App Check token provided');
       }
+    } catch (e) {
+      console.log('App Check Failed:', e);
+      return res.status(401).json({
+        type: 'error',
+        message: 'App Check Failed.',
+      });
     }
-  );
+  };
+
+export const authMiddleware =
+  (handler: (req: Request, res: Response, user: User) => Promise<any>) =>
+  async (req: Request, res: Response) => {
+    const { getAuth } = await import('firebase-admin/auth');
+    const auth = getAuth();
+
+    const { authToken }: { authToken: string } = JSON.parse(req.body);
+    // load and authenticate user
+    const decodedToken = await auth.verifyIdToken(authToken).catch((e) => {
+      // Firebase authentication error
+      res.status(401).json({
+        type: 'error',
+        message: 'Authentication Failed.',
+        error: (e as Error).message,
+      });
+    });
+    if (!decodedToken) return;
+    const user = new User(decodedToken.uid);
+    await user.load();
+    if (!user.exists) {
+      return res
+        .status(400)
+        .json({ type: 'error', message: 'User does not exist.' });
+    } else {
+      return await handler(req, res, user);
+    }
+  };
 
 export const sentryWrapper =
   (
     name: string,
-    handler: (
-      req: functions.https.Request,
-      res: functions.Response,
-      user: User
-    ) => Promise<any>
+    handler: (req: Request, res: Response, user: User) => Promise<any>
   ) =>
-  async (req: functions.https.Request, res: functions.Response, user: User) => {
+  async (req: Request, res: Response, user: User) => {
     // make sure we are in production --- if we aren't just throw the error like normal.
     if (process.env.FUNCTIONS_EMULATOR === 'true') {
       try {
@@ -100,7 +85,7 @@ export const sentryWrapper =
             message: err.message,
             error: err.message,
           });
-        functions.logger.error(err);
+        firebaseLog.error(err);
       }
     } else {
       // dynamic imports to improve cold start times
@@ -166,7 +151,7 @@ export const sentryWrapper =
         // 4. Send any errors to Sentry
         captureException(e, { tags: { handled: false } });
 
-        functions.logger.error('Sentry Error Handled: ' + e);
+        firebaseLog.error('Sentry Error Handled: ' + e);
       } finally {
         // 5. Finish the Sentry transaction
         configureScope((scope) => scope.clear());

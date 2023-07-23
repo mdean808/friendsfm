@@ -1,4 +1,4 @@
-import serviceAccount from '../firebase-auth';
+import serviceAccount from './firebase-auth';
 import { cert, initializeApp, ServiceAccount } from 'firebase-admin/app';
 import * as Sentry from '@sentry/node';
 import { ProfilingIntegration } from '@sentry/profiling-node';
@@ -20,9 +20,4 @@ if (process.env.FUNCTIONS_EMULATOR !== 'true') {
   });
 }
 
-export * from './endpoints/auth';
-export * from './endpoints/friends';
-export * from './endpoints/notifications';
-export * from './endpoints/submissions';
-export * from './endpoints/users';
-export * from './endpoints/songs';
+export * from './endpoints';

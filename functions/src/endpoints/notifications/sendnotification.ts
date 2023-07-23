@@ -1,10 +1,10 @@
-import * as functions from 'firebase-functions';
-import { sendDaily } from '../lib/notifications';
-import { createNotificationTask } from '../lib/tasks';
-import * as Sentry from '@sentry/node';
+import { onRequest } from 'firebase-functions/v2/https';
+import { logger as firebaseLog, pubsub } from 'firebase-functions';
+import { captureCheckIn } from '@sentry/node';
+import { createNotificationTask } from '@/lib/tasks';
+import { sendDaily } from '@/lib/notifications';
 
-export const sendNotification = functions.https.onRequest(async (req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
+export const sendnotification = onRequest({ cors: true }, async (req, res) => {
   const data = req.body;
   if (!req.body) {
     res.status(400).end();
@@ -13,15 +13,15 @@ export const sendNotification = functions.https.onRequest(async (req, res) => {
   const secret = data.split('__')[1];
   if (secret === process.env.SECRET) {
     // 🟡 Notify Sentry job is running:
-    const checkInId = Sentry.captureCheckIn({
+    const checkInId = captureCheckIn({
       monitorSlug: 'daily-notification-sent',
       status: 'in_progress',
     });
-    functions.logger.info('Sending Daily Notifications!');
+    firebaseLog.info('Sending Daily Notifications!');
     await sendDaily().catch((e) => {
       console.log(e);
       // 🔴 Notify Sentry job has failed:
-      Sentry.captureCheckIn({
+      captureCheckIn({
         checkInId,
         monitorSlug: 'daily-notification-sent',
         status: 'error',
@@ -32,13 +32,13 @@ export const sendNotification = functions.https.onRequest(async (req, res) => {
       message: 'Daily notification sent.',
     });
     // 🟢 Notify Sentry job has completed successfully:
-    Sentry.captureCheckIn({
+    captureCheckIn({
       checkInId,
       monitorSlug: 'daily-notification-sent',
       status: 'ok',
     });
   } else {
-    functions.logger.info(
+    firebaseLog.info(
       'Secret was incorrect: ' + secret + '\nNo notifications sent.'
     );
     res
@@ -47,11 +47,11 @@ export const sendNotification = functions.https.onRequest(async (req, res) => {
   }
 });
 
-export const generateNotificationTime = functions.pubsub
+export const generateNotificationTime = pubsub
   .schedule('0 0 * * *') // default timezone is America/Los_Angeles
   .onRun(async () => {
     // 🟡 Notify Sentry job is running:
-    const checkInId = Sentry.captureCheckIn({
+    const checkInId = captureCheckIn({
       monitorSlug: 'generate-daily-notification-time',
       status: 'in_progress',
     });
@@ -60,7 +60,7 @@ export const generateNotificationTime = functions.pubsub
     } catch (e) {
       console.log(e);
       // 🔴 Notify Sentry job has failed:
-      Sentry.captureCheckIn({
+      captureCheckIn({
         checkInId,
         monitorSlug: 'generate-daily-notification-time',
         status: 'error',

@@ -8,9 +8,16 @@
     "strict": true,
     "target": "es2017",
     "inlineSources": true,
-    "sourceRoot": "/",
+    "sourceRoot": "./src",
     "noEmitHelpers": true,
-    "importHelpers": true
+    "importHelpers": true,
+    "baseUrl": "./src",
+    "rootDir": "./src/",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
   },
   "compileOnSave": true,
   "include": [

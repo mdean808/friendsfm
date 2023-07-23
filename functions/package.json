@@ -1,9 +1,9 @@
 {
   "name": "functions",
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc --watch",
-    "serve": "yarn build:watch && firebase emulators:start --import=./data --export-on-exit",
+    "build": "tsc && tsc-alias",
+    "watch": "tsc --watch",
+    "serve": "yarn build && firebase emulators:start --import=./data --export-on-exit",
     "shell": "yarn build && firebase functions:shell",
     "start": "yarn shell",
     "deploy": "COMMIT=$(git rev-parse HEAD) firebase deploy --only functions",
@@ -16,12 +16,12 @@
   "engines": {
     "node": "18"
   },
-  "main": "bin/src/index.js",
+  "main": "bin/index.js",
   "dependencies": {
-    "@google-cloud/tasks": "^3.1.0",
+    "@google-cloud/tasks": "^3.1.2",
     "@sentry/node": "^7.59.3",
     "@sentry/profiling-node": "^1.1.2",
-    "firebase-admin": "^11.5.0",
+    "firebase-admin": "^11.10.1",
     "firebase-functions": "^4.4.1",
     "openai": "^3.2.1",
     "tslib": "^2.6.0"
@@ -30,7 +30,8 @@
     "@firebase/app-types": "^0.9.0",
     "eslint": "^8.34.0",
     "prettier": "^2.8.4",
-    "typescript": "^4.6.4"
+    "tsc-alias": "^1.8.7",
+    "typescript": "^5.1.6"
   },
   "private": true
 }
