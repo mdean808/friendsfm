@@ -84,7 +84,8 @@ export default class User {
   public async setMessagingToken(token: string) {
     if (!this.exists) throw Error('User not loaded.');
     if (!token) throw Error('No messaging token provided.');
-    await this.dbRef.update({ token });
+    this.messagingToken = token;
+    await this.dbRef.update({ messagingToken: token });
   }
 
   public async setUsername(username: string) {
