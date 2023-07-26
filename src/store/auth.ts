@@ -4,7 +4,6 @@ import { FirebaseAppCheck } from '@capacitor-firebase/app-check';
 import { Preferences } from '@capacitor/preferences';
 import { atom, action, map } from 'nanostores';
 import {
-  FIREBASE_URL,
   friendSubmissions,
   homepageLoaded,
   refreshUser,
@@ -13,7 +12,12 @@ import {
   user,
   userSubmission,
 } from '.';
-import { goto, handleApiResponse, registerForNotifications } from '../lib';
+import {
+  getFirebaseUrl,
+  goto,
+  handleApiResponse,
+  registerForNotifications,
+} from '../lib';
 import type { SavedSong, User } from '../types';
 
 // refresh every 30 seconds
@@ -55,7 +59,7 @@ export const getNewAuthToken = action(
 export const loginUser = action(user, 'login-user', async (store) => {
   const u = store.get();
   u.messagingToken = await registerForNotifications();
-  const res = await fetch(FIREBASE_URL.get() + '/loginuser', {
+  const res = await fetch(getFirebaseUrl('loginuser'), {
     method: 'POST',
     body: JSON.stringify(u),
     headers: { 'x-firebase-appcheck': appCheckToken.get() },

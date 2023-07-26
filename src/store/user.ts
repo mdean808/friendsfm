@@ -7,13 +7,12 @@ import { map, action } from 'nanostores';
 import {
   appCheckToken,
   authToken,
-  FIREBASE_URL,
   friendSubmissions,
   getFriendSubmissions,
   loggedIn,
   songs,
 } from '.';
-import { goto, handleApiResponse } from '../lib';
+import { getFirebaseUrl, goto, handleApiResponse } from '../lib';
 import type { MusicPlatform, SavedSong, Submission, User } from '../types';
 export const user = map<User>({} as User);
 
@@ -77,7 +76,7 @@ export const updateUsername = action(
   'update-username',
   async (store, newUsername: string) => {
     const u = store.get();
-    const res = await fetch(FIREBASE_URL.get() + '/setusername', {
+    const res = await fetch(getFirebaseUrl('setusername'), {
       method: 'POST',
       body: JSON.stringify({
         authToken: authToken.get(),
@@ -103,7 +102,7 @@ export const updateMusicPlatform = action(
   'update-music-platform',
   async (store, newMusicPlatform: MusicPlatform, authCode?: string) => {
     const u = store.get();
-    const res = await fetch(FIREBASE_URL.get() + '/setmusicplatform', {
+    const res = await fetch(getFirebaseUrl('setmusicplatform'), {
       method: 'POST',
       body: JSON.stringify({
         authToken: authToken.get(),
@@ -144,7 +143,7 @@ export const refreshUser = action(user, 'get-user-data', async (_store) => {
     console.log(e);
   }
   // await getNewAuthToken();
-  const res = await fetch(FIREBASE_URL.get() + '/getuser', {
+  const res = await fetch(getFirebaseUrl('getuser'), {
     method: 'POST',
     body: JSON.stringify({
       authToken: authToken.get(),
@@ -167,7 +166,7 @@ export const unlinkMusicProvider = action(
   user,
   'unlink-music-provider',
   async (store) => {
-    const res = await fetch(FIREBASE_URL.get() + '/unlinkmusicplatform', {
+    const res = await fetch(getFirebaseUrl('unlinkmusicplatform'), {
       method: 'POST',
       body: JSON.stringify({
         authToken: authToken.get(),

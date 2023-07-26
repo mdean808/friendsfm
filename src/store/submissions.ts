@@ -1,14 +1,7 @@
 import { action, atom, map } from 'nanostores';
 import type { Audial, Submission } from '../types';
-import { goto, handleApiResponse } from '../lib';
-import {
-  appCheckToken,
-  authToken,
-  FIREBASE_URL,
-  getNewAuthToken,
-  loading,
-  user,
-} from '.';
+import { getFirebaseUrl, goto, handleApiResponse } from '../lib';
+import { appCheckToken, authToken, getNewAuthToken, loading, user } from '.';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Dialog } from '@capacitor/dialog';
 import { toast } from '@zerodevx/svelte-toast';
@@ -31,7 +24,7 @@ export const generateSubmission = action(
       } catch (e) {
         console.log('Location permissions rejected.');
       }
-      const res = await fetch(FIREBASE_URL.get() + '/createnewusersubmission', {
+      const res = await fetch(getFirebaseUrl('createnewusersubmission'), {
         method: 'POST',
         body: JSON.stringify({
           authToken: authToken.get(),
@@ -62,16 +55,13 @@ export const getSubmissionStatus = action(
   'get-submission-status',
   async (store) => {
     await getNewAuthToken();
-    const res = await fetch(
-      FIREBASE_URL.get() + '/getcurrentsubmissionstatus',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          authToken: authToken.get(),
-        }),
-        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-      }
-    );
+    const res = await fetch(getFirebaseUrl('getcurrentsubmissionstatus'), {
+      method: 'POST',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+      }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+    });
     const json = await handleApiResponse(res);
     if (!json) {
       // failed to set new music platform
@@ -92,7 +82,7 @@ export const getFriendSubmissions = action(
   'get-submission-status',
   async (store) => {
     await getNewAuthToken();
-    const res = await fetch(FIREBASE_URL.get() + '/getfriendsubmissions', {
+    const res = await fetch(getFirebaseUrl('getfriendsubmissions'), {
       method: 'POST',
       body: JSON.stringify({
         authToken: authToken.get(),
@@ -128,18 +118,15 @@ export const shareAudial = action(
       number = parseInt(split[0].split('#')[1]) as number;
       score = split[1] ? split[1] : audial;
     }
-    const res = await fetch(
-      FIREBASE_URL.get() + '/setcurrentsubmissionaudialscore',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          authToken: authToken.get(),
-          submissionId: sub.id,
-          parsedAudial: { number, score },
-        }),
-        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-      }
-    );
+    const res = await fetch(getFirebaseUrl('setcurrentsubmissionaudialscore'), {
+      method: 'POST',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+        submissionId: sub.id,
+        parsedAudial: { number, score },
+      }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+    });
     const json = await handleApiResponse(res);
     loading.set(false);
     if (!json) {
@@ -172,7 +159,7 @@ export const createSubmissionsPlaylist = action(
     });
     if (!value) return;
     loading.set(true);
-    const res = await fetch(FIREBASE_URL.get() + '/createsubmissionsplaylist', {
+    const res = await fetch(getFirebaseUrl('createsubmissionsplaylist'), {
       method: 'POST',
       body: JSON.stringify({
         authToken: authToken.get(),

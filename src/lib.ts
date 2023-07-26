@@ -169,3 +169,11 @@ export const getAppVersion = async () => {
     return 'web';
   }
 };
+
+export const getFirebaseUrl = (endpoint: string) => {
+  if (import.meta.env.DEV) {
+    return `http://127.0.0.1:5001/friendsfm/us-central1/${endpoint}`;
+  } else {
+    return `https://${endpoint}-tprlxlzyxq-uc.a.run.app`;
+  }
+};

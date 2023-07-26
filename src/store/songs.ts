@@ -3,15 +3,15 @@ import { Preferences } from '@capacitor/preferences';
 import { toast } from '@zerodevx/svelte-toast';
 import { action, atom } from 'nanostores';
 import { user } from '.';
-import { handleApiResponse } from '../lib';
+import { getFirebaseUrl, handleApiResponse } from '../lib';
 import type { SavedSong } from '../types';
 import { appCheckToken, authToken } from './auth';
-import { FIREBASE_URL, loading } from './misc';
+import { loading } from './misc';
 
 export const songs = atom<SavedSong[]>([]);
 
 export const loadSongs = action(songs, 'load-songs', async (store) => {
-  const res = await fetch(FIREBASE_URL.get() + '/getsongs', {
+  const res = await fetch(getFirebaseUrl('getsongs'), {
     method: 'POST',
     body: JSON.stringify({
       authToken: authToken.get(),
@@ -38,7 +38,7 @@ export const toggleSong = action(
       s = s.filter((s) => s.name !== song.name);
       store.set(s);
       // save to backend
-      const res = await fetch(FIREBASE_URL.get() + '/deletesong', {
+      const res = await fetch(getFirebaseUrl('deletesong'), {
         method: 'POST',
         body: JSON.stringify({
           authToken: authToken.get(),
@@ -53,7 +53,7 @@ export const toggleSong = action(
       }
     } else {
       // save to the backend
-      const res = await fetch(FIREBASE_URL.get() + '/savesong', {
+      const res = await fetch(getFirebaseUrl('savesong'), {
         method: 'POST',
         body: JSON.stringify({
           authToken: authToken.get(),
@@ -93,7 +93,7 @@ export const createSongsSpotifyPlaylist = action(
     });
     if (!value) return;
     loading.set(true);
-    const res = await fetch(FIREBASE_URL.get() + '/createlikedsongsplaylist', {
+    const res = await fetch(getFirebaseUrl('createlikedsongsplaylist'), {
       method: 'POST',
       body: JSON.stringify({
         authToken: authToken.get(),
