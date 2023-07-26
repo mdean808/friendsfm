@@ -130,9 +130,9 @@ export const sentryWrapper =
         scope.setSpan(transaction);
       });
 
-      // 3. Set the transaction context
+      // 3. Set the transaction context (sanitize body)
       setContext('Function context', {
-        ...(req.body || req.query || {}),
+        ...({ ...req.body, authToken: null } || req.query || {}),
         function: name,
         op: 'functions.https.onRequest',
       });
@@ -142,16 +142,25 @@ export const sentryWrapper =
         return await handler(req, res, user);
       } catch (e) {
         // return error response
-        if (!res.headersSent)
-          res.status(500).json({
+        const err = e as Error;
+        if (!res.headersSent) {
+          if (err.message.includes(':'))
+            res.status(500).json({
+              type: 'error',
+              message: 'Something went wrong. Please try again later.',
+              error: err.message,
+            });
+        } else {
+          res.status(400).json({
             type: 'error',
-            message: 'Something went wrong. Please try again later.',
-            error: (e as Error).message,
+            message: err.message,
+            error: err.message,
           });
+        }
         // 4. Send any errors to Sentry
-        captureException(e, { tags: { handled: false } });
+        captureException(e, { tags: { handled: true } });
 
-        firebaseLog.error('Sentry Error Handled: ' + e);
+        firebaseLog.error('Sentry Error Handled: ' + err);
       } finally {
         // 5. Finish the Sentry transaction
         configureScope((scope) => scope.clear());
