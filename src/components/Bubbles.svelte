@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { handleApiResponse } from '../lib';
+  import { getFirebaseUrl, handleApiResponse } from '../lib';
   import type { Audial, MusicPlatform, Song } from '../types';
   import { Geolocation, type Position } from '@capacitor/geolocation';
-  import { FIREBASE_URL } from '../store';
+  // import { FIREBASE_URL } from '../store';
   let canvas: HTMLCanvasElement;
   let wrapper: HTMLDivElement;
 
@@ -65,7 +65,7 @@
     } catch (e) {
       console.log('Location permissions rejected.');
     }
-    const res = await fetch(FIREBASE_URL.get() + '/nearbySubmissions', {
+    const res = await fetch(getFirebaseUrl('nearbySubmissions'), {
       method: 'post',
       body: JSON.stringify({
         location: {
