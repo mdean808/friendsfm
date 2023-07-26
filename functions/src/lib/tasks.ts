@@ -10,8 +10,7 @@ export const createNotificationTask = async (checkInId: string) => {
   const project = 'friendsfm';
   const queue = 'notification-time';
   const location = 'us-west1';
-  const url =
-    'https://us-central1-friendsfm.cloudfunctions.net/sendNotification';
+  const url = 'https://sendnotification-tprlxlzyxq-uc.a.run.app';
   const notificationTime = getRandomDate(
     new Date(new Date().getTime() + 6 * 60 * 60 * 1000),
     new Date(new Date().getTime() + 21 * 60 * 60 * 1000)
