@@ -268,7 +268,7 @@ export default class User {
     if (submissionRes.empty) return;
     const submissionData = submissionRes.docs[0].data() as SubmissionType;
     return new Submission(
-      submissionData.id || '',
+      submissionRes.docs[0].id,
       submissionData.number,
       submissionData.song,
       submissionData.audial,
