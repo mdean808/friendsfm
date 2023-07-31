@@ -27,6 +27,7 @@
     refreshUser,
     appLoading,
     platform,
+    friendSubmissions,
   } from './store';
   import { goto } from './lib';
   import Loading from './components/Loading.svelte';
@@ -35,6 +36,9 @@
   import TopNav from './components/TopNav.svelte';
   import BottomNav from './components/BottomNav.svelte';
   import PasteAudial from './pages/paste_audial.svelte';
+  import OSLogger from './plugins/OSLogger';
+  import { SplashScreen } from '@capacitor/splash-screen';
+  import AnimatedSplashScreen from './components/AnimatedSplashScreen.svelte';
 
   // IONIC SETUP
   import { initialize } from '@ionic/core/components';
@@ -45,9 +49,6 @@
   import { IonSpinner } from '@ionic/core/components/ion-spinner';
   import { IonApp } from '@ionic/core/components/ion-app';
   import { IonContent } from '@ionic/core/components/ion-content';
-  import OSLogger from './plugins/OSLogger';
-  import { SplashScreen } from '@capacitor/splash-screen';
-  import AnimatedSplashScreen from './components/AnimatedSplashScreen.svelte';
 
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.title) return;

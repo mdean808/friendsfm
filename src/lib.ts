@@ -6,6 +6,7 @@ import {
   prevPath,
   spotifyAuthCode,
   updateMusicPlatform,
+  user,
 } from './store';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';

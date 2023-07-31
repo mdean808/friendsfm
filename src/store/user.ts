@@ -38,7 +38,7 @@ export const getUserFromPreferences = action(
     // const res4 = await Preferences.get({ key: 'submission' });
     // userSubmission.set(JSON.parse(res4.value || '{}') as Submission);
 
-    const res5 = await Preferences.get({ key: 'friendSubmissions' });
+    const res5 = await Preferences.get({ key: 'friend-submissions' });
     friendSubmissions.set(JSON.parse(res5.value || '[]') as Submission[]);
 
     return u;

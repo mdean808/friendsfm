@@ -97,7 +97,7 @@ export const getFriendSubmissions = action(
     store.set(json.message.friends as Submission[]);
     await Preferences.set({
       key: 'friend-submissions',
-      value: JSON.stringify(friendSubmissions.get() || []),
+      value: JSON.stringify((json.message.friends as Submission[]) || []),
     });
   }
 );

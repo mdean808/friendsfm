@@ -83,7 +83,7 @@ export const loginUser = action(user, 'login-user', async (store) => {
 export const logout = action(user, 'logout', async (store) => {
   FirebaseAnalytics.logEvent({
     name: 'logout',
-    params: { id: store.get().id },
+    params: { id: store.get()?.id },
   });
   await FirebaseAuthentication.signOut();
   loggedIn.set(false);

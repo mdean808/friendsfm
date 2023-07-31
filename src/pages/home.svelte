@@ -37,16 +37,6 @@
   // GLOBALS
   let loadingSubmission = false;
   let loadingFriendSubmissions = false;
-  let sortedSubmissions: SubmissionType[] = [];
-
-  friendSubmissions.subscribe((val) => {
-    if (val)
-      sortedSubmissions = [...val].sort(
-        (a, b) =>
-          new Date(b.lateTime || b.time).getTime() -
-          new Date(a.lateTime || a.time).getTime()
-      );
-  });
 
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.title) return;
@@ -84,14 +74,14 @@
       loadingFriendSubmissions = false;
       appLoading.set(false);
     }
-    if (!sortedSubmissions && friendSubmissions.get()) {
-      sortedSubmissions = [...friendSubmissions.get()].sort(
-        (a, b) =>
-          new Date(b.lateTime || b.time).getTime() -
-          new Date(a.lateTime || a.time).getTime()
-      );
-    }
   });
+
+  const sortByDate = (a: SubmissionType, b: SubmissionType) => {
+    return (
+      new Date(b.lateTime || b.time).getTime() -
+      new Date(a.lateTime || a.time).getTime()
+    );
+  };
 
   onDestroy(() => {
     const refresher = document.getElementById('refresher') as IonRefresher;
@@ -284,7 +274,7 @@
             on:click={createSubmission}>share</Button
           >
         {:else if !loadingSubmission}
-          {#each sortedSubmissions as submission}
+          {#each [...$friendSubmissions].sort(sortByDate) as submission}
             <div class="my-2">
               <Submission data={submission} />
             </div>
