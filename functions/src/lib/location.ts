@@ -1,6 +1,7 @@
 import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
 import Submission from '../classes/submission';
+import User from '@/classes/user';
 import type { Location, Submission as SubmissionType } from '../types';
 const db = getFirestore();
 
@@ -29,13 +30,25 @@ export const getNearbySubmissions = async (
   const results = commonResults.map((id) =>
     latSnapshot.docs.find((doc) => doc.id === id)
   );
-  return results
-    .filter((doc) => {
-      const docLocation = (doc?.data() as SubmissionType).location;
-      const distanceInKm = getDistanceInKm(location, docLocation);
-      return distanceInKm <= radius;
-    })
-    .map((doc) => doc?.data()) as SubmissionType[];
+  return await Promise.all(
+    results
+      .filter((doc) => {
+        const docLocation = (doc?.data() as SubmissionType).location;
+        const distanceInKm = getDistanceInKm(location, docLocation);
+        return distanceInKm <= radius;
+      })
+      .map(async (doc) => {
+        const data = doc?.data() as SubmissionType;
+        const user = new User(data.userId);
+        await user.load();
+        data.user = {
+          id: user.id,
+          username: user.username,
+          musicPlatform: user.musicPlatform,
+        };
+        return data;
+      })
+  );
 };
 
 function getBoundingBox(location: Location, radiusInKm: number) {

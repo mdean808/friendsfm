@@ -31,6 +31,7 @@ export default class Submission {
     latitude: number;
   };
   lateTime: Date | Timestamp;
+  userId: string;
 
   constructor(
     id: string,
@@ -56,6 +57,7 @@ export default class Submission {
       username: user.username || '',
       musicPlatform: user.musicPlatform || MusicPlatform.spotify,
     };
+    this.userId = user.id;
   }
 
   public async load(): Promise<Submission> {
