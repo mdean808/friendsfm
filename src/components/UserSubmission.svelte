@@ -1,11 +1,11 @@
 <script lang="ts">
   import {
-    getPlatformColor,
-    formatTimePlayed,
     convertDateToLateString,
+    formatTimePlayed,
     getDaysAgo,
+    getPlatformColor,
+    goto,
   } from '../lib';
-  import MusicPlatformIcon from './MusicPlatformIcon.svelte';
   import type { SavedSong, Submission } from '../types';
   import { toggleSong, songs } from '../store';
 
@@ -27,26 +27,44 @@
   };
 </script>
 
-<div class={`border-white rounded-lg shadow-lg bg-gray-700 `}>
+<div class={`border-white rounded-lg mb-1 shadow-lg bg-gray-700 `}>
   <div class="">
-    <div
-      class={`flex p-2 rounded-t-lg bg-${getPlatformColor(
-        data.user.musicPlatform
-      )}`}
-    >
-      <div class="flex-grow text-left">
-        <h4 class="text-xl">
-          {data.user ? data.user.username : 'Unknown'}
-          <span class={`text-white`}
-            ><MusicPlatformIcon
-              className="inline w-5 h-5"
-              id={data.user ? data.user.musicPlatform : 'spotify'}
-            />
-          </span>
-        </h4>
-      </div>
-      <div class="text-right">
-        <div class="h-full flex flex-col flex-nowrap justify-between">
+    <div class="relative">
+      {#if data.song.timestamp === 0}
+        <div
+          style={`
+      width: ${(data.song.durationElapsed / data.song.length) * 100}%
+      `}
+          class="absolute rounded-l-lg left-0 right-0 h-full bg-blue-700 opacity-60 z-0"
+        />
+      {/if}
+
+      <div class="sticky px-2 py-1">
+        <div class="flex">
+          <div>
+            {#if !data.late}
+              <span class="text-sm text-gray-400"
+                >{new Date(data.time).toLocaleString('en-US', {
+                  hour: 'numeric',
+                  minute: 'numeric',
+                  hour12: true,
+                })}
+              </span>
+            {:else}
+              <span class="text-sm text-red-500">
+                {convertDateToLateString(new Date(data.lateTime))}
+              </span>
+            {/if}
+            {#if data.song.timestamp > 0}
+              -
+              <span class="text-gray-400 w-8/12 text-sm">
+                played {getDaysAgo(new Date(data.song?.timestamp))}
+                {#if !getDaysAgo(new Date(data.song?.timestamp)).includes('days ago')}at
+                  {formatTimePlayed(data.song?.timestamp)}
+                {/if}
+              </span>
+            {/if}
+          </div>
           <svg
             on:click={toggleHeart}
             on:keypress={toggleHeart}
@@ -71,44 +89,9 @@
             /></svg
           >
         </div>
-      </div>
-    </div>
-    <div class="relative">
-      {#if data.song.timestamp === 0}
-        <div
-          style={`
-      width: ${(data.song.durationElapsed / data.song.length) * 100}%
-      `}
-          class="absolute rounded-bl-lg left-0 right-0 h-full bg-blue-700 opacity-80 z-0"
-        />
-      {/if}
-
-      <div class="sticky">
-        <div class="flex px-2 py-1">
-          <div class="w-2/3 text-left">
+        <div class="flex">
+          <div class="w-[64%] text-left">
             <a href={data.song.url}>
-              {#if !data.late}
-                <span class="text-sm text-gray-400"
-                  >{new Date(data.time).toLocaleString('en-US', {
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true,
-                  })}
-                </span>
-              {:else}
-                <span class="text-sm text-red-500">
-                  {convertDateToLateString(new Date(data.lateTime))}
-                </span>
-              {/if}
-              {#if data.song.timestamp > 0}
-                -
-                <span class="text-gray-400 text-sm">
-                  played {getDaysAgo(new Date(data.song?.timestamp))}
-                  {#if !getDaysAgo(new Date(data.song?.timestamp)).includes('days ago')}at
-                    {formatTimePlayed(data.song?.timestamp)}
-                  {/if}
-                </span>
-              {/if}
               <div class="flex mb-1 mt-0.5">
                 {#if data.song.albumArtwork}
                   <img
@@ -132,15 +115,18 @@
               </div>
             </a>
           </div>
-          <div class="w-1/3 text-right mb-1.5 self-end">
-            <div class="text-sm">
-              {#if data.audial && data.audial.number != -1}
-                <p>audial #{data.audial.number}</p>
-                <span class="text-xs">{data.audial.score}</span>
-              {:else}
-                <!-- no audial... -->
-              {/if}
-            </div>
+          <div class="w-[36%] text-right mb-1 flex">
+            {#if data.audial && data.audial.number != -1}
+              <div class="text-xs self-end text-right w-full">
+                <p class="text-sm text-right">audial #{data.audial.number}</p>
+                {data.audial.score}
+              </div>
+            {:else}
+              <button
+                class="text-blue-500 text-right text-sm underline self-end w-full"
+                on:click={() => goto('/paste_audial')}>share audial</button
+              >
+            {/if}
           </div>
         </div>
       </div>

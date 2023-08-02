@@ -65,6 +65,10 @@ export interface Submission {
     musicPlatform: MusicPlatform;
     id: string;
   };
+  location: {
+    longitude: number;
+    latitude: number;
+  };
   song: Song;
   time: Date;
   lateTime: Date;
@@ -85,4 +89,14 @@ export interface NetworkResponse {
   type: ResponseType;
   message: string | any;
   error?: string;
+}
+
+export interface StrippedSubmission {
+  song: Song;
+  audial: Audial;
+  location: {
+    longitude: number;
+    latitude: number;
+  };
+  user: { username: string; id: string; musicPlatform: MusicPlatform };
 }

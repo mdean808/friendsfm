@@ -27,12 +27,12 @@
     refreshUser,
     appLoading,
     platform,
-    friendSubmissions,
+    genrePane,
   } from './store';
   import { goto } from './lib';
   import Loading from './components/Loading.svelte';
   import Friends from './pages/friends.svelte';
-  import { fade, fly } from 'svelte/transition';
+  import { fade, fly, scale } from 'svelte/transition';
   import TopNav from './components/TopNav.svelte';
   import BottomNav from './components/BottomNav.svelte';
   import PasteAudial from './pages/paste_audial.svelte';
@@ -49,6 +49,8 @@
   import { IonSpinner } from '@ionic/core/components/ion-spinner';
   import { IonApp } from '@ionic/core/components/ion-app';
   import { IonContent } from '@ionic/core/components/ion-content';
+  import Genre from './pages/genre.svelte';
+  import { CupertinoPane } from 'cupertino-pane';
 
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.title) return;
@@ -87,29 +89,33 @@
         }
       );
     }
-    initialize();
-    // The rest of the ion-elements can be defined as below
-    tryDefine('ion-refresher', IonRefresher);
-    tryDefine('ion-refresher-content', IonRefresherContent);
-    tryDefine('ion-spinner', IonSpinner);
-    tryDefine('ion-app', IonApp);
-    tryDefine('ion-content', IonContent);
-    // Repeat for all components used in your application
-
-    // Prevents exception when hot reloading.
-    function tryDefine(tag: string, impl: any) {
-      try {
-        customElements.define(tag, impl);
-      } catch (error) {}
-    }
-    // Applies required global styles
-    document.documentElement.classList.add('ion-ce');
     loading.set(false);
 
     await getStatusBarHeight();
     await getBottomInset();
     // request permissions
     FirebaseMessaging.requestPermissions();
+    try {
+      initialize();
+      // The rest of the ion-elements can be defined as below
+      tryDefine('ion-refresher', IonRefresher);
+      tryDefine('ion-refresher-content', IonRefresherContent);
+      tryDefine('ion-spinner', IonSpinner);
+      tryDefine('ion-app', IonApp);
+      tryDefine('ion-content', IonContent);
+      // Repeat for all components used in your application
+
+      // Prevents exception when hot reloading.
+      function tryDefine(tag: string, impl: any) {
+        try {
+          customElements.define(tag, impl);
+        } catch (error) {}
+      }
+      // Applies required global styles
+      document.documentElement.classList.add('ion-ce');
+    } catch (e) {
+      console.log('ionic error:', e);
+    }
     // load user
     await getNewAuthToken();
     await getUserFromPreferences();
@@ -125,12 +131,30 @@
     } else {
       goto('/new_user');
     }
+    genrePane.set(
+      new CupertinoPane('#genre-pane', {
+        fastSwipeClose: true,
+        fastSwipeSensivity: 5,
+        fitScreenHeight: true,
+        backdrop: false,
+        bottomClose: true,
+        dragBy: ['.pane .draggable', '.pane-draggable'],
+      })
+    );
   });
 </script>
 
 <!-- Navigation -->
 <svelte:head>
   <title>{$currPath?.split('/')[1] || 'home'}</title>
+  <script
+    defer
+    async
+    src={`https://maps.googleapis.com/maps/api/js?key=${
+      import.meta.env.VITE_GOOGLE_MAPS_BROWSER
+    }&callback=mapready`}
+  >
+  </script>
 </svelte:head>
 {#if $appLoading}
   <div transition:fade={{ duration: 100 }}>
@@ -204,6 +228,14 @@
           >
             <Settings />
           </div>
+        {:else if $currPath === '/genre'}
+          <div
+            style={`padding-top: ${0 + $statusBarHeight}px`}
+            class="z-40 bg-gray-900 absolute left-0 top-0 w-full h-[100vh]"
+            transition:fly={{ y: document.body.clientHeight }}
+          >
+            <Genre />
+          </div>
         {:else if $currPath === '/friends'}
           <div
             style={`padding-top: ${0 + $statusBarHeight}px`}
@@ -235,3 +267,7 @@
     </div>
   </div>
 </ion-app>
+
+<!-- <div id="genre-pane" class="bg-gray-900 text-white"> -->
+<!--   <Genre /> -->
+<!-- </div> -->

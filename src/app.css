@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .scroll-hide {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  .scroll-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and Opera */
+  }
+}
+
 @font-face {
   font-family: 'League Spartan';
   src: url('/fonts/LeagueSpartan.ttf');
@@ -29,4 +39,7 @@ input, textarea, button, select, a {
   --toastBackground: theme('colors.gray.900');
   --ion-background-color: theme('colors.gray.800') !important;
   --ion-text-color: theme('colors.white') !important;
+  --cupertino-pane-background: theme('colors.gray.900');
+  --cupertino-pane-color: theme('colors.white')
 }
+

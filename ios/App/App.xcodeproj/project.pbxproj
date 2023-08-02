@@ -137,8 +137,6 @@
 			dependencies = (
 			);
 			name = FriendsFM;
-			packageProductDependencies = (
-			);
 			productName = App;
 			productReference = 504EC3041FED79650016851F /* FriendsFM.app */;
 			productType = "com.apple.product-type.application";
@@ -168,8 +166,6 @@
 				Base,
 			);
 			mainGroup = 504EC2FB1FED79650016851F;
-			packageReferences = (
-			);
 			productRefGroup = 504EC3051FED79650016851F /* Products */;
 			projectDirPath = "";
 			projectRoot = "";

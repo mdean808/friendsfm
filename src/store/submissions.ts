@@ -1,5 +1,5 @@
 import { action, atom, map } from 'nanostores';
-import type { Audial, Submission } from '../types';
+import type { StrippedSubmission, Audial, Submission } from '../types';
 import { getFirebaseUrl, goto, handleApiResponse } from '../lib';
 import { appCheckToken, authToken, getNewAuthToken, loading, user } from '.';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
@@ -178,5 +178,40 @@ export const createSubmissionsPlaylist = action(
     // return the playlist id
     toast.push('playlist successfully created!');
     return json.message;
+  }
+);
+
+export const nearbySubmissions = map<StrippedSubmission[]>([]);
+
+export const getNearbySubmissions = action(
+  nearbySubmissions,
+  'get-nearbysubmissions',
+  async (store) => {
+    let location: Position;
+    try {
+      await Geolocation.checkPermissions().catch(
+        async () => await Geolocation.requestPermissions()
+      );
+      location = await Geolocation.getCurrentPosition();
+    } catch (e) {
+      console.log('Location permissions rejected.');
+    }
+    const res = await fetch(getFirebaseUrl('nearbysubmissions'), {
+      method: 'post',
+      body: JSON.stringify({
+        location: {
+          latitude: location ? location.coords.latitude : 0,
+          longitude: location ? location.coords.longitude : 0,
+        },
+      }),
+    });
+    const json = await handleApiResponse(res);
+    if (!json) {
+      // failed to set new music platform
+      return false;
+    }
+    const data = json.message as StrippedSubmission[];
+    store.set(data);
+    return data;
   }
 );
