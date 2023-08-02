@@ -6,7 +6,7 @@ export const nearbysubmissions = onRequest(
   { cors: true },
   emptyMiddleware(
     sentryWrapper('nearby-submissions', async (req, res) => {
-      //todo: decide if we need auth.
+      //todo: implement auth
       res.set('Access-Control-Allow-Origin', '*');
       if (!req.body) res.status(400).end();
       try {

@@ -13,9 +13,9 @@ interface ActualCreateChatCompletionResponse
 
 export const getTrackGenre = async (name: string, artist: string) => {
   const openai = new OpenAIApi(configuration);
-  const prompt = `What genre is "${name}" by "${artist}"? Pick from these comma separated options: Pop, Rock, Hip Hop, Rap, Pop, Blues, Folk, Classical, Heavy Metal, Country, R&B, Punk Rock, Electronic, Soul, Reggae, Funk, Techno, Disco, Alternative Rock, Ambient, Swing, Industrial, Gospel, Trance, Instrumental, Dubstep, EDM, Ska, Electronic, Pop Rock, Indie Rock, Psychedelic, New Wave, Grunge, Drum & Bass, House, K-Pop, New Age, Lo-Fi, Drill, Trap, Indie`;
+  const prompt = `What genre is "${name}" by "${artist}"? Pick a single genre from these comma separated options: Pop, Rock, Hip Hop, Rap, Pop, Blues, Folk, Classical, Heavy Metal, Country, R&B, Punk Rock, Electronic, Soul, Reggae, Funk, Techno, Disco, Alternative Rock, Ambient, Swing, Industrial, Gospel, Trance, Instrumental, Dubstep, EDM, Ska, Electronic, Pop Rock, Indie Rock, Psychedelic, New Wave, Grunge, Drum & Bass, House, K-Pop, New Age, Lo-Fi, Drill, Trap, Indie`;
   const systemPrompt =
-    'You are an assistant that knows a lot about music. You also only respond in 1 to 3 word answers. ';
+    'You are an assistant that knows a lot about music. You also only respond with the name of a single musical genre that best fits the question. ';
   const res = await openai.createChatCompletion({
     model: 'gpt-3.5-turbo',
     messages: [
