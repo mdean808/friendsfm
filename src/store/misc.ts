@@ -1,7 +1,6 @@
 import { action, atom, map } from 'nanostores';
 import { Device } from '@capacitor/device';
 import type { Notification } from '@capacitor-firebase/messaging';
-import type { CupertinoPane } from 'cupertino-pane';
 
 export const currPath = atom<string>('/');
 
@@ -16,8 +15,6 @@ export const homepageLoaded = atom<boolean>(false);
 export const platform = atom<string>('');
 
 export const activeGenre = atom<string>('');
-
-export const genrePane = map<CupertinoPane>();
 
 export const getPlatform = action(platform, 'get-platform', async (store) => {
   const info = await Device.getInfo();

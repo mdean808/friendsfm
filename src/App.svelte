@@ -27,12 +27,11 @@
     refreshUser,
     appLoading,
     platform,
-    genrePane,
   } from './store';
   import { goto } from './lib';
   import Loading from './components/Loading.svelte';
   import Friends from './pages/friends.svelte';
-  import { fade, fly, scale } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
   import TopNav from './components/TopNav.svelte';
   import BottomNav from './components/BottomNav.svelte';
   import PasteAudial from './pages/paste_audial.svelte';
@@ -50,7 +49,6 @@
   import { IonApp } from '@ionic/core/components/ion-app';
   import { IonContent } from '@ionic/core/components/ion-content';
   import Genre from './pages/genre.svelte';
-  import { CupertinoPane } from 'cupertino-pane';
 
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.title) return;
@@ -131,16 +129,6 @@
     } else {
       goto('/new_user');
     }
-    genrePane.set(
-      new CupertinoPane('#genre-pane', {
-        fastSwipeClose: true,
-        fastSwipeSensivity: 5,
-        fitScreenHeight: true,
-        backdrop: false,
-        bottomClose: true,
-        dragBy: ['.pane .draggable', '.pane-draggable'],
-      })
-    );
   });
 </script>
 
