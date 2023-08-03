@@ -182,8 +182,8 @@
       {/if}
       <main
         style={`height: calc(100vh - ${
-          55 +
-          ($currPath === '/audial' ? 0 : 55) +
+          65 +
+          ($currPath === '/audial' ? 0 : 65) +
           $bottomInset +
           $statusBarHeight
         }px)`}
@@ -209,15 +209,15 @@
             <Audial />
           </div>
         {:else if $currPath === '/new_user'}
-          <div style={`margin-top: 55px`} in:fade={{ duration: 300 }}>
+          <div style={`margin-top: 65px`} in:fade={{ duration: 300 }}>
             <NewUser />
           </div>
         {:else if $currPath === '/username'}
-          <div style={`margin-top: 55px`} in:fade={{ duration: 300 }}>
+          <div style={`margin-top: 65px`} in:fade={{ duration: 300 }}>
             <Username />
           </div>
         {:else if $currPath === '/music_provider'}
-          <div style={`margin-top: 55px`} in:fade={{ duration: 300 }}>
+          <div style={`margin-top: 65px`} in:fade={{ duration: 300 }}>
             <MusicProvider />
           </div>
         {:else if $currPath === '/settings'}

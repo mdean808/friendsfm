@@ -11,19 +11,22 @@
 
 <div
   style={`height: ${
-    55 + $statusBarHeight
+    65 + $statusBarHeight
   }px; padding-top: ${$statusBarHeight}px`}
-  class={`bg-gray-900 z-30 w-full`}
+  class={`z-30 w-full`}
 >
   <div
-    class={`w-full flex p-3 flex-row justify-between items-center text-${getPlatformColor(
+    class={`w-full flex flex-row justify-between items-center text-${getPlatformColor(
       $user?.musicPlatform
     )}`}
   >
-    <button class="flex-grow-0 relative" on:click={() => goto('/friends')}>
+    <button
+      class="flex-grow-0 p-3 m-2 rounded-3xl shadow-2xl shadow-gray-700 bg-gray-900"
+      on:click={() => goto('/friends')}
+    >
       <svg
         fill="none"
-        class="w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800"
+        class="w-6 h-6"
         stroke="currentColor"
         stroke-width="1.5"
         viewBox="0 0 24 24"
@@ -50,10 +53,13 @@
       {$user.username}
     </h1>
     {#if $currPath === '/songs'}
-      <button class="flex-grow-0" on:click={createSongsSpotifyPlaylist}>
+      <button
+        class="flex-grow-0 p-3 m-2 rounded-3xl shadow-2xl shadow-gray-700 bg-gray-900"
+        on:click={createSongsSpotifyPlaylist}
+      >
         <svg
           fill="none"
-          class="w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800"
+          class="w-8 h-8"
           stroke="currentColor"
           stroke-width="1.5"
           viewBox="0 0 24 24"
@@ -68,9 +74,12 @@
         </svg>
       </button>
     {:else}
-      <button class="flex-grow-0" on:click={() => goto('/settings')}>
+      <button
+        class="flex-grow-0 p-3 m-2 rounded-3xl shadow-2xl shadow-gray-700 bg-gray-900"
+        on:click={() => goto('/settings')}
+      >
         <svg
-          class="w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800"
+          class="w-6 h-6"
           fill="none"
           stroke="currentColor"
           stroke-width="1.5"
