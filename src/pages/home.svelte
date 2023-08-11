@@ -16,6 +16,7 @@
     user,
     createSubmissionsPlaylist,
     navDate,
+    getNearbySubmissions,
   } from '../store';
   import Button from '../components/Button.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
@@ -37,6 +38,7 @@
   // GLOBALS
   let loadingSubmission = false;
   let loadingFriendSubmissions = false;
+  let loadingGenres = false;
   let previousDays: (HomeDayType | 'loading' | 'end')[] = [
     'loading',
     'loading',
@@ -118,8 +120,10 @@
     ) {
       load();
       loadFriends();
+      loadGenres();
     } else {
       if (loggedIn.get() && !homepageLoaded.get()) loadFriends(true);
+      loadingGenres = false;
       loadingSubmission = false;
       loadingFriendSubmissions = false;
       appLoading.set(false);
@@ -138,6 +142,7 @@
     loadingSubmission = false;
     if (!userSubmission.get() || !userSubmission.get().song) {
       loadingFriendSubmissions = false;
+      loadingGenres = false;
     }
     appLoading.set(false);
     homepageLoaded.set(true);
@@ -149,9 +154,16 @@
     if (!hideLoadingIndicator) loadingFriendSubmissions = false;
   };
 
+  const loadGenres = async () => {
+    loadingGenres = true;
+    await getNearbySubmissions();
+    loadingGenres = false;
+  };
+
   const handleRefresh = async () => {
     const refresher = document.getElementById('refresher') as IonRefresher;
     getSubmissionStatus();
+    loadGenres();
     await loadFriends(true);
     refresher.complete();
   };
@@ -160,6 +172,7 @@
     loading.set(true);
     loadFriends(true);
     await generateSubmission();
+    loadGenres();
     loading.set(false);
   };
   const sortByDate = (a: SubmissionType, b: SubmissionType) => {
@@ -188,89 +201,88 @@
         >
       {:else}
         <div class="h-full">
-          <swiper-container
-            use:renderSwiper={'home-swiper'}
-            init={false}
-            id={'home-swiper'}
-            class="h-full"
-            pagination={true}
-            pagination-dynamic-bullets={true}
-          >
-            <!-- {#each [...previousDays].reverse() as day} -->
-            <!--   <swiper-slide> -->
-            <!--     {#if day === 'loading'} -->
-            <!--       loading -->
-            <!--     {:else if day === 'end'} -->
-            <!--       <p>you've reached the end of the line.</p> -->
-            <!--       <p>there are no more submissions to be viewed.</p> -->
-            <!--     {:else} -->
-            <!--       <HomeDay data={day} /> -->
-            <!--     {/if} -->
-            <!--   </swiper-slide> -->
-            <!-- {/each} -->
-            <swiper-slide>
-              {#if $userSubmission}
-                <div
-                  id="home"
-                  class="text-center w-full overflow-y-auto h-full"
-                >
-                  <div class="pb-2">
-                    <Genres />
-                  </div>
-                  <span class="border-white border-t-2 block w-full" />
-                  <div class="mb-3 mt-3 px-4 mx-auto">
-                    {#if loadingSubmission}
-                      <LoadingIndicator className={'mx-auto w-16 h-16'} />
-                    {:else if $userSubmission.song}
-                      <UserSubmission data={$userSubmission} />
-                    {/if}
-                  </div>
-                  <span class="border-white border-t-2 block w-full" />
-                  <div class="my-3">
-                    {#if loadingFriendSubmissions}
-                      <SkeletonSubmission />
-                      <SkeletonSubmission />
-                      <SkeletonSubmission />
-                    {:else if !loadingFriendSubmissions}
-                      {#each [...$friendSubmissions].sort(sortByDate) as submission}
-                        <div class="my-2">
-                          <Submission data={submission} />
-                        </div>
-                      {/each}
-                      {#if $friendSubmissions.length === 0}
-                        <p class="mx-auto text-center mt-3">
-                          nobody else has submitted yet.
-                        </p>
-                        <p
-                          on:keyup={() => goto('/friends')}
-                          on:click={() => goto('/friends')}
-                          class="mx-auto text-center text-blue-500 underline"
-                        >
-                          add friends.
-                        </p>
-                        {#if $user.submissionsPlaylist}
-                          <a
-                            href={`https://open.spotify.com/playlist/${$user.submissionsPlaylist}`}
-                            class="mx-auto text-center mt-3 text-gray-300 underline"
-                          >
-                            open your submissions playlist
-                          </a>
-                        {:else}
-                          <p
-                            on:keyup={createSubmissionsPlaylist}
-                            on:click={createSubmissionsPlaylist}
-                            class="mx-auto text-center mt-3 text-gray-300 opacity-70 underline"
-                          >
-                            create your dynamic friendsfm playlist.
-                          </p>
-                        {/if}
-                      {/if}
-                    {/if}
-                  </div>
+          <!-- <swiper-container -->
+          <!--   use:renderSwiper={'home-swiper'} -->
+          <!--   init={false} -->
+          <!--   id={'home-swiper'} -->
+          <!--   class="h-full" -->
+          <!--   pagination={true} -->
+          <!--   pagination-dynamic-bullets={true} -->
+          <!-- > -->
+          <!-- {#each [...previousDays].reverse() as day} -->
+          <!--   <swiper-slide> -->
+          <!--     {#if day === 'loading'} -->
+          <!--       loading -->
+          <!--     {:else if day === 'end'} -->
+          <!--       <p>you've reached the end of the line.</p> -->
+          <!--       <p>there are no more submissions to be viewed.</p> -->
+          <!--     {:else} -->
+          <!--       <HomeDay data={day} /> -->
+          <!--     {/if} -->
+          <!--   </swiper-slide> -->
+          <!-- {/each} -->
+          <!-- <swiper-slide> -->
+          {#if $userSubmission}
+            <div id="home" class="text-center w-full overflow-y-auto h-full">
+              {#if $userSubmission.song}
+                <div class="pb-2">
+                  <Genres loading={loadingGenres} />
                 </div>
               {/if}
-            </swiper-slide>
-          </swiper-container>
+              <span class="border-white border-t-2 block w-full" />
+              <div class="mb-3 mt-3 px-4 mx-auto">
+                {#if loadingSubmission}
+                  <LoadingIndicator className={'mx-auto w-16 h-16'} />
+                {:else if $userSubmission.song}
+                  <UserSubmission data={$userSubmission} />
+                {/if}
+              </div>
+              <span class="border-white border-t-2 block w-full" />
+              <div class="my-3">
+                {#if loadingFriendSubmissions}
+                  <SkeletonSubmission />
+                  <SkeletonSubmission />
+                  <SkeletonSubmission />
+                {:else if !loadingFriendSubmissions}
+                  {#each [...$friendSubmissions].sort(sortByDate) as submission}
+                    <div class="my-2">
+                      <Submission data={submission} />
+                    </div>
+                  {/each}
+                  {#if $friendSubmissions.length === 0}
+                    <p class="mx-auto text-center mt-3">
+                      nobody else has submitted yet.
+                    </p>
+                    <p
+                      on:keyup={() => goto('/friends')}
+                      on:click={() => goto('/friends')}
+                      class="mx-auto text-center text-blue-500 underline"
+                    >
+                      add friends.
+                    </p>
+                    {#if $user.submissionsPlaylist}
+                      <a
+                        href={`https://open.spotify.com/playlist/${$user.submissionsPlaylist}`}
+                        class="mx-auto text-center mt-3 text-gray-300 underline"
+                      >
+                        open your submissions playlist
+                      </a>
+                    {:else}
+                      <p
+                        on:keyup={createSubmissionsPlaylist}
+                        on:click={createSubmissionsPlaylist}
+                        class="mx-auto text-center mt-3 text-gray-300 opacity-70 underline"
+                      >
+                        create your dynamic friendsfm playlist.
+                      </p>
+                    {/if}
+                  {/if}
+                {/if}
+              </div>
+            </div>
+          {/if}
+          <!-- </swiper-slide> -->
+          <!-- </swiper-container> -->
         </div>
       {/if}
     </div>

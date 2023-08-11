@@ -153,7 +153,6 @@
             >
               <div class="flex-grow text-left">
                 <h4 class="text-xl">
-                  {sub.user ? sub.user.username : 'Unknown'}
                   <span class={`text-white`}
                     ><MusicPlatformIcon
                       className="inline w-5 h-5"

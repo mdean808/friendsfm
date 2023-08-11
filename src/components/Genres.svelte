@@ -1,22 +1,17 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import {
-    activeGenre,
-    getNearbySubmissions,
-    nearbySubmissions,
-  } from '../store';
+  import { activeGenre, nearbySubmissions } from '../store';
   import { goto, intToRGB, hashCode } from '../lib';
 
   let genreCounts: { count: number; name: string }[] = [];
   let uniqueGenres: string[] = [];
   let genres: string[] = [];
   let message = 0;
-  let loading = true;
+  export let loading = false;
 
   onMount(async () => {
     setInterval(() => (message = Math.floor(Math.random() * 5)), 1500);
     // handle data
-    await getNearbySubmissions();
     genres = [...nearbySubmissions.get().map((item) => item.song.genre)];
     uniqueGenres = [...new Set(genres)];
     genreCounts = uniqueGenres.map((genre) => {
@@ -25,7 +20,6 @@
         name: genre,
       };
     });
-    loading = false;
   });
 
   const getPosition = (name: string) => {
@@ -35,29 +29,33 @@
 </script>
 
 <div class="h-[34px]">
-  {#if uniqueGenres.length > 0 && !loading}
+  {#if !loading}
     <div class="overflow-x-auto scroll-hide">
       <div
         class="text-xs gap-2 inline-flex font-semibold
     leading-sm uppercase py-1 rounded-full"
       >
-        {#each uniqueGenres.sort((a, b) => genreCounts.find((c) => c.name === b).count - genreCounts.find((c) => c.name === a).count) as genre}
-          <div
-            on:keyup={() => {
-              activeGenre.set(genre);
-              goto('/genre');
-            }}
-            on:click={() => {
-              activeGenre.set(genre);
-              goto('/genre');
-            }}
-            class="text-xs inline-flex items-center leading-sm
+        {#if uniqueGenres.length < 1}
+          <div class="mt-2 text-gray-300 text-center">no nearby genres</div>
+        {:else}
+          {#each uniqueGenres.sort((a, b) => genreCounts.find((c) => c.name === b).count - genreCounts.find((c) => c.name === a).count) as genre}
+            <div
+              on:keyup={() => {
+                activeGenre.set(genre);
+                goto('/genre');
+              }}
+              on:click={() => {
+                activeGenre.set(genre);
+                goto('/genre');
+              }}
+              class="text-xs inline-flex items-center leading-sm
         uppercase px-3 py-1 rounded-full truncate"
-            style={`background: ${intToRGB(hashCode(genre, 23))}; `}
-          >
-            <span class="mt-[2px]">#{getPosition(genre)}: {genre}</span>
-          </div>
-        {/each}
+              style={`background: ${intToRGB(hashCode(genre, 23))}; `}
+            >
+              <span class="mt-[2px]">#{getPosition(genre)}: {genre}</span>
+            </div>
+          {/each}
+        {/if}
       </div>
     </div>
   {:else}
