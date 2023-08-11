@@ -196,18 +196,18 @@
             pagination={true}
             pagination-dynamic-bullets={true}
           >
-            {#each [...previousDays].reverse() as day}
-              <swiper-slide>
-                {#if day === 'loading'}
-                  loading
-                {:else if day === 'end'}
-                  <p>you've reached the end of the line.</p>
-                  <p>there are no more submissions to be viewed.</p>
-                {:else}
-                  <HomeDay data={day} />
-                {/if}
-              </swiper-slide>
-            {/each}
+            <!-- {#each [...previousDays].reverse() as day} -->
+            <!--   <swiper-slide> -->
+            <!--     {#if day === 'loading'} -->
+            <!--       loading -->
+            <!--     {:else if day === 'end'} -->
+            <!--       <p>you've reached the end of the line.</p> -->
+            <!--       <p>there are no more submissions to be viewed.</p> -->
+            <!--     {:else} -->
+            <!--       <HomeDay data={day} /> -->
+            <!--     {/if} -->
+            <!--   </swiper-slide> -->
+            <!-- {/each} -->
             <swiper-slide>
               {#if $userSubmission}
                 <div
