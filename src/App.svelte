@@ -165,7 +165,7 @@
     {/if}
 
     <div>
-      {#if $loggedIn && $user.username && $user.musicPlatform && $currPath !== '/audial'}
+      {#if $loggedIn && $user?.username && $user?.musicPlatform && $currPath !== '/audial'}
         <TopNav />
       {/if}
       <main

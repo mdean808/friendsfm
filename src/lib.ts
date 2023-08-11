@@ -123,6 +123,34 @@ export const formatTimePlayed = (time: number = Date.now()) => {
   return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 };
 
+export const getShortDate = (date: Date) => {
+  const monthNames = [
+    'jan.',
+    'feb.',
+    'mar.',
+    'apr.',
+    'may',
+    'jun.',
+    'jul.',
+    'aug.',
+    'sep.',
+    'oct.',
+    'nov.',
+    'dec.',
+  ];
+  const monthIndex = date.getMonth();
+  const day = date.getDate();
+  let ordinalIndicator = 'th';
+  if (day === 1 || day === 21 || day === 31) {
+    ordinalIndicator = 'st';
+  } else if (day === 2 || day === 22) {
+    ordinalIndicator = 'nd';
+  } else if (day === 3 || day === 23) {
+    ordinalIndicator = 'rd';
+  }
+  return `${monthNames[monthIndex]} ${day}${ordinalIndicator}`;
+};
+
 export const getDaysAgo = (date: Date) => {
   const currDate = new Date();
   const diffDays = currDate.getDate() - date.getDate();
@@ -209,7 +237,7 @@ export function intToRGB(i: number) {
   let rgb = hex.match(/.{2}/g).map((v) => parseInt(v, 16)) as [
     number,
     number,
-    number
+    number,
   ];
   let contrast = getContrastRatio(rgb, [31, 41, 55]);
   while (contrast < 4.5) {
@@ -219,7 +247,7 @@ export function intToRGB(i: number) {
     rgb = hex.match(/.{2}/g).map((v) => parseInt(v, 16)) as [
       number,
       number,
-      number
+      number,
     ];
     contrast = getContrastRatio(rgb, [31, 41, 55]);
   }

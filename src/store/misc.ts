@@ -14,8 +14,6 @@ export const homepageLoaded = atom<boolean>(false);
 
 export const platform = atom<string>('');
 
-export const activeGenre = atom<string>('');
-
 export const getPlatform = action(platform, 'get-platform', async (store) => {
   const info = await Device.getInfo();
   store.set(info.platform);
@@ -28,3 +26,7 @@ export const getPlatform = action(platform, 'get-platform', async (store) => {
 // );
 
 export const notificationAction = map<Notification>();
+
+export const activeGenre = atom<string>('');
+
+export const navDate = map<Date>(new Date());
