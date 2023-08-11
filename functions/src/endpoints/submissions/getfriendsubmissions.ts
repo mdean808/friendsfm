@@ -5,7 +5,7 @@ export const getfriendsubmissions = onRequest(
   { cors: true },
   authMiddleware(
     sentryWrapper('get-friend-submissions', async (_req, res, user) => {
-      const friendSubmissions = (await user.getCurrentSubmission())
+      const friendSubmissions = (await user.getSubmission())
         ? await user.getFriendSubmissions()
         : [];
       res.status(200).json({

@@ -20,6 +20,7 @@ import {
   User as UserType,
 } from '../types';
 import Submission from './submission';
+import { logger } from 'firebase-functions/v2';
 
 const db = getFirestore();
 
@@ -256,13 +257,16 @@ export default class User {
     }
   }
 
-  public async getCurrentSubmission(
-    number?: number
-  ): Promise<Submission | undefined> {
+  public async getSubmission(number?: number): Promise<Submission | undefined> {
     if (!this.id) throw Error('User not loaded.');
+    logger.log('getSubmission: ' + number);
     const submissionRef = db
       .collection('submissions')
-      .where('number', '==', number || (await Submission.getCurrentCount()))
+      .where(
+        'number',
+        '==',
+        number != null ? number : await Submission.getCurrentCount()
+      )
       .where('userId', '==', this.id);
     const submissionRes = await submissionRef.get();
     if (submissionRes.empty) return;
@@ -287,7 +291,7 @@ export default class User {
       const friend = new User(localFriend.id);
       await friend.load();
       try {
-        const friendSub = await friend.getCurrentSubmission(number);
+        const friendSub = await friend.getSubmission(number);
         if (!friendSub) continue;
         friendSub.formatDatesForFrontend();
         friendSubmissions.push(friendSub);

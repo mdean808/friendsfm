@@ -9,7 +9,7 @@ export const setcurrentsubmissionaudialscore = onRequest(
       'set-current-submission-audial-score',
       async (req, res, user) => {
         const { parsedAudial }: { parsedAudial: Audial } = JSON.parse(req.body);
-        await (await user.getCurrentSubmission())?.setAudial(parsedAudial);
+        await (await user.getSubmission())?.setAudial(parsedAudial);
         res.status(200).json({
           type: 'success',
           message: 'success',

@@ -1,5 +1,5 @@
 <script>
-  import { getPlatformColor, goto } from '../lib';
+  import { getPlatformColor, goto, getShortDate } from '../lib';
 
   import {
     createSongsSpotifyPlaylist,
@@ -21,7 +21,7 @@
     )}`}
   >
     <button
-      class="flex-grow-0 p-3 m-2 rounded-3xl shadow-2xl shadow-gray-700 bg-gray-900"
+      class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900"
       on:click={() => goto('/friends')}
     >
       <svg
@@ -50,16 +50,16 @@
       {/if}
     </button>
     <h1 class="text-center mx-auto text-2xl text-white truncate flex-grow px-4">
-      {$user.username}
+      {getShortDate(new Date())}
     </h1>
     {#if $currPath === '/songs'}
       <button
-        class="flex-grow-0 p-3 m-2 rounded-3xl shadow-2xl shadow-gray-700 bg-gray-900"
+        class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900"
         on:click={createSongsSpotifyPlaylist}
       >
         <svg
           fill="none"
-          class="w-8 h-8"
+          class="w-6 h-6"
           stroke="currentColor"
           stroke-width="1.5"
           viewBox="0 0 24 24"
@@ -75,7 +75,7 @@
       </button>
     {:else}
       <button
-        class="flex-grow-0 p-3 m-2 rounded-3xl shadow-2xl shadow-gray-700 bg-gray-900"
+        class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900"
         on:click={() => goto('/settings')}
       >
         <svg

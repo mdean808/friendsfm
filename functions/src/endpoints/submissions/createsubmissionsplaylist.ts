@@ -8,7 +8,7 @@ export const createsubmissionsplaylist = onRequest(
   authMiddleware(
     sentryWrapper('create-submissions-playlist', async (_req, res, user) => {
       const songs: Song[] = [];
-      const song = (await user.getCurrentSubmission())?.song || null;
+      const song = (await user.getSubmission())?.song || null;
       if (song) songs.push(song);
       const friendSubmissions = await user.getFriendSubmissions();
       for (const sub of friendSubmissions) {

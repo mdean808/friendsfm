@@ -5,7 +5,7 @@ export const getcurrentsubmissionstatus = onRequest(
   { cors: true },
   authMiddleware(
     sentryWrapper('get-current-submission-status', async (_req, res, user) => {
-      const userSub = await user.getCurrentSubmission();
+      const userSub = await user.getSubmission();
       res.status(200).json({
         type: 'success',
         message: {

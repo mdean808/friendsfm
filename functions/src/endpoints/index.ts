@@ -9,6 +9,7 @@ export * from './submissions/getcurrentsubmissionstatus';
 export * from './submissions/setcurrentsubmissionaudialscore';
 export * from './submissions/createnewusersubmission';
 export * from './submissions/createsubmissionsplaylist';
+export * from './submissions/getsubmissionbynumber';
 export * from './users/getuser';
 export * from './users/setusername';
 export * from './users/setmusicplatform';
