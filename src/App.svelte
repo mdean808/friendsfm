@@ -6,7 +6,8 @@
   import Home from './pages/home.svelte';
   import NewUser from './pages/new_user.svelte';
   import Songs from './pages/songs.svelte';
-  import Audial from './pages/audial.svelte';
+  // import Audial from './pages/audial.svelte';
+  import Stats from './pages/stats.svelte';
   import Username from './pages/username.svelte';
   import MusicProvider from './pages/music_provider.svelte';
   import Settings from './pages/settings.svelte';
@@ -170,8 +171,8 @@
       {/if}
       <main
         style={`height: calc(100vh - ${
-          65 +
-          ($currPath === '/audial' ? 0 : 65) +
+          55 +
+          ($currPath === '/audial' ? 0 : 55) +
           $bottomInset +
           $statusBarHeight
         }px)`}
@@ -192,9 +193,13 @@
           >
             <Songs />
           </div>
-        {:else if $currPath === '/audial'}
+          <!--{:else if $currPath === '/audial'}
           <div in:fly={{ x: document.body.clientWidth }}>
             <Audial />
+          </div>-->
+        {:else if $currPath === '/stats'}
+          <div in:fly={{ x: document.body.clientWidth }}>
+            <Stats />
           </div>
         {:else if $currPath === '/new_user'}
           <div style={`margin-top: 65px`} in:fade={{ duration: 300 }}>
@@ -242,7 +247,7 @@
           </div>
         {/if}
       </main>
-      {#if $loggedIn && $user.username && $user.musicPlatform}
+      {#if $loggedIn && $user?.username && $user?.musicPlatform}
         <BottomNav />
       {/if}
     </div>

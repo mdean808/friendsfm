@@ -9,6 +9,7 @@ import {
   MusicPlatform,
   Song,
   Submission as SubmissionType,
+  Location,
 } from '../types';
 import User from './user';
 
@@ -26,38 +27,35 @@ export default class Submission {
     musicPlatform: MusicPlatform;
     id: string;
   };
-  location: {
-    longitude: number;
-    latitude: number;
-  };
+  location: Location
   lateTime: Date | Timestamp;
   userId: string;
 
   constructor(
     id: string,
-    number: number,
-    song: Song,
-    audial: Audial,
-    location: { longitude: number; latitude: number },
-    late: boolean,
-    time: Date | Timestamp,
-    lateTime: Date | Timestamp,
-    user: User
+    number?: number,
+    song?: Song,
+    audial?: Audial,
+    location?: { longitude: number; latitude: number },
+    late?: boolean,
+    time?: Date | Timestamp,
+    lateTime?: Date | Timestamp,
+    user?: User
   ) {
     this.id = id;
-    this.number = number;
-    this.song = song;
-    this.audial = audial;
-    this.location = location;
-    this.late = late;
-    this.time = time;
-    this.lateTime = lateTime;
+    this.number = number || -1;
+    this.song = song || {} as Song;
+    this.audial = audial || {} as Audial;
+    this.location = location || {} as Location;
+    this.late = late || false;
+    this.time = time || new Date();
+    this.lateTime = lateTime || new Date();
     this.user = {
-      id: user.id,
-      username: user.username || '',
-      musicPlatform: user.musicPlatform || MusicPlatform.spotify,
+      id: user?.id || '',
+      username: user?.username || '',
+      musicPlatform: user?.musicPlatform || MusicPlatform.spotify,
     };
-    this.userId = user.id;
+    this.userId = user?.id || '';
   }
 
   public async load(): Promise<Submission> {
@@ -101,16 +99,16 @@ export default class Submission {
     };
   }
 
-  public static async getCurrentCount() {
-    return (await db.collection('misc').doc('notifications').get()).get(
-      'count'
-    );
-  }
-
   public async setAudial(audial: Audial) {
     if (!audial || !audial.score || !audial.number)
       throw new Error('Invalid audial provided');
     await this.dbRef.update({ audial });
+  }
+
+  public static async getCurrentCount() {
+    return (await db.collection('misc').doc('notifications').get()).get(
+      'count'
+    );
   }
 
   public static async canCreate(

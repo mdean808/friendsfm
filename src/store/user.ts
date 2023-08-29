@@ -13,8 +13,16 @@ import {
   songs,
 } from '.';
 import { getFirebaseUrl, goto, handleApiResponse } from '../lib';
-import type { MusicPlatform, SavedSong, Submission, User } from '../types';
+import type {
+  MusicPlatform,
+  SavedSong,
+  Submission,
+  User,
+  UserStatistics,
+} from '../types';
+
 export const user = map<User>({} as User);
+export const userStatistics = map<UserStatistics>({} as UserStatistics);
 
 // Load user from preferences
 export const getUserFromPreferences = action(
@@ -160,6 +168,8 @@ export const refreshUser = action(user, 'get-user-data', async (_store) => {
   await updateUser(json.message.user as User);
   // also update friend submissions
   await getFriendSubmissions();
+  // also update user statistics
+  await getUserStatistics();
 });
 
 export const unlinkMusicProvider = action(
@@ -181,5 +191,25 @@ export const unlinkMusicProvider = action(
     const u = store.get();
     u.musicPlatform = null;
     await updateUser(u);
+  }
+);
+
+export const getUserStatistics = action(
+  userStatistics,
+  'get-user-statistics',
+  async (store) => {
+    const res = await fetch(getFirebaseUrl('getuserstatistics'), {
+      method: 'POST',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+      }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+    });
+    const json = await handleApiResponse(res);
+    if (!json) {
+      // failed to unlink provider
+      return false;
+    }
+    store.set(json.message as UserStatistics);
   }
 );

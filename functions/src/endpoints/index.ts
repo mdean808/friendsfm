@@ -11,6 +11,7 @@ export * from './submissions/createnewusersubmission';
 export * from './submissions/createsubmissionsplaylist';
 export * from './submissions/getsubmissionbynumber';
 export * from './users/getuser';
+export * from './users/getuserstatistics';
 export * from './users/setusername';
 export * from './users/setmusicplatform';
 export * from './users/unlinkmusicplatform';

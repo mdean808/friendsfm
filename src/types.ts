@@ -19,6 +19,12 @@ export interface User {
   id: string;
 }
 
+export interface UserStatistics {
+  topSong: Song;
+  submissionCount: number;
+  onTimeSubmissionCount: number;
+}
+
 export interface Friend {
   username: string;
   id: string;

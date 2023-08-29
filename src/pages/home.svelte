@@ -17,6 +17,7 @@
     createSubmissionsPlaylist,
     navDate,
     getNearbySubmissions,
+    getUserStatistics,
   } from '../store';
   import Button from '../components/Button.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
@@ -138,6 +139,7 @@
   const load = async () => {
     homepageLoaded.set(false);
     loadingSubmission = true;
+    getUserStatistics();
     await getSubmissionStatus();
     loadingSubmission = false;
     if (!userSubmission.get() || !userSubmission.get().song) {

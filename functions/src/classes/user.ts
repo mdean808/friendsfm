@@ -17,6 +17,7 @@ import {
   Song,
   SpotifyAuthRes,
   Submission as SubmissionType,
+  UserStatistics,
   User as UserType,
 } from '../types';
 import Submission from './submission';
@@ -535,6 +536,28 @@ export default class User {
     // doesn't need to be synchronous
     newNotification(message);
   }
+
+  public async getStatistics() {
+    if (!this.exists) throw Error('User not loaded.');
+    const stats = {} as UserStatistics
+    stats.onTimeSubmissionCount = 0;
+    const popSongs = [] as (Song & {appearances: number})[];
+    const submissionsRef = await db.collection('submissions').where('userId', '==', this.id).get()
+    stats.submissionCount = submissionsRef.size;
+    for (const doc of submissionsRef.docs) {
+      const sub = doc.data()
+      // percentange
+      if (!sub.late) stats.onTimeSubmissionCount++
+      // calculate popular song
+      const songIndex = popSongs.findIndex(s => s.name === sub.song.name && s.artist === sub.song.artist)
+      if (songIndex === -1) popSongs.push({...sub.song, appearances: 1})
+      else popSongs[songIndex].appearances += 1
+    }
+    stats.topSong = popSongs.sort((a, b) => b.appearances - a.appearances)[0]
+    console.log(stats.topSong)
+    return stats
+  }
+
   //STATIC METHODS
   static async create(user: UserType) {
     // check if the email. username already exists

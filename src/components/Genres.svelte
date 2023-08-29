@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { activeGenre, nearbySubmissions } from '../store';
   import { goto, intToRGB, hashCode } from '../lib';
+  import type { StrippedSubmission } from '../types';
 
   let genreCounts: { count: number; name: string }[] = [];
   let uniqueGenres: string[] = [];
@@ -9,10 +10,18 @@
   let message = 0;
   export let loading = false;
 
+  nearbySubmissions.listen((val) => {
+    parseGenres(val);
+  });
+
   onMount(async () => {
     setInterval(() => (message = Math.floor(Math.random() * 5)), 1500);
+    parseGenres(nearbySubmissions.get());
+  });
+
+  const parseGenres = (storeValue: readonly StrippedSubmission[]) => {
     // handle data
-    genres = [...nearbySubmissions.get().map((item) => item.song.genre)];
+    genres = [...storeValue.map((item) => item.song.genre)];
     uniqueGenres = [...new Set(genres)];
     genreCounts = uniqueGenres.map((genre) => {
       return {
@@ -20,7 +29,7 @@
         name: genre,
       };
     });
-  });
+  };
 
   const getPosition = (name: string) => {
     const sorted = genreCounts.sort((a, b) => b.count - a.count);
