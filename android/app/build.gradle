@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
 
     namespace 'xyz.mogdan.friendsfm'
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion 34
     defaultConfig {
         applicationId "xyz.mogdan.friendsfm"
         minSdkVersion rootProject.ext.minSdkVersion
