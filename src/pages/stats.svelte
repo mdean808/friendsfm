@@ -5,7 +5,7 @@
 
 <div>
   <div class="text-white mx-auto text-center">
-    <h2 class="text-blue-600">submissions</h2>
+    <h2 class="text-blue-500">submissions</h2>
     <p>{$userStatistics.submissionCount}</p>
     <h2 class="text-green-600">on-time submissions</h2>
     <p>
