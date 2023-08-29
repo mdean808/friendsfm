@@ -21,7 +21,6 @@ import {
   User as UserType,
 } from '../types';
 import Submission from './submission';
-import { logger } from 'firebase-functions/v2';
 
 const db = getFirestore();
 
@@ -260,7 +259,6 @@ export default class User {
 
   public async getSubmission(number?: number): Promise<Submission | undefined> {
     if (!this.id) throw Error('User not loaded.');
-    logger.log('getSubmission: ' + number);
     const submissionRef = db
       .collection('submissions')
       .where(
@@ -559,7 +557,6 @@ export default class User {
       }
     }
     stats.topSong = popSongs.sort((a, b) => b.appearances - a.appearances)[0]
-    console.log(stats.topSong)
     return stats
   }
 
