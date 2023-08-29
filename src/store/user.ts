@@ -9,6 +9,7 @@ import {
   authToken,
   friendSubmissions,
   getFriendSubmissions,
+  getNewAuthToken,
   loggedIn,
   songs,
 } from '.';
@@ -198,6 +199,7 @@ export const getUserStatistics = action(
   userStatistics,
   'get-user-statistics',
   async (store) => {
+    await getNewAuthToken();
     const res = await fetch(getFirebaseUrl('getuserstatistics'), {
       method: 'POST',
       body: JSON.stringify({
