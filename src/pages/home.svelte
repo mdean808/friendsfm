@@ -170,7 +170,7 @@
 
   const createSubmission = async () => {
     loading.set(true);
-    loadFriends(true);
+    loadFriends();
     await generateSubmission();
     loadGenres();
     loading.set(false);
