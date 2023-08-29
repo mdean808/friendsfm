@@ -39,6 +39,7 @@
   // GLOBALS
   let loadingSubmission = false;
   let loadingFriendSubmissions = false;
+  let sortedFriendSubmissions: SubmissionType[] = [];
   let loadingGenres = false;
   let previousDays: (HomeDayType | 'loading' | 'end')[] = [
     'loading',
@@ -98,6 +99,10 @@
     }
   });
 
+  friendSubmissions.listen((val) => {
+    sortedFriendSubmissions = [...val].sort(sortByDate);
+  });
+
   register();
 
   onMount(async () => {
@@ -114,6 +119,7 @@
     }
 
     await getUserFromPreferences();
+    getUserStatistics();
     if (
       (!userSubmission.get() || !Object.keys(userSubmission.get())?.length) &&
       loggedIn.get() &&
@@ -139,7 +145,6 @@
   const load = async () => {
     homepageLoaded.set(false);
     loadingSubmission = true;
-    getUserStatistics();
     await getSubmissionStatus();
     loadingSubmission = false;
     if (!userSubmission.get() || !userSubmission.get().song) {
@@ -172,8 +177,8 @@
 
   const createSubmission = async () => {
     loading.set(true);
-    loadFriends();
     await generateSubmission();
+    loadFriends();
     loadGenres();
     loading.set(false);
   };
@@ -246,7 +251,7 @@
                   <SkeletonSubmission />
                   <SkeletonSubmission />
                 {:else if !loadingFriendSubmissions}
-                  {#each [...$friendSubmissions].sort(sortByDate) as submission}
+                  {#each sortedFriendSubmissions.sort(sortByDate) as submission}
                     <div class="my-2">
                       <Submission data={submission} />
                     </div>
@@ -262,22 +267,22 @@
                     >
                       add friends.
                     </p>
-                    {#if $user.submissionsPlaylist}
-                      <a
-                        href={`https://open.spotify.com/playlist/${$user.submissionsPlaylist}`}
-                        class="mx-auto text-center mt-3 text-gray-300 underline"
-                      >
-                        open your submissions playlist
-                      </a>
-                    {:else}
-                      <p
-                        on:keyup={createSubmissionsPlaylist}
-                        on:click={createSubmissionsPlaylist}
-                        class="mx-auto text-center mt-3 text-gray-300 opacity-70 underline"
-                      >
-                        create your dynamic friendsfm playlist.
-                      </p>
-                    {/if}
+                  {/if}
+                  {#if $user.submissionsPlaylist}
+                    <a
+                      href={`https://open.spotify.com/playlist/${$user.submissionsPlaylist}`}
+                      class="mx-auto text-center mt-3 text-gray-300 underline"
+                    >
+                      open your submissions playlist
+                    </a>
+                  {:else}
+                    <p
+                      on:keyup={createSubmissionsPlaylist}
+                      on:click={createSubmissionsPlaylist}
+                      class="mx-auto text-center mt-3 text-gray-300 opacity-70 underline"
+                    >
+                      create your dynamic friendsfm playlist.
+                    </p>
                   {/if}
                 {/if}
               </div>
