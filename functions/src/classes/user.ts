@@ -545,13 +545,18 @@ export default class User {
     const submissionsRef = await db.collection('submissions').where('userId', '==', this.id).get()
     stats.submissionCount = submissionsRef.size;
     for (const doc of submissionsRef.docs) {
-      const sub = doc.data()
+      const sub = doc.data() as SubmissionType
       // percentange
       if (!sub.late) stats.onTimeSubmissionCount++
       // calculate popular song
       const songIndex = popSongs.findIndex(s => s.name === sub.song.name && s.artist === sub.song.artist)
       if (songIndex === -1) popSongs.push({...sub.song, appearances: 1})
-      else popSongs[songIndex].appearances += 1
+      else {
+        if (!popSongs[songIndex]?.albumArtwork && sub?.song?.albumArtwork) {
+          popSongs[songIndex].albumArtwork = sub?.song?.albumArtwork
+        }
+        popSongs[songIndex].appearances += 1
+      }
     }
     stats.topSong = popSongs.sort((a, b) => b.appearances - a.appearances)[0]
     console.log(stats.topSong)
