@@ -18,7 +18,7 @@ import { getAppCheckToken, initAppCheck, spotifyAuthCode } from './store';
 if (import.meta.env.PROD && import.meta.env.RELEASE) {
   Sentry.init(
     {
-      dsn: 'https://6b81e7dbc9474aa9bb64e2b24652684d@o4504839408844801.ingest.sentry.io/4504839411400704',
+      dsn: import.meta.env.VITE_SENTRY_DSN,
       // integrations: [new SentrySvelte.BrowserTracing()] as any[],
       // Set your dist version, such as "1"
       dist: '1',
