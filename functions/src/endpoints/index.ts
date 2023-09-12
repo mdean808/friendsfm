@@ -19,3 +19,5 @@ export * from './songs/getsongs';
 export * from './songs/deletesong';
 export * from './songs/savesong';
 export * from './songs/createlikedsongsplaylist';
+export * from './comments/createcomment';
+export * from './comments/deletecomment';

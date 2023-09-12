@@ -3,6 +3,7 @@ import {
   DocumentSnapshot,
   getFirestore,
   Timestamp,
+  FieldValue,
 } from 'firebase-admin/firestore';
 import {
   Audial,
@@ -10,8 +11,10 @@ import {
   Song,
   Submission as SubmissionType,
   Location,
+  Comment,
 } from '../types';
 import User from './user';
+import { randomUUID } from 'crypto';
 
 const db = getFirestore();
 
@@ -29,6 +32,7 @@ export default class Submission {
   };
   location: Location
   lateTime: Date | Timestamp;
+  comments: Comment[];
   userId: string;
 
   constructor(
@@ -40,6 +44,7 @@ export default class Submission {
     late?: boolean,
     time?: Date | Timestamp,
     lateTime?: Date | Timestamp,
+    comments?: Comment[],
     user?: User
   ) {
     this.id = id;
@@ -50,6 +55,7 @@ export default class Submission {
     this.late = late || false;
     this.time = time || new Date();
     this.lateTime = lateTime || new Date();
+    this.comments = comments || [];
     this.user = {
       id: user?.id || '',
       username: user?.username || '',
@@ -94,6 +100,7 @@ export default class Submission {
       late: this.late,
       time: this.time,
       lateTime: this.lateTime,
+      comments: this.comments,
       user: this.user,
       userId: this.user.id,
     };
@@ -103,6 +110,19 @@ export default class Submission {
     if (!audial || !audial.score || !audial.number)
       throw new Error('Invalid audial provided');
     await this.dbRef.update({ audial });
+  }
+
+  public async addComment(content: string, userId: string): Promise<Comment> {
+    if (!content) throw new Error('No comment content provided')
+    const id = randomUUID()
+    await this.dbRef.update({ comments: FieldValue.arrayUnion({ id, content, user: userId }) })
+    return {content, userId: this.userId, id }
+  }
+
+  public async removeComment(id: string, content: string, userId: string) {
+    if (!content) throw new Error('No comment content provided')
+    if (!userId) throw new Error('No comment author provided')
+    await this.dbRef.update({ comments: FieldValue.arrayRemove({ id, content, user: userId }) })
   }
 
   public static async getCurrentCount() {

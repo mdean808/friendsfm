@@ -279,6 +279,7 @@ export default class User {
       submissionData.late,
       submissionData.time,
       submissionData.lateTime,
+      submissionData.comments,
       this
     );
   }
@@ -363,6 +364,7 @@ export default class User {
       audial: { number: -1, score: '' },
       song,
       location: { latitude: latitude || 135, longitude: longitude || 90.0 },
+      comments: [],
       userId: this.id,
     };
     const newSubmissionId = (
@@ -425,6 +427,7 @@ export default class User {
       newSubmission.late,
       newSubmission.time,
       newSubmission.lateTime,
+      newSubmission.comments,
       this
     );
   }

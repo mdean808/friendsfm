@@ -67,9 +67,16 @@ export interface Submission {
     musicPlatform: MusicPlatform;
     id: string;
   };
+  comments: Comment[]
   location: Location;
   lateTime: Date | Timestamp;
   userId: string;
+}
+
+export interface Comment {
+  id: string;
+  userId: string;
+  content: string;
 }
 
 export interface Location {
