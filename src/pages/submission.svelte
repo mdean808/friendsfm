@@ -13,6 +13,7 @@
     activeSubmission,
     activeGenre,
     createCommentForSubmission,
+    statusBarHeight,
   } from '../store';
   import Comment from '../components/Comment.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
@@ -37,6 +38,7 @@
 {#if $activeSubmission?.user}
   <div
     transition:scale
+    style={`padding-top: ${0 + $statusBarHeight}px`}
     class="z-50 fixed top-0 left-0 w-full h-full bg-gray-800"
   >
     <div class="sticky top-0 w-full mx-auto">
@@ -70,20 +72,20 @@
     </div>
     <div class="flex bg-gray-700 py-2 px-4 h-full">
       <div class="w-full text-left">
+        {#if !$activeSubmission.late}
+          <span class="text-sm text-center block text-gray-400"
+            >{new Date($activeSubmission.time).toLocaleString('en-US', {
+              hour: 'numeric',
+              minute: 'numeric',
+              hour12: true,
+            })}
+          </span>
+        {:else}
+          <span class="text-sm text-center block text-red-500">
+            {convertDateToLateString(new Date($activeSubmission.lateTime))}
+          </span>
+        {/if}
         <a href={$activeSubmission.song.url}>
-          {#if !$activeSubmission.late}
-            <span class="text-sm text-center text-gray-400"
-              >{new Date($activeSubmission.time).toLocaleString('en-US', {
-                hour: 'numeric',
-                minute: 'numeric',
-                hour12: true,
-              })}
-            </span>
-          {:else}
-            <span class="text-sm text-center block text-red-500">
-              {convertDateToLateString(new Date($activeSubmission.lateTime))}
-            </span>
-          {/if}
           <div class="flex mx-auto w-full py-2">
             {#if $activeSubmission.song.albumArtwork}
               <img
@@ -95,19 +97,16 @@
           </div>
           <div class="w-full mx-auto text-center">
             <div class="flex flex-col px-3 justify-start">
-              <div>
-                {#if $activeSubmission.song.timestamp > 0}
-                  -
-                  <span class="text-gray-400 text-sm">
-                    played {getDaysAgo(
-                      new Date($activeSubmission.song?.timestamp)
-                    )}
-                    {#if !getDaysAgo(new Date($activeSubmission.song?.timestamp)).includes('days ago')}at
-                      {formatTimePlayed($activeSubmission.song?.timestamp)}
-                    {/if}
-                  </span>
-                {/if}
-              </div>
+              {#if $activeSubmission.song.timestamp > 0}
+                <span class="text-gray-400 text-center text-sm">
+                  played {getDaysAgo(
+                    new Date($activeSubmission.song?.timestamp)
+                  )}
+                  {#if !getDaysAgo(new Date($activeSubmission.song?.timestamp)).includes('days ago')}at
+                    {formatTimePlayed($activeSubmission.song?.timestamp)}
+                  {/if}
+                </span>
+              {/if}
               <span
                 class={`w-full truncate text-${getPlatformColor(
                   $activeSubmission.user.musicPlatform
@@ -118,36 +117,38 @@
               <span class="w-full truncate text-gray-100">
                 {$activeSubmission.song.artist}
               </span>
-              {#if $activeSubmission.song?.genre}
-                <div
-                  on:keyup={() => {
-                    activeGenre.set($activeSubmission.song.genre);
-                    goto('/genre');
-                  }}
-                  on:click={() => {
-                    activeGenre.set($activeSubmission.song.genre);
-                    goto('/genre');
-                  }}
-                  class="text-xs w-fit mx-auto items-center leading-sm
-        uppercase px-3 pb-1 pt-1.5 rounded-full"
-                  style={`background: ${intToRGB(
-                    hashCode($activeSubmission.song.genre, 23)
-                  )}; `}
-                >
-                  <span>{$activeSubmission.song.genre}</span>
-                </div>
-              {/if}
             </div>
           </div>
         </a>
-        {#if $activeSubmission.audial && $activeSubmission.audial.number != -1}
-          <div class="text-xs pt-1 w-full text-center">
-            <p class="text-sm">
-              audial #{$activeSubmission.audial.number}
-            </p>
-            {$activeSubmission.audial.score}
-          </div>
-        {/if}
+        <div>
+          {#if $activeSubmission.song?.genre}
+            <div
+              on:keyup={() => {
+                activeGenre.set($activeSubmission.song.genre);
+                goto('/genre');
+              }}
+              on:click={() => {
+                activeGenre.set($activeSubmission.song.genre);
+                goto('/genre');
+              }}
+              class="text-xs w-fit mx-auto items-center leading-sm
+        uppercase px-3 pb-1 pt-1.5 rounded-full"
+              style={`background: ${intToRGB(
+                hashCode($activeSubmission.song.genre, 23)
+              )}; `}
+            >
+              <span>{$activeSubmission.song.genre}</span>
+            </div>
+          {/if}
+          {#if $activeSubmission.audial && $activeSubmission.audial.number != -1}
+            <div class="text-xs pt-1 w-full text-center">
+              <p class="text-sm">
+                audial #{$activeSubmission.audial.number}
+              </p>
+              {$activeSubmission.audial.score}
+            </div>
+          {/if}
+        </div>
         <div class="mx-auto w-full h-full py-2 text-left">
           <div
             class="overflow-y-auto text-white h-full border-t-white border-t-2 block"
@@ -188,7 +189,7 @@
               </svg>
               <input
                 bind:value={commentValue}
-                class="w-10/12 p-2 bg-transparent placeholder:text-gray-400 border-x-2 border-white outline-none"
+                class="w-10/12 p-2 bg-transparent placeholder:text-gray-400 border-x-2 rounded-none border-white outline-none"
                 placeholder="tap to start a comment"
               />
               {#if !commentSubmitting}
