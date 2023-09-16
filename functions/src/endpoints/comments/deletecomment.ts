@@ -6,11 +6,21 @@ export const deletecomment = onRequest(
   { cors: true },
   authMiddleware(
     sentryWrapper('delete-comment', async (req, res, user) => {
-      const { submissionId, commentId, content } = req.body;
-      const submission = new Submission(submissionId)
+      const { submissionId, comment } = JSON.parse(req.body);
+      const submission = new Submission(submissionId);
       await submission.load();
-      const comment = await submission.removeComment(commentId, content, user.id);
-      res.status(200).type('json').send({ type: 'success', comment });
+      if (user.id === comment.user.id) {
+        await submission.removeComment(comment);
+        res.status(200).type('json').send({
+          type: 'success',
+          message: 'Successfully deleted the comment.',
+        });
+      } else {
+        res.status(401).type('json').send({
+          type: 'error',
+          message: 'Delete failed: User unauthorized.',
+        });
+      }
     })
   )
 );

@@ -67,7 +67,7 @@ export interface Submission {
     musicPlatform: MusicPlatform;
     id: string;
   };
-  comments: Comment[]
+  comments: Comment[];
   location: Location;
   lateTime: Date | Timestamp;
   userId: string;
@@ -75,7 +75,10 @@ export interface Submission {
 
 export interface Comment {
   id: string;
-  userId: string;
+  user: {
+    id: string;
+    username: string;
+  };
   content: string;
 }
 

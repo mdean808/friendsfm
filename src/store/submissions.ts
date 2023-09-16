@@ -1,5 +1,5 @@
 import { action, atom, map } from 'nanostores';
-import type { StrippedSubmission, Audial, Submission } from '../types';
+import type { StrippedSubmission, Audial, Submission, Comment } from '../types';
 import { getFirebaseUrl, goto, handleApiResponse } from '../lib';
 import { appCheckToken, authToken, getNewAuthToken, loading, user } from '.';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
@@ -213,5 +213,55 @@ export const getNearbySubmissions = action(
     const data = json.message as StrippedSubmission[];
     store.set(data);
     return data;
+  }
+);
+
+export const activeSubmission = map<Submission>();
+
+export const createCommentForSubmission = action(
+  activeSubmission,
+  'create-comment-submission',
+  async (store, content: string) => {
+    const sub = store.get() as Submission;
+    const res = await fetch(getFirebaseUrl('createcomment'), {
+      method: 'post',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+        submissionId: sub.id,
+        content,
+      }),
+    });
+    const json = await handleApiResponse(res);
+    if (!json) {
+      // failed to set new music platform
+      return false;
+    }
+    const data = json.message as Comment;
+    console.log(data);
+    sub.comments.push(data);
+    store.set(sub);
+  }
+);
+
+export const deleteCommentFromSubmission = action(
+  activeSubmission,
+  'delete-comment-submission',
+  async (store, comment: Comment) => {
+    const sub = store.get() as Submission;
+    const res = await fetch(getFirebaseUrl('deletecomment'), {
+      method: 'post',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+        submissionId: sub.id,
+        comment,
+      }),
+    });
+    const json = await handleApiResponse(res);
+    if (!json) {
+      // failed to set new music platform
+      return false;
+    }
+    sub.comments = sub.comments.filter((c) => c.id !== comment.id);
+    store.set(sub);
   }
 );

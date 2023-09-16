@@ -30,7 +30,7 @@ export default class Submission {
     musicPlatform: MusicPlatform;
     id: string;
   };
-  location: Location
+  location: Location;
   lateTime: Date | Timestamp;
   comments: Comment[];
   userId: string;
@@ -49,9 +49,9 @@ export default class Submission {
   ) {
     this.id = id;
     this.number = number || -1;
-    this.song = song || {} as Song;
-    this.audial = audial || {} as Audial;
-    this.location = location || {} as Location;
+    this.song = song || ({} as Song);
+    this.audial = audial || ({} as Audial);
+    this.location = location || ({} as Location);
     this.late = late || false;
     this.time = time || new Date();
     this.lateTime = lateTime || new Date();
@@ -112,17 +112,32 @@ export default class Submission {
     await this.dbRef.update({ audial });
   }
 
-  public async addComment(content: string, userId: string): Promise<Comment> {
-    if (!content) throw new Error('No comment content provided')
-    const id = randomUUID()
-    await this.dbRef.update({ comments: FieldValue.arrayUnion({ id, content, user: userId }) })
-    return {content, userId: this.userId, id }
+  public async addComment(content: string, user: User): Promise<Comment> {
+    if (!content) throw new Error('No comment content provided');
+    const id = randomUUID();
+    const comment = {
+      id,
+      content,
+      user: { id: user.id, username: user.username },
+    };
+    await this.dbRef.update({
+      comments: FieldValue.arrayUnion(comment),
+    });
+    const u = new User(this.userId);
+    u.load().then(() =>
+      u.sendNotification(
+        `new comment`,
+        `${this.user.username} just commented on your friendsfm submission!`
+      )
+    );
+    return comment;
   }
 
-  public async removeComment(id: string, content: string, userId: string) {
-    if (!content) throw new Error('No comment content provided')
-    if (!userId) throw new Error('No comment author provided')
-    await this.dbRef.update({ comments: FieldValue.arrayRemove({ id, content, user: userId }) })
+  public async removeComment(comment: Comment) {
+    if (!comment) throw new Error('No comment provided');
+    await this.dbRef.update({
+      comments: FieldValue.arrayRemove(comment),
+    });
   }
 
   public static async getCurrentCount() {

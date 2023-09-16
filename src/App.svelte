@@ -50,6 +50,7 @@
   import { IonApp } from '@ionic/core/components/ion-app';
   import { IonContent } from '@ionic/core/components/ion-content';
   import Genre from './pages/genre.svelte';
+  import Submission from './pages/submission.svelte';
 
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.title) return;
@@ -165,6 +166,10 @@
       </div>
     {/if}
 
+    {#if $currPath.includes('&submission')}
+      <Submission />
+    {/if}
+
     <div>
       {#if $loggedIn && $user?.username && $user?.musicPlatform && $currPath !== '/audial'}
         <TopNav />
@@ -177,7 +182,7 @@
           $statusBarHeight
         }px)`}
       >
-        {#if $currPath === '/'}
+        {#if $currPath === '/' || $currPath.includes('/&')}
           <div
             style="height: inherit;"
             class="overflow-y-scroll"

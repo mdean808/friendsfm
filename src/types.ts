@@ -79,7 +79,17 @@ export interface Submission {
   song: Song;
   time: Date;
   lateTime: Date;
+  comments: Comment[];
   audial: Audial;
+}
+
+export interface Comment {
+  id: string;
+  user: {
+    id: string;
+    username: string;
+  };
+  content: string;
 }
 
 export interface Audial {

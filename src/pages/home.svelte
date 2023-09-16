@@ -100,7 +100,7 @@
   });
 
   friendSubmissions.listen((val) => {
-    sortedFriendSubmissions = [...val].sort(sortByDate);
+    if (val) sortedFriendSubmissions = [...val].sort(sortByDate);
   });
 
   register();
@@ -119,7 +119,7 @@
     }
 
     await getUserFromPreferences();
-    getUserStatistics();
+    if (loggedIn.get()) getUserStatistics();
     if (
       (!userSubmission.get() || !Object.keys(userSubmission.get())?.length) &&
       loggedIn.get() &&

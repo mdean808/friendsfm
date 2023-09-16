@@ -7,12 +7,13 @@
     goto,
   } from '../lib';
   import type { SavedSong, Submission } from '../types';
-  import { toggleSong, songs } from '../store';
+  import { toggleSong, songs, activeSubmission } from '../store';
 
   export let data: Submission;
 
   let loadingHeart = false;
-  const toggleHeart = async () => {
+  const toggleHeart = async (e: MouseEvent | KeyboardEvent) => {
+    e.stopPropagation();
     if (loadingHeart) return;
     loadingHeart = true;
     const savedSong: SavedSong = {
@@ -25,9 +26,18 @@
     await toggleSong(savedSong);
     loadingHeart = false;
   };
+
+  const showFullSubmission = () => {
+    activeSubmission.set(data);
+    goto('/&submission');
+  };
 </script>
 
-<div class={`border-white rounded-lg mb-1 shadow-lg bg-gray-700 `}>
+<div
+  on:keypress={showFullSubmission}
+  on:click={showFullSubmission}
+  class={`border-white rounded-lg mb-1 shadow-lg bg-gray-700 `}
+>
   <div class="">
     <div class="relative">
       {#if data.song.timestamp === 0}
@@ -65,55 +75,74 @@
               </span>
             {/if}
           </div>
-          <svg
-            on:click={toggleHeart}
-            on:keypress={toggleHeart}
-            class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
-              loadingHeart ? 'animate-ping text-pink-500' : ''
-            } ${
-              $songs.find((s) => s.name === data.song.name)
-                ? 'text-pink-500'
-                : ''
-            } `}
-            fill={$songs.find((s) => s.name === data.song.name)
-              ? 'currentColor'
-              : 'none'}
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-            /></svg
-          >
+          <div class="ml-auto flex gap-2 flex-grow-0 flex-shrink">
+            <div class="flex text-lg gap-1">
+              {data.comments.length}
+              <svg
+                style="transform: scale(-1, 1);"
+                fill="none"
+                class="w-6 h-6"
+                stroke="currentColor"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
+                ></path>
+              </svg>
+            </div>
+            <svg
+              on:click={toggleHeart}
+              on:keypress={toggleHeart}
+              class={`w-6 h-6 flex-grow-0 flex-shrink ${
+                loadingHeart ? 'animate-ping text-pink-500' : ''
+              } ${
+                $songs.find((s) => s.name === data.song.name)
+                  ? 'text-pink-500'
+                  : ''
+              } `}
+              fill={$songs.find((s) => s.name === data.song.name)
+                ? 'currentColor'
+                : 'none'}
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              /></svg
+            >
+          </div>
         </div>
         <div class="flex">
           <div class="w-[64%] text-left">
-            <a href={data.song.url}>
-              <div class="flex mb-1 mt-0.5">
-                {#if data.song.albumArtwork}
-                  <img
-                    alt="Album Artwork"
-                    class="w-1/4 mr-2 max-w-[3rem] max-h-[3rem] rounded-sm"
-                    src={data.song.albumArtwork}
-                  />
-                {/if}
-                <div class="w-3/4 flex flex-col items-end pr-3 justify-end">
-                  <span
-                    class={`w-full truncate text-${getPlatformColor(
-                      data.user.musicPlatform
-                    )}`}
-                  >
-                    {data.song.name}
-                  </span>
-                  <span class="w-full truncate text-gray-100">
-                    {data.song.artist}
-                  </span>
-                </div>
+            <div class="flex mb-1 mt-0.5">
+              {#if data.song.albumArtwork}
+                <img
+                  alt="Album Artwork"
+                  class="w-1/4 mr-2 max-w-[3rem] max-h-[3rem] rounded-sm"
+                  src={data.song.albumArtwork}
+                />
+              {/if}
+              <div class="w-3/4 flex flex-col items-end pr-3 justify-end">
+                <span
+                  class={`w-full truncate text-${getPlatformColor(
+                    data.user.musicPlatform
+                  )}`}
+                >
+                  {data.song.name}
+                </span>
+                <span class="w-full truncate text-gray-100">
+                  {data.song.artist}
+                </span>
               </div>
-            </a>
+            </div>
           </div>
           <div class="w-[36%] text-right mb-1 flex">
             {#if data.audial && data.audial.number != -1}
