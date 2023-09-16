@@ -210,7 +210,7 @@
                   ></path>
                 </svg>
               {:else}
-                <LoadingIndicator className={'p-2 w-1/12'} />
+                <LoadingIndicator className={'p-1 w-1/12'} />
               {/if}
             </div>
           </div>
