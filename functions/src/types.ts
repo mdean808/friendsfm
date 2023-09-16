@@ -64,7 +64,7 @@ export interface Submission {
   audial: Audial;
   user?: {
     username: string;
-    musicPlatform: MusicPlatform;
+    musicPlatform?: MusicPlatform;
     id: string;
   };
   comments: Comment[];

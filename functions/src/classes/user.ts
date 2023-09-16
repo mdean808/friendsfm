@@ -586,8 +586,7 @@ export default class User {
     user.friends = [];
     user.username = user.id;
     user.friendRequests = [];
-    user.musicPlatform = undefined;
-    await newUserRef.set(user);
+    await newUserRef.set({ ...user, musicPlatform: '' });
     return user;
   }
 }
