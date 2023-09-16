@@ -33,7 +33,7 @@ export default class User {
   displayName: string = '';
   photoURL: string = '';
   username: string = '';
-  musicPlatform: MusicPlatform = MusicPlatform.spotify;
+  musicPlatform?: MusicPlatform = undefined;
   friends: Friend[] = [];
   friendRequests: string[] = []; // usernames
   submissions: string[] = []; // submission ids
@@ -540,27 +540,32 @@ export default class User {
 
   public async getStatistics() {
     if (!this.exists) throw Error('User not loaded.');
-    const stats = {} as UserStatistics
+    const stats = {} as UserStatistics;
     stats.onTimeSubmissionCount = 0;
-    const popSongs = [] as (Song & {appearances: number})[];
-    const submissionsRef = await db.collection('submissions').where('userId', '==', this.id).get()
+    const popSongs = [] as (Song & { appearances: number })[];
+    const submissionsRef = await db
+      .collection('submissions')
+      .where('userId', '==', this.id)
+      .get();
     stats.submissionCount = submissionsRef.size;
     for (const doc of submissionsRef.docs) {
-      const sub = doc.data() as SubmissionType
+      const sub = doc.data() as SubmissionType;
       // percentange
-      if (!sub.late) stats.onTimeSubmissionCount++
+      if (!sub.late) stats.onTimeSubmissionCount++;
       // calculate popular song
-      const songIndex = popSongs.findIndex(s => s.name === sub.song.name && s.artist === sub.song.artist)
-      if (songIndex === -1) popSongs.push({...sub.song, appearances: 1})
+      const songIndex = popSongs.findIndex(
+        (s) => s.name === sub.song.name && s.artist === sub.song.artist
+      );
+      if (songIndex === -1) popSongs.push({ ...sub.song, appearances: 1 });
       else {
         if (!popSongs[songIndex]?.albumArtwork && sub?.song?.albumArtwork) {
-          popSongs[songIndex].albumArtwork = sub?.song?.albumArtwork
+          popSongs[songIndex].albumArtwork = sub?.song?.albumArtwork;
         }
-        popSongs[songIndex].appearances += 1
+        popSongs[songIndex].appearances += 1;
       }
     }
-    stats.topSong = popSongs.sort((a, b) => b.appearances - a.appearances)[0]
-    return stats
+    stats.topSong = popSongs.sort((a, b) => b.appearances - a.appearances)[0];
+    return stats;
   }
 
   //STATIC METHODS
@@ -581,6 +586,7 @@ export default class User {
     user.friends = [];
     user.username = user.id;
     user.friendRequests = [];
+    user.musicPlatform = undefined;
     await newUserRef.set(user);
     return user;
   }
