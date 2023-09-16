@@ -124,12 +124,10 @@ export default class Submission {
       comments: FieldValue.arrayUnion(comment),
     });
     const u = new User(this.userId);
-    u.load().then(() =>
-      u.sendNotification(
-        `new friendsfm comment`,
-        `${user.username}: ${content}`
-      )
-    );
+    if (this.userId !== user.id)
+      u.load().then(() =>
+        u.sendNotification(`friendsfm comment`, `${user.username}: ${content}`)
+      );
     return comment;
   }
 
