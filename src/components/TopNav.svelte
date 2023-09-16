@@ -4,18 +4,12 @@
   import {
     createSongsSpotifyPlaylist,
     currPath,
-    statusBarHeight,
     user,
     navDate,
   } from '../store';
 </script>
 
-<div
-  style={`height: ${
-    65 + $statusBarHeight
-  }px; padding-top: ${$statusBarHeight}px`}
-  class={`z-30 w-full`}
->
+<div class={`z-30 w-full h-[65px]`}>
   <div
     class={`w-full flex flex-row justify-between items-center text-${getPlatformColor(
       $user?.musicPlatform

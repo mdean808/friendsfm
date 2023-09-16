@@ -38,7 +38,6 @@
 {#if $activeSubmission?.user}
   <div
     transition:scale
-    style={`padding-top: ${0 + $statusBarHeight}px`}
     class="z-50 fixed top-0 left-0 w-full h-full bg-gray-800"
   >
     <div class="sticky top-0 w-full mx-auto">

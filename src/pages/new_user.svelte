@@ -36,9 +36,7 @@
           authToken: authToken.get(),
         });
       // send login information to the backend
-      if (!(await loginUser())) {
-        // don't goto username
-      } else {
+      if (await loginUser()) {
         const u = user.get();
         if (!u) return;
         if (!u.username || u.username === u.id) goto('/username');
@@ -93,15 +91,17 @@
   };
 </script>
 
-<main class="text-center">
-  <img src={Icon} alt="FriendsFM Logo" class="mx-auto mt-16 w-44 h-44" />
-  <div class="mx-auto py-6 px-4 w-full">
-    <h1 class="text-4xl">FriendsFM</h1>
-    <p class="text-lg text-gray-400">
-      the social way for you and your friends to enjoy music
-    </p>
+<div class="text-center flex flex-col h-full">
+  <div class="pt-10">
+    <img src={Icon} alt="FriendsFM Logo" class="mx-auto w-44 h-44" />
+    <div class="mx-auto py-6 px-4 w-full">
+      <h1 class="text-4xl">FriendsFM</h1>
+      <p class="text-lg text-gray-400">
+        the social way for you and your friends to enjoy music
+      </p>
+    </div>
   </div>
-  <div class="mx-auto w-full mt-48">
+  <div class="mx-auto w-full align-bottom h-32 flex items-end flex-col">
     <button
       type="button"
       on:click={signInWithGoogle}
@@ -148,4 +148,4 @@
       </button>
     {/if}
   </div>
-</main>
+</div>

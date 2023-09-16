@@ -16,10 +16,10 @@
   import {
     user,
     currPath,
-    bottomInset,
+    insets,
     getStatusBarHeight,
     statusBarHeight,
-    getBottomInset,
+    getInsets,
     loading,
     getNewAuthToken,
     getUserFromPreferences,
@@ -92,7 +92,7 @@
     loading.set(false);
 
     await getStatusBarHeight();
-    await getBottomInset();
+    await getInsets();
     // request permissions
     FirebaseMessaging.requestPermissions();
     try {
@@ -140,20 +140,26 @@
   <script
     defer
     async
-    src={`https://maps.googleapis.com/maps/api/js?key=${
-      import.meta.env.VITE_GOOGLE_MAPS_KEY
-    }&callback=mapready`}
+    src={'https://maps.googleapis.com/maps/api/js?key=' +
+      import.meta.env.VITE_GOOGLE_MAPS_KEY +
+      '&callback=mapready'}
   >
   </script>
 </svelte:head>
-{#if $appLoading}
-  <div transition:fade={{ duration: 100 }}>
-    <AnimatedSplashScreen />
-  </div>
-{/if}
+
 <ion-app>
-  <div class="overflow-y-hidden">
-    <div class="absolute" style={`bottom: calc(110px + ${$bottomInset}px); `}>
+  <!-- FULL APP WRAPPER -->
+  <!-- padding handles device-specific insets -->
+  <div
+    style={`padding-top: ${$insets.top}px; padding-bottom: ${
+      $insets.bottom / 2
+    }px`}
+    class="relative h-screen max-h-screen"
+  >
+    <!-- START absolute positioning -->
+
+    <!-- put the toast double the height of the bottom nav -->
+    <div class="absolute" style={`bottom: 110px; `}>
       <SvelteToast
         options={{
           reversed: true,
@@ -170,102 +176,92 @@
       <Submission />
     {/if}
 
-    <div>
-      {#if $loggedIn && $user?.username && $user?.musicPlatform && $currPath !== '/audial'}
-        <TopNav />
-      {/if}
-      <main
-        style={`height: calc(100vh - ${
-          55 +
-          ($currPath === '/audial' ? 0 : 55) +
-          $bottomInset +
-          $statusBarHeight
-        }px)`}
-      >
-        {#if $currPath === '/' || $currPath.includes('/&')}
-          <div
-            style="height: inherit;"
-            class="overflow-y-scroll"
-            in:fly={{ y: document.body.clientHeight }}
-          >
-            <Home />
-          </div>
-        {:else if $currPath === '/songs'}
-          <div
-            style="height: inherit;"
-            class="overflow-y-scroll"
-            in:fly={{ x: -document.body.clientWidth }}
-          >
-            <Songs />
-          </div>
-          <!--{:else if $currPath === '/audial'}
-          <div in:fly={{ x: document.body.clientWidth }}>
-            <Audial />
-          </div>-->
-        {:else if $currPath === '/stats'}
-          <div in:fly={{ x: document.body.clientWidth }}>
-            <Stats />
-          </div>
-        {:else if $currPath === '/new_user'}
-          <div style={`margin-top: 65px`} in:fade={{ duration: 300 }}>
-            <NewUser />
-          </div>
-        {:else if $currPath === '/username'}
-          <div style={`margin-top: 65px`} in:fade={{ duration: 300 }}>
-            <Username />
-          </div>
-        {:else if $currPath === '/music_provider'}
-          <div style={`margin-top: 65px`} in:fade={{ duration: 300 }}>
-            <MusicProvider />
-          </div>
-        {:else if $currPath === '/settings'}
-          <div
-            style={`padding-top: ${0 + $statusBarHeight}px`}
-            class="z-40 bg-gray-900 absolute left-0 top-0 w-full h-[100vh]"
-            transition:fly={{ x: document.body.clientWidth }}
-          >
-            <Settings />
-          </div>
-        {:else if $currPath === '/genre'}
-          <div
-            style={`padding-top: ${0 + $statusBarHeight}px`}
-            class="z-40 bg-gray-900 absolute left-0 top-0 w-full h-[100vh]"
-            transition:fly={{ y: document.body.clientHeight }}
-          >
-            <Genre />
-          </div>
-        {:else if $currPath === '/friends'}
-          <div
-            style={`padding-top: ${0 + $statusBarHeight}px`}
-            class="z-40 bg-gray-900 w-full absolute top-0 left-0 h-[100vh]"
-            transition:fly={{ x: -document.body.clientWidth }}
-          >
-            <Friends />
-          </div>
-        {:else if $currPath === '/paste_audial'}
-          <div
-            style={`padding-top: ${0 + $statusBarHeight}px`}
-            class="z-40 bg-gray-900 w-full absolute top-0 left-0 h-[100vh]"
-            transition:fly={{ y: -document.body.clientWidth }}
-          >
-            <PasteAudial />
-          </div>
-        {/if}
-      </main>
-      {#if $loggedIn && $user?.username && $user?.musicPlatform}
-        <BottomNav />
-      {/if}
-    </div>
+    {#if $appLoading}
+      <div transition:fade={{ duration: 100 }}>
+        <AnimatedSplashScreen />
+      </div>
+    {/if}
 
-    <div class="hidden">
-      Hidden div for Tailwind JIT
-      <span class="text-spotify" />
-      <span class="text-apple-music" />
-      <span class="border-spotify" />
-    </div>
+    {#if $currPath === '/settings'}
+      <div
+        style={`padding-top: ${0 + $statusBarHeight}px`}
+        class="z-40 bg-gray-900 absolute left-0 top-0 w-full h-full"
+        transition:fly={{ x: document.body.clientWidth }}
+      >
+        <Settings />
+      </div>
+    {:else if $currPath === '/genre'}
+      <div
+        style={`padding-top: ${0 + $statusBarHeight}px`}
+        class="z-40 bg-gray-900 absolute left-0 top-0 w-full h-full"
+        transition:fly={{ y: document.body.clientHeight }}
+      >
+        <Genre />
+      </div>
+    {:else if $currPath === '/friends'}
+      <div
+        style={`padding-top: ${0 + $statusBarHeight}px`}
+        class="z-40 bg-gray-900 w-full absolute top-0 left-0 h-full"
+        transition:fly={{ x: -document.body.clientWidth }}
+      >
+        <Friends />
+      </div>
+    {:else if $currPath === '/paste_audial'}
+      <div
+        style={`padding-top: ${0 + $statusBarHeight}px`}
+        class="z-40 bg-gray-900 w-full absolute top-0 left-0 h-full"
+        transition:fly={{ y: -document.body.clientWidth }}
+      >
+        <PasteAudial />
+      </div>
+    {/if}
+    <!-- END absolute positioning -->
+    {#if $loggedIn && $user?.username && $user?.musicPlatform && $currPath !== '/audial'}
+      <TopNav />
+    {/if}
+    <!-- APP BODY -->
+    <main style={`height: calc(100% - 70px - 65px);`}>
+      {#if $currPath === '/' || ($currPath.includes('/&') && $currPath === '/')}
+        <div class="h-full" in:fly={{ y: -document.body.clientHeight }}>
+          <Home />
+        </div>
+      {:else if $currPath === '/songs'}
+        <div in:fly={{ x: -document.body.clientWidth }}>
+          <Songs />
+        </div>
+        <!--{:else if $currPath === '/audial'}
+        <!--<div in:fly={{ x: document.body.clientWidth }}>
+        <!--  <Audial />
+        <!-- </div>
+        -->
+      {:else if $currPath === '/stats'}
+        <div class="h-full" in:fly={{ x: document.body.clientWidth }}>
+          <Stats />
+        </div>
+      {:else if $currPath === '/new_user'}
+        <div class="h-full" in:fade={{ duration: 300 }}>
+          <NewUser />
+        </div>
+      {:else if $currPath === '/username'}
+        <div class="h-full" in:fade={{ duration: 300 }}>
+          <Username />
+        </div>
+      {:else if $currPath === '/music_provider'}
+        <div class="h-full" in:fade={{ duration: 300 }}>
+          <MusicProvider />
+        </div>
+      {/if}
+      <!-- NAVS FIXED -->
+    </main>
+    {#if $loggedIn && $user?.username && $user?.musicPlatform}
+      <BottomNav />
+    {/if}
   </div>
 </ion-app>
 
-<!-- <div id="genre-pane" class="bg-gray-900 text-white"> -->
-<!--   <Genre /> -->
-<!-- </div> -->
+<div class="hidden">
+  Hidden div for Tailwind JIT
+  <span class="text-spotify" />
+  <span class="text-apple-music" />
+  <span class="border-spotify" />
+</div>

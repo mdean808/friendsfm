@@ -1,17 +1,20 @@
 <script>
   import { getPlatformColor, goto } from '../lib';
-  import { bottomInset, currPath, user } from '../store';
+  import { currPath, user } from '../store';
 </script>
 
-<div
-  style={`height: ${70 + $bottomInset + (bottomInset ? -15 : 0)}px`}
-  class={`bg-gray-900 z-30 flex w-full`}
->
+<div class={`flex w-full`}>
   <button
     on:click={() => goto('/songs')}
     class="w-1/3 flex justify-center py-2"
   >
-    <div class="mx-auto">
+    <div
+      class={`mx-auto rounded-full border bg-gray-900 px-6 pt-1 ${
+        $currPath === '/songs'
+          ? `border-${getPlatformColor($user.musicPlatform)} `
+          : 'currentColor border-transparent'
+      }`}
+    >
       <svg
         class={`w-6 h-6 mx-auto ${
           $currPath === '/songs'
@@ -29,7 +32,13 @@
     </div>
   </button>
   <button on:click={() => goto('/')} class="w-1/3 flex justify-center py-2">
-    <div class="mx-auto">
+    <div
+      class={`mx-auto rounded-full border bg-gray-900 px-6 pt-1 ${
+        $currPath === '/'
+          ? `border-${getPlatformColor($user.musicPlatform)} `
+          : 'currentColor border-transparent'
+      }`}
+    >
       <svg
         class={`w-6 h-6 mx-auto ${
           $currPath === '/'
@@ -50,7 +59,13 @@
     on:click={() => goto('/stats')}
     class="w-1/3 flex justify-center py-2"
   >
-    <div class="mx-auto">
+    <div
+      class={`mx-auto rounded-full border bg-gray-900 px-6 pt-1 ${
+        $currPath === '/stats'
+          ? `border-${getPlatformColor($user.musicPlatform)} `
+          : 'currentColor border-transparent'
+      }`}
+    >
       <svg
         fill="none"
         class={`w-6 h-6 mx-auto ${

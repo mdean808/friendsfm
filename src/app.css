@@ -26,7 +26,11 @@ body {
   color: theme('colors.gray.200');
 }
 
-input, textarea, button, select, a {
+input,
+textarea,
+button,
+select,
+a {
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -40,6 +44,9 @@ input, textarea, button, select, a {
   --ion-background-color: theme('colors.gray.800') !important;
   --ion-text-color: theme('colors.white') !important;
   --cupertino-pane-background: theme('colors.gray.900');
-  --cupertino-pane-color: theme('colors.white')
+  --cupertino-pane-color: theme('colors.white');
 }
 
+.firebase-emulator-warning {
+  display: none;
+}

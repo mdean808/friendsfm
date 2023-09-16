@@ -1,5 +1,5 @@
 import { map, atom, action } from 'nanostores';
-import { SafeArea } from 'capacitor-plugin-safe-area';
+import { SafeArea, type SafeAreaInsets } from 'capacitor-plugin-safe-area';
 import type { Location, ReverseGeolocationPosition } from '../types';
 import { NativeGeocoder } from '@capgo/nativegeocoder';
 import { Geolocation } from '@capacitor/geolocation';
@@ -15,16 +15,12 @@ export const getStatusBarHeight = action(
   }
 );
 
-export const bottomInset = atom<number>(0);
-export const getBottomInset = action(
-  bottomInset,
-  'get-bottom-inset',
-  async (store) => {
-    const insets = await SafeArea.getSafeAreaInsets();
-    store.set(insets.insets.bottom);
-    return insets.insets.bottom;
-  }
-);
+export const insets = map<SafeAreaInsets['insets']>();
+export const getInsets = action(insets, 'get-bottom-inset', async (store) => {
+  const insets = await SafeArea.getSafeAreaInsets();
+  store.set(insets.insets);
+  return insets.insets;
+});
 
 export const location = map<Location>();
 export const updateCurrentLocation = action(
