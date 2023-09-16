@@ -126,8 +126,8 @@ export default class Submission {
     const u = new User(this.userId);
     u.load().then(() =>
       u.sendNotification(
-        `new comment`,
-        `${this.user.username} just commented on your friendsfm submission!`
+        `new friendsfm comment`,
+        `${user.username}: ${content}`
       )
     );
     return comment;
