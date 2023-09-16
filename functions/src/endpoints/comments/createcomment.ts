@@ -10,6 +10,7 @@ export const createcomment = onRequest(
       const submission = new Submission(submissionId);
       await submission.load();
       await submission.addComment(content, user);
+      //todo: for some reason this isn't loading submission.user.username/id/musicPreference and so on
       res
         .status(200)
         .type('json')
