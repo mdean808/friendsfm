@@ -56,8 +56,33 @@
           </span>
         </h4>
       </div>
-      <div class="flex gap-2 text-right">
-        <div class="flex text-lg gap-1">
+      <div class="flex text-right">
+        <div class="flex text-lg gap-2">
+          <div class="h-full flex flex-col flex-nowrap justify-between">
+            <svg
+              on:click={toggleHeart}
+              on:keypress={toggleHeart}
+              class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
+                loadingHeart ? 'animate-ping text-pink-500' : ''
+              } ${
+                $songs.find((s) => s.name === data.song.name)
+                  ? 'text-pink-500'
+                  : ''
+              } `}
+              fill={$songs.find((s) => s.name === data.song.name)
+                ? 'currentColor'
+                : 'none'}
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              /></svg
+            >
+          </div>
           <div class="relative">
             <div
               class={`absolute inline-flex items-center justify-center w-4 h-4 text-xs pt-0.5 font-bold text-${getPlatformColor(
@@ -84,31 +109,6 @@
               ></path>
             </svg>
           </div>
-        </div>
-        <div class="h-full flex flex-col flex-nowrap justify-between">
-          <svg
-            on:click={toggleHeart}
-            on:keypress={toggleHeart}
-            class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
-              loadingHeart ? 'animate-ping text-pink-500' : ''
-            } ${
-              $songs.find((s) => s.name === data.song.name)
-                ? 'text-pink-500'
-                : ''
-            } `}
-            fill={$songs.find((s) => s.name === data.song.name)
-              ? 'currentColor'
-              : 'none'}
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-            /></svg
-          >
         </div>
       </div>
     </div>
