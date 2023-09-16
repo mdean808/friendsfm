@@ -9,10 +9,7 @@
         "firebase-debug.log",
         "firebase-debug.*.log"
       ],
-      "predeploy": [
-        "npm --prefix . run build",
-        "npm --prefix . run sentry:prepare"
-      ]
+      "predeploy": ["yarn run build", "yarn run sentry:prepare"]
     }
   ],
   "emulators": {
