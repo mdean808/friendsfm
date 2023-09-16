@@ -123,6 +123,7 @@ export default class Submission {
     await this.dbRef.update({
       comments: FieldValue.arrayUnion(comment),
     });
+    this.comments.push(comment);
     const u = new User(this.userId);
     if (this.userId !== user.id)
       u.load().then(() =>

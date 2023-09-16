@@ -236,10 +236,15 @@ export const createCommentForSubmission = action(
       // failed to set new music platform
       return false;
     }
-    const data = json.message as Comment;
-    console.log(data);
-    sub.comments.push(data);
-    store.set(sub);
+    store.set(json.message);
+    // update other possible locations for the submission for homepage ui updates
+    let fSubs = friendSubmissions.get();
+    if (fSubs.find((s) => s.id === sub.id)) {
+      fSubs = fSubs.filter((s) => s.id !== sub.id);
+      fSubs.push(json.message);
+      friendSubmissions.set(fSubs);
+    }
+    if (sub.id === userSubmission.get().id) userSubmission.set(json.message);
   }
 );
 
@@ -261,7 +266,14 @@ export const deleteCommentFromSubmission = action(
       // failed to set new music platform
       return false;
     }
-    sub.comments = sub.comments.filter((c) => c.id !== comment.id);
-    store.set(sub);
+    store.set(json.message);
+    // update other possible locations for the submission for homepage ui updates
+    let fSubs = friendSubmissions.get();
+    if (fSubs.find((s) => s.id === sub.id)) {
+      fSubs = fSubs.filter((s) => s.id !== sub.id);
+      fSubs.push(json.message);
+      friendSubmissions.set(fSubs);
+    }
+    if (sub.id === userSubmission.get().id) userSubmission.set(json.message);
   }
 );

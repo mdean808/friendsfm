@@ -9,8 +9,11 @@ export const createcomment = onRequest(
       const { submissionId, content } = JSON.parse(req.body);
       const submission = new Submission(submissionId);
       await submission.load();
-      const comment = await submission.addComment(content, user);
-      res.status(200).type('json').send({ type: 'success', message: comment });
+      await submission.addComment(content, user);
+      res
+        .status(200)
+        .type('json')
+        .send({ type: 'success', message: submission.json });
     })
   )
 );

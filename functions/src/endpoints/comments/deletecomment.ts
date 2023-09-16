@@ -13,7 +13,7 @@ export const deletecomment = onRequest(
         await submission.removeComment(comment);
         res.status(200).type('json').send({
           type: 'success',
-          message: 'Successfully deleted the comment.',
+          message: submission.json,
         });
       } else {
         res.status(401).type('json').send({
