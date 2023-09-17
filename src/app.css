@@ -54,3 +54,12 @@ a {
 .firebase-emulator-warning {
   display: none;
 }
+
+ion-content {
+  --offset-bottom: auto !important;
+  --overflow: hidden;
+  overflow: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
