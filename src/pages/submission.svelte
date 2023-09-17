@@ -13,7 +13,7 @@
     activeSubmission,
     activeGenre,
     createCommentForSubmission,
-    statusBarHeight,
+    insets,
   } from '../store';
   import Comment from '../components/Comment.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
@@ -37,6 +37,7 @@
 
 {#if $activeSubmission?.user}
   <div
+    style={`padding-top: ${0 + $insets.top}px`}
     transition:scale
     class="z-50 fixed top-0 left-0 w-full h-full bg-gray-800"
   >

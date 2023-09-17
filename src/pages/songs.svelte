@@ -13,7 +13,7 @@
   });
 </script>
 
-<div>
+<div class="h-full overflow-y-scroll">
   <div class="mx-4 py-1 text-center border-b-2 border-gray-400">
     <h1 class="text-xl">songs</h1>
   </div>
@@ -50,7 +50,7 @@
         you have no saved songs
       </p>
     {/if}
-    {#each $songs as song}
+    {#each [...$songs, ...$songs, ...$songs, ...$songs] as song}
       <div
         in:slide
         class="text-left px-2 mx-4 border-b-2 border-gray-400 py-2 mb-2 flex space-x-4"

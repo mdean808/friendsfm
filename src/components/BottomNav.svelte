@@ -3,7 +3,7 @@
   import { currPath, user } from '../store';
 </script>
 
-<div class={`flex w-full`}>
+<div class={`flex w-full fixed`}>
   <button
     on:click={() => goto('/songs')}
     class="w-1/3 flex justify-center py-2"

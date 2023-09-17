@@ -18,7 +18,6 @@
     currPath,
     insets,
     getStatusBarHeight,
-    statusBarHeight,
     getInsets,
     loading,
     getNewAuthToken,
@@ -184,7 +183,7 @@
 
     {#if $currPath === '/settings'}
       <div
-        style={`padding-top: ${0 + $statusBarHeight}px`}
+        style={`padding-top: ${0 + $insets.top}px`}
         class="z-40 bg-gray-900 absolute left-0 top-0 w-full h-full"
         transition:fly={{ x: document.body.clientWidth }}
       >
@@ -192,7 +191,7 @@
       </div>
     {:else if $currPath === '/genre'}
       <div
-        style={`padding-top: ${0 + $statusBarHeight}px`}
+        style={`padding-top: ${0 + $insets.top}px`}
         class="z-40 bg-gray-900 absolute left-0 top-0 w-full h-full"
         transition:fly={{ y: document.body.clientHeight }}
       >
@@ -200,7 +199,7 @@
       </div>
     {:else if $currPath === '/friends'}
       <div
-        style={`padding-top: ${0 + $statusBarHeight}px`}
+        style={`padding-top: ${0 + $insets.top}px`}
         class="z-40 bg-gray-900 w-full absolute top-0 left-0 h-full"
         transition:fly={{ x: -document.body.clientWidth }}
       >
@@ -208,7 +207,7 @@
       </div>
     {:else if $currPath === '/paste_audial'}
       <div
-        style={`padding-top: ${0 + $statusBarHeight}px`}
+        style={`padding-top: ${0 + $insets.top}px`}
         class="z-40 bg-gray-900 w-full absolute top-0 left-0 h-full"
         transition:fly={{ y: -document.body.clientWidth }}
       >
@@ -226,7 +225,7 @@
           <Home />
         </div>
       {:else if $currPath === '/songs'}
-        <div in:fly={{ x: -document.body.clientWidth }}>
+        <div class="h-full" in:fly={{ x: -document.body.clientWidth }}>
           <Songs />
         </div>
         <!--{:else if $currPath === '/audial'}

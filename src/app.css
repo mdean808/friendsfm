@@ -47,6 +47,10 @@ a {
   --cupertino-pane-color: theme('colors.white');
 }
 
+::-webkit-scrollbar {
+  display: none;
+}
+
 .firebase-emulator-warning {
   display: none;
 }
