@@ -89,9 +89,7 @@
                 data.user.musicPlatform
               )} bg-white rounded-full -top-1 -right-1`}
             >
-              {data.comments.length > 9
-                ? data.comments.length + '+'
-                : data.comments.length}
+              {data.comments.length > 9 ? 9 + '+' : data.comments.length}
             </div>
             <svg
               fill="none"
