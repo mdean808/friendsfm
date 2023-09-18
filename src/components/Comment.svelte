@@ -2,7 +2,9 @@
   import { user, deleteCommentFromSubmission } from '../store';
   import type { Comment } from '../types';
   import LoadingIndicator from './LoadingIndicator.svelte';
+
   export let comment: Comment;
+  export let replyFunc: (username: string) => void;
 
   let deleting = false;
 
@@ -18,6 +20,13 @@
   <div class="pl-2">
     <p>{comment.content}</p>
   </div>
+  <p
+    class="text-blue-500 underline text-sm"
+    on:keyup={() => replyFunc(comment.user.username)}
+    on:click={() => replyFunc(comment.user.username)}
+  >
+    reply
+  </p>
   {#if $user.id === comment.user.id}
     {#if !deleting}
       <button

@@ -20,6 +20,7 @@
 
   let commentValue: string;
   let commentSubmitting = false;
+  let input: HTMLInputElement;
   let focused = false;
 
   const submitComment = async () => {
@@ -33,6 +34,11 @@
   const close = () => {
     goto('/');
     activeSubmission.set(null);
+  };
+
+  const replyFunc = (username: string) => {
+    commentValue = `@${username} `;
+    input.focus();
   };
 </script>
 
@@ -72,85 +78,93 @@
       </div>
     </div>
     <div class="bg-gray-700 py-2 px-4 pb-[50px] w-full">
-      {#if !$activeSubmission.late}
-        <span class="text-sm text-center block text-gray-400"
-          >{new Date($activeSubmission.time).toLocaleString('en-US', {
-            hour: 'numeric',
-            minute: 'numeric',
-            hour12: true,
-          })}
-        </span>
-      {:else}
-        <span class="text-sm text-center block text-red-500">
-          {convertDateToLateString(new Date($activeSubmission.lateTime))}
-        </span>
-      {/if}
-      <a href={$activeSubmission.song.url}>
-        <div class="flex mx-auto w-full py-1">
-          {#if $activeSubmission.song.albumArtwork}
-            <img
-              alt="Album Artwork"
-              class="w-24 rounded-sm mx-auto"
-              src={$activeSubmission.song.albumArtwork}
-            />
+      {#if !focused}
+        <div transition:slide>
+          {#if !$activeSubmission.late}
+            <span class="text-sm text-center block text-gray-400"
+              >{new Date($activeSubmission.time).toLocaleString('en-US', {
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: true,
+              })}
+            </span>
+          {:else}
+            <span class="text-sm text-center block text-red-500">
+              {convertDateToLateString(new Date($activeSubmission.lateTime))}
+            </span>
           {/if}
-        </div>
-        <div class="w-full mx-auto text-center">
-          <div class="flex flex-col px-3 justify-start">
-            {#if $activeSubmission.song.timestamp > 0}
-              <span class="text-gray-400 text-center text-sm">
-                played {getDaysAgo(new Date($activeSubmission.song?.timestamp))}
-                {#if !getDaysAgo(new Date($activeSubmission.song?.timestamp)).includes('days ago')}at
-                  {formatTimePlayed($activeSubmission.song?.timestamp)}
+          <a href={$activeSubmission.song.url}>
+            <div class="flex mx-auto w-full py-1">
+              {#if $activeSubmission.song.albumArtwork}
+                <img
+                  alt="Album Artwork"
+                  class="w-24 rounded-sm mx-auto"
+                  src={$activeSubmission.song.albumArtwork}
+                />
+              {/if}
+            </div>
+            <div class="w-full mx-auto text-center">
+              <div class="flex flex-col px-3 justify-start">
+                {#if $activeSubmission.song.timestamp > 0}
+                  <span class="text-gray-400 text-center text-sm">
+                    played {getDaysAgo(
+                      new Date($activeSubmission.song?.timestamp)
+                    )}
+                    {#if !getDaysAgo(new Date($activeSubmission.song?.timestamp)).includes('days ago')}at
+                      {formatTimePlayed($activeSubmission.song?.timestamp)}
+                    {/if}
+                  </span>
                 {/if}
-              </span>
+                <span
+                  class={`w-full truncate text-${getPlatformColor(
+                    $activeSubmission.user.musicPlatform
+                  )}`}
+                >
+                  {$activeSubmission.song.name}
+                </span>
+                <span class="w-full truncate text-gray-100">
+                  {$activeSubmission.song.artist}
+                </span>
+              </div>
+            </div>
+          </a>
+          <div>
+            {#if $activeSubmission.song?.genre}
+              <div
+                on:keyup={() => {
+                  activeGenre.set($activeSubmission.song.genre);
+                  goto('/genre');
+                }}
+                on:click={() => {
+                  activeGenre.set($activeSubmission.song.genre);
+                  goto('/genre');
+                }}
+                class="text-xs w-fit mx-auto items-center leading-sm
+        uppercase px-3 pb-1 pt-1.5 rounded-full"
+                style={`background: ${intToRGB(
+                  hashCode($activeSubmission.song.genre, 23)
+                )}; `}
+              >
+                <span>{$activeSubmission.song.genre}</span>
+              </div>
             {/if}
-            <span
-              class={`w-full truncate text-${getPlatformColor(
-                $activeSubmission.user.musicPlatform
-              )}`}
-            >
-              {$activeSubmission.song.name}
-            </span>
-            <span class="w-full truncate text-gray-100">
-              {$activeSubmission.song.artist}
-            </span>
+            {#if $activeSubmission.audial && $activeSubmission.audial.number != -1}
+              <div class="text-xs pt-1 w-full text-center">
+                <p class="text-sm">
+                  audial #{$activeSubmission.audial.number}
+                </p>
+                {$activeSubmission.audial.score}
+              </div>
+            {:else}
+              <p class="text-sm pt-2 text-center">no audial submitted</p>
+            {/if}
           </div>
         </div>
-      </a>
-      <div>
-        {#if $activeSubmission.song?.genre}
-          <div
-            on:keyup={() => {
-              activeGenre.set($activeSubmission.song.genre);
-              goto('/genre');
-            }}
-            on:click={() => {
-              activeGenre.set($activeSubmission.song.genre);
-              goto('/genre');
-            }}
-            class="text-xs w-fit mx-auto items-center leading-sm
-        uppercase px-3 pb-1 pt-1.5 rounded-full"
-            style={`background: ${intToRGB(
-              hashCode($activeSubmission.song.genre, 23)
-            )}; `}
-          >
-            <span>{$activeSubmission.song.genre}</span>
-          </div>
-        {/if}
-        {#if $activeSubmission.audial && $activeSubmission.audial.number != -1}
-          <div class="text-xs pt-1 w-full text-center">
-            <p class="text-sm">
-              audial #{$activeSubmission.audial.number}
-            </p>
-            {$activeSubmission.audial.score}
-          </div>
-        {:else}
-          <p class="text-sm pt-2 text-center">no audial submitted</p>
-        {/if}
-      </div>
+      {/if}
       <div
-        style={`height: calc(100vh - ${$insets.bottom + 375}px)`}
+        style={`height: calc(100vh - ${
+          $insets.bottom + (!focused ? 375 : 0)
+        }px)`}
         class="overflow-y-scroll text-white border-t-white border-t-2 pt-2 mt-2 block"
       >
         {#if !$activeSubmission.comments?.length}
@@ -162,7 +176,7 @@
             out:fly={{ x: -document.body.clientWidth }}
             in:slide
           >
-            <Comment {comment} />
+            <Comment {comment} {replyFunc} />
           </div>
         {/each}
       </div>
@@ -177,6 +191,7 @@
       >
         <input
           bind:value={commentValue}
+          bind:this={input}
           on:submit={submitComment}
           on:focusin={() => (focused = true)}
           on:focusout={() => (focused = false)}

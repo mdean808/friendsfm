@@ -8,7 +8,7 @@ android {
         applicationId "xyz.mogdan.friendsfm"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 19
+        versionCode 21 
         versionName "0.0.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [API_KEY: "$System.env.VITE_GOOGLE_MAPS_KEY"]
