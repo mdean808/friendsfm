@@ -27,7 +27,7 @@ export default class Submission {
   audial: Audial;
   user: {
     username: string;
-    musicPlatform: MusicPlatform;
+    musicPlatform?: MusicPlatform;
     id: string;
   };
   location: Location;
@@ -69,6 +69,11 @@ export default class Submission {
     for (const key in this) {
       this[key] = res.get(key.toString()) || this[key];
     }
+    const u = new User(this.userId);
+    await u.load();
+    this.user.id = u.id;
+    this.user.username = u.username;
+    this.user.musicPlatform = u.musicPlatform;
     return this;
   }
 
@@ -124,11 +129,23 @@ export default class Submission {
       comments: FieldValue.arrayUnion(comment),
     });
     this.comments.push(comment);
-    const u = new User(this.userId);
+    // send notification to the current submission user
+    let u = new User(this.userId);
     if (this.userId !== user.id)
       u.load().then(() =>
         u.sendNotification(`friendsfm comment`, `${user.username}: ${content}`)
       );
+    // send notification to anyone else who commented
+    for (const c of this.comments) {
+      let u = new User(c.user.id);
+      if (this.userId !== u.id && u.id !== user.id)
+        u.load().then(() =>
+          u.sendNotification(
+            `friendsfm comment`,
+            `${user.username}: ${content}`
+          )
+        );
+    }
     return comment;
   }
 

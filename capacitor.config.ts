@@ -25,13 +25,13 @@ const config: CapacitorConfig = {
       presentationOptions: ['badge', 'sound', 'alert'],
     },
     Keyboard: {
-      resize: KeyboardResize.Body,
+      resize: KeyboardResize.Native,
       style: KeyboardStyle.Dark,
       resizeOnFullScreen: true,
     },
   },
   // server: {
-  //   url: 'http://206.12.66.56:8080/',
+  //   url: 'http://206.12.70.203:8080/',
   //   cleartext: true,
   // },
 };

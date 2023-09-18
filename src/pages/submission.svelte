@@ -20,6 +20,7 @@
 
   let commentValue: string;
   let commentSubmitting = false;
+  let focused = false;
 
   const submitComment = async () => {
     if (!commentValue) return;
@@ -70,10 +71,7 @@
         </button>
       </div>
     </div>
-    <div
-      style="height: calc(100% - 55px)"
-      class="bg-gray-700 py-2 px-4 pb-[50px] w-full"
-    >
+    <div class="bg-gray-700 py-2 px-4 pb-[50px] w-full">
       {#if !$activeSubmission.late}
         <span class="text-sm text-center block text-gray-400"
           >{new Date($activeSubmission.time).toLocaleString('en-US', {
@@ -88,7 +86,7 @@
         </span>
       {/if}
       <a href={$activeSubmission.song.url}>
-        <div class="flex mx-auto w-full py-2">
+        <div class="flex mx-auto w-full py-1">
           {#if $activeSubmission.song.albumArtwork}
             <img
               alt="Album Artwork"
@@ -152,7 +150,7 @@
         {/if}
       </div>
       <div
-        style="height: calc(100vh - 375px)"
+        style={`height: calc(100vh - ${$insets.bottom + 375}px)`}
         class="overflow-y-scroll text-white border-t-white border-t-2 pt-2 mt-2 block"
       >
         {#if !$activeSubmission.comments?.length}
@@ -170,35 +168,27 @@
       </div>
     </div>
     <div
-      class="w-full absolute bottom-0 flex rounded-t border shadow-md bg-gray-900 text-white"
+      style={`bottom: ${focused ? 0 : $insets.bottom}px;`}
+      class="w-full absolute flex rounded-none border-t border-b py-1 shadow-md bg-gray-900 text-white"
     >
-      <svg
-        fill="none"
-        class="p-1 h-9 w-9 m-auto"
-        stroke="currentColor"
-        stroke-width="1.5"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
+      <form
+        on:submit={(e) => e.preventDefault()}
+        class="p-2 w-10/12 rounded-none"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
-        ></path>
-      </svg>
-      <div class="p-2 w-10/12 rounded-none border-r-2 border-white">
         <input
           bind:value={commentValue}
+          on:submit={submitComment}
+          on:focusin={() => (focused = true)}
+          on:focusout={() => (focused = false)}
           class="bg-gray-900 w-full placeholder:text-gray-400 rounded-md p-1 outline-none"
           placeholder="tap to start a comment"
         />
-      </div>
+      </form>
       {#if !commentSubmitting}
         <svg
           on:click={submitComment}
           fill="none"
-          class="p-1 h-9 w-9 m-auto"
+          class="p-1 h-9 w-9 mx-auto bg-blue-600 mt-1 rounded-full"
           stroke="currentColor"
           stroke-width="1.5"
           viewBox="0 0 24 24"
@@ -212,7 +202,9 @@
           ></path>
         </svg>
       {:else}
-        <LoadingIndicator className={'p-1 h-9 w-9 m-auto'} />
+        <LoadingIndicator
+          className={'p-1 h-9 w-9 mx-auto bg-blue-600 mt-1 rounded-full'}
+        />
       {/if}
     </div>
   </div>
