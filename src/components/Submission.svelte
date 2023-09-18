@@ -124,7 +124,7 @@
 
       <div class="sticky">
         <div class="flex px-2 py-1">
-          <div class="w-2/3 text-left">
+          <div class="w-3/4 text-left">
             <div>
               {#if !data.late}
                 <span class="text-sm text-gray-400"
@@ -171,11 +171,24 @@
               </div>
             </div>
           </div>
-          <div class="w-1/3 text-right mb-1.5 self-end">
+          <div class="w-1/4 text-right mb-1.5 self-end">
             <div class="text-sm">
               {#if data.audial && data.audial.number != -1}
                 <p>audial #{data.audial.number}</p>
-                <span class="text-xs">{data.audial.score}</span>
+                <p class="text-xs">
+                  {data.audial.score
+                    .split(' ')
+                    .slice(0, 3)
+                    .toString()
+                    .replaceAll(',', ' ')}
+                </p>
+                <p class="text-xs">
+                  {data.audial.score
+                    .split(' ')
+                    .slice(3, 6)
+                    .toString()
+                    .replaceAll(',', ' ')}
+                </p>
               {:else}
                 <!-- no audial... -->
               {/if}
