@@ -225,7 +225,9 @@
         <div
           class="h-full"
           in:fly={{
-            x: document.body.clientWidth * ($prevPath === '/songs' ? 1 : -1),
+            x:
+              document.body.clientWidth *
+              ($prevPath === '/songs' || $prevPath === '/friends' ? 1 : -1),
           }}
         >
           <Home />
