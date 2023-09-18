@@ -94,7 +94,11 @@
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.title) return;
     const title = notif.title;
-    if (title.includes('FriendsFM') || title.includes('late submission')) {
+    if (
+      title.includes('FriendsFM') ||
+      title.includes('late submission') ||
+      title.includes('comment')
+    ) {
       load();
       loadFriends();
     }
