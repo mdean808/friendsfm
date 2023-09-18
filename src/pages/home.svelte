@@ -18,6 +18,7 @@
     navDate,
     getNearbySubmissions,
     getUserStatistics,
+    header,
   } from '../store';
   import Button from '../components/Button.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
@@ -106,6 +107,7 @@
   register();
 
   onMount(async () => {
+    header.set('');
     if (
       Capacitor.getPlatform() !== 'ios' ||
       Capacitor.getPlatform() !== 'android'

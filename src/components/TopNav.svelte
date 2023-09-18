@@ -6,6 +6,7 @@
     currPath,
     user,
     navDate,
+    header,
   } from '../store';
 </script>
 
@@ -45,7 +46,7 @@
       {/if}
     </button>
     <h1 class="text-center mx-auto text-2xl text-white truncate flex-grow px-4">
-      {$navDate ? getShortDate($navDate) : 'n/a'}
+      {$header || ($navDate ? getShortDate($navDate) : 'n/a')}
     </h1>
     {#if $currPath === '/songs'}
       <button

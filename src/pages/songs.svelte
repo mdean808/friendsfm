@@ -2,10 +2,11 @@
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
   import { formatDurationPlayed, getPlatformColor } from '../lib';
-  import { loadSongs, songs, toggleSong, user } from '../store';
+  import { loadSongs, songs, toggleSong, user, header } from '../store';
 
   let loadingSongs = false;
   onMount(async () => {
+    header.set('songs');
     if (loadingSongs || !songs.get() || songs.get().length !== 0) return;
     loadingSongs = true;
     await loadSongs();
@@ -14,9 +15,7 @@
 </script>
 
 <div class="h-full overflow-y-scroll">
-  <div class="mx-4 py-1 text-center border-b-2 border-gray-400">
-    <h1 class="text-xl">songs</h1>
-  </div>
+  <div class="mx-4 py-1 text-center border-b-2 border-gray-400"></div>
   {#if loadingSongs}
     <div
       class="text-left mt-2 px-2 mx-4 border-b-2 border-gray-400 py-2 mb-2 space-x-4"
@@ -50,9 +49,8 @@
         you have no saved songs
       </p>
     {/if}
-    {#each [...$songs, ...$songs, ...$songs, ...$songs] as song}
+    {#each $songs as song}
       <div
-        in:slide
         class="text-left px-2 mx-4 border-b-2 border-gray-400 py-2 mb-2 flex space-x-4"
       >
         <a href={song.url} class="flex flex-grow items-center">

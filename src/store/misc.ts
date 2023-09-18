@@ -8,6 +8,8 @@ export const prevPath = atom<string>('');
 
 export const loading = atom<boolean>(false);
 
+export const header = atom<string>('');
+
 export const appLoading = atom<boolean>(true);
 
 export const homepageLoaded = atom<boolean>(false);

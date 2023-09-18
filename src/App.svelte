@@ -23,6 +23,7 @@
     getNewAuthToken,
     getUserFromPreferences,
     loggedIn,
+    prevPath,
     notificationAction,
     refreshUser,
     appLoading,
@@ -221,7 +222,12 @@
     <!-- APP BODY -->
     <main style={`height: calc(100% - 70px - 65px);`}>
       {#if $currPath === '/' || ($currPath.includes('/&') && $currPath === '/')}
-        <div class="h-full" in:fly={{ y: -document.body.clientHeight }}>
+        <div
+          class="h-full"
+          in:fly={{
+            x: document.body.clientWidth * ($prevPath === '/songs' ? 1 : -1),
+          }}
+        >
           <Home />
         </div>
       {:else if $currPath === '/songs'}

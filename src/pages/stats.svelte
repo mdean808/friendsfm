@@ -1,6 +1,11 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { formatDurationPlayed, getPlatformColor } from '../lib';
-  import { toggleSong, user, userStatistics } from '../store';
+  import { header, toggleSong, user, userStatistics } from '../store';
+
+  onMount(() => {
+    header.set('stats');
+  });
 </script>
 
 <div>
