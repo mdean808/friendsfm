@@ -159,7 +159,7 @@
     <!-- START absolute positioning -->
 
     <!-- put the toast double the height of the bottom nav -->
-    <div class="absolute" style={`bottom: 110px; `}>
+    <div class="absolute" style={`bottom: ${55 + $insets.bottom}px; `}>
       <SvelteToast
         options={{
           reversed: true,
