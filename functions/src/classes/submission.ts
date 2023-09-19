@@ -15,6 +15,7 @@ import {
 } from '../types';
 import User from './user';
 import { randomUUID } from 'crypto';
+import { CustomError } from './error';
 
 const db = getFirestore();
 
@@ -113,12 +114,12 @@ export default class Submission {
 
   public async setAudial(audial: Audial) {
     if (!audial || !audial.score || !audial.number)
-      throw new Error('Invalid audial provided');
+      throw new CustomError('Invalid audial provided');
     await this.dbRef.update({ audial });
   }
 
   public async addComment(content: string, user: User): Promise<Comment> {
-    if (!content) throw new Error('No comment content provided');
+    if (!content) throw new CustomError('No comment content provided');
     const id = randomUUID();
     const comment = {
       id,
@@ -150,7 +151,7 @@ export default class Submission {
   }
 
   public async removeComment(comment: Comment) {
-    if (!comment) throw new Error('No comment provided');
+    if (!comment) throw new CustomError('No comment provided');
     await this.dbRef.update({
       comments: FieldValue.arrayRemove(comment),
     });

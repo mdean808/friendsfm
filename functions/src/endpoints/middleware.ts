@@ -2,6 +2,7 @@ import { logger as firebaseLog } from 'firebase-functions';
 import User from '../classes/user';
 import type { Request } from 'firebase-functions/v2/https';
 import type { Response } from 'firebase-functions';
+import { CustomError } from '@/classes/error';
 
 export const emptyMiddleware =
   (handler: (req: Request, res: Response, user: User) => Promise<any>) =>
@@ -68,7 +69,6 @@ export const sentryWrapper =
     // make sure we are in production --- if we aren't just throw the error like normal.
     if (process.env.FUNCTIONS_EMULATOR === 'true') {
       try {
-        // 3. Try calling the function handler itself
         return await handler(req, res, user);
       } catch (e) {
         const err = e as Error;
@@ -142,20 +142,21 @@ export const sentryWrapper =
         return await handler(req, res, user);
       } catch (e) {
         // return error response
-        const err = e as Error;
+        const err = e as Error | CustomError;
         if (!res.headersSent) {
-          if (err.message.includes(':'))
+          if (err instanceof CustomError) {
+            res.status(400).json({
+              type: 'error',
+              message: err.message,
+              error: err.message,
+            });
+          } else {
             res.status(500).json({
               type: 'error',
               message: 'Something went wrong. Please try again later.',
               error: err.message,
             });
-        } else {
-          res.status(400).json({
-            type: 'error',
-            message: err.message,
-            error: err.message,
-          });
+          }
         }
         // 4. Send any errors to Sentry
         captureException(e, { tags: { handled: true } });

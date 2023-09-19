@@ -8,6 +8,7 @@ import {
   SpotifyRecentlyPlayedRes,
   SpotifySearchRes,
 } from '../types';
+import { CustomError } from '@/classes/error';
 
 export const SPOTIFY_AUTH = Buffer.from(
   process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET
@@ -39,7 +40,7 @@ export const refreshSpotifyAccessCode = async (
     });
     if (res.status !== 200) {
       console.error(await res.text());
-      throw new Error('Spotify token refresh error.');
+      throw new CustomError('Spotify token refresh error.');
     } else {
       const json = await res.json();
       data.access_token = json.access_token;
@@ -70,7 +71,7 @@ export const getCurrentSpotifySong = async (accessToken: string) => {
     if (res.status === 204) {
       return await getRecentlyPlayedSpotifySongs(accessToken);
     }
-    throw new Error('Spotify now playing error. ' + res.status);
+    throw new CustomError('Spotify now playing error. ' + res.status);
   } else {
     const realRes = (await res.json()) as SpotifyCurrentlyPlayingRes;
     if (realRes.timestamp) delete realRes?.timestamp;
@@ -96,13 +97,13 @@ export const getRecentlyPlayedSpotifySongs = async (accessToken: string) => {
       'get recently played spotify songs: ' + res.status,
       await res.text()
     );
-    throw new Error('Spotify recent songs error.');
+    throw new CustomError('Spotify recent songs error.');
   } else {
     const jsonRes = await res.json();
 
     const json = jsonRes as SpotifyRecentlyPlayedRes;
 
-    if (!json.items[0]) throw new Error('No recently played songs');
+    if (!json.items[0]) throw new CustomError('No recently played songs');
 
     const currentlyPlaying: SpotifyCurrentlyPlayingRes = {
       timestamp: new Date(json.items[0]?.played_at).getTime(),
@@ -159,7 +160,7 @@ export const createSpotifyPlaylist = async (
     }
   );
   if (res.status === 403 || res.status === 400) {
-    throw new Error(
+    throw new CustomError(
       'Spotify 403 Forbidden: Please re-link the Spotify account.'
     );
   } else {
@@ -195,7 +196,7 @@ export const addSongsToSpotifyPlaylist = async (
     }
   );
   if (res.status === 403) {
-    throw new Error(
+    throw new CustomError(
       'Spotify 403 Forbidden: Adding Songs failed. Please re-link the Spotify account.'
     );
   }
@@ -238,7 +239,7 @@ export const removeAllSongsFromSpotifyPlaylist = async (
     }
   );
   if (songsRes.status === 403) {
-    throw new Error(
+    throw new CustomError(
       'Spotify 403 Forbidden: Get Songs Failed. Please re-link the Spotify account.'
     );
   }
@@ -264,7 +265,7 @@ export const removeAllSongsFromSpotifyPlaylist = async (
     }
   );
   if (res.status === 403) {
-    throw new Error(
+    throw new CustomError(
       'Spotify 403 Forbidden: Delete Songs Failed. Please re-link the Spotify account.'
     );
   }
@@ -295,7 +296,7 @@ export const removeSongsFromSpotifyPlaylist = async (
     }
   );
   if (res.status === 403) {
-    throw new Error(
+    throw new CustomError(
       'Spotify 403 Forbidden: Please re-link the Spotify account.'
     );
   }

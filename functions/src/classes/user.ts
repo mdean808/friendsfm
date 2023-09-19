@@ -21,6 +21,7 @@ import {
   User as UserType,
 } from '../types';
 import Submission from './submission';
+import { CustomError } from './error';
 
 const db = getFirestore();
 
@@ -92,7 +93,7 @@ export default class User {
   public async setUsername(username: string) {
     const usersRef = db.collection('users');
     if ((await usersRef.where('username', '==', username).get()).docs[0]) {
-      throw new Error('Username taken. Please try another.');
+      throw new CustomError('Username taken. Please try another.');
     } else {
       const userFriends = this.friends as {
         id: string;
@@ -195,7 +196,7 @@ export default class User {
 
   public async unsaveSong(song: SavedSong) {
     if (!this.exists) throw Error('User not loaded.');
-    if (!song?.id) throw new Error('No song provided.');
+    if (!song?.id) throw new CustomError('No song provided.');
     const songsRef = this.dbRef.collection('songs');
     const songRef = songsRef.doc(song.id);
 
@@ -345,7 +346,7 @@ export default class User {
       .doc('notifications')
       .get();
     if (!(await Submission.canCreate(this.id, notificationsSnapshot))) {
-      throw new Error('User already submitted.');
+      throw new CustomError('User already submitted.');
     }
     // make sure we have the latest access tokens for the user's music oauth before we get their song
     await this.updateMusicAuth();
@@ -443,13 +444,13 @@ export default class User {
   }
 
   public async acceptRequest(requester: string) {
-    if (!requester) throw new Error('No requester provided');
+    if (!requester) throw new CustomError('No requester provided');
     const usersRef = db.collection('users');
     const friendQuery = usersRef.where('username', '==', requester);
     const friend = (await friendQuery.get()).docs[0]?.data() as UserType;
     // if we have such a friend and there is an actual request from them to the user
     if (!friend || !this.friendRequests.find((u) => u === friend.username))
-      throw new Error('Friend request does not exist.');
+      throw new CustomError('Friend request does not exist.');
     // update user friends
     const userFriends = this.friends;
     this.friends.push({ username: friend.username, id: friend.id });
@@ -492,13 +493,13 @@ export default class User {
   }
 
   public async rejectRequest(requester: string) {
-    if (!requester) throw new Error('No requester provided');
+    if (!requester) throw new CustomError('No requester provided');
     const usersRef = db.collection('users');
     const friendQuery = usersRef.where('username', '==', requester);
     const friend = (await friendQuery.get()).docs[0]?.data() as UserType;
     // if we have such a friend and there is an actual request from them to the user
     if (!friend || !this.friendRequests.find((u) => u === friend.username))
-      throw new Error('Friend request does not exist.');
+      throw new CustomError('Friend request does not exist.');
     // remove from friend request array
     const userFriendRequests = this.friendRequests;
     const updatedRequests = userFriendRequests.filter(
@@ -510,11 +511,11 @@ export default class User {
   }
 
   public async sendRequest(username: string) {
-    if (!username) throw new Error('No username provided');
+    if (!username) throw new CustomError('No username provided');
     const usersRef = db.collection('users');
     const friendQuery = usersRef.where('username', '==', username);
     const friend = (await friendQuery.get()).docs[0]?.data() as User;
-    if (!friend) throw new Error('No user with provided username.');
+    if (!friend) throw new CustomError('No user with provided username.');
     const friendRef = usersRef.doc(friend.id);
     const requests = [...friend.friendRequests, this.username];
     // doesn't need to be synchronous
@@ -573,11 +574,11 @@ export default class User {
     // check if the email. username already exists
     const usersRef = db.collection('users');
     if ((await usersRef.where('email', '==', user.email).get()).docs[0]) {
-      throw new Error(`Email '${user.email}' already registered.`);
+      throw new CustomError(`Email '${user.email}' already registered.`);
     }
 
     if ((await usersRef.doc(user.id).get()).exists) {
-      throw new Error(
+      throw new CustomError(
         'User ID taken. (Perhaps the user has already registered.)'
       );
     }
