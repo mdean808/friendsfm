@@ -133,7 +133,7 @@ export default class Submission {
     let u = new User(this.userId);
     if (this.userId !== user.id)
       u.load().then(() =>
-        u.sendNotification(`friendsfm comment`, `${user.username}: ${content}`)
+        u.sendNotification(`${user.username} commented`, `${content}`)
       );
     // send notification to anyone else who commented
     for (const c of this.comments) {
@@ -195,7 +195,7 @@ export default class Submission {
       ).toDate();
       const difference = new Date().getTime() - prevTime.getTime(); // This will give difference in milliseconds
       const resultInMinutes = Math.round(difference / (60 * 1000));
-      if (resultInMinutes > 2) {
+      if (resultInMinutes > 5) {
         late = true;
         lateTime = new Date(new Date().getTime() - prevTime.getTime());
       }
@@ -203,7 +203,7 @@ export default class Submission {
       // the current date is after the current notification time
       const difference = new Date().getTime() - notificationTime.getTime(); // This will give difference in milliseconds
       const resultInMinutes = Math.round(difference / (60 * 1000));
-      if (resultInMinutes > 2) {
+      if (resultInMinutes > 5) {
         late = true;
         lateTime = new Date(new Date().getTime() - notificationTime.getTime());
       }
