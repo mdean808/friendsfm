@@ -185,20 +185,18 @@
       style={`bottom: ${focused ? 0 : $insets.bottom}px;`}
       class="w-full absolute flex rounded-none border-t border-b py-1 shadow-md bg-gray-900 text-white"
     >
-      <form
-        on:submit={(e) => e.preventDefault()}
-        class="p-2 w-10/12 rounded-none"
-      >
+      <div class="p-2 w-10/12 rounded-none">
         <input
           bind:value={commentValue}
           bind:this={input}
           on:submit={submitComment}
+          on:keyup={(e) => e.key === 'Enter' && submitComment()}
           on:focusin={() => (focused = true)}
           on:focusout={() => (focused = false)}
           class="bg-gray-900 w-full placeholder:text-gray-400 rounded-md p-1 outline-none"
           placeholder="tap to start a comment"
         />
-      </form>
+      </div>
       {#if !commentSubmitting}
         <svg
           on:click={submitComment}
