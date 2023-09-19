@@ -16,6 +16,11 @@ import { getAppCheckToken, initAppCheck, spotifyAuthCode } from './store';
 
 // Initialize Sentry
 if (import.meta.env.PROD && import.meta.env.RELEASE) {
+  console.log(
+    'sentry information',
+    import.meta.env.VITE_SENTRY_DSN,
+    import.meta.env.npm_packge_version
+  );
   Sentry.init(
     {
       dsn: import.meta.env.VITE_SENTRY_DSN,
@@ -43,6 +48,7 @@ const firebaseConfig = {
   measurementId: 'G-HQGHCKN11Z',
 };
 initializeApp(firebaseConfig);
+FirebaseAnalytics.setEnabled({ enabled: true });
 
 if (import.meta.env.DEV) {
   (async () => {
@@ -53,10 +59,6 @@ if (import.meta.env.DEV) {
     }).catch(console.log);
   })();
 }
-
-FirebaseAnalytics.setEnabled({ enabled: true });
-
-// use emulator for auth if on dev
 
 // Initialize Status Bar
 if (Capacitor.isPluginAvailable('StatusBar'))
@@ -70,7 +72,6 @@ const app = new App({
 });
 
 // Handle deeplinks
-
 CapacitorApp.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
   const url = new URL(event.url);
   if (url.pathname.includes('spotify-login')) {
