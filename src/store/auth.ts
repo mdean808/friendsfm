@@ -20,9 +20,9 @@ import {
 } from '../lib';
 import type { SavedSong, User } from '../types';
 
-// refresh every 30 seconds
+// refresh every 10 seconds
 export const userRefreshInterval = map<NodeJS.Timer>(
-  setInterval(refreshUser, 30 * 1000)
+  setInterval(refreshUser, 10 * 1000)
 );
 
 export const stopRefreshInterval = action(
