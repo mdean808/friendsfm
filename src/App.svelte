@@ -227,7 +227,9 @@
           in:fly={{
             x:
               document.body.clientWidth *
-              ($prevPath === '/songs' || $prevPath === '/friends' ? 1 : -1),
+              ($prevPath === '/songs' || $prevPath === '/friends' ? 1 : -1) *
+              ($prevPath.includes('&submission') ? 0 : 1),
+            y: $prevPath.includes('&submission') && document.body.clientHeight,
           }}
         >
           <Home />
