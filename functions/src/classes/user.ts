@@ -315,7 +315,11 @@ export default class User {
   }
 
   // METHODS
-  public async sendNotification(title: string, body: string) {
+  public async sendNotification(
+    title: string,
+    body: string,
+    data?: Message['data']
+  ) {
     if (!this.exists) throw Error('User not loaded.');
     if (!this.messagingToken) throw Error('User has no notification support.');
     const message: Message = {
@@ -323,6 +327,7 @@ export default class User {
         title: title,
         body: body,
       },
+      data,
       token: this.messagingToken,
       apns: {
         payload: {
@@ -376,7 +381,8 @@ export default class User {
       // don't await so it happens asynchonously
       this.sendNotificationToFriends(
         'late submission',
-        `${this.username} just shared what they're listening to.`
+        `${this.username} just shared what they're listening to.`,
+        { type: 'late-submission', submissionId: newSubmissionId }
       );
     }
 
@@ -433,13 +439,17 @@ export default class User {
     );
   }
 
-  public async sendNotificationToFriends(title: string, body: string) {
+  public async sendNotificationToFriends(
+    title: string,
+    body: string,
+    data?: Message['data']
+  ) {
     if (!this.exists) throw Error('User not loaded.');
     for (const f of this.friends) {
       const friend = new User(f.id);
       await friend.load();
       if (!friend.messagingToken) continue;
-      friend.sendNotification(title, body);
+      friend.sendNotification(title, body, data);
     }
   }
 
@@ -477,6 +487,10 @@ export default class User {
       notification: {
         title: this.username + ' accepted your friend request!',
         body: "tap to see what they're listening to",
+      },
+      data: {
+        type: 'request-accept',
+        friendId: this.id,
       },
       token: friend.messagingToken,
       apns: {
@@ -527,6 +541,10 @@ export default class User {
         body: 'tap to accept their request',
       },
       token: friend.messagingToken,
+      data: {
+        type: 'friend-request',
+        id: this.id,
+      },
       apns: {
         payload: {
           aps: {

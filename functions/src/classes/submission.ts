@@ -134,17 +134,20 @@ export default class Submission {
     let u = new User(this.userId);
     if (this.userId !== user.id)
       u.load().then(() =>
-        u.sendNotification(`${user.username} commented`, `${content}`)
+        u.sendNotification(`${user.username} commented`, content, {
+          type: 'comment',
+          submissionId: this.id,
+        })
       );
     // send notification to anyone else who commented
     for (const c of this.comments) {
       let u = new User(c.user.id);
       if (this.userId !== u.id && u.id !== user.id)
         u.load().then(() =>
-          u.sendNotification(
-            `friendsfm comment`,
-            `${user.username}: ${content}`
-          )
+          u.sendNotification(`${user.username} commented`, content, {
+            type: 'comment',
+            submissionId: this.id,
+          })
         );
     }
     return comment;

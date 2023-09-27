@@ -12,6 +12,9 @@ export const sendDaily = async () => {
       title: 'FriendsFM',
       body: 'See what your friends are currently listening to!',
     },
+    data: {
+      type: 'daily',
+    },
     topic: 'all',
     android: {
       priority: 'high',
