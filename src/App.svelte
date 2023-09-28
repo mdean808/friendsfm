@@ -28,6 +28,9 @@
     refreshUser,
     appLoading,
     platform,
+    friendSubmissions,
+    userSubmission,
+    activeSubmission,
   } from './store';
   import { goto } from './lib';
   import Loading from './components/Loading.svelte';
@@ -36,7 +39,6 @@
   import TopNav from './components/TopNav.svelte';
   import BottomNav from './components/BottomNav.svelte';
   import PasteAudial from './pages/paste_audial.svelte';
-  import OSLogger from './plugins/OSLogger';
   import { SplashScreen } from '@capacitor/splash-screen';
   import AnimatedSplashScreen from './components/AnimatedSplashScreen.svelte';
 
@@ -53,23 +55,26 @@
   import Submission from './pages/submission.svelte';
 
   notificationAction.subscribe(async (notif) => {
-    if (!notif || !notif.title) return;
-    const title = notif.title;
+    if (!notif || !notif.data) return;
     await getUserFromPreferences();
-    if (title.includes('added you as a friend')) {
+    // handle routing for new notifications
+    const data = notif.data as { [key: string]: any };
+    if (data.type === 'request-create') {
       await refreshUser();
       goto('/friends');
-    } else if (
-      title.includes('FriendsFM') ||
-      title.includes('late submission')
-    ) {
+    } else if (data.type === 'daily' || data.type === 'late-submission') {
       goto('/');
-    } else if (title.includes('accepted your friend request')) {
+    } else if (data.type === 'request-accept') {
       await refreshUser();
       goto('/friends');
-    }
-    if (Capacitor.isPluginAvailable('OSLogger')) {
-      await OSLogger.log({ message: currPath.get() + ' ' + title });
+    } else if (data.type === 'comment') {
+      //todo: visit sub.id
+      const subId = data.id;
+      const sub =
+        $friendSubmissions.find((s) => s.id === subId) ||
+        ($userSubmission.id === subId ? $userSubmission : null);
+      activeSubmission.set(sub);
+      goto('/&submission');
     }
   });
 
@@ -77,9 +82,6 @@
     // await initAppCheck();
     platform.set(Capacitor.getPlatform());
     SplashScreen.hide();
-    if (Capacitor.isPluginAvailable('OSLogger')) {
-      await OSLogger.log({ message: 'starting app' });
-    }
 
     if (Capacitor.isPluginAvailable('FirebaseMessaging')) {
       FirebaseMessaging.addListener(

@@ -12,10 +12,8 @@
     appLoading,
     loggedIn,
     getUserFromPreferences,
-    authToken,
     user,
     createSubmissionsPlaylist,
-    navDate,
     getNearbySubmissions,
     getUserStatistics,
     header,
@@ -28,13 +26,8 @@
   import type { IonRefresher } from '@ionic/core/components/ion-refresher';
   import { Capacitor } from '@capacitor/core';
   import { FirebaseMessaging } from '@capacitor-firebase/messaging';
-  import { register, type SwiperContainer } from 'swiper/element/bundle';
-  import HomeDay from '../components/HomeDay.svelte';
-  import type {
-    HomeDay as HomeDayType,
-    Submission as SubmissionType,
-  } from '../types';
-  import { getFirebaseUrl, goto, handleApiResponse } from '../lib';
+  import type { Submission as SubmissionType } from '../types';
+  import { goto } from '../lib';
   import Genres from '../components/Genres.svelte';
 
   // GLOBALS
@@ -42,65 +35,67 @@
   let loadingFriendSubmissions = false;
   let sortedFriendSubmissions: SubmissionType[] = [];
   let loadingGenres = false;
-  let previousDays: (HomeDayType | 'loading' | 'end')[] = [
-    'loading',
-    'loading',
-  ];
-  let currentIndex = -1;
+  // let previousDays: (HomeDayType | 'loading' | 'end')[] = [
+  //   'loading',
+  //   'loading',
+  // ];
+  // let currentIndex = -1;
 
-  function renderSwiper(container: SwiperContainer, _bar: any) {
-    // the node has been mounted in the DOM
-    container.initialize();
-    container.swiper.slideTo(previousDays.length);
-    container.swiper.on('slideChange', async (a) => {
-      if (a.swipeDirection === 'prev') {
-        currentIndex++;
-      } else {
-        currentIndex--;
-      }
-      if (currentIndex === -1) return;
-      const res = await fetch(getFirebaseUrl('getsubmissionbynumber'), {
-        method: 'POST',
-        body: JSON.stringify({
-          authToken: $authToken,
-          number: $userSubmission.number - (currentIndex + 1),
-        }),
-      });
-      const json = await handleApiResponse(res);
-      if (!json) return; // error
-      const data = json.message as HomeDayType;
-      previousDays[currentIndex] = data;
-      if (
-        $userSubmission.number !==
-          $userSubmission.number - (currentIndex + 1) &&
-        data.userSubmission.song
-      )
-        navDate.set(new Date(data.userSubmission.time));
-      else if (!data.userSubmission.song) navDate.set(null);
-      else navDate.set(new Date());
-    });
-    return {
-      update(bar: string) {
-        console.log(bar);
-        // the value of `bar` has changed
-      },
-
-      destroy() {
-        // the node has been removed from the DOM
-      },
-    };
-  }
+  // function renderSwiper(container: SwiperContainer, _bar: any) {
+  //   // the node has been mounted in the DOM
+  //   container.initialize();
+  //   container.swiper.slideTo(previousDays.length);
+  //   container.swiper.on('slideChange', async (a) => {
+  //     if (a.swipeDirection === 'prev') {
+  //       currentIndex++;
+  //     } else {
+  //       currentIndex--;
+  //     }
+  //     if (currentIndex === -1) return;
+  //     const res = await fetch(getFirebaseUrl('getsubmissionbynumber'), {
+  //       method: 'POST',
+  //       body: JSON.stringify({
+  //         authToken: $authToken,
+  //         number: $userSubmission.number - (currentIndex + 1),
+  //       }),
+  //     });
+  //     const json = await handleApiResponse(res);
+  //     if (!json) return; // error
+  //     const data = json.message as HomeDayType;
+  //     previousDays[currentIndex] = data;
+  //     if (
+  //       $userSubmission.number !==
+  //         $userSubmission.number - (currentIndex + 1) &&
+  //       data.userSubmission.song
+  //     )
+  //       navDate.set(new Date(data.userSubmission.time));
+  //     else if (!data.userSubmission.song) navDate.set(null);
+  //     else navDate.set(new Date());
+  //   });
+  //   return {
+  //     update(bar: string) {
+  //       console.log(bar);
+  //       // the value of `bar` has changed
+  //     },
+  //
+  //     destroy() {
+  //       // the node has been removed from the DOM
+  //     },
+  //   };
+  // }
 
   notificationAction.subscribe(async (notif) => {
-    if (!notif || !notif.title) return;
-    const title = notif.title;
-    if (
-      title.includes('FriendsFM') ||
-      title.includes('late submission') ||
-      title.includes('comment')
-    ) {
-      load();
-      loadFriends();
+    if (!notif || !notif.data) return;
+    const data: { [key: string]: any } = notif.data;
+    switch (data.type) {
+      case 'daily':
+        load();
+        break;
+      case 'late-submission':
+        loadFriends();
+        break;
+      default:
+        break;
     }
   });
 
@@ -108,7 +103,8 @@
     if (val) sortedFriendSubmissions = [...val].sort(sortByDate);
   });
 
-  register();
+  // from siper/element/bundle
+  // register();
 
   onMount(async () => {
     header.set('');
