@@ -382,7 +382,7 @@ export default class User {
       this.sendNotificationToFriends(
         'late submission',
         `${this.username} just shared what they're listening to.`,
-        { type: 'late-submission', submissionId: newSubmissionId }
+        { type: 'late-submission', id: newSubmissionId }
       );
     }
 

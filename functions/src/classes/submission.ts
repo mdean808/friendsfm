@@ -136,7 +136,7 @@ export default class Submission {
       u.load().then(() =>
         u.sendNotification(`${user.username} commented`, content, {
           type: 'comment',
-          submissionId: this.id,
+          id: this.id,
         })
       );
     // send notification to anyone else who commented
@@ -146,7 +146,7 @@ export default class Submission {
         u.load().then(() =>
           u.sendNotification(`${user.username} commented`, content, {
             type: 'comment',
-            submissionId: this.id,
+            id: this.id,
           })
         );
     }
