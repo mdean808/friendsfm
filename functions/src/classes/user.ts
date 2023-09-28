@@ -542,7 +542,7 @@ export default class User {
       },
       token: friend.messagingToken,
       data: {
-        type: 'friend-request',
+        type: 'request-create',
         id: this.id,
       },
       apns: {
