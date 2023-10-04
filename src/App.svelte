@@ -1,6 +1,10 @@
 <script lang="ts">
   import { FirebaseMessaging } from '@capacitor-firebase/messaging';
-  import { SvelteToast } from '@zerodevx/svelte-toast';
+  import {
+    SvelteToast,
+    toast,
+    type SvelteToastOptions,
+  } from '@zerodevx/svelte-toast';
   import { Capacitor } from '@capacitor/core';
 
   import Home from './pages/home.svelte';
@@ -68,13 +72,23 @@
       await refreshUser();
       goto('/friends');
     } else if (data.type === 'comment') {
-      //todo: visit sub.id
       const subId = data.id;
       const sub =
         $friendSubmissions.find((s) => s.id === subId) ||
         ($userSubmission.id === subId ? $userSubmission : null);
-      activeSubmission.set(sub);
-      goto('/&submission');
+      if (sub) {
+        activeSubmission.set(sub);
+        goto('/&submission');
+      } else {
+        const toastError: SvelteToastOptions = {
+          theme: {
+            '--toastColor': 'white',
+            '--toastBackground': '#ad2626',
+            '--toastBarBackground': 'white',
+          },
+        };
+        toast.push('Error: Comment not found.', toastError);
+      }
     }
   });
 
