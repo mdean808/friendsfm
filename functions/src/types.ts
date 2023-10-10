@@ -151,7 +151,7 @@ export interface SpotifyRecentlyPlayedRes {
 }
 
 export interface SpotifySearchRes {
-  tracks: {
+  tracks?: {
     href: string;
     limit: number;
     next: string;
@@ -160,63 +160,36 @@ export interface SpotifySearchRes {
     total: number;
     items: SpotifyTrack[];
   };
-  artists: {
+  artists?: {
     href: string;
     limit: number;
     next: string;
     offset: number;
     previous: string;
     total: number;
-    items: SpotifyTrack[];
+    items: SpotifyArtist[];
   };
-  playlists: {
+  albums?: {
     href: string;
     limit: number;
     next: string;
     offset: number;
     previous: string;
     total: number;
-    items: SpotifyTrack[];
+    items: SpotifyAlbum[];
   };
-  shows: {
+  playlists?: {
     href: string;
     limit: number;
     next: string;
     offset: number;
     previous: string;
     total: number;
-    items: SpotifyTrack[];
-  };
-  episodes: {
-    href: string;
-    limit: number;
-    next: string;
-    offset: number;
-    previous: string;
-    total: number;
-    items: SpotifyTrack[];
-  };
-  albums: {
-    href: string;
-    limit: number;
-    next: string;
-    offset: number;
-    previous: string;
-    total: number;
-    items: SpotifyTrack[];
-  };
-  audiobooks: {
-    href: string;
-    limit: number;
-    next: string;
-    offset: number;
-    previous: string;
-    total: number;
-    items: SpotifyTrack[];
+    items: SpotifyPlaylist[];
   };
 }
 
-export interface SpotifyPlaylistRes {
+export interface SpotifyPlaylist {
   collaborative: boolean;
   description: string;
   external_urls: {
@@ -254,6 +227,15 @@ export interface SpotifyPlaylistRes {
   snapshot_id: string;
   tracks: {
     href: string;
+    total: number;
+  };
+  type: string;
+  uri: string;
+}
+
+export interface SpotifyPlaylistRes extends SpotifyPlaylist {
+  tracks: {
+    href: string;
     limit: number;
     next: string;
     offset: number;
@@ -280,6 +262,66 @@ export interface SpotifyPlaylistRes {
       }
     ];
   };
+}
+
+export interface SpotifyAlbum {
+  album_type: string;
+  total_tracks: number;
+  available_markets: string[];
+  external_urls: {
+    spotify: string;
+  };
+  href: string;
+  id: string;
+  images: [
+    {
+      url: string;
+      height: number;
+      width: number;
+    }
+  ];
+  name: string;
+  release_date: string;
+  release_date_precision: string;
+  restrictions: {
+    reason: string;
+  };
+  type: string;
+  uri: string;
+  artists: [
+    {
+      external_urls: {
+        spotify: string;
+      };
+      href: string;
+      id: string;
+      name: string;
+      type: string;
+      uri: string;
+    }
+  ];
+}
+
+export interface SpotifyArtist {
+  external_urls: {
+    spotify: string;
+  };
+  followers: {
+    href: string;
+    total: 0;
+  };
+  genres: string[];
+  href: string;
+  id: string;
+  images: [
+    {
+      url: string;
+      height: number;
+      width: number;
+    }
+  ];
+  name: string;
+  popularity: 0;
   type: string;
   uri: string;
 }

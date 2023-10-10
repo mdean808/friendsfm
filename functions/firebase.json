@@ -1,17 +1,16 @@
 {
-  "functions": [
-    {
-      "source": ".",
-      "codebase": "default",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log"
-      ],
-      "predeploy": ["yarn run build", "yarn run sentry:prepare"]
-    }
-  ],
+  "functions": {
+    "source": ".",
+    "codebase": "default",
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-debug.*.log"
+    ],
+    "predeploy": ["yarn run build", "yarn run sentry:prepare"],
+    "runtime": "nodejs18"
+  },
   "emulators": {
     "auth": {
       "port": 9099

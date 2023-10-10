@@ -180,7 +180,7 @@ export const addSongsToSpotifyPlaylist = async (
   if (!spotifyAuth) throw Error('User not signed into spotify.');
   const songUris = [];
   for (const song of songs) {
-    const uri = (await getSpotifySong(song, spotifyAuth)).uri;
+    const uri = (await getSpotifySong(song, spotifyAuth))?.uri;
     songUris.push(uri);
   }
   const res = await fetch(
@@ -220,7 +220,7 @@ const getSpotifySong = async (
   );
   const json = (await res.json()) as SpotifySearchRes;
 
-  return json.tracks.items[0];
+  return json.tracks?.items[0];
 };
 
 export const removeAllSongsFromSpotifyPlaylist = async (
@@ -279,7 +279,7 @@ export const removeSongsFromSpotifyPlaylist = async (
   if (!spotifyAuth) throw Error('User not signed into spotify.');
   const songUris = [];
   for (const song of songs) {
-    const uri = (await getSpotifySong(song, spotifyAuth)).uri;
+    const uri = (await getSpotifySong(song, spotifyAuth))?.uri;
     songUris.push({ uri });
   }
 
@@ -300,4 +300,29 @@ export const removeSongsFromSpotifyPlaylist = async (
       'Spotify 403 Forbidden: Please re-link the Spotify account.'
     );
   }
+};
+
+export const searchSpotify = async (
+  query: string,
+  types: ('artist' | 'track' | 'playlist' | 'album')[],
+  spotifyAuth: MusicPlatformAuth
+): Promise<SpotifySearchRes> => {
+  if (!spotifyAuth) throw Error('User not signed into spotify.');
+  const res = await fetch(
+    `https://api.spotify.com/v1/search?q=${query}&type=${types.toString()}`,
+    {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + spotifyAuth.access_token,
+      },
+    }
+  );
+  if (res.status === 403) {
+    throw new CustomError(
+      'Spotify 403 Forbidden: Please re-link the Spotify account.'
+    );
+  }
+  return await res.json();
 };
