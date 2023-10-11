@@ -188,7 +188,7 @@
                 class="relative"
               >
                 <img
-                  alt="Artis "
+                  alt="Artist"
                   class="w-20 h-20 mx-auto rounded-sm"
                   src={profile.favorites.artist.artwork}
                 />
