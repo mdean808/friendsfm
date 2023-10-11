@@ -1,10 +1,16 @@
-<script>
+<script lang="ts">
   import { getPlatformColor, goto } from '../lib';
-  import { currPath, user } from '../store';
+  import { currPath, insets, user } from '../store';
+  let elem: HTMLDivElement;
 </script>
 
+{elem?.getAttribute('style')}
 <div
-  class={`flex w-full absolute left-0 bottom-0 backdrop-blur-xl rounded-t-lg`}
+  class={`flex w-full absolute left-0 backdrop-blur-xl rounded-t-lg`}
+  bind:this={elem}
+  style={`bottom: calc(${$insets.bottom}px - ${
+    $insets.bottom ? '35' : '0'
+  }px); height: calc(70px + ${$insets.bottom}px);`}
 >
   <button
     on:click={() => goto('/songs')}

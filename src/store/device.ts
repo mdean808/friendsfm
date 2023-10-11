@@ -16,7 +16,7 @@ export const getStatusBarHeight = action(
 );
 
 export const insets = map<SafeAreaInsets['insets']>();
-export const getInsets = action(insets, 'get-bottom-inset', async (store) => {
+export const getInsets = action(insets, 'get-insets', async (store) => {
   const insets = await SafeArea.getSafeAreaInsets();
   store.set(insets.insets);
   return insets.insets;

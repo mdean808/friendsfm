@@ -1,8 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
   import { formatDurationPlayed, getPlatformColor } from '../lib';
-  import { loadSongs, songs, toggleSong, user, header } from '../store';
+  import { loadSongs, songs, toggleSong, user, header, insets } from '../store';
 
   let loadingSongs = false;
   onMount(async () => {
@@ -14,7 +13,10 @@
   });
 </script>
 
-<div class="h-full overflow-y-scroll pb-[70px]">
+<div
+  class="h-full overflow-y-scroll"
+  style={`padding-bottom: calc(70px + ${$insets.bottom}px)`}
+>
   <div class="mx-4 py-1 text-center border-b-2 border-gray-400"></div>
   {#if loadingSongs}
     <div

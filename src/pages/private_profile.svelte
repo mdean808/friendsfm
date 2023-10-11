@@ -14,6 +14,7 @@
 
   onMount(() => {
     header.set('profile');
+    console.log('profile mounted');
   });
 </script>
 
@@ -54,11 +55,11 @@
           placeholder="Create a short bio..."
           class="resize-none text-center font-mono focus:none outline-none p-2 text-black placeholder:text-gray-300 rounded-md w-full"
         />
-      {:else if $user.profile.bio}
+      {:else if $user.profile?.bio}
         <p
           class="align-middle self-center text-center w-full font-mono text-sm"
         >
-          {$user.profile.bio}
+          {$user.profile?.bio}
         </p>
       {:else}
         <p
@@ -75,22 +76,23 @@
   <div class="py-4">
     <h1 class={`font-semibold text-xl`}>favorites</h1>
     <div class="grid grid-cols-3 py-2">
-      <div>
+      <div class="relative">
         {#if $user.profile?.favorites?.song}
-          <a
-            target="_blank"
-            href={$user.profile.favorites.song.url}
-            class="relative"
-          >
+          <a target="_blank" href={$user.profile.favorites.song.url}>
             <img
               alt="Song Artwork"
               class="w-20 h-20 mx-auto rounded-sm"
               src={$user.profile.favorites.song.artwork}
             />
             {#if $editingProfile}
-              <button
+              <div
                 transition:fade={{ duration: 100 }}
                 on:click={(e) => {
+                  e.preventDefault();
+                  searchType.set('track');
+                  goto('/search_spotify');
+                }}
+                on:keypress={(e) => {
                   e.preventDefault();
                   searchType.set('track');
                   goto('/search_spotify');
@@ -107,7 +109,7 @@
                     d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z"
                   ></path>
                 </svg>
-              </button>
+              </div>
             {/if}
           </a>
           <p class="mt-1 text-sm">{$user.profile.favorites.song.name}</p>
@@ -145,94 +147,93 @@
           <p class="mt-1">choose song</p>
         {/if}
       </div>
-      <div>
-        <div>
-          {#if $user.profile?.favorites?.album}
-            <a
-              target="_blank"
-              href={$user.profile.favorites.album.url}
-              class="relative"
-            >
-              <img
-                alt="Song Artwork"
-                class="w-20 h-20 mx-auto rounded-sm"
-                src={$user.profile.favorites.album.artwork}
-              />
-              {#if $editingProfile}
-                <button
-                  transition:fade={{ duration: 100 }}
-                  on:click={(e) => {
-                    e.preventDefault();
-                    searchType.set('album');
-                    goto('/search_spotify');
-                  }}
-                  class="absolute bg-white text-black p-1 w-6 h-6 right-3.5 -top-2.5 rounded-full"
-                >
-                  <svg
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z"
-                    ></path>
-                  </svg>
-                </button>
-              {/if}
-            </a>
-            <p class="mt-1 text-sm">{$user.profile.favorites.album.name}</p>
-            <p class="mt-1 text-sm text-gray-400">
-              {$user.profile.favorites.album.artist}
-            </p>
-          {:else}
-            <div
-              class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
-              on:click={() => {
-                searchType.set('album');
-                goto('/search_spotify');
-              }}
-              on:keyup={() => {
-                searchType.set('album');
-                goto('/search_spotify');
-              }}
-            >
-              <svg
-                fill="none"
-                stroke="currentColor"
-                class="w-full h-full"
-                stroke-width="1.5"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z"
-                ></path>
-              </svg>
-            </div>
-            <p class="mt-1">choose album</p>
-          {/if}
-        </div>
-      </div>
-      <div>
-        {#if $user.profile?.favorites?.artist}
-          <a
-            target="_blank"
-            href={$user.profile.favorites.artist.url}
-            class="relative"
-          >
+      <div class="relative">
+        {#if $user.profile?.favorites?.album}
+          <a target="_blank" href={$user.profile.favorites.album.url}>
             <img
-              alt="Artis "
+              alt="Song Artwork"
+              class="w-20 h-20 mx-auto rounded-sm"
+              src={$user.profile.favorites.album.artwork}
+            />
+            {#if $editingProfile}
+              <div
+                transition:fade={{ duration: 100 }}
+                on:click={(e) => {
+                  e.preventDefault();
+                  searchType.set('album');
+                  goto('/search_spotify');
+                }}
+                on:keypress={(e) => {
+                  e.preventDefault();
+                  searchType.set('album');
+                  goto('/search_spotify');
+                }}
+                class="absolute bg-white text-black p-1 w-6 h-6 right-3.5 -top-2.5 rounded-full"
+              >
+                <svg
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z"
+                  ></path>
+                </svg>
+              </div>
+            {/if}
+          </a>
+          <p class="mt-1 text-sm">{$user.profile.favorites.album.name}</p>
+          <p class="mt-1 text-sm text-gray-400">
+            {$user.profile.favorites.album.artist}
+          </p>
+        {:else}
+          <div
+            class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
+            on:click={() => {
+              searchType.set('album');
+              goto('/search_spotify');
+            }}
+            on:keyup={() => {
+              searchType.set('album');
+              goto('/search_spotify');
+            }}
+          >
+            <svg
+              fill="none"
+              stroke="currentColor"
+              class="w-full h-full"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z"
+              ></path>
+            </svg>
+          </div>
+          <p class="mt-1">choose album</p>
+        {/if}
+      </div>
+      <div class="relative">
+        {#if $user.profile?.favorites?.artist}
+          <a target="_blank" href={$user.profile.favorites.artist.url}>
+            <img
+              alt="Artist"
               class="w-20 h-20 mx-auto rounded-sm"
               src={$user.profile.favorites.artist.artwork}
             />
             {#if $editingProfile}
-              <button
+              <div
                 transition:fade={{ duration: 100 }}
                 on:click={() => {
+                  searchType.set('artist');
+                  goto('/search_spotify');
+                }}
+                on:keypress={() => {
                   searchType.set('artist');
                   goto('/search_spotify');
                 }}
@@ -248,7 +249,7 @@
                     d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z"
                   ></path>
                 </svg>
-              </button>
+              </div>
             {/if}
           </a>
           <p class="text-sm mt-1">{$user.profile.favorites.artist.name}</p>

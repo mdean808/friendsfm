@@ -17,6 +17,7 @@
     getNearbySubmissions,
     getUserStatistics,
     header,
+    insets,
   } from '../store';
   import Button from '../components/Button.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
@@ -244,7 +245,10 @@
                 {/if}
               </div>
               <span class="border-white border-t-2 block w-full" />
-              <div class="my-3 pb-[70px]">
+              <div
+                class="my-3"
+                style={`padding-bottom: calc(70px + ${$insets.bottom}px)`}
+              >
                 {#if loadingFriendSubmissions}
                   <SkeletonSubmission />
                   <SkeletonSubmission />

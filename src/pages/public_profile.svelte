@@ -41,6 +41,7 @@
     profile = json.message as User['profile'];
     loading.set(false);
   });
+  //todo: add share links, ability to add as a friend if you haven't friended them
 </script>
 
 <div class="bg-gray-900">

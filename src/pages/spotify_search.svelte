@@ -13,6 +13,7 @@
     SpotifyArtist,
     SpotifySearchRes,
     SpotifyTrack,
+    User,
   } from '../types';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
 
@@ -49,8 +50,8 @@
 
   const setFavoriteTrack = async (item: SpotifyTrack) => {
     loading.set(true);
-    const profile = $user.profile;
-    if (!profile.favorites) profile.favorites = {};
+    const profile = $user.profile || ({} as User['profile']);
+    if (!profile?.favorites) profile.favorites = {};
     profile.favorites.song = {
       name: item.name,
       artwork: item.album.images[0]?.url,
@@ -64,8 +65,8 @@
 
   const setFavoriteAlbum = async (item: SpotifyAlbum) => {
     loading.set(true);
-    const profile = $user.profile;
-    if (!profile.favorites) profile.favorites = {};
+    const profile = $user.profile || ({} as User['profile']);
+    if (!profile?.favorites) profile.favorites = {};
     profile.favorites.album = {
       name: item.name,
       artwork: item.images[0]?.url,
@@ -79,8 +80,8 @@
 
   const setFavoriteArtist = async (item: SpotifyArtist) => {
     loading.set(true);
-    const profile = $user.profile;
-    if (!profile.favorites) profile.favorites = {};
+    const profile = $user.profile || ({} as User['profile']);
+    if (!profile?.favorites) profile.favorites = {};
     profile.favorites.artist = {
       name: item.name,
       artwork: item.images[0]?.url,
