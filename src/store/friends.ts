@@ -1,8 +1,7 @@
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { action } from 'nanostores';
-import { appCheckToken, authToken, updateUser, user } from '.';
+import { appCheckToken, authToken, refreshUser, user } from '.';
 import { getFirebaseUrl, handleApiResponse } from '../lib';
-import type { User } from '../types';
 
 export const sendFriendRequest = action(
   user,
@@ -30,7 +29,7 @@ export const sendFriendRequest = action(
 export const acceptFriendRequest = action(
   user,
   'accpet-friend-request',
-  async (store, requester) => {
+  async (_store, requester) => {
     const res = await fetch(getFirebaseUrl('acceptfriend'), {
       method: 'POST',
       body: JSON.stringify({
@@ -44,8 +43,7 @@ export const acceptFriendRequest = action(
       // failed to send request
       return false;
     }
-    store.set(json.message as User);
-    updateUser(json.message);
+    refreshUser();
     FirebaseAnalytics.logEvent({ name: 'accept_friend_request' });
     return true;
   }
@@ -68,8 +66,9 @@ export const rejectFriendRequest = action(
       // failed to send request
       return false;
     }
-    store.set(json.message as User);
-    updateUser(json.message);
+    const u = store.get();
+    u.friendRequests = u.friendRequests.filter((fr) => fr !== requester);
+    store.set(u);
     FirebaseAnalytics.logEvent({ name: 'reject_friend_request' });
     return true;
   }

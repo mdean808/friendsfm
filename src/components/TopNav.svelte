@@ -28,7 +28,7 @@
     )}`}
   >
     <button
-      class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900"
+      class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900 relative"
       on:click={() => goto('/friends')}
     >
       <svg
@@ -48,7 +48,7 @@
       </svg>
       {#if $user.friendRequests.length > 0}
         <div
-          class="absolute inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full top-0 -right-2"
+          class="absolute inline-flex pt-0.5 items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full top-0 -right-1"
         >
           {$user.friendRequests.length > 9
             ? $user.friendRequests.length + '+'
@@ -80,7 +80,7 @@
           />
         </svg>
       </button>
-    {:else if $currPath === '/profile'}
+    {:else if $currPath === '/private_profile'}
       <button
         class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900"
         on:click={toggleEditingProfile}

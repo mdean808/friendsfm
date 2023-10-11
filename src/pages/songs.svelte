@@ -14,7 +14,7 @@
   });
 </script>
 
-<div class="h-full overflow-y-scroll">
+<div class="h-full overflow-y-scroll pb-[70px]">
   <div class="mx-4 py-1 text-center border-b-2 border-gray-400"></div>
   {#if loadingSongs}
     <div

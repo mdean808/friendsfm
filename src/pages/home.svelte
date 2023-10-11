@@ -244,7 +244,7 @@
                 {/if}
               </div>
               <span class="border-white border-t-2 block w-full" />
-              <div class="my-3">
+              <div class="my-3 pb-[70px]">
                 {#if loadingFriendSubmissions}
                   <SkeletonSubmission />
                   <SkeletonSubmission />

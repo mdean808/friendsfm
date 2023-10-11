@@ -16,28 +16,33 @@
   import { onDestroy, onMount } from 'svelte';
   import { slide } from 'svelte/transition';
   let newUsername = '';
+  let loaders = $user.friendRequests.map(() => false);
   let loading = false;
 
   const addFriend = async () => {
+    if (loading) return;
     loading = true;
-    if (await sendFriendRequest(newUsername)) {
+    if (await sendFriendRequest(newUsername.trim())) {
       newUsername = '';
       toast.push('Succcessfully sent friend request');
     }
     loading = false;
   };
-  const acceptRequest = async (requester: string) => {
-    loading = true;
+  const acceptRequest = async (requester: string, i: number) => {
+    console.log(loaders, i);
+    if (loaders[i]) return;
+    loaders[i] = true;
     if (await acceptFriendRequest(requester))
       toast.push('Succcessfully accepted friend request');
-    loading = false;
+    loaders[i] = false;
   };
 
-  const rejectRequest = async (requester: string) => {
-    loading = true;
+  const rejectRequest = async (requester: string, i: number) => {
+    if (loaders[i]) return;
+    loaders[i] = true;
     if (await rejectFriendRequest(requester))
       toast.push('Succcessfully rejected friend request');
-    loading = false;
+    loaders[i] = false;
   };
 
   const swipePosStart = { x: 0, y: 0 };
@@ -149,7 +154,7 @@
   </div>
   <div class="px-2 py-2 flex bg-gray-800 border-b-2 border-white">
     <div
-      class="inline-block py-1 px-1 border-2 border-r-0 rounded-sm rounded-r-none border-gray-600 text-gray-400 w-2/12 text-center "
+      class="inline-block py-1 px-1 border-2 border-r-0 rounded-sm rounded-r-none border-gray-600 text-gray-400 w-2/12 text-center"
     >
       <svg
         fill="none"
@@ -212,7 +217,7 @@
         friend requests
       </p>
       <div class="bg-gray-800 max-h-[150px] h-auto overflow-scroll">
-        {#each $user.friendRequests as username}
+        {#each $user.friendRequests as username, i}
           <div
             transition:slide
             class="w-full border-b-white text-lg border-b-2 py-1 px-3 flex"
@@ -222,11 +227,11 @@
             ><span class="text-white inline-block w-9/12 pt-1.5"
               >{username}</span
             >
-            {#if !loading}
+            {#if !loaders[i]}
               <Button
                 type="breaking"
                 title="Add friend"
-                on:click={() => rejectRequest(username)}
+                on:click={() => rejectRequest(username, i)}
                 className="w-2/12 mr-2 rounded-md h-full my-auto text-3xl"
               >
                 <svg
@@ -248,7 +253,7 @@
               <Button
                 type="submit"
                 title="Add friend"
-                on:click={() => acceptRequest(username)}
+                on:click={() => acceptRequest(username, i)}
                 className="w-2/12 h-full my-auto text-3xl"
               >
                 <svg

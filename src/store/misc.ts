@@ -38,3 +38,5 @@ export const searchType = atom<'track' | 'album' | 'playlist' | 'artist'>(
 );
 
 export const editingProfile = atom<boolean>(false);
+
+export const publicProfileUsername = atom<string>('');

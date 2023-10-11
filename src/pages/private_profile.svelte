@@ -1,11 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import {
-    formatDurationPlayed,
-    getPlatformColor,
-    goto,
-    transitionSlide,
-  } from '../lib';
+  import { formatDurationPlayed, getPlatformColor, goto } from '../lib';
   import {
     editingProfile,
     header,
@@ -15,7 +10,7 @@
     user,
     userStatistics,
   } from '../store';
-  import { fade, fly, slide } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
 
   onMount(() => {
     header.set('profile');

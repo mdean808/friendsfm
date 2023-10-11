@@ -44,7 +44,6 @@
       return false;
     }
     response = json.message as SpotifySearchRes;
-    console.log(response);
     searching = false;
   };
 
@@ -60,7 +59,7 @@
     };
     await setProfile(profile);
     loading.set(false);
-    goto('/profile');
+    goto('/private_profile');
   };
 
   const setFavoriteAlbum = async (item: SpotifyAlbum) => {
@@ -75,7 +74,7 @@
     };
     await setProfile(profile);
     loading.set(false);
-    goto('/profile');
+    goto('/private_profile');
   };
 
   const setFavoriteArtist = async (item: SpotifyArtist) => {
@@ -89,7 +88,7 @@
     };
     await setProfile(profile);
     loading.set(false);
-    goto('/profile');
+    goto('/private_profile');
   };
 </script>
 
@@ -103,7 +102,7 @@
         {$searchType} search
       </h1>
       <button
-        on:click={() => goto('/profile')}
+        on:click={() => goto('/private_profile')}
         class="flex-grow-0 text-transparent"
         ><svg
           fill="none"

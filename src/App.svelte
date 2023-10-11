@@ -11,7 +11,7 @@
   import NewUser from './pages/new_user.svelte';
   import Songs from './pages/songs.svelte';
   // import Audial from './pages/audial.svelte';
-  import Profile from './pages/profile.svelte';
+  import PrivateProfile from './pages/private_profile.svelte';
   import Username from './pages/username.svelte';
   import MusicProvider from './pages/music_provider.svelte';
   import Settings from './pages/settings.svelte';
@@ -58,6 +58,7 @@
   import Genre from './pages/genre.svelte';
   import Submission from './pages/submission.svelte';
   import SpotifySearch from './pages/spotify_search.svelte';
+  import PublicProfile from './pages/public_profile.svelte';
 
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.data) return;
@@ -239,13 +240,21 @@
       >
         <SpotifySearch />
       </div>
+    {:else if $currPath === '/public_profile'}
+      <div
+        style={`padding-top: ${0 + $insets.top}px`}
+        class="z-40 bg-gray-900 absolute left-0 top-0 w-full h-full"
+        transition:fly={{ y: document.body.clientHeight }}
+      >
+        <PublicProfile />
+      </div>
     {/if}
     <!-- END absolute positioning -->
     {#if $loggedIn && $user?.username && $user?.musicPlatform && $currPath !== '/audial'}
       <TopNav />
     {/if}
     <!-- APP BODY -->
-    <main style={`height: calc(100% - 70px - 65px);`}>
+    <main style={`height: calc(100% - 65px);`}>
       {#if $currPath === '/' || ($currPath.includes('/&') && $currPath === '/')}
         <div
           class="h-full"
@@ -253,8 +262,14 @@
             x:
               document.body.clientWidth *
               ($prevPath === '/songs' || $prevPath === '/friends' ? 1 : -1) *
-              ($prevPath.includes('&submission') ? 0 : 1),
-            y: $prevPath.includes('&submission') && document.body.clientHeight,
+              ($prevPath.includes('&submission') ||
+              $prevPath === '/public_profile'
+                ? 0
+                : 1),
+            y:
+              ($prevPath.includes('&submission') ||
+                $prevPath === '/public_profile') &&
+              document.body.clientHeight,
           }}
         >
           <Home />
@@ -268,7 +283,7 @@
         <!--  <Audial />
         <!-- </div>
         -->
-      {:else if $currPath === '/profile'}
+      {:else if $currPath === '/private_profile'}
         <div
           class="h-full"
           in:fly={{
@@ -276,7 +291,7 @@
             y: $prevPath === '/search_spotify' ? document.body.clientHeight : 0,
           }}
         >
-          <Profile />
+          <PrivateProfile />
         </div>
       {:else if $currPath === '/new_user'}
         <div class="h-full" in:fade={{ duration: 300 }}>

@@ -8,7 +8,12 @@
   } from '../lib';
   import MusicPlatformIcon from './MusicPlatformIcon.svelte';
   import type { SavedSong, Submission } from '../types';
-  import { toggleSong, songs, activeSubmission } from '../store';
+  import {
+    toggleSong,
+    songs,
+    activeSubmission,
+    publicProfileUsername,
+  } from '../store';
 
   export let data: Submission;
 
@@ -45,7 +50,13 @@
         data.user.musicPlatform
       )}`}
     >
-      <div class="flex-grow text-left">
+      <button
+        on:click={() => {
+          goto('/public_profile');
+          publicProfileUsername.set(data.user.username);
+        }}
+        class="flex-grow text-left"
+      >
         <h4 class="text-xl">
           <img
             class="w-5 h-5 inline rounded-full"
@@ -62,7 +73,7 @@
             />
           </span>
         </h4>
-      </div>
+      </button>
       <div class="flex text-right">
         <div class="flex text-lg gap-2">
           <div class="h-full flex flex-col flex-nowrap justify-between">

@@ -3,7 +3,9 @@
   import { currPath, user } from '../store';
 </script>
 
-<div class={`flex w-full fixed`}>
+<div
+  class={`flex w-full absolute left-0 bottom-0 backdrop-blur-xl rounded-t-lg`}
+>
   <button
     on:click={() => goto('/songs')}
     class="w-1/3 flex justify-center py-2"
@@ -56,19 +58,19 @@
     </div>
   </button>
   <button
-    on:click={() => goto('/profile')}
+    on:click={() => goto('/private_profile')}
     class="w-1/3 flex justify-center py-2"
   >
     <div
       class={`mx-auto rounded-full border bg-gray-900 px-6 pt-1 ${
-        $currPath === '/profile'
+        $currPath === '/private_profile'
           ? `border-${getPlatformColor($user.musicPlatform)} `
           : 'currentColor border-transparent'
       }`}
     >
       <svg
         class={`w-6 h-6 mx-auto ${
-          $currPath === '/profile'
+          $currPath === '/private_profile'
             ? `text-${getPlatformColor($user.musicPlatform)}`
             : 'currentColor'
         }`}
