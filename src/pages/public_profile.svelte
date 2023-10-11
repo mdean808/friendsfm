@@ -35,9 +35,11 @@
     const json = await handleApiResponse(res);
     if (!json) {
       // handle login failure
-      return false;
+      loading.set(false);
+      return;
     }
     profile = json.message as User['profile'];
+    loading.set(false);
   });
 </script>
 
@@ -75,7 +77,7 @@
         <h1 class="py-2 font-semibold text-xl">{$publicProfileUsername}</h1>
         <hr class="w-28 border-gray-400 border-[1.5px] rounded-full mx-auto" />
         <div class="py-2 flex max-h-20 h-20 w-full">
-          {#if profile.bio}
+          {#if profile?.bio}
             <p
               class="align-middle self-center text-center w-full font-mono text-sm"
             >
@@ -115,7 +117,7 @@
               </p>
             {:else}
               <div
-                class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
+                class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto transition-all duration-100"
               >
                 <svg
                   fill="none"
@@ -156,7 +158,7 @@
                 </p>
               {:else}
                 <div
-                  class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
+                  class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto transition-all duration-100"
                 >
                   <svg
                     fill="none"
@@ -194,7 +196,7 @@
               <p class="text-sm mt-1">{profile.favorites.artist.name}</p>
             {:else}
               <div
-                class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
+                class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto transition-all duration-100"
               >
                 <svg
                   fill="none"
@@ -219,7 +221,7 @@
       </div>
       <hr class="w-28 border-gray-400 border-[1.5px] rounded-full mx-auto" />
       <!-- User Common Song -->
-      {#if profile.stats?.topSong}
+      {#if profile?.stats?.topSong}
         <h2 class="mt-3 mb-1 font-semibold text-xl">most common song</h2>
         <div
           class="text-left bg-gray-700 rounded-md px-2 mx-4 py-2 mb-2 flex space-x-4"
