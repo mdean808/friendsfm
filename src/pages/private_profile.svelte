@@ -24,7 +24,10 @@
   };
 </script>
 
-<div class="text-white mx-auto text-center">
+<div
+  class="text-white mx-auto text-center"
+  style="height: calc(100% - 70px); overflow-y: scroll;"
+>
   <!-- User Info -->
   <div class="px-2">
     <div class="relative w-20 h-20 mx-auto">

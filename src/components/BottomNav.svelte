@@ -4,7 +4,6 @@
   let elem: HTMLDivElement;
 </script>
 
-{elem?.getAttribute('style')}
 <div
   class={`flex w-full absolute left-0 backdrop-blur-xl rounded-t-lg`}
   bind:this={elem}

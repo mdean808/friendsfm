@@ -65,7 +65,10 @@
         ></path>
       </svg>
     </button>
-    <div class="text-white mx-auto text-center py-2">
+    <div
+      class="text-white mx-auto text-center py-2"
+      style="height: calc(100% - 70px); overflow-y: scroll;"
+    >
       <!-- User Info -->
       <div class="px-2">
         <div class="relative w-20 h-20 mx-auto">
@@ -77,22 +80,21 @@
         </div>
         <h1 class="py-2 font-semibold text-xl">{$publicProfileUsername}</h1>
         <hr class="w-28 border-gray-400 border-[1.5px] rounded-full mx-auto" />
-        <div class="py-2 flex max-h-20 h-20 w-full">
+        <div class="py-1 flex max-h-20 h-14 w-full">
           {#if profile?.bio}
             <p
-              class="align-middle self-center text-center w-full font-mono text-sm"
+              class="align-middle self-center text-center w-full font-mono text-xs"
             >
-              {profile.bio}
+              {profile?.bio}
             </p>
           {:else}
             <p
-              class="text-gray-400 text-sm align-middle self-center text-center w-full"
+              class="text-gray-400 text-xs font-mono align-middle self-center text-center w-full"
             >
               {$publicProfileUsername} has no bio...
             </p>
           {/if}
         </div>
-
         <hr class="w-28 border-gray-400 border-[1.5px] rounded-full mx-auto" />
       </div>
       <!-- User Favorites -->
