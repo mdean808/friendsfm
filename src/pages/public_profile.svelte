@@ -96,7 +96,7 @@
         <hr class="w-28 border-gray-400 border-[1.5px] rounded-full mx-auto" />
       </div>
       <!-- User Favorites -->
-      <div class="py-4">
+      <div class="py-4 px-2">
         <h1 class={`font-semibold text-xl`}>favorites</h1>
         <div class="grid grid-cols-3 py-2">
           <div>
