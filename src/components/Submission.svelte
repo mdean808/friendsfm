@@ -47,6 +47,13 @@
     >
       <div class="flex-grow text-left">
         <h4 class="text-xl">
+          <img
+            class="w-5 h-5 inline rounded-full"
+            src={`https://icotar.com/avatar/${
+              data.user?.username || 'undefined'
+            }.svg`}
+            alt="avatar"
+          />
           {data.user ? data.user.username : 'Unknown'}
           <span class={`text-white`}
             ><MusicPlatformIcon

@@ -51,6 +51,13 @@
 
       <div class="sticky px-2 py-2">
         <div class="flex">
+          <img
+            class="w-5 h-5 mr-2 inline rounded-full"
+            src={`https://icotar.com/avatar/${
+              data.user?.username || 'undefined'
+            }.svg`}
+            alt="avatar"
+          />
           <div>
             {#if !data.late}
               <span class="text-sm text-gray-400"
