@@ -11,11 +11,18 @@
     userStatistics,
   } from '../store';
   import { fade } from 'svelte/transition';
+  import Input from '../components/Input.svelte';
 
   onMount(() => {
     header.set('profile');
     console.log('profile mounted');
   });
+
+  const handleKeyup = (e: KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      (document.activeElement as HTMLInputElement).blur();
+    }
+  };
 </script>
 
 <div class="text-white mx-auto text-center">
@@ -47,23 +54,25 @@
     </div>
     <h1 class="py-2 font-semibold text-xl">{$user.username}</h1>
     <hr class="w-28 border-gray-400 border-[1.5px] rounded-full mx-auto" />
-    <div class="py-2 flex max-h-20 h-20 w-full">
+    <div class="py-1 flex max-h-20 h-14 w-full">
       {#if $editingProfile}
-        <textarea
-          maxlength="74"
+        <Input
+          name="bio"
+          maxlength="47"
           bind:value={$user.profile.bio}
           placeholder="Create a short bio..."
-          class="resize-none text-center font-mono focus:none outline-none p-2 text-black placeholder:text-gray-300 rounded-md w-full"
+          className="font-mono text-xs text-center"
+          on:keyup={handleKeyup}
         />
       {:else if $user.profile?.bio}
         <p
-          class="align-middle self-center text-center w-full font-mono text-sm"
+          class="align-middle self-center text-center w-full font-mono text-xs"
         >
           {$user.profile?.bio}
         </p>
       {:else}
         <p
-          class="text-gray-400 text-sm align-middle self-center text-center w-full"
+          class="text-gray-400 text-xs font-mono align-middle self-center text-center w-full"
         >
           {$user.username} has no bio...
         </p>
@@ -73,7 +82,7 @@
     <hr class="w-28 border-gray-400 border-[1.5px] rounded-full mx-auto" />
   </div>
   <!-- User Favorites -->
-  <div class="py-4">
+  <div class="py-2 px-2">
     <h1 class={`font-semibold text-xl`}>favorites</h1>
     <div class="grid grid-cols-3 py-2">
       <div class="relative">
@@ -289,7 +298,7 @@
   <hr class="w-28 border-gray-400 border-[1.5px] rounded-full mx-auto" />
   <!-- User Common Song -->
   {#if $userStatistics?.topSong}
-    <h2 class="mt-3 mb-1 font-semibold text-xl">most common song</h2>
+    <h2 class="mt-2 mb-1 font-semibold text-xl">most common song</h2>
     <div
       class="text-left bg-gray-700 rounded-md px-2 mx-4 py-2 mb-2 flex space-x-4"
     >
