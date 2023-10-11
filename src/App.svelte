@@ -57,7 +57,7 @@
   import { IonContent } from '@ionic/core/components/ion-content';
   import Genre from './pages/genre.svelte';
   import Submission from './pages/submission.svelte';
-  import SpotifySearch from './components/spotify_search.svelte';
+  import SpotifySearch from './pages/spotify_search.svelte';
 
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.data) return;

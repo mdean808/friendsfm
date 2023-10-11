@@ -14,7 +14,7 @@
     SpotifySearchRes,
     SpotifyTrack,
   } from '../types';
-  import LoadingIndicator from './LoadingIndicator.svelte';
+  import LoadingIndicator from '../components/LoadingIndicator.svelte';
 
   let query: string;
   let searching = false;
@@ -60,7 +60,7 @@
     };
     await setProfile(profile);
     loading.set(false);
-    goto('/profile')
+    goto('/profile');
   };
 
   const setFavoriteAlbum = async (item: SpotifyAlbum) => {
@@ -75,7 +75,7 @@
     };
     await setProfile(profile);
     loading.set(false);
-    goto('/profile')
+    goto('/profile');
   };
 
   const setFavoriteArtist = async (item: SpotifyArtist) => {
@@ -85,12 +85,11 @@
     profile.favorites.artist = {
       name: item.name,
       artwork: item.images[0]?.url,
-      artist: item.name,
       url: item.external_urls.spotify,
     };
     await setProfile(profile);
     loading.set(false);
-    goto('/profile')
+    goto('/profile');
   };
 </script>
 
