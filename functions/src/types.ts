@@ -21,6 +21,7 @@ export interface User {
   profile: {
     bio?: string;
     avatarString?: string;
+    stats: UserStatistics;
     favorites?: {
       album?: {
         artwork: string;
