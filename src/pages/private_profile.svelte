@@ -15,7 +15,6 @@
 
   onMount(() => {
     header.set('profile');
-    console.log('profile mounted');
   });
 
   const handleKeyup = (e: KeyboardEvent) => {
@@ -61,7 +60,7 @@
           maxlength="47"
           bind:value={$user.profile.bio}
           placeholder="Create a short bio..."
-          className="font-mono text-xs text-center"
+          className="font-mono text-xs text-center w-full"
           on:keyup={handleKeyup}
         />
       {:else if $user.profile?.bio}

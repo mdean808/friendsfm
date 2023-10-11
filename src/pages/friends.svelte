@@ -29,7 +29,6 @@
     loading = false;
   };
   const acceptRequest = async (requester: string, i: number) => {
-    console.log(loaders, i);
     if (loaders[i]) return;
     loaders[i] = true;
     if (await acceptFriendRequest(requester))

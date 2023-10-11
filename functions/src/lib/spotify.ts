@@ -251,7 +251,6 @@ export const removeAllSongsFromSpotifyPlaylist = async (
       uri: t.track.uri,
     };
   });
-  console.log('deleting the songs from the playlist!');
   const res = await fetch(
     `https://api.spotify.com/v1/playlists/${encodeURI(playlistId)}/tracks`,
     {

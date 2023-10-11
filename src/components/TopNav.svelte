@@ -1,5 +1,6 @@
-<script>
+<script lang="ts">
   import { getPlatformColor, goto, getShortDate } from '../lib';
+  import type { User } from '../types';
 
   import {
     createSongsSpotifyPlaylist,
@@ -16,6 +17,11 @@
       editingProfile.set(false);
       setProfile($user.profile);
     } else {
+      if (!$user.profile) {
+        const u = user.get();
+        u.profile = {} as User['profile'];
+        user.set(u);
+      }
       editingProfile.set(true);
     }
   };
