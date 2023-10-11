@@ -18,6 +18,29 @@ export interface User {
   messagingToken?: string;
   id: string;
   authToken: string;
+  profile: {
+    bio?: string;
+    avatarString?: string;
+    favorites?: {
+      album?: {
+        artwork: string;
+        name: string;
+        artist: string;
+        url: string;
+      };
+      artist?: {
+        artwork: string;
+        name: string;
+        url: string;
+      };
+      song?: {
+        artwork: string;
+        name: string;
+        artist: string;
+        url: string;
+      };
+    };
+  };
 }
 
 export interface UserStatistics {

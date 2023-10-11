@@ -14,6 +14,7 @@ export * from './users/getuser';
 export * from './users/getuserstatistics';
 export * from './users/setusername';
 export * from './users/setmusicplatform';
+export * from './users/setprofile';
 export * from './users/unlinkmusicplatform';
 export * from './songs/getsongs';
 export * from './songs/deletesong';

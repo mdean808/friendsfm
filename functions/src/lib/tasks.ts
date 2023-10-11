@@ -46,8 +46,8 @@ export const createNotificationTask = async (checkInId: string) => {
   const notificationsRef = db.collection('misc').doc('notifications');
   const notificationTimestamp = (await notificationsRef.get()).get('time');
   const prevTime = new Timestamp(
-    (notificationTimestamp as Timestamp).seconds,
-    (notificationTimestamp as Timestamp).nanoseconds
+    (notificationTimestamp as Timestamp)?.seconds,
+    (notificationTimestamp as Timestamp)?.nanoseconds
   ).toDate();
 
   await notificationsRef.update({

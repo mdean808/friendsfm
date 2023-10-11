@@ -43,6 +43,7 @@ export default class User {
   authToken: string = '';
   musicPlatformAcessCode?: string;
   loaded = false;
+  profile: UserType['profile'] = {} as UserType['profile'];
 
   constructor(id: string, authToken?: string) {
     if (!id) throw Error('No user id passed to constructor');
@@ -67,6 +68,7 @@ export default class User {
       savedSongs: this.savedSongs,
       messagingToken: this.messagingToken,
       authToken: this.authToken,
+      profile: this.profile,
     } as UserType;
   }
 
@@ -585,6 +587,12 @@ export default class User {
     }
     stats.topSong = popSongs.sort((a, b) => b.appearances - a.appearances)[0];
     return stats;
+  }
+
+  public async setProfile(profile: UserType['profile']) {
+    if (!profile) throw new CustomError('No new profile provided.');
+    this.profile = profile;
+    await this.dbRef.update({ profile: this.profile });
   }
 
   //STATIC METHODS

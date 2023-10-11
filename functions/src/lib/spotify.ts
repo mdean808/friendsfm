@@ -18,7 +18,7 @@ export const refreshSpotifyAccessCode = async (
   data: MusicPlatformAuth,
   userRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>
 ) => {
-  if ((data.expires_at as Timestamp).seconds) {
+  if ((data.expires_at as Timestamp)?.seconds) {
     data.expires_at = new Timestamp(
       (data.expires_at as Timestamp).seconds,
       (data.expires_at as Timestamp).nanoseconds
@@ -276,7 +276,7 @@ export const removeSongsFromSpotifyPlaylist = async (
   playlistId: string,
   spotifyAuth: MusicPlatformAuth
 ) => {
-  if (!spotifyAuth) throw Error('User not signed into spotify.');
+  if (!spotifyAuth) throw new CustomError('User not signed into spotify.');
   const songUris = [];
   for (const song of songs) {
     const uri = (await getSpotifySong(song, spotifyAuth))?.uri;
@@ -307,7 +307,7 @@ export const searchSpotify = async (
   types: ('artist' | 'track' | 'playlist' | 'album')[],
   spotifyAuth: MusicPlatformAuth
 ): Promise<SpotifySearchRes> => {
-  if (!spotifyAuth) throw Error('User not signed into spotify.');
+  if (!spotifyAuth) throw new CustomError('User not signed into spotify.');
   const res = await fetch(
     `https://api.spotify.com/v1/search?q=${query}&type=${types.toString()}`,
     {

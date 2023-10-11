@@ -5,7 +5,7 @@ import { searchSpotify } from '@/lib/spotify';
 export const searchspotify = onRequest(
   { cors: true },
   authMiddleware(
-    sentryWrapper('create-liked-songs-playlist', async (req, res, user) => {
+    sentryWrapper('search-spotify', async (req, res, user) => {
       await user.updateMusicAuth();
       const data = JSON.parse(req.body);
       const results = await searchSpotify(
