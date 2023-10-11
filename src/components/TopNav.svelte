@@ -7,7 +7,18 @@
     user,
     navDate,
     header,
+    editingProfile,
+    setProfile,
   } from '../store';
+
+  const toggleEditingProfile = () => {
+    if ($editingProfile) {
+      editingProfile.set(false);
+      setProfile($user.profile);
+    } else {
+      editingProfile.set(true);
+    }
+  };
 </script>
 
 <div class={`z-30 w-full h-[65px]`}>
@@ -68,6 +79,41 @@
             d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z"
           />
         </svg>
+      </button>
+    {:else if $currPath === '/profile'}
+      <button
+        class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900"
+        on:click={toggleEditingProfile}
+      >
+        {#if $editingProfile}
+          <svg
+            class="w-6 h-6"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 256 256"
+          >
+            <path
+              d="M219.31,80,176,36.69A15.86,15.86,0,0,0,164.69,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V91.31A15.86,15.86,0,0,0,219.31,80ZM168,208H88V152h80Zm40,0H184V152a16,16,0,0,0-16-16H88a16,16,0,0,0-16,16v56H48V48H164.69L208,91.31ZM160,72a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h56A8,8,0,0,1,160,72Z"
+            >
+            </path>
+          </svg>
+        {:else}
+          <svg
+            fill="none"
+            class="w-6 h-6"
+            stroke="currentColor"
+            stroke-width="1.5"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+            ></path>
+          </svg>
+        {/if}
       </button>
     {:else}
       <button

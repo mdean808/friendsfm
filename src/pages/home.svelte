@@ -185,10 +185,7 @@
     loading.set(false);
   };
   const sortByDate = (a: SubmissionType, b: SubmissionType) => {
-    return (
-      new Date(b.lateTime || b.time).getTime() -
-      new Date(a.lateTime || a.time).getTime()
-    );
+    return new Date(b.time).getTime() - new Date(a.time).getTime();
   };
 </script>
 

@@ -137,7 +137,7 @@ export const updateMusicPlatform = action(
 );
 
 // get updated user data
-export const refreshUser = action(user, 'get-user-data', async (_store) => {
+export const refreshUser = action(user, 'get-user-data', async (store) => {
   if (!loggedIn.get()) return false;
   let messagingToken = '';
   try {
@@ -166,11 +166,17 @@ export const refreshUser = action(user, 'get-user-data', async (_store) => {
     return false;
   }
   songs.set(json.message.songs as SavedSong[]);
-  await updateUser(json.message.user as User);
+  const u = json.message.user as User;
+  // make sure we don't overwrite the bio or avatar
+  if (u.profile.bio !== store.get().profile.bio) {
+    u.profile.bio = store.get().profile.bio;
+  }
+  if (u.profile.avatarString !== store.get().profile.avatarString) {
+    u.profile.avatarString = store.get().profile.avatarString;
+  }
+  await updateUser(u);
   // also update friend submissions
   await getFriendSubmissions();
-  // also update user statistics
-  await getUserStatistics();
 });
 
 export const unlinkMusicProvider = action(
@@ -213,5 +219,28 @@ export const getUserStatistics = action(
       return false;
     }
     store.set(json.message as UserStatistics);
+  }
+);
+
+export const setProfile = action(
+  user,
+  'set-user-profile',
+  async (store, newProfile: User['profile']) => {
+    const u = store.get();
+    const res = await fetch(getFirebaseUrl('setprofile'), {
+      method: 'POST',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+        newProfile,
+      }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+    });
+    const json = await handleApiResponse(res);
+    if (!json) {
+      // failed to unlink provider
+      return false;
+    }
+    u.profile = newProfile;
+    store.set(u);
   }
 );

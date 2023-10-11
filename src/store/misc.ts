@@ -32,3 +32,9 @@ export const notificationAction = map<Notification>();
 export const activeGenre = atom<string>('');
 
 export const navDate = map<Date>(new Date());
+
+export const searchType = atom<'track' | 'album' | 'playlist' | 'artist'>(
+  'track'
+);
+
+export const editingProfile = atom<boolean>(false);

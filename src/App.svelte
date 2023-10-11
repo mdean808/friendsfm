@@ -11,7 +11,7 @@
   import NewUser from './pages/new_user.svelte';
   import Songs from './pages/songs.svelte';
   // import Audial from './pages/audial.svelte';
-  import Stats from './pages/stats.svelte';
+  import Profile from './pages/profile.svelte';
   import Username from './pages/username.svelte';
   import MusicProvider from './pages/music_provider.svelte';
   import Settings from './pages/settings.svelte';
@@ -57,6 +57,7 @@
   import { IonContent } from '@ionic/core/components/ion-content';
   import Genre from './pages/genre.svelte';
   import Submission from './pages/submission.svelte';
+  import SpotifySearch from './components/spotify_search.svelte';
 
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.data) return;
@@ -230,6 +231,14 @@
       >
         <PasteAudial />
       </div>
+    {:else if $currPath === '/search_spotify'}
+      <div
+        style={`padding-top: ${0 + $insets.top}px`}
+        class="z-40 bg-gray-900 absolute left-0 top-0 w-full h-full"
+        transition:fly={{ y: document.body.clientHeight }}
+      >
+        <SpotifySearch />
+      </div>
     {/if}
     <!-- END absolute positioning -->
     {#if $loggedIn && $user?.username && $user?.musicPlatform && $currPath !== '/audial'}
@@ -259,9 +268,15 @@
         <!--  <Audial />
         <!-- </div>
         -->
-      {:else if $currPath === '/stats'}
-        <div class="h-full" in:fly={{ x: document.body.clientWidth }}>
-          <Stats />
+      {:else if $currPath === '/profile'}
+        <div
+          class="h-full"
+          in:fly={{
+            x: $prevPath === '/search_spotify' ? 0 : document.body.clientWidth,
+            y: $prevPath === '/search_spotify' ? document.body.clientHeight : 0,
+          }}
+        >
+          <Profile />
         </div>
       {:else if $currPath === '/new_user'}
         <div class="h-full" in:fade={{ duration: 300 }}>

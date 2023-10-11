@@ -17,10 +17,33 @@ export interface User {
   messagingToken?: string;
   authToken: string;
   id: string;
+  profile?: {
+    bio?: string;
+    avatarString: string;
+    favorites?: {
+      album?: {
+        artwork: string;
+        name: string;
+        artist: string;
+        url: string;
+      };
+      artist?: {
+        artwork: string;
+        name: string;
+        url: string;
+      };
+      song?: {
+        artwork: string;
+        name: string;
+        artist: string;
+        url: string;
+      };
+    };
+  };
 }
 
 export interface UserStatistics {
-  topSong: Song;
+  topSong: SavedSong;
   submissionCount: number;
   onTimeSubmissionCount: number;
 }
@@ -122,4 +145,207 @@ export interface HomeDay {
   number?: number;
   userSubmission: Submission;
   friendSubmissions: readonly Submission[];
+}
+
+export interface SpotifySearchRes {
+  tracks?: {
+    href: string;
+    limit: number;
+    next: string;
+    offset: number;
+    previous: string;
+    total: number;
+    items: SpotifyTrack[];
+  };
+  artists?: {
+    href: string;
+    limit: number;
+    next: string;
+    offset: number;
+    previous: string;
+    total: number;
+    items: SpotifyArtist[];
+  };
+  albums?: {
+    href: string;
+    limit: number;
+    next: string;
+    offset: number;
+    previous: string;
+    total: number;
+    items: SpotifyAlbum[];
+  };
+  playlists?: {
+    href: string;
+    limit: number;
+    next: string;
+    offset: number;
+    previous: string;
+    total: number;
+    items: SpotifyPlaylist[];
+  };
+}
+
+export interface SpotifyPlaylist {
+  collaborative: boolean;
+  description: string;
+  external_urls: {
+    spotify: string;
+  };
+  followers: {
+    href: string;
+    total: number;
+  };
+  href: string;
+  id: string;
+  images: [
+    {
+      url: string;
+      height: number;
+      width: number;
+    },
+  ];
+  name: string;
+  owner: {
+    external_urls: {
+      spotify: string;
+    };
+    followers: {
+      href: string;
+      total: number;
+    };
+    href: string;
+    id: string;
+    type: string;
+    uri: string;
+    display_name: string;
+  };
+  public: boolean;
+  snapshot_id: string;
+  tracks: {
+    href: string;
+    total: number;
+  };
+  type: string;
+  uri: string;
+}
+
+export interface SpotifyPlaylistRes extends SpotifyPlaylist {
+  tracks: {
+    href: string;
+    limit: number;
+    next: string;
+    offset: number;
+    previous: string;
+    total: number;
+    items: [
+      {
+        added_at: Date;
+        added_by: {
+          external_urls: {
+            spotify: string;
+          };
+          followers: {
+            href: string;
+            total: number;
+          };
+          href: string;
+          id: string;
+          type: string;
+          uri: string;
+        };
+        is_local: true;
+        track: SpotifyTrack[];
+      },
+    ];
+  };
+}
+
+export interface SpotifyAlbum {
+  album_type: string;
+  total_tracks: number;
+  available_markets: string[];
+  external_urls: {
+    spotify: string;
+  };
+  href: string;
+  id: string;
+  images: [
+    {
+      url: string;
+      height: number;
+      width: number;
+    },
+  ];
+  name: string;
+  release_date: string;
+  release_date_precision: string;
+  restrictions: {
+    reason: string;
+  };
+  type: string;
+  uri: string;
+  artists: [
+    {
+      external_urls: {
+        spotify: string;
+      };
+      href: string;
+      id: string;
+      name: string;
+      type: string;
+      uri: string;
+    },
+  ];
+}
+
+export interface SpotifyArtist {
+  external_urls: {
+    spotify: string;
+  };
+  followers: {
+    href: string;
+    total: 0;
+  };
+  genres: string[];
+  href: string;
+  id: string;
+  images: [
+    {
+      url: string;
+      height: number;
+      width: number;
+    },
+  ];
+  name: string;
+  popularity: 0;
+  type: string;
+  uri: string;
+}
+
+export interface SpotifyTrack {
+  artists: [
+    {
+      name: string;
+    },
+  ];
+  album: {
+    id: string;
+    images: [
+      {
+        url: string;
+        height: number;
+        width: number;
+      },
+    ];
+  };
+  duration_ms: number;
+  external_urls: {
+    spotify: string;
+  };
+  id: string;
+  uri: string;
+  href: string; // api url
+  name: string;
+  preview_url: string;
 }
