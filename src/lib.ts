@@ -9,7 +9,10 @@ import {
 } from './store';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
-import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import {
+  FirebaseAnalytics,
+  type LogEventOptions,
+} from '@capacitor-firebase/analytics';
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { App } from '@capacitor/app';
 import { Dialog } from '@capacitor/dialog';
@@ -53,6 +56,9 @@ export const registerForNotifications = async () => {
 };
 
 export const handleApiResponse = async (res: Response) => {
+  let eventParams: LogEventOptions['params'] = {};
+  eventParams.status = res.status;
+  eventParams.statusText = res.statusText;
   const toastError: SvelteToastOptions = {
     theme: {
       '--toastColor': 'white',
@@ -62,24 +68,29 @@ export const handleApiResponse = async (res: Response) => {
   };
   if (res.status >= 500) {
     toast.push('Error ' + res.status + ': ' + res.statusText, toastError);
+    FirebaseAnalytics.logEvent({
+      name: 'handle-api-response',
+      params: eventParams,
+    });
     return;
   }
   const json = (await res.json()) as NetworkResponse;
   if (res.status !== 200 && !json) {
     toast.push('Error ' + res.status + ': ' + res.statusText, toastError);
+    FirebaseAnalytics.logEvent({
+      name: 'handle-api-response',
+      params: eventParams,
+    });
     return false;
   } else if (json.type === ResponseType.error) {
     console.log('ERROR:', json);
+    eventParams.message = json.message;
+    eventParams.error = json.error;
     if (json.message === 'User does not exist.') {
       logout();
       goto('/new_user');
     } else if (json.message === 'Authentication Failed.') {
-      if (json.error.includes('Decoding Firebase ID token')) {
-        logout();
-        goto('/new_user');
-      } else {
-        await getNewAuthToken();
-      }
+      await getNewAuthToken();
     } else if (
       json.message.includes('Spotify 403 Forbidden') ||
       json.message.includes('Spotify token refresh error')
@@ -107,9 +118,18 @@ export const handleApiResponse = async (res: Response) => {
     } else {
       toast.push('Error: ' + json.message, toastError);
     }
+    FirebaseAnalytics.logEvent({
+      name: 'handle-api-response',
+      params: eventParams,
+    });
     return false;
   }
 
+  eventParams.message = json.message;
+  FirebaseAnalytics.logEvent({
+    name: 'handle-api-response',
+    params: eventParams,
+  });
   return json;
 };
 
@@ -199,11 +219,14 @@ export const getAppVersion = async () => {
 };
 
 export const getFirebaseUrl = (endpoint: string) => {
+  let url = '';
   if (import.meta.env.DEV) {
-    return `http://127.0.0.1:5001/friendsfm/us-central1/${endpoint}`;
+    url = `http://127.0.0.1:5001/friendsfm/us-central1/${endpoint}`;
   } else {
-    return `https://${endpoint}-tprlxlzyxq-uc.a.run.app`;
+    url = `https://${endpoint}-tprlxlzyxq-uc.a.run.app`;
   }
+  FirebaseAnalytics.logEvent({ name: 'request', params: { url } });
+  return url;
 };
 
 export function hashCode(str: string, seed: number) {
@@ -252,38 +275,4 @@ export function intToRGB(i: number) {
     contrast = getContrastRatio(rgb, [31, 41, 55]);
   }
   return hex;
-}
-
-export function transitionSlide({ duration = 2000, pixels = 100 } = {}) {
-  function send(node) {
-    return function () {
-      let top = node.offsetTop - parseFloat(getComputedStyle(node).marginTop);
-      let left = node.offsetLeft;
-      return {
-        duration,
-        css(t, u) {
-          // Remove the element from the normal flow so that it doesn't interfere with the
-          // placement of the new element, but position it exactly where it was.
-          return `position:absolute;top:${top}px;left:${left}px;opacity:${t};transform:translateY(-${Math.floor(
-            pixels * u
-          )}px)`;
-        },
-      };
-    };
-  }
-
-  function receive(node) {
-    return function () {
-      return {
-        duration,
-        css(t, u) {
-          return `transform:translateY(${Math.floor(
-            pixels * u
-          )}px);opacity:${t}`;
-        },
-      };
-    };
-  }
-
-  return [send, receive];
 }
