@@ -8,6 +8,7 @@
   } from '../lib';
   import type { SavedSong, Submission } from '../types';
   import { toggleSong, songs, activeSubmission } from '../store';
+  import MusicPlatformIcon from './MusicPlatformIcon.svelte';
 
   export let data: Submission;
 
@@ -131,7 +132,7 @@
               {#if data.song.albumArtwork}
                 <img
                   alt="Album Artwork"
-                  class="w-1/4 mr-2 max-w-[3rem] max-h-[3rem] rounded-sm"
+                  class="w-1/4 mr-2 max-w-[3rem] max-h-[3rem]"
                   src={data.song.albumArtwork}
                 />
               {/if}
@@ -150,17 +151,10 @@
             </div>
           </div>
           <div class="w-[36%] text-right mb-1 flex">
-            {#if data.audial && data.audial.number != -1}
-              <div class="text-xs self-end text-right w-full">
-                <p class="text-sm text-right">audial #{data.audial.number}</p>
-                {data.audial.score}
-              </div>
-            {:else}
-              <button
-                class="text-blue-500 text-right text-sm underline self-end w-full"
-                on:click={() => goto('/paste_audial')}>share audial</button
-              >
-            {/if}
+            <MusicPlatformIcon
+              id={data.user ? data.user.musicPlatform : 'spotify'}
+              className="h-5 w-5 self-end ml-auto"
+            />
           </div>
         </div>
       </div>

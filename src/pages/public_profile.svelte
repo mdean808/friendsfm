@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SpotifyLogo from '../assets/spotify_logo_green.png';
   import { onMount } from 'svelte';
   import {
     formatDurationPlayed,
@@ -17,7 +18,7 @@
     toggleSong,
     user,
   } from '../store';
-  import type { User } from '../types';
+  import { MusicPlatform, type User } from '../types';
 
   let profile: User['profile'];
 
@@ -110,7 +111,7 @@
               >
                 <img
                   alt="Song Artwork"
-                  class="w-20 h-20 mx-auto rounded-sm"
+                  class="w-20 h-20 mx-auto"
                   src={profile.favorites.song.artwork}
                 />
               </a>
@@ -151,7 +152,7 @@
                 >
                   <img
                     alt="Song Artwork"
-                    class="w-20 h-20 mx-auto rounded-sm"
+                    class="w-20 h-20 mx-auto"
                     src={profile.favorites.album.artwork}
                   />
                 </a>
@@ -192,7 +193,7 @@
               >
                 <img
                   alt="Artist"
-                  class="w-20 h-20 mx-auto rounded-sm"
+                  class="w-20 h-20 mx-auto"
                   src={profile.favorites.artist.artwork}
                 />
               </a>
@@ -221,6 +222,9 @@
             {/if}
           </div>
         </div>
+        {#if $user.musicPlatform === MusicPlatform.spotify}
+          <img alt="spotify logo" class="h-4 my-1 mx-auto" src={SpotifyLogo} />
+        {:else}<!-- apple music icon-->{/if}
       </div>
       <hr class="w-28 border-gray-400 border-[1.5px] rounded-full mx-auto" />
       <!-- User Common Song -->
@@ -237,7 +241,7 @@
               <div>
                 <img
                   alt="Album Artwork"
-                  class="w-16 h-16 mr-3 rounded-sm"
+                  class="w-16 h-16 mr-3"
                   src={profile.stats.topSong.albumArtwork}
                 />
               </div>

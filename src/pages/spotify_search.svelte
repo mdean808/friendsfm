@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SpotifyLogo from '../assets/spotify_logo_green.png';
   import { getFirebaseUrl, goto, handleApiResponse } from '../lib';
   import {
     appCheckToken,
@@ -8,12 +9,13 @@
     setProfile,
     user,
   } from '../store';
-  import type {
-    SpotifyAlbum,
-    SpotifyArtist,
-    SpotifySearchRes,
-    SpotifyTrack,
-    User,
+  import {
+    MusicPlatform,
+    type SpotifyAlbum,
+    type SpotifyArtist,
+    type SpotifySearchRes,
+    type SpotifyTrack,
+    type User,
   } from '../types';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
 
@@ -159,6 +161,12 @@
           />
         {/if}
       </div>
+      <div class="ml-1 text-sm flex text-gray-600">
+        powered by
+        {#if $user.musicPlatform === MusicPlatform.spotify}
+          <img alt="spotify logo" class=" ml-1 mt-1 h-3" src={SpotifyLogo} />
+        {:else}<!-- apple music icon-->{/if}
+      </div>
     </div>
     <div class="overflow-y-scroll" style={`height: calc(100vh - ${130}px)`}>
       {#if response?.tracks?.items}
@@ -175,7 +183,7 @@
             <img
               src={track.album.images[0]?.url}
               alt={track.name}
-              class="w-10 h-10 rounded-md self-center"
+              class="w-10 h-10 self-center"
             />
             <p class="pl-2 pt-2 w-9/12">
               {track.name} - {track.artists[0]?.name}
@@ -197,7 +205,7 @@
             <img
               src={album.images[0]?.url}
               alt={album.name}
-              class="w-10 h-10 rounded-md self-center"
+              class="w-10 h-10 self-center"
             />
             <p class={`pl-2 pt-2 `}>
               {album.name} - {album.artists[0]?.name}

@@ -96,9 +96,9 @@ export const handleApiResponse = async (res: Response) => {
       json.message.includes('Spotify token refresh error')
     ) {
       const { value } = await Dialog.confirm({
-        title: 'Spotify Authentication',
+        title: 'Spotify® Authentication',
         message:
-          'You need to re-authenticate with Spotify to proceed. Continue?',
+          'You need to re-authenticate with Spotify® to proceed. Continue?',
       });
       if (value) {
         spotifySet = false;

@@ -11,6 +11,7 @@
   import AppleMusic from '../plugins/AppleMusic';
   import { onMount } from 'svelte';
   import { toast } from '@zerodevx/svelte-toast';
+  import MusicPlatformIcon from '../components/MusicPlatformIcon.svelte';
 
   let platform: MusicPlatform;
 
@@ -64,8 +65,13 @@
           />
           <label
             for="spotify"
-            class="block cursor-pointer select-none rounded-xl p-2 text-center outline:none peer-checked:bg-spotify peer-checked:font-bold peer-checked:text-white"
-            >Spotify</label
+            class="ck flex cursor-pointer select-none rounded-xl p-2 text-center outline:none peer-checked:bg-spotify peer-checked:font-bold peer-checked:text-white"
+            ><div class="mx-auto">
+              <MusicPlatformIcon
+                className={'w-4 inline mr-2 mb-0.5 h-4'}
+                id={'spotify'}
+              />Spotify®
+            </div></label
           >
         </div>
 

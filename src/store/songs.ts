@@ -87,9 +87,9 @@ export const createSongsSpotifyPlaylist = action(
       return;
     }
     const { value } = await Dialog.confirm({
-      title: 'Create Spotify Playlist',
+      title: 'Create Spotify® Playlist',
       message:
-        'This will create a new spotify playlist of your saved songs. Proceed?',
+        'This will create a new Spotify® playlist of your saved songs. Proceed?',
     });
     if (!value) return;
     loading.set(true);

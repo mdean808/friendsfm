@@ -198,7 +198,7 @@
                         {#if sub.song.albumArtwork}
                           <img
                             alt="Album Artwork"
-                            class="w-12 h-12 mr-3 rounded-sm"
+                            class="w-12 h-12 mr-3"
                             src={sub.song.albumArtwork}
                           />
                         {/if}

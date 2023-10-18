@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SpotifyLogo from '../assets/spotify_logo_green.png';
   import { fly, scale, slide } from 'svelte/transition';
   import {
     convertDateToLateString,
@@ -17,6 +18,8 @@
   } from '../store';
   import Comment from '../components/Comment.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
+  import MusicPlatformIcon from '../components/MusicPlatformIcon.svelte';
+  import { MusicPlatform } from '../types';
 
   let commentValue: string;
   let commentSubmitting = false;
@@ -93,28 +96,26 @@
               {convertDateToLateString(new Date($activeSubmission.lateTime))}
             </span>
           {/if}
+          {#if $activeSubmission.song.timestamp > 0}
+            <span class="text-gray-400 w-full block text-center text-sm">
+              played {getDaysAgo(new Date($activeSubmission.song?.timestamp))}
+              {#if !getDaysAgo(new Date($activeSubmission.song?.timestamp)).includes('days ago')}at
+                {formatTimePlayed($activeSubmission.song?.timestamp)}
+              {/if}
+            </span>
+          {/if}
           <a href={$activeSubmission.song.url}>
             <div class="flex mx-auto w-full py-1">
               {#if $activeSubmission.song.albumArtwork}
                 <img
                   alt="Album Artwork"
-                  class="w-24 rounded-sm mx-auto"
+                  class="w-24 mx-auto"
                   src={$activeSubmission.song.albumArtwork}
                 />
               {/if}
             </div>
             <div class="w-full mx-auto text-center">
               <div class="flex flex-col px-3 justify-start">
-                {#if $activeSubmission.song.timestamp > 0}
-                  <span class="text-gray-400 text-center text-sm">
-                    played {getDaysAgo(
-                      new Date($activeSubmission.song?.timestamp)
-                    )}
-                    {#if !getDaysAgo(new Date($activeSubmission.song?.timestamp)).includes('days ago')}at
-                      {formatTimePlayed($activeSubmission.song?.timestamp)}
-                    {/if}
-                  </span>
-                {/if}
                 <span
                   class={`w-full truncate text-${getPlatformColor(
                     $activeSubmission.user.musicPlatform
@@ -127,8 +128,11 @@
                 </span>
               </div>
             </div>
+            {#if $activeSubmission.user.musicPlatform === MusicPlatform.spotify}
+              <img alt="spotify logo" class="h-6 mx-auto" src={SpotifyLogo} />
+            {:else}<!-- apple music icon-->{/if}
           </a>
-          <div>
+          <div class="pt-2">
             {#if $activeSubmission.song?.genre}
               <div
                 on:keyup={() => {
@@ -147,16 +151,6 @@
               >
                 <span>{$activeSubmission.song.genre}</span>
               </div>
-            {/if}
-            {#if $activeSubmission.audial && $activeSubmission.audial.number != -1}
-              <div class="text-xs pt-1 w-full text-center">
-                <p class="text-sm">
-                  audial #{$activeSubmission.audial.number}
-                </p>
-                {$activeSubmission.audial.score}
-              </div>
-            {:else}
-              <p class="text-sm pt-2 text-center">no audial submitted</p>
             {/if}
           </div>
         </div>

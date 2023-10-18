@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { formatDurationPlayed, getPlatformColor } from '../lib';
   import { loadSongs, songs, toggleSong, user, header, insets } from '../store';
+  import MusicPlatformIcon from '../components/MusicPlatformIcon.svelte';
 
   let loadingSongs = false;
   onMount(async () => {
@@ -60,7 +61,7 @@
             <div>
               <img
                 alt="Album Artwork"
-                class="w-16 h-16 mr-3 rounded-sm"
+                class="w-16 h-16 mr-3"
                 src={song.albumArtwork}
               />
             </div>
@@ -83,11 +84,13 @@
             </p>
           </div>
         </a>
-        <div class="flex-grow-0 flex-shrink">
+        <div
+          class="inline-flex flex-grow-0 flex-shrink flex-col justify-between"
+        >
           <svg
             on:click={() => toggleSong(song)}
             on:keypress={() => toggleSong(song)}
-            class="w-6 h-6 ml-auto flex-grow-0 flex-shrink text-pink-500"
+            class="w-6 h-6 ml-auto self-start text-pink-500"
             fill="currentColor"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -99,6 +102,12 @@
               d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
             /></svg
           >
+          <div class="mb-1.5 p-0.5 w-6 h-6 self-end">
+            <MusicPlatformIcon
+              className=""
+              id={$user.musicPlatform ? $user.musicPlatform : 'spotify'}
+            />
+          </div>
         </div>
       </div>
     {/each}

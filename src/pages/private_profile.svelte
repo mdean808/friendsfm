@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import SpotifyLogo from '../assets/spotify_logo_green.png';
   import { formatDurationPlayed, getPlatformColor, goto } from '../lib';
   import {
     editingProfile,
@@ -12,6 +13,7 @@
   } from '../store';
   import { fade } from 'svelte/transition';
   import Input from '../components/Input.svelte';
+  import { MusicPlatform } from '../types';
 
   onMount(() => {
     header.set('profile');
@@ -85,14 +87,13 @@
   </div>
   <!-- User Favorites -->
   <div class="py-2 px-2">
-    <h1 class={`font-semibold text-xl`}>favorites</h1>
     <div class="grid grid-cols-3 py-2">
       <div class="relative">
         {#if $user.profile?.favorites?.song}
           <a target="_blank" href={$user.profile.favorites.song.url}>
             <img
               alt="Song Artwork"
-              class="w-20 h-20 mx-auto rounded-sm"
+              class="w-20 h-20 mx-auto"
               src={$user.profile.favorites.song.artwork}
             />
             {#if $editingProfile}
@@ -163,7 +164,7 @@
           <a target="_blank" href={$user.profile.favorites.album.url}>
             <img
               alt="Song Artwork"
-              class="w-20 h-20 mx-auto rounded-sm"
+              class="w-20 h-20 mx-auto"
               src={$user.profile.favorites.album.artwork}
             />
             {#if $editingProfile}
@@ -234,7 +235,7 @@
           <a target="_blank" href={$user.profile.favorites.artist.url}>
             <img
               alt="Artist"
-              class="w-20 h-20 mx-auto rounded-sm"
+              class="w-20 h-20 mx-auto"
               src={$user.profile.favorites.artist.artwork}
             />
             {#if $editingProfile}
@@ -296,6 +297,9 @@
         {/if}
       </div>
     </div>
+    {#if $user.musicPlatform === MusicPlatform.spotify}
+      <img alt="spotify logo" class="h-4 my-1 mx-auto" src={SpotifyLogo} />
+    {:else}<!-- apple music icon-->{/if}
   </div>
   <hr class="w-28 border-gray-400 border-[1.5px] rounded-full mx-auto" />
   <!-- User Common Song -->
@@ -309,7 +313,7 @@
           <div>
             <img
               alt="Album Artwork"
-              class="w-16 h-16 mr-3 rounded-sm"
+              class="w-16 h-16 mr-3"
               src={$userStatistics.topSong.albumArtwork}
             />
           </div>

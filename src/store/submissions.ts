@@ -153,9 +153,9 @@ export const createSubmissionsPlaylist = action(
       return;
     }
     const { value } = await Dialog.confirm({
-      title: 'Create Spotify Playlist',
+      title: 'Create Spotify® Playlist',
       message:
-        'This will create a new spotify playlist of the songs on your friends submissions each day. Proceed?',
+        'This will create a new Spotify® playlist of the songs on your friends submissions each day. Proceed?',
     });
     if (!value) return;
     loading.set(true);

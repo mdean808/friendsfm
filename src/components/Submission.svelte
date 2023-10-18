@@ -66,12 +66,6 @@
             alt="avatar"
           />
           {data.user ? data.user.username : 'Unknown'}
-          <span class={`text-white`}
-            ><MusicPlatformIcon
-              className="inline w-5 h-5"
-              id={data.user ? data.user.musicPlatform : 'spotify'}
-            />
-          </span>
         </h4>
       </button>
       <div class="flex text-right">
@@ -168,7 +162,7 @@
                 {#if data.song.albumArtwork}
                   <img
                     alt="Album Artwork"
-                    class="w-1/4 mr-2 max-w-[3rem] max-h-[3rem] rounded-sm"
+                    class="w-1/4 mr-2 max-w-[3rem] max-h-[3rem]"
                     src={data.song.albumArtwork}
                   />
                 {/if}
@@ -188,27 +182,10 @@
             </div>
           </div>
           <div class="w-1/4 text-right mb-1.5 self-end">
-            <div class="text-sm">
-              {#if data.audial && data.audial.number != -1}
-                <p>audial #{data.audial.number}</p>
-                <p class="text-xs">
-                  {data.audial.score
-                    .split(' ')
-                    .slice(0, 3)
-                    .toString()
-                    .replaceAll(',', ' ')}
-                </p>
-                <p class="text-xs">
-                  {data.audial.score
-                    .split(' ')
-                    .slice(3, 6)
-                    .toString()
-                    .replaceAll(',', ' ')}
-                </p>
-              {:else}
-                <!-- no audial... -->
-              {/if}
-            </div>
+            <MusicPlatformIcon
+              className="self-end ml-auto w-5 h-5"
+              id={data.user ? data.user.musicPlatform : 'spotify'}
+            />
           </div>
         </div>
       </div>
