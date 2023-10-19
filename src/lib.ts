@@ -69,7 +69,7 @@ export const handleApiResponse = async (res: Response) => {
   if (res.status >= 500) {
     toast.push('Error ' + res.status + ': ' + res.statusText, toastError);
     FirebaseAnalytics.logEvent({
-      name: 'handle-api-response',
+      name: 'response',
       params: eventParams,
     });
     return;
@@ -78,7 +78,7 @@ export const handleApiResponse = async (res: Response) => {
   if (res.status !== 200 && !json) {
     toast.push('Error ' + res.status + ': ' + res.statusText, toastError);
     FirebaseAnalytics.logEvent({
-      name: 'handle-api-response',
+      name: 'response',
       params: eventParams,
     });
     return false;
@@ -119,7 +119,7 @@ export const handleApiResponse = async (res: Response) => {
       toast.push('Error: ' + json.message, toastError);
     }
     FirebaseAnalytics.logEvent({
-      name: 'handle-api-response',
+      name: 'response',
       params: eventParams,
     });
     return false;
@@ -127,7 +127,7 @@ export const handleApiResponse = async (res: Response) => {
 
   eventParams.message = json.message;
   FirebaseAnalytics.logEvent({
-    name: 'handle-api-response',
+    name: 'response',
     params: eventParams,
   });
   return json;
