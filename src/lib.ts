@@ -125,7 +125,6 @@ export const handleApiResponse = async (res: Response) => {
     return false;
   }
 
-  eventParams.message = json.message;
   FirebaseAnalytics.logEvent({
     name: 'response',
     params: eventParams,

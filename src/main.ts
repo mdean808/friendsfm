@@ -16,11 +16,6 @@ import { getAppCheckToken, initAppCheck, spotifyAuthCode } from './store';
 
 // Initialize Sentry
 if (import.meta.env.PROD && import.meta.env.RELEASE) {
-  console.log(
-    'sentry information',
-    import.meta.env.VITE_SENTRY_DSN,
-    import.meta.env.npm_packge_version
-  );
   Sentry.init(
     {
       dsn: import.meta.env.VITE_SENTRY_DSN,

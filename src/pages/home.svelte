@@ -195,7 +195,7 @@
     <ion-refresher-content />
   </ion-refresher>
   {#if $userSubmission}
-    <div id="home" class="text-center w-full py-2 px-4 overflow-y-auto h-full">
+    <div id="home" class="text-center w-full py-2 px-4">
       {#if !$userSubmission.song}
         <h3>you haven't shared what you're listening to yet.</h3>
         <h4 class="mb-2">submit to see what your friends are playing!</h4>
