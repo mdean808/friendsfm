@@ -168,11 +168,11 @@ export const refreshUser = action(user, 'get-user-data', async (store) => {
   songs.set(json.message.songs as SavedSong[]);
   const u = json.message.user as User;
   // make sure we don't overwrite the bio or avatar
-  if (u.profile.bio !== store.get().profile.bio) {
-    u.profile.bio = store.get().profile.bio;
+  if (u.profile.bio !== store.get()?.profile?.bio) {
+    u.profile.bio = store.get()?.profile?.bio;
   }
-  if (u.profile.avatarString !== store.get().profile.avatarString) {
-    u.profile.avatarString = store.get().profile.avatarString;
+  if (u.profile.avatarString !== store.get()?.profile?.avatarString) {
+    u.profile.avatarString = store.get()?.profile?.avatarString;
   }
   await updateUser(u);
   // also update friend submissions
