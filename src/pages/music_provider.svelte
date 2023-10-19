@@ -8,10 +8,9 @@
     user,
   } from '../store';
   import { goto } from '../lib';
-  import AppleMusic from '../plugins/AppleMusic';
   import { onMount } from 'svelte';
   import { toast } from '@zerodevx/svelte-toast';
-  import MusicPlatformIcon from '../components/MusicPlatformIcon.svelte';
+  import MusicPlatformIcon from '../components/icons/MusicPlatformIcon.svelte';
 
   let platform: MusicPlatform;
 

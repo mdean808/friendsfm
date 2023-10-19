@@ -1,0 +1,36 @@
+<script lang="ts">
+  import {
+    convertDateToLateString,
+    formatTimePlayed,
+    getDaysAgo,
+  } from '../../lib';
+  import type { Submission } from '../../types';
+
+  export let data: Submission;
+  export let className: string = '';
+</script>
+
+<div class={className}>
+  {#if !data.late}
+    <span class="text-sm text-gray-400"
+      >{new Date(data.time).toLocaleString('en-US', {
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true,
+      })}
+    </span>
+  {:else}
+    <span class="text-sm text-red-500">
+      {convertDateToLateString(new Date(data.lateTime))}
+    </span>
+  {/if}
+  {#if data.song.timestamp > 0}
+    -
+    <span class="text-gray-400 text-sm">
+      played {getDaysAgo(new Date(data.song?.timestamp))}
+      {#if !getDaysAgo(new Date(data.song?.timestamp)).includes('days ago')}at
+        {formatTimePlayed(data.song?.timestamp)}
+      {/if}
+    </span>
+  {/if}
+</div>

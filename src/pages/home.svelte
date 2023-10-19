@@ -21,9 +21,9 @@
   } from '../store';
   import Button from '../components/Button.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
-  import SkeletonSubmission from '../components/SkeletonSubmission.svelte';
-  import Submission from '../components/Submission.svelte';
-  import UserSubmission from '../components/UserSubmission.svelte';
+  import SkeletonSubmission from '../components/submission/Skeleton.svelte';
+  import Submission from '../components/submission/index.svelte';
+  import UserSubmission from '../components/submission/User.svelte';
   import type { IonRefresher } from '@ionic/core/components/ion-refresher';
   import { Capacitor } from '@capacitor/core';
   import { FirebaseMessaging } from '@capacitor-firebase/messaging';

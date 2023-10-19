@@ -18,7 +18,6 @@
   } from '../store';
   import Comment from '../components/Comment.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
-  import MusicPlatformIcon from '../components/MusicPlatformIcon.svelte';
   import { MusicPlatform } from '../types';
 
   let commentValue: string;

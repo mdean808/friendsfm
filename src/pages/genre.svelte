@@ -10,7 +10,7 @@
     updateCurrentLocation,
     prevPath,
   } from '../store';
-  import MusicPlatformIcon from '../components/MusicPlatformIcon.svelte';
+  import MusicPlatformIcon from '../components/icons/MusicPlatformIcon.svelte';
   import { onMount } from 'svelte';
 
   let map: google.maps.Map;

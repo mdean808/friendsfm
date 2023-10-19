@@ -59,6 +59,7 @@
   import Submission from './pages/submission.svelte';
   import SpotifySearch from './pages/spotify_search.svelte';
   import PublicProfile from './pages/public_profile.svelte';
+  import ModalPageWrapper from './components/ModalPageWrapper.svelte';
 
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.data) return;
@@ -201,53 +202,29 @@
     {/if}
 
     {#if $currPath === '/settings'}
-      <div
-        style={`padding-top: ${0 + $insets.top}px`}
-        class="z-40 bg-gray-900 absolute left-0 top-0 w-full h-full"
-        transition:fly={{ x: document.body.clientWidth }}
-      >
+      <ModalPageWrapper flySettings={{ x: document.body.clientWidth }}>
         <Settings />
-      </div>
+      </ModalPageWrapper>
     {:else if $currPath === '/genre'}
-      <div
-        style={`padding-top: ${0 + $insets.top}px`}
-        class="z-40 bg-gray-900 absolute left-0 top-0 w-full h-full"
-        transition:fly={{ y: document.body.clientHeight }}
-      >
+      <ModalPageWrapper flySettings={{ y: document.body.clientHeight }}>
         <Genre />
-      </div>
+      </ModalPageWrapper>
     {:else if $currPath === '/friends'}
-      <div
-        style={`padding-top: ${0 + $insets.top}px`}
-        class="z-40 bg-gray-900 w-full absolute top-0 left-0 h-full"
-        transition:fly={{ x: -document.body.clientWidth }}
-      >
+      <ModalPageWrapper flySettings={{ x: -document.body.clientWidth }}>
         <Friends />
-      </div>
+      </ModalPageWrapper>
     {:else if $currPath === '/paste_audial'}
-      <div
-        style={`padding-top: ${0 + $insets.top}px`}
-        class="z-40 bg-gray-900 w-full absolute top-0 left-0 h-full"
-        transition:fly={{ y: -document.body.clientWidth }}
-      >
+      <ModalPageWrapper flySettings={{ y: -document.body.clientHeight }}>
         <PasteAudial />
-      </div>
+      </ModalPageWrapper>
     {:else if $currPath === '/search_spotify'}
-      <div
-        style={`padding-top: ${0 + $insets.top}px`}
-        class="z-40 bg-gray-900 absolute left-0 top-0 w-full h-full"
-        transition:fly={{ y: document.body.clientHeight }}
-      >
+      <ModalPageWrapper flySettings={{ y: document.body.clientHeight }}>
         <SpotifySearch />
-      </div>
+      </ModalPageWrapper>
     {:else if $currPath === '/public_profile'}
-      <div
-        style={`padding-top: ${0 + $insets.top}px`}
-        class="z-40 bg-gray-900 absolute left-0 top-0 w-full h-full"
-        transition:fly={{ y: document.body.clientHeight }}
-      >
+      <ModalPageWrapper flySettings={{ y: document.body.clientHeight }}>
         <PublicProfile />
-      </div>
+      </ModalPageWrapper>
     {/if}
     <!-- END absolute positioning -->
     {#if $loggedIn && $user?.username && $user?.musicPlatform && $currPath !== '/audial'}

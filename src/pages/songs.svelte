@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { formatDurationPlayed, getPlatformColor } from '../lib';
   import { loadSongs, songs, toggleSong, user, header, insets } from '../store';
-  import MusicPlatformIcon from '../components/MusicPlatformIcon.svelte';
+  import MusicPlatformIcon from '../components/icons/MusicPlatformIcon.svelte';
 
   let loadingSongs = false;
   onMount(async () => {
