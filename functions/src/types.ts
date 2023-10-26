@@ -7,13 +7,12 @@ export interface User {
   musicPlatformAuth: MusicPlatformAuth;
   displayName?: string;
   photoURL?: string;
-  uid: string;
   username: string;
   musicPlatform?: MusicPlatform;
   friends: Friend[];
   friendRequests: string[]; // usernames
   submissions?: string[]; // submission ids
-  savedSongs?: string[]; // song ids
+  savedSongs?: SavedSong[]; // song ids
   audials?: string[]; // audial ids
   messagingToken?: string;
   id: string;
@@ -22,6 +21,7 @@ export interface User {
     bio?: string;
     avatarString?: string;
     stats: UserStatistics;
+    musicPlatform: MusicPlatform;
     favorites?: {
       album?: {
         artwork: string;
@@ -61,21 +61,24 @@ export enum MusicPlatform {
 }
 
 export interface Song {
-  name: string;
-  artist: string;
-  length: number; // in seconds
-  durationElapsed: number; // in seconds
-  timestamp?: number; // the time the song was played in milliseconds
-  albumArtwork?: string;
+  //todo: add a parameter for saving data from both apple music and spotify
+  id: string; // platform id of the user that submitted this song
   url: string;
-  id: string;
+  name: string;
   genre: string;
+  artist: string;
+  albumArtwork?: string;
+  length: number; // song length in seconds
+  // submission-specific things
+  durationElapsed: number; // time song has been played for in seconds
+  timestamp?: number; // the date the song was played in milliseconds
 }
 
 export interface SavedSong extends Song {
   user: {
     id: string;
     username: string;
+    musicPlatform?: MusicPlatform;
   };
 }
 

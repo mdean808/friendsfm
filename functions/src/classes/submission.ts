@@ -19,7 +19,7 @@ import { CustomError } from './error';
 
 const db = getFirestore();
 
-export default class Submission {
+export default class Submission implements SubmissionType {
   id: string;
   number: number;
   late: boolean;

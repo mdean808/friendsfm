@@ -10,6 +10,8 @@ export const getprofile = onRequest(
       const user = await User.getByUsername(username);
       const stats = await user.getStatistics();
       user.profile.stats = stats;
+      if (!user.profile.musicPlatform)
+        user.profile.musicPlatform === user.musicPlatform;
       res
         .status(200)
         .type('json')

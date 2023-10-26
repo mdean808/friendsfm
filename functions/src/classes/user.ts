@@ -25,7 +25,7 @@ import { CustomError } from './error';
 
 const db = getFirestore();
 
-export default class User {
+export default class User implements UserType {
   id: string;
   email: string = '';
   likedSongsPlaylist: string = '';
@@ -38,7 +38,7 @@ export default class User {
   friends: Friend[] = [];
   friendRequests: string[] = []; // usernames
   submissions: string[] = []; // submission ids
-  savedSongs: string[] = []; // song ids
+  savedSongs: SavedSong[] = []; // song ids
   messagingToken: string = '';
   authToken: string = '';
   musicPlatformAcessCode?: string;
@@ -144,6 +144,8 @@ export default class User {
           access_token: spotifyAuthRes.access_token,
           refresh_token: spotifyAuthRes.refresh_token,
         };
+        this.musicPlatform = musicPlatform;
+        this.musicPlatformAuth = musicPlatformAuth;
         await this.dbRef.update({
           musicPlatform,
           musicPlatformAuth,
@@ -151,6 +153,10 @@ export default class User {
       }
     } else {
       // apple music
+      this.musicPlatform = musicPlatform;
+      await this.dbRef.update({
+        musicPlatform,
+      });
     }
   }
 
@@ -166,7 +172,9 @@ export default class User {
       this.musicPlatformAcessCode = accessCode;
       return accessCode;
     } else if (this.musicPlatform == MusicPlatform.appleMusic) {
-      throw Error('Apple Music support coming soon!');
+      console.log('No need to update music auth for apple music');
+      return '';
+      //throw Error('Apple Music support coming soon!');
     } else {
       throw Error('Unknown music platform.');
     }
@@ -230,34 +238,28 @@ export default class User {
     return songs;
   }
 
-  public async getRecentSong(): Promise<Song> {
+  public async getRecentSpotifySong(): Promise<Song> {
     if (!this.exists) throw Error('User not loaded.');
     if (!this.musicPlatformAcessCode)
       throw Error('No access code provided. Cannot get most recent song.');
-    if (this.musicPlatform == MusicPlatform.spotify) {
-      const currentSong = await getCurrentSpotifySong(
-        this.musicPlatformAcessCode
-      );
-      return {
-        id: '',
-        name: currentSong.item.name,
-        artist: currentSong.item.artists[0]?.name,
-        url: currentSong.item.external_urls.spotify,
-        length: currentSong.item.duration_ms / 1000,
-        durationElapsed: currentSong.progress_ms / 1000,
-        albumArtwork: currentSong.item.album.images[0]?.url,
-        timestamp: currentSong.timestamp || 0,
-        genre:
-          (await getTrackGenre(
-            currentSong.item.name,
-            currentSong.item.artists[0]?.name
-          )) || 'unkown',
-      } as Song;
-    } else if (this.musicPlatform == MusicPlatform.appleMusic) {
-      throw Error('Apple Music support coming soon!');
-    } else {
-      throw Error('Unknown music platform.');
-    }
+    const currentSong = await getCurrentSpotifySong(
+      this.musicPlatformAcessCode
+    );
+    return {
+      id: '',
+      name: currentSong.item.name,
+      artist: currentSong.item.artists[0]?.name,
+      url: currentSong.item.external_urls.spotify,
+      length: currentSong.item.duration_ms / 1000,
+      durationElapsed: currentSong.progress_ms / 1000,
+      albumArtwork: currentSong.item.album.images[0]?.url,
+      timestamp: currentSong.timestamp || 0,
+      genre:
+        (await getTrackGenre(
+          currentSong.item.name,
+          currentSong.item.artists[0]?.name
+        )) || 'unkown',
+    } as Song;
   }
 
   public async getSubmission(number?: number): Promise<Submission | undefined> {
@@ -344,7 +346,8 @@ export default class User {
 
   public async createSubmission(
     latitude: number,
-    longitude: number
+    longitude: number,
+    appleMusicSong: Song
   ): Promise<Submission> {
     if (!this.exists) throw Error('User not loaded.');
     // perform verification checks for this new submission
@@ -357,7 +360,10 @@ export default class User {
     }
     // make sure we have the latest access tokens for the user's music oauth before we get their song
     await this.updateMusicAuth();
-    const song = await this.getRecentSong();
+    let song = {} as Song;
+    if (this.musicPlatform === MusicPlatform.spotify)
+      song = await this.getRecentSpotifySong();
+    if (this.musicPlatform === MusicPlatform.appleMusic) song = appleMusicSong;
 
     // calculate time and late information if the submission is late
     const { late, time, lateTime } = Submission.calculateCurrentTimeData(
@@ -479,7 +485,7 @@ export default class User {
     // update friend friends
     const friendFriends = friend.friends;
     friendFriends.push({ username: this.username, id: this.id });
-    const friendRef = usersRef.doc(friend.uid);
+    const friendRef = usersRef.doc(friend.id);
     // doesn't need to be synchronous
     friendRef.update({ friends: friendFriends });
 
