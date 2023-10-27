@@ -1,13 +1,11 @@
 import { getNearbySubmissions } from '@/lib/location';
 import { onRequest } from 'firebase-functions/v2/https';
-import { emptyMiddleware, sentryWrapper } from '../middleware';
+import { authMiddleware, sentryWrapper } from '../middleware';
 
 export const nearbysubmissions = onRequest(
   { cors: true },
-  emptyMiddleware(
+  authMiddleware(
     sentryWrapper('nearby-submissions', async (req, res) => {
-      //todo: implement auth
-      res.set('Access-Control-Allow-Origin', '*');
       if (!req.body) res.status(400).end();
       try {
         const data = JSON.parse(req.body);
