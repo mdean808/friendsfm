@@ -24,4 +24,3 @@ export * from './songs/createlikedsongsplaylist';
 export * from './comments/createcomment';
 export * from './comments/deletecomment';
 export * from './misc/searchspotify';
-export * from './search';
