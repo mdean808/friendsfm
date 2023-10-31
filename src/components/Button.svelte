@@ -25,6 +25,13 @@
       buttonCSS = 'bg-gray-600 hover:bg-gray-500';
       break;
 
+    case 'spotify':
+      buttonCSS = 'bg-spotify hover:bg-green-500 shadow-md';
+      break;
+    case 'apple-music':
+      buttonCSS = 'bg-apple-music hover:bg-apple-music-secondary shadow-md';
+      break;
+
     default:
       buttonCSS = 'bg-blue-600 hover:bg-blue-500';
       break;

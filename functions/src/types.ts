@@ -68,6 +68,7 @@ export interface Song {
   platforms: {
     id: MusicPlatform;
     url: string;
+    name: string;
     artist: string;
     albumArtwork?: string;
   }[];

@@ -35,6 +35,7 @@
     friendSubmissions,
     userSubmission,
     activeSubmission,
+    authToken,
   } from './store';
   import { goto } from './lib';
   import Loading from './components/Loading.svelte';
@@ -139,8 +140,15 @@
     await getNewAuthToken();
     await getUserFromPreferences();
     const u = user.get();
-    if (!loggedIn.get() || !u || Object.keys(u).length === 0)
+    if (
+      !loggedIn.get() ||
+      !u ||
+      Object.keys(u).length === 0 ||
+      !authToken.get()
+    ) {
+      loggedIn.set(false);
       return goto('/new_user');
+    }
     if (u.username && u.username !== u.id && u.musicPlatform) {
       goto('/');
     } else if (!u.username || u.username === u.id) {

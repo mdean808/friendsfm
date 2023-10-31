@@ -1,6 +1,8 @@
 <script lang="ts">
-  import SpotifyLogo from '../assets/spotify_logo_green.png';
+  import SpotifyLogoGreen from '../assets/spotify_logo_green.png';
+  import SpotifyLogoWhite from '../assets/spotify_logo_white.png';
   import AppleMusicLogo from '../assets/apple_music_logo_white.svg';
+  import AppleMusicListenOn from '../assets/apple_music_listen_on_white.svg';
   import { fly, scale, slide } from 'svelte/transition';
   import {
     convertDateToLateString,
@@ -21,6 +23,7 @@
   import Comment from '../components/Comment.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
   import { MusicPlatform } from '../types';
+  import Button from '../components/Button.svelte';
 
   let commentValue: string;
   let commentSubmitting = false;
@@ -107,11 +110,7 @@
               {/if}
             </span>
           {/if}
-          <a
-            href={$activeSubmission.song.platforms?.find(
-              (p) => p.id === $user.musicPlatform
-            )?.url || $activeSubmission.song.url}
-          >
+          <div>
             <div class="flex mx-auto w-full py-1">
               {#if $activeSubmission.song.albumArtwork}
                 <img
@@ -136,16 +135,19 @@
               </div>
             </div>
             {#if $activeSubmission.user.musicPlatform === MusicPlatform.spotify}
-              <img alt="spotify logo" class="h-6 mx-auto" src={SpotifyLogo} />
-            {:else}<!-- apple music icon-->
-
+              <img
+                alt="spotify logo"
+                class="h-4 my-1 mx-auto"
+                src={SpotifyLogoGreen}
+              />
+            {:else}
               <img
                 alt="spotify logo"
                 class="h-6 mx-auto"
                 src={AppleMusicLogo}
               />
             {/if}
-          </a>
+          </div>
           <div class="pt-2">
             {#if $activeSubmission.song?.genre}
               <div
@@ -166,6 +168,44 @@
                 <span>{$activeSubmission.song.genre}</span>
               </div>
             {/if}
+          </div>
+        </div>
+        <div class="mt-2 border-t-white border-t-2">
+          <div class="flex w-72 mx-auto gap-4">
+            <div class="pt-2 w-52">
+              <Button
+                on:click={() =>
+                  (window.location.href =
+                    $activeSubmission.song.platforms?.find(
+                      (p) => p.id === MusicPlatform.spotify
+                    )?.url)}
+                type="spotify"
+                title="open in spotify"
+                className="flex gap-2 items-center justify-center bg-spotify"
+              >
+                <span class="text-transparent">a</span>
+                <img alt="spotify logo" class="h-6" src={SpotifyLogoWhite} />
+                <span class="text-transparent">a</span>
+              </Button>
+            </div>
+            <div class="pt-2 w-52 mx-auto">
+              <Button
+                on:click={() =>
+                  (window.location.href =
+                    $activeSubmission.song.platforms?.find(
+                      (p) => p.id === MusicPlatform.appleMusic
+                    )?.url)}
+                type="apple-music"
+                title="open in apple music"
+                className="flex gap-2 items-center justify-center"
+              >
+                <img
+                  alt="apple music logo"
+                  class="h-6"
+                  src={AppleMusicListenOn}
+                />
+              </Button>
+            </div>
           </div>
         </div>
       {/if}

@@ -222,7 +222,7 @@
             {/if}
           </div>
         </div>
-        {#if profile.musicPlatform === MusicPlatform.spotify}
+        {#if profile?.musicPlatform === MusicPlatform.spotify}
           <img alt="spotify logo" class="h-4 my-1 mx-auto" src={SpotifyLogo} />
         {:else}<!-- apple music icon-->
           <img
@@ -255,7 +255,7 @@
             <div class={profile.stats.topSong.albumArtwork ? 'w-52' : 'w-64'}>
               <h1
                 class={`truncate text-${getPlatformColor(
-                  profile.musicPlatform
+                  profile?.musicPlatform
                 )}`}
               >
                 {profile.stats.topSong.name}

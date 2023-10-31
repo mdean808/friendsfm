@@ -362,12 +362,14 @@ export default class User implements UserType {
         id: MusicPlatform.spotify,
         url: song.url,
         artist: song.artist,
+        name: song.name,
         albumArtwork: song.albumArtwork,
       });
       const appleMusicRes = await searchAppleMusic(song.name);
       song.platforms.push({
         id: MusicPlatform.appleMusic,
         url: appleMusicRes.results.songs?.data[0]?.attributes?.url,
+        name: appleMusicRes.results.songs?.data[0]?.attributes?.name,
         artist: appleMusicRes.results.songs?.data[0]?.attributes.artistName,
         albumArtwork:
           appleMusicRes.results.songs?.data[0]?.attributes?.artwork?.url || '',
@@ -378,6 +380,7 @@ export default class User implements UserType {
       song.platforms.push({
         id: MusicPlatform.appleMusic,
         url: song.url,
+        name: song.name,
         artist: song.artist,
         albumArtwork: song.albumArtwork,
       });
@@ -386,6 +389,7 @@ export default class User implements UserType {
       song.platforms.push({
         id: MusicPlatform.spotify,
         url: spotifySong?.external_urls.spotify || '',
+        name: spotifySong?.name || '',
         artist: spotifySong?.artists[0]?.name || '',
         albumArtwork: spotifySong?.album.images[0]?.url || '',
       });

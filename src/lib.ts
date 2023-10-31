@@ -83,7 +83,7 @@ export const handleApiResponse = async (res: Response) => {
     });
     return false;
   } else if (json.type === ResponseType.error) {
-    console.log('ERROR:', json);
+    console.log('ERROR:', json, res.url);
     eventParams.message = json.message;
     eventParams.error = json.error;
     if (json.message === 'User does not exist.') {
@@ -116,7 +116,10 @@ export const handleApiResponse = async (res: Response) => {
         window.location.href = spotifyUrl;
       }
     } else {
-      toast.push('Error: ' + json.message, toastError);
+      toast.push(
+        'Error: ' + json.message || json.error || 'Unknown Error.',
+        toastError
+      );
     }
     FirebaseAnalytics.logEvent({
       name: 'response',

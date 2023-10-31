@@ -18,6 +18,7 @@
     getUserStatistics,
     header,
     insets,
+    authToken,
   } from '../store';
   import Button from '../components/Button.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
@@ -122,17 +123,19 @@
     }
 
     await getUserFromPreferences();
-    if (loggedIn.get()) getUserStatistics();
+    if (loggedIn.get() && authToken.get()) getUserStatistics();
     if (
       (!userSubmission.get() || !Object.keys(userSubmission.get())?.length) &&
       loggedIn.get() &&
-      !homepageLoaded.get()
+      !homepageLoaded.get() &&
+      authToken.get()
     ) {
       load();
       loadFriends();
       loadGenres();
     } else {
-      if (loggedIn.get() && !homepageLoaded.get()) loadFriends(true);
+      if (loggedIn.get() && !homepageLoaded.get() && authToken.get())
+        loadFriends(true);
       loadingGenres = false;
       loadingSubmission = false;
       loadingFriendSubmissions = false;
