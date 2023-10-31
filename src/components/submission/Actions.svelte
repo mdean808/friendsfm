@@ -33,10 +33,8 @@
       on:click={toggleHeart}
       on:keypress={toggleHeart}
       className={`w-6 h-6 flex-grow-0 flex-shrink ${
-        loadingHeart ? 'animate-ping text-pink-500' : ''
-      } ${
-        $songs.find((s) => s.name === data.song.name) ? 'text-pink-500' : ''
-      } `}
+        loadingHeart ? 'animate-ping text-white' : ''
+      } ${$songs.find((s) => s.name === data.song.name) ? 'text-white' : ''} `}
       fill={$songs.find((s) => s.name === data.song.name)
         ? 'currentColor'
         : 'none'}
