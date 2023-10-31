@@ -3,6 +3,7 @@
   import { formatDurationPlayed, getPlatformColor } from '../lib';
   import { loadSongs, songs, toggleSong, user, header, insets } from '../store';
   import MusicPlatformIcon from '../components/icons/MusicPlatformIcon.svelte';
+  import { MusicPlatform } from '../types';
 
   let loadingSongs = false;
   onMount(async () => {
@@ -68,7 +69,9 @@
           {/if}
           <div class={song.albumArtwork ? 'w-52' : 'w-64'}>
             <h1
-              class={`truncate text-${getPlatformColor($user.musicPlatform)}`}
+              class={`truncate text-${getPlatformColor(
+                song.user.musicPlatform || $user.musicPlatform
+              )}`}
             >
               {song.name}
             </h1>
@@ -105,7 +108,9 @@
           <div class="mb-1.5 p-0.5 w-6 h-6 self-end">
             <MusicPlatformIcon
               className=""
-              id={$user.musicPlatform ? $user.musicPlatform : 'spotify'}
+              id={song.user.musicPlatform
+                ? song.user.musicPlatform
+                : $user.musicPlatform}
             />
           </div>
         </div>

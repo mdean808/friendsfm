@@ -6,13 +6,9 @@ export const searchspotify = onRequest(
   { cors: true },
   authMiddleware(
     sentryWrapper('search-spotify', async (req, res, user) => {
-      await user.updateMusicAuth();
+      await user.updateSpotifyAuth();
       const data = JSON.parse(req.body);
-      const results = await searchSpotify(
-        data.query,
-        data.types,
-        user.musicPlatformAuth
-      );
+      const results = await searchSpotify(data.query, data.types);
       res.status(200).type('json').send({ type: 'success', message: results });
     })
   )

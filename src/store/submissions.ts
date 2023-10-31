@@ -1,12 +1,23 @@
 import { action, atom, map } from 'nanostores';
-import type { StrippedSubmission, Audial, Submission, Comment } from '../types';
-import { getFirebaseUrl, goto, handleApiResponse } from '../lib';
+import {
+  type StrippedSubmission,
+  type Audial,
+  type Submission,
+  type Comment,
+  MusicPlatform,
+  type Song,
+} from '../types';
+import { errorToast, getFirebaseUrl, goto, handleApiResponse } from '../lib';
 import { appCheckToken, authToken, getNewAuthToken, loading, user } from '.';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Dialog } from '@capacitor/dialog';
 import { toast } from '@zerodevx/svelte-toast';
 import { Geolocation, type Position } from '@capacitor/geolocation';
 import { Preferences } from '@capacitor/preferences';
+import AppleMusic, {
+  AppleMusicPermissionsResults,
+  type AppleMusicSong,
+} from '../plugins/AppleMusic';
 
 export const userSubmission = map<Submission>();
 
@@ -14,39 +25,63 @@ export const generateSubmission = action(
   userSubmission,
   'generate-submission',
   async (store) => {
+    // set location
+    let location: Position;
+    console.log('getting location');
     try {
-      let location: Position;
-      try {
-        await Geolocation.checkPermissions().catch(
-          async () => await Geolocation.requestPermissions()
-        );
-        location = await Geolocation.getCurrentPosition();
-      } catch (e) {
-        console.log('Location permissions rejected.');
-      }
-      const res = await fetch(getFirebaseUrl('createnewusersubmission'), {
-        method: 'POST',
-        body: JSON.stringify({
-          authToken: authToken.get(),
-          latitude: location ? location.coords.latitude : undefined,
-          longitude: location ? location.coords.longitude : undefined,
-        }),
-        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-      });
-      const json = await handleApiResponse(res);
-      if (!json) {
-        // failed to set new music platform
-        return false;
-      }
-      store.set(json.message.user as Submission);
-      FirebaseAnalytics.logEvent({ name: 'generate_submission' });
-      // await Preferences.set({
-      //   key: 'submission',
-      //   value: JSON.stringify(userSubmission.get() || {}),
-      // });
+      await Geolocation.checkPermissions().catch(
+        async () => await Geolocation.requestPermissions()
+      );
+      location = await Geolocation.getCurrentPosition();
     } catch (e) {
-      console.log(e);
+      console.log('Location permissions rejected.');
     }
+
+    let recentlyPlayed: { song: AppleMusicSong };
+    if (user.get().musicPlatform === MusicPlatform.appleMusic) {
+      console.log('checking apple music perms');
+      // check apple music permissions.
+      const perms = await AppleMusic.checkPermissions();
+      if (perms.receive !== AppleMusicPermissionsResults.granted) {
+        console.log('requesting apple music permissions');
+        const permsRes = await AppleMusic.requestPermissions();
+        if (permsRes.receive !== AppleMusicPermissionsResults.granted) {
+          return Dialog.alert({
+            message:
+              "We can't see what you're listening to! Please allow apple music permissions in settings.",
+            title: 'Permissions Denied.',
+          });
+        }
+      }
+      try {
+        console.log('getting apple music recently played');
+        recentlyPlayed = await AppleMusic.getRecentlyPlayed();
+      } catch (e) {
+        console.log(e);
+        return errorToast(e.message);
+      }
+    }
+    const res = await fetch(getFirebaseUrl('createnewusersubmission'), {
+      method: 'POST',
+      body: JSON.stringify({
+        authToken: authToken.get(),
+        latitude: location ? location.coords.latitude : undefined,
+        longitude: location ? location.coords.longitude : undefined,
+        appleMusic: recentlyPlayed?.song as Song,
+      }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+    });
+    const json = await handleApiResponse(res);
+    if (!json) {
+      // failed to set new music platform
+      return false;
+    }
+    store.set(json.message.user as Submission);
+    FirebaseAnalytics.logEvent({ name: 'generate_submission' });
+    // await Preferences.set({
+    //   key: 'submission',
+    //   value: JSON.stringify(userSubmission.get() || {}),
+    // });
   }
 );
 
@@ -147,37 +182,51 @@ export const createSubmissionsPlaylist = action(
   user,
   'create-submissions-playlist',
   async (u) => {
-    if (u.get().submissionsPlaylist) {
+    const musicPlatform = u.get().musicPlatform;
+    if (musicPlatform === MusicPlatform.spotify) {
+      const { value } = await Dialog.confirm({
+        title: 'Create Spotify® Playlist',
+        message:
+          'This will create a new Spotify® playlist of the songs on your friends submissions each day. Proceed?',
+      });
+      if (!value) return;
+      loading.set(true);
+      const res = await fetch(getFirebaseUrl('createsubmissionsplaylist'), {
+        method: 'POST',
+        body: JSON.stringify({
+          authToken: authToken.get(),
+        }),
+        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+      });
+      const json = await handleApiResponse(res);
+      loading.set(false);
+      if (!json) {
+        //api response failed
+        toast.push('playlist creation failed. please try again.');
+        return;
+      }
+      // goto the playlist!
       window.location.href =
-        'https://open.spotify.com/playlist/' + u.get().submissionsPlaylist;
-      return;
+        'https://open.spotify.com/playlist/' + json.message;
+      toast.push('playlist successfully created!');
+      return json.message;
+    } else if (musicPlatform === MusicPlatform.appleMusic) {
+      const { value } = await Dialog.confirm({
+        title: 'Create Apple Music Playlist',
+        message:
+          'This will create a new Apple Music playlist of the songs on your friends submissions each day. Proceed?',
+      });
+      if (!value) return;
+      const { id } = await AppleMusic.createPlaylist({
+        name: 'friendsfm - submissions',
+      });
+      // goto playlist
+      window.location.href = 'https://music.apple.com/playlist/' + id;
+      toast.push('playlist successfully created!');
+      //todo: create-submissions-playlist save id to database and populate playlist
+      return id;
     }
-    const { value } = await Dialog.confirm({
-      title: 'Create Spotify® Playlist',
-      message:
-        'This will create a new Spotify® playlist of the songs on your friends submissions each day. Proceed?',
-    });
-    if (!value) return;
-    loading.set(true);
-    const res = await fetch(getFirebaseUrl('createsubmissionsplaylist'), {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-      }),
-      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-    });
-    const json = await handleApiResponse(res);
-    loading.set(false);
-    if (!json) {
-      //api response failed
-      toast.push('playlist creation failed. please try again.');
-      return;
-    }
-    // goto the playlist!
-    window.location.href = 'https://open.spotify.com/playlist/' + json.message;
     // return the playlist id
-    toast.push('playlist successfully created!');
-    return json.message;
   }
 );
 

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import SpotifyLogo from '../assets/spotify_logo_green.png';
+  import AppleMusicLogo from '../assets/apple_music_logo_white.svg';
   import { formatDurationPlayed, getPlatformColor, goto } from '../lib';
   import {
     editingProfile,
@@ -299,7 +300,13 @@
     </div>
     {#if $user.musicPlatform === MusicPlatform.spotify}
       <img alt="spotify logo" class="h-4 my-1 mx-auto" src={SpotifyLogo} />
-    {:else}<!-- apple music icon-->{/if}
+    {:else}<!-- apple music icon-->
+      <img
+        alt="apple music logo"
+        class="h-4 my-1 mx-auto"
+        src={AppleMusicLogo}
+      />
+    {/if}
   </div>
   <hr class="w-28 border-gray-400 border-[1.5px] rounded-full mx-auto" />
   <!-- User Common Song -->

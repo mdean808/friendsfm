@@ -275,3 +275,14 @@ export function intToRGB(i: number) {
   }
   return hex;
 }
+
+export function errorToast(content: string) {
+  const toastError: SvelteToastOptions = {
+    theme: {
+      '--toastColor': 'white',
+      '--toastBackground': '#ad2626',
+      '--toastBarBackground': 'white',
+    },
+  };
+  toast.push(content, toastError);
+}

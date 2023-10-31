@@ -1,4 +1,5 @@
-import { getFirestore } from 'firebase-admin/firestore';
+import { Timestamp, getFirestore } from 'firebase-admin/firestore';
+import { CustomError } from './error';
 
 const db = getFirestore();
 
@@ -7,12 +8,19 @@ export class SpotifyApi {
   private client_secret: string;
   public access_token = '';
 
-  constructor(client_id: string, client_secret: string) {
+  constructor(
+    client_id: string | undefined,
+    client_secret: string | undefined
+  ) {
+    if (!client_id)
+      throw new CustomError('No Spotify client ID passed to constructor.');
+    if (!client_secret)
+      throw new CustomError('No Spotify client ID passed to constructor.');
     this.client_id = client_id;
     this.client_secret = client_secret;
   }
 
-  public async getAccessToken(): Promise<string> {
+  public async refreshAccessToken() {
     const options = {
       method: 'POST',
       headers: {
@@ -35,20 +43,32 @@ export class SpotifyApi {
         }
       })
       .then(async (body) => {
-        const access_token = body.access_token;
+        this.access_token = body.access_token;
         const expires_at = new Date();
         const doc = db.collection('misc').doc('spotify');
-        doc.set({ access_token, expires_at });
+        doc.update({
+          access_token: this.access_token,
+          expires_at: Timestamp.fromDate(expires_at),
+        });
       })
       .catch((error) => console.error(error));
+  }
 
-    return '';
+  public async getAccessToken(): Promise<string> {
+    const doc = await db.collection('misc').doc('spotify').get();
+    const access_token = doc.get('access_token');
+    const expires_at = doc.get('expires_at') as Timestamp;
+    this.access_token = access_token;
+    if (new Date() > expires_at.toDate()) {
+      await this.refreshAccessToken();
+    }
+    return this.access_token;
   }
 
   public async isAccessTokenExpired(): Promise<boolean> {
-    const expires_at = new Date(
-      (await db.collection('misc').doc('spotify').get()).get('expires_at')
-    );
-    return new Date() > expires_at;
+    const expires_at = (await db.collection('misc').doc('spotify').get()).get(
+      'expires_at'
+    ) as Timestamp;
+    return new Date() > expires_at.toDate();
   }
 }

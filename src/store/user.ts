@@ -3,7 +3,7 @@ import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { captureException } from '@sentry/capacitor';
-import { map, action } from 'nanostores';
+import { map, action, allTasks } from 'nanostores';
 import {
   appCheckToken,
   authToken,

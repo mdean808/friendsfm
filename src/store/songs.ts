@@ -4,7 +4,8 @@ import { toast } from '@zerodevx/svelte-toast';
 import { action, atom } from 'nanostores';
 import { user } from '.';
 import { getFirebaseUrl, handleApiResponse } from '../lib';
-import type { SavedSong } from '../types';
+import AppleMusic from '../plugins/AppleMusic';
+import { MusicPlatform, type SavedSong } from '../types';
 import { appCheckToken, authToken } from './auth';
 import { loading } from './misc';
 
@@ -76,41 +77,62 @@ export const toggleSong = action(
   }
 );
 
-export const createSongsSpotifyPlaylist = action(
+export const createSongsPlaylist = action(
   songs,
   'create-songs-playlist',
   async () => {
     const u = user.get();
     if (u.likedSongsPlaylist) {
+      if (u.musicPlatform === MusicPlatform.spotify)
+        window.location.href =
+          'https://open.spotify.com/playlist/' + u.likedSongsPlaylist;
+      if (u.musicPlatform === MusicPlatform.appleMusic)
+        window.location.href =
+          'https://music.apple.com/playlist/' + u.likedSongsPlaylist;
+      return;
+    }
+    if (u.musicPlatform === MusicPlatform.spotify) {
+      const { value } = await Dialog.confirm({
+        title: 'Create Spotify® Playlist',
+        message:
+          'This will create a new Spotify® playlist of your saved songs. Proceed?',
+      });
+      if (!value) return;
+      loading.set(true);
+      const res = await fetch(getFirebaseUrl('createlikedsongsplaylist'), {
+        method: 'POST',
+        body: JSON.stringify({
+          authToken: authToken.get(),
+        }),
+        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+      });
+      const json = await handleApiResponse(res);
+      loading.set(false);
+      if (!json) {
+        //api response failed
+        toast.push('playlist creation failed. please try again.');
+        return;
+      }
+      // goto the playlist!
       window.location.href =
-        'https://open.spotify.com/playlist/' + u.likedSongsPlaylist;
-      return;
+        'https://open.spotify.com/playlist/' + json.message;
+      toast.push('playlist successfully created!');
+      return json.message;
+    } else if (u.musicPlatform === MusicPlatform.appleMusic) {
+      const { value } = await Dialog.confirm({
+        title: 'Create Apple Music Playlist',
+        message:
+          'This will create a new Apple Music playlist of your saved songs. Proceed?',
+      });
+      if (!value) return;
+      const { id } = await AppleMusic.createPlaylist({
+        name: 'friendsfm - submissions',
+      });
+      // goto playlist
+      window.location.href = 'https://music.apple.com/playlist/' + id;
+      toast.push('playlist successfully created!');
+      //todo: create-songs-playlist: save id to database
+      return id;
     }
-    const { value } = await Dialog.confirm({
-      title: 'Create Spotify® Playlist',
-      message:
-        'This will create a new Spotify® playlist of your saved songs. Proceed?',
-    });
-    if (!value) return;
-    loading.set(true);
-    const res = await fetch(getFirebaseUrl('createlikedsongsplaylist'), {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-      }),
-      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-    });
-    const json = await handleApiResponse(res);
-    loading.set(false);
-    if (!json) {
-      //api response failed
-      toast.push('playlist creation failed. please try again.');
-      return;
-    }
-    // goto the playlist!
-    window.location.href = 'https://open.spotify.com/playlist/' + json.message;
-    // return the playlist id
-    toast.push('playlist successfully created!');
-    return json.message;
   }
 );

@@ -11,6 +11,9 @@
   import { onMount } from 'svelte';
   import { toast } from '@zerodevx/svelte-toast';
   import MusicPlatformIcon from '../components/icons/MusicPlatformIcon.svelte';
+  import AppleMusic, {
+    AppleMusicPermissionsResults,
+  } from '../plugins/AppleMusic';
 
   let platform: MusicPlatform;
 
@@ -34,12 +37,36 @@
       window.location.href = spotifyUrl;
     } else if (platform === MusicPlatform.appleMusic) {
       loading.set(false);
-      return toast.push('Apple Music support in development!');
-      //todo: authenticate with appleMusic
-      // console.log(await AppleMusic.checkPermissions());
-      // console.log(await AppleMusic.getUserSubscriptionStatus());
-      // console.log(await AppleMusic.getNowPlaying());
-      // if (await updateMusicPlatform(platform)) goto('/');
+      // return toast.push('Apple Music support in development!');
+      switch ((await AppleMusic.checkPermissions()).receive) {
+        case AppleMusicPermissionsResults.granted:
+          console.log('Permissions granted.');
+          if (await updateMusicPlatform(platform)) goto('/');
+          break;
+        case AppleMusicPermissionsResults.prompt: {
+          console.log('Permissions not granted');
+          const res = await AppleMusic.requestPermissions();
+          if (res.receive === AppleMusicPermissionsResults.granted) {
+            if (await updateMusicPlatform(platform)) goto('/');
+          } else console.log('Permissions denied AGAIN');
+          break;
+        }
+        case AppleMusicPermissionsResults.denied: {
+          console.log('Permissions denied');
+          const res = await AppleMusic.requestPermissions();
+          if (res.receive === AppleMusicPermissionsResults.granted) {
+            if (await updateMusicPlatform(platform)) goto('/');
+          } else console.log('Permissions denied AGAIN');
+          break;
+        }
+        default: {
+          const res = await AppleMusic.requestPermissions();
+          if (res.receive === AppleMusicPermissionsResults.granted) {
+            if (await updateMusicPlatform(platform)) goto('/');
+          } else console.log('Permissions denied AGAIN');
+          break;
+        }
+      }
     }
   };
 </script>
@@ -95,9 +122,9 @@
       <Button
         type="muted"
         className={`mx-auto px-6 ${
-          platform === 'spotify'
+          platform === MusicPlatform.spotify
             ? 'bg-spotify'
-            : platform === 'apple-music'
+            : platform === MusicPlatform.appleMusic
             ? 'bg-apple-music'
             : 'bg-gray-600'
         }`}

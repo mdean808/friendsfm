@@ -27,7 +27,7 @@
   import type { IonRefresher } from '@ionic/core/components/ion-refresher';
   import { Capacitor } from '@capacitor/core';
   import { FirebaseMessaging } from '@capacitor-firebase/messaging';
-  import type { Submission as SubmissionType } from '../types';
+  import { MusicPlatform, type Submission as SubmissionType } from '../types';
   import { goto } from '../lib';
   import Genres from '../components/Genres.svelte';
 
@@ -272,12 +272,21 @@
                     </p>
                   {/if}
                   {#if $user.submissionsPlaylist}
-                    <a
-                      href={`https://open.spotify.com/playlist/${$user.submissionsPlaylist}`}
-                      class="mx-auto text-center mt-3 text-gray-300 underline"
-                    >
-                      open your submissions playlist
-                    </a>
+                    {#if $user.musicPlatform === MusicPlatform.spotify}
+                      <a
+                        href={`https://open.spotify.com/playlist/${$user.submissionsPlaylist}`}
+                        class="mx-auto text-center mt-3 text-gray-300 underline"
+                      >
+                        open your submissions playlist
+                      </a>
+                    {:else if $user.musicPlatform === MusicPlatform.appleMusic}
+                      <a
+                        href={`https://music.apple.com/playlist/${$user.submissionsPlaylist}`}
+                        class="mx-auto text-center mt-3 text-gray-300 underline"
+                      >
+                        open your submissions playlist
+                      </a>
+                    {/if}
                   {:else}
                     <p
                       on:keyup={createSubmissionsPlaylist}

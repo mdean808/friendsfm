@@ -3,7 +3,7 @@
   import type { User } from '../types';
 
   import {
-    createSongsSpotifyPlaylist,
+    createSongsPlaylist,
     currPath,
     user,
     navDate,
@@ -68,7 +68,7 @@
     {#if $currPath === '/songs'}
       <button
         class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900"
-        on:click={createSongsSpotifyPlaylist}
+        on:click={createSongsPlaylist}
       >
         <svg
           fill="none"

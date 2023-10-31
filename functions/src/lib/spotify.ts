@@ -9,6 +9,7 @@ import {
   SpotifySearchRes,
 } from '../types';
 import { CustomError } from '@/classes/error';
+import { SpotifyApi } from '@/classes/SpotifyApi';
 
 export const SPOTIFY_AUTH = Buffer.from(
   process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET
@@ -180,7 +181,7 @@ export const addSongsToSpotifyPlaylist = async (
   if (!spotifyAuth) throw Error('User not signed into spotify.');
   const songUris = [];
   for (const song of songs) {
-    const uri = (await getSpotifySong(song, spotifyAuth))?.uri;
+    const uri = (await getSpotifySong(song))?.uri;
     songUris.push(uri);
   }
   const res = await fetch(
@@ -202,11 +203,16 @@ export const addSongsToSpotifyPlaylist = async (
   }
 };
 
-const getSpotifySong = async (
-  song: Song | SavedSong,
-  spotifyAuth: MusicPlatformAuth
-) => {
-  if (!spotifyAuth) throw Error('User not signed into spotify.');
+export const getSpotifySong = async (song: Song | SavedSong) => {
+  const spotifyApi = new SpotifyApi(
+    process.env.SPOTIFY_CLIENT_ID,
+    process.env.SPOTIFY_CLIENT_SECRET
+  );
+  if (await spotifyApi.isAccessTokenExpired()) {
+    await spotifyApi.refreshAccessToken();
+  } else {
+    await spotifyApi.getAccessToken();
+  }
   const res = await fetch(
     `https://api.spotify.com/v1/search?type=track&limit=1&q=${encodeURI(
       `track:${song.name} artist:${song.artist}`
@@ -214,7 +220,7 @@ const getSpotifySong = async (
     {
       method: 'GET',
       headers: {
-        Authorization: 'Bearer ' + spotifyAuth.access_token,
+        Authorization: 'Bearer ' + spotifyApi.access_token,
       },
     }
   );
@@ -278,7 +284,7 @@ export const removeSongsFromSpotifyPlaylist = async (
   if (!spotifyAuth) throw new CustomError('User not signed into spotify.');
   const songUris = [];
   for (const song of songs) {
-    const uri = (await getSpotifySong(song, spotifyAuth))?.uri;
+    const uri = (await getSpotifySong(song))?.uri;
     songUris.push({ uri });
   }
 
@@ -303,10 +309,17 @@ export const removeSongsFromSpotifyPlaylist = async (
 
 export const searchSpotify = async (
   query: string,
-  types: ('artist' | 'track' | 'playlist' | 'album')[],
-  spotifyAuth: MusicPlatformAuth
+  types: ('artist' | 'track' | 'playlist' | 'album')[]
 ): Promise<SpotifySearchRes> => {
-  if (!spotifyAuth) throw new CustomError('User not signed into spotify.');
+  const spotifyApi = new SpotifyApi(
+    process.env.SPOTIFY_CLIENT_ID,
+    process.env.SPOTIFY_CLIENT_SECRET
+  );
+  if (await spotifyApi.isAccessTokenExpired()) {
+    await spotifyApi.refreshAccessToken();
+  } else {
+    await spotifyApi.getAccessToken();
+  }
   const res = await fetch(
     `https://api.spotify.com/v1/search?q=${query}&type=${types.toString()}`,
     {
@@ -314,7 +327,7 @@ export const searchSpotify = async (
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + spotifyAuth.access_token,
+        Authorization: 'Bearer ' + spotifyApi.access_token,
       },
     }
   );

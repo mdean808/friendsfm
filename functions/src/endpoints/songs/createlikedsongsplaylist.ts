@@ -6,7 +6,7 @@ export const createlikedsongsplaylist = onRequest(
   { cors: true },
   authMiddleware(
     sentryWrapper('create-liked-songs-playlist', async (_req, res, user) => {
-      await user.updateMusicAuth();
+      await user.updateSpotifyAuth();
       const songs = await user.getSongs();
       const playlistUrl = await createSpotifyPlaylist(
         user.musicPlatformAuth,

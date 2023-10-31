@@ -14,7 +14,7 @@ export const createsubmissionsplaylist = onRequest(
       for (const sub of friendSubmissions) {
         songs.push(sub.song);
       }
-      await user.updateMusicAuth();
+      await user.updateSpotifyAuth();
       const playlistUrl = await createSpotifyPlaylist(
         user.musicPlatformAuth,
         songs,

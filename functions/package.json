@@ -23,6 +23,7 @@
     "@sentry/profiling-node": "^1.1.2",
     "firebase-admin": "^11.10.1",
     "firebase-functions": "^4.4.1",
+    "jsonwebtoken": "^9.0.2",
     "openai": "^3.2.1",
     "tslib": "^2.6.0"
   },

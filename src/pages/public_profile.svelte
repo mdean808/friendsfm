@@ -1,5 +1,6 @@
 <script lang="ts">
   import SpotifyLogo from '../assets/spotify_logo_green.png';
+  import AppleMusicLogo from '../assets/apple_music_logo_white.svg';
   import { onMount } from 'svelte';
   import {
     formatDurationPlayed,
@@ -16,7 +17,6 @@
     publicProfileUsername,
     songs,
     toggleSong,
-    user,
   } from '../store';
   import { MusicPlatform, type User } from '../types';
 
@@ -42,7 +42,7 @@
     profile = json.message as User['profile'];
     loading.set(false);
   });
-  //todo: add share links, ability to add as a friend if you haven't friended them
+  //todo: public_profile.svelte: add share links, ability to add as a friend if you haven't friended them
 </script>
 
 <div class="bg-gray-900">
@@ -222,9 +222,15 @@
             {/if}
           </div>
         </div>
-        {#if $user.musicPlatform === MusicPlatform.spotify}
+        {#if profile.musicPlatform === MusicPlatform.spotify}
           <img alt="spotify logo" class="h-4 my-1 mx-auto" src={SpotifyLogo} />
-        {:else}<!-- apple music icon-->{/if}
+        {:else}<!-- apple music icon-->
+          <img
+            alt="apple music logo"
+            class="h-4 my-1 mx-auto"
+            src={AppleMusicLogo}
+          />
+        {/if}
       </div>
       <hr class="w-28 border-gray-400 border-[1.5px] rounded-full mx-auto" />
       <!-- User Common Song -->
@@ -248,7 +254,9 @@
             {/if}
             <div class={profile.stats.topSong.albumArtwork ? 'w-52' : 'w-64'}>
               <h1
-                class={`truncate text-${getPlatformColor($user.musicPlatform)}`}
+                class={`truncate text-${getPlatformColor(
+                  profile.musicPlatform
+                )}`}
               >
                 {profile.stats.topSong.name}
               </h1>

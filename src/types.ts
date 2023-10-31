@@ -21,6 +21,7 @@ export interface User {
     bio?: string;
     avatarString: string;
     stats: UserStatistics;
+    musicPlatform: MusicPlatform;
     favorites?: {
       album?: {
         artwork: string;
@@ -84,6 +85,7 @@ export interface SavedSong extends Song {
   user: {
     id: string;
     username: string;
+    musicPlatform?: MusicPlatform;
   };
 }
 

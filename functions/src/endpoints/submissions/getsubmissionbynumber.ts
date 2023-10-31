@@ -7,7 +7,6 @@ export const getsubmissionbynumber = onRequest(
   authMiddleware(
     sentryWrapper('get-submission-by-number', async (req, res, user) => {
       const number = JSON.parse(req.body).number;
-      //todo: handle numbers that don't exist
       const userSub = await user.getSubmission(number);
       let friendSubs: Submission[] = [];
       if (userSub) friendSubs = await user.getFriendSubmissions(number);

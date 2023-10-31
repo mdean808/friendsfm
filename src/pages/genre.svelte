@@ -46,7 +46,7 @@
       disableDefaultUI: true,
       zoomControl: true,
     });
-    //todo: as the user zooms out of the map, request a wider raidus of submissions of said genre and add them as markers
+    //todo: genre.svelte as the user zooms out of the map, request a wider raidus of submissions of said genre and add them as markers
 
     for (const sub of genreSubmissions) {
       const markerDiv = document.createElement('div');

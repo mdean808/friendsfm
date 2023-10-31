@@ -8,6 +8,7 @@ import {
   getCurrentSpotifySong,
   refreshSpotifyAccessCode,
   removeSongsFromSpotifyPlaylist,
+  getSpotifySong,
 } from '../lib/spotify';
 import {
   Friend,
@@ -22,6 +23,7 @@ import {
 } from '../types';
 import Submission from './submission';
 import { CustomError } from './error';
+import { searchAppleMusic } from '@/lib/music-kit';
 
 const db = getFirestore();
 
@@ -160,24 +162,16 @@ export default class User implements UserType {
     }
   }
 
-  public async updateMusicAuth(): Promise<string> {
+  public async updateSpotifyAuth(): Promise<string> {
     if (!this.exists) throw Error('User not loaded.');
     if (!this.musicPlatformAuth)
       throw Error('No music platform authenticated.');
-    if (this.musicPlatform == MusicPlatform.spotify) {
-      const accessCode = await refreshSpotifyAccessCode(
-        this.musicPlatformAuth,
-        this.dbRef
-      );
-      this.musicPlatformAcessCode = accessCode;
-      return accessCode;
-    } else if (this.musicPlatform == MusicPlatform.appleMusic) {
-      console.log('No need to update music auth for apple music');
-      return '';
-      //throw Error('Apple Music support coming soon!');
-    } else {
-      throw Error('Unknown music platform.');
-    }
+    const accessCode = await refreshSpotifyAccessCode(
+      this.musicPlatformAuth,
+      this.dbRef
+    );
+    this.musicPlatformAcessCode = accessCode;
+    return accessCode;
   }
 
   public async saveSong(song: SavedSong): Promise<SavedSong> {
@@ -191,7 +185,7 @@ export default class User implements UserType {
     // add the new song to the playlist
     if (this.likedSongsPlaylist) {
       if (this.musicPlatform === MusicPlatform.spotify) {
-        await this.updateMusicAuth();
+        await this.updateSpotifyAuth();
         // this doesn't need to be synchronous
         addSongsToSpotifyPlaylist(
           [song],
@@ -213,7 +207,7 @@ export default class User implements UserType {
     // remove the song from the playlist
     if (this.likedSongsPlaylist) {
       if (this.musicPlatform === MusicPlatform.spotify) {
-        await this.updateMusicAuth();
+        await this.updateSpotifyAuth();
         // this doesn't need to synchronous
         removeSongsFromSpotifyPlaylist(
           [song],
@@ -359,11 +353,42 @@ export default class User implements UserType {
       throw new CustomError('User already submitted.');
     }
     // make sure we have the latest access tokens for the user's music oauth before we get their song
-    await this.updateMusicAuth();
     let song = {} as Song;
-    if (this.musicPlatform === MusicPlatform.spotify)
+    if (this.musicPlatform === MusicPlatform.spotify) {
+      await this.updateSpotifyAuth();
       song = await this.getRecentSpotifySong();
-    if (this.musicPlatform === MusicPlatform.appleMusic) song = appleMusicSong;
+      song.platforms.push({
+        id: MusicPlatform.spotify,
+        url: song.url,
+        artist: song.artist,
+        albumArtwork: song.albumArtwork,
+      });
+      const appleMusicRes = await searchAppleMusic(song.name);
+      song.platforms.push({
+        id: MusicPlatform.appleMusic,
+        url: appleMusicRes.results.songs?.data[0]?.href,
+        artist: appleMusicRes.results.songs?.data[0]?.attributes.artistName,
+        albumArtwork:
+          appleMusicRes.results.songs?.data[0]?.attributes.artwork.url,
+      });
+    }
+    if (this.musicPlatform === MusicPlatform.appleMusic) {
+      song = appleMusicSong;
+      song.platforms.push({
+        id: MusicPlatform.appleMusic,
+        url: song.url,
+        artist: song.artist,
+        albumArtwork: song.albumArtwork,
+      });
+      // spotify information
+      const spotifySong = await getSpotifySong(song);
+      song.platforms.push({
+        id: MusicPlatform.spotify,
+        url: spotifySong?.external_urls.spotify || '',
+        artist: spotifySong?.artists[0]?.name || '',
+        albumArtwork: spotifySong?.album.images[0]?.url,
+      });
+    }
 
     // calculate time and late information if the submission is late
     const { late, time, lateTime } = Submission.calculateCurrentTimeData(
@@ -419,7 +444,7 @@ export default class User implements UserType {
         for (const fid of friendIds) {
           const friend = new User(fid);
           await friend.load();
-          await friend.updateMusicAuth();
+          await friend.updateSpotifyAuth();
           if (song) {
             await addSongsToSpotifyPlaylist(
               [song],

@@ -19,6 +19,7 @@
       user: {
         id: data.user.id,
         username: data.user.username,
+        musicPlatform: data.user.musicPlatform,
       },
     };
     await toggleSong(savedSong);

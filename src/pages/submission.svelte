@@ -1,5 +1,6 @@
 <script lang="ts">
   import SpotifyLogo from '../assets/spotify_logo_green.png';
+  import AppleMusicLogo from '../assets/apple_music_logo_white.svg';
   import { fly, scale, slide } from 'svelte/transition';
   import {
     convertDateToLateString,
@@ -62,7 +63,9 @@
         </h1>
         <button on:click={close} class="flex-grow-0 text-transparent"
           ><svg
-            class="w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-spotify"
+            class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${getPlatformColor(
+              $activeSubmission.user.musicPlatform
+            )}`}
             fill="none"
             stroke="currentColor"
             stroke-width="1.5"
@@ -129,7 +132,14 @@
             </div>
             {#if $activeSubmission.user.musicPlatform === MusicPlatform.spotify}
               <img alt="spotify logo" class="h-6 mx-auto" src={SpotifyLogo} />
-            {:else}<!-- apple music icon-->{/if}
+            {:else}<!-- apple music icon-->
+
+              <img
+                alt="spotify logo"
+                class="h-6 mx-auto"
+                src={AppleMusicLogo}
+              />
+            {/if}
           </a>
           <div class="pt-2">
             {#if $activeSubmission.song?.genre}

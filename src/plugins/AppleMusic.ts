@@ -1,6 +1,6 @@
 import { registerPlugin } from '@capacitor/core';
 
-enum PermissionsResults {
+export enum AppleMusicPermissionsResults {
   granted = 'granted',
   denied = 'denied',
   prompt = 'prompt',
@@ -12,21 +12,24 @@ interface AppleMusicSubscriptionStatus {
   hasCloudLibraryEnabled: boolean;
 }
 
-interface AppleMusicSong {
+export interface AppleMusicSong {
   name: string;
   artist: string;
   length: number; // in seconds
-  // durationElapsed: number; // in seconds
+  durationElapsed: number; // in seconds
   timestamp: number; // date (milliseconds) when it was played
+  albumArtWork: string;
+  genre: string;
   url: string;
   id: string;
 }
 
 export interface AppleMusicPlugin {
-  checkPermissions(): Promise<{ receive: PermissionsResults }>;
-  requestPermissions(): Promise<{ receive: PermissionsResults }>;
-  getNowPlaying(): Promise<{ song: AppleMusicSong }>;
+  checkPermissions(): Promise<{ receive: AppleMusicPermissionsResults }>;
+  requestPermissions(): Promise<{ receive: AppleMusicPermissionsResults }>;
+  getRecentlyPlayed(): Promise<{ song: AppleMusicSong }>;
   getUserSubscriptionStatus(): Promise<AppleMusicSubscriptionStatus>;
+  createPlaylist(options: { name: string }): Promise<{ id: string }>;
 }
 
 const AppleMusic = registerPlugin<AppleMusicPlugin>('AppleMusic');
