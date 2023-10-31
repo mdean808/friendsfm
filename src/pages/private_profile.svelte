@@ -169,7 +169,6 @@
               src={$user.profile.favorites.album.artwork}
             />
             {#if $editingProfile}
-              <!-- TODO: go to search_apple_music for that music platform-->
               <div
                 transition:fade={{ duration: 100 }}
                 on:click={(e) => {

@@ -172,40 +172,64 @@
         </div>
         <div class="mt-2 border-t-white border-t-2">
           <div class="flex w-72 mx-auto gap-4">
-            <div class="pt-2 w-52">
-              <Button
-                on:click={() =>
-                  (window.location.href =
-                    $activeSubmission.song.platforms?.find(
-                      (p) => p.id === MusicPlatform.spotify
-                    )?.url)}
-                type="spotify"
-                title="open in spotify"
-                className="flex gap-2 items-center justify-center bg-spotify"
-              >
-                <span class="text-transparent">a</span>
-                <img alt="spotify logo" class="h-6" src={SpotifyLogoWhite} />
-                <span class="text-transparent">a</span>
-              </Button>
-            </div>
-            <div class="pt-2 w-52 mx-auto">
-              <Button
-                on:click={() =>
-                  (window.location.href =
-                    $activeSubmission.song.platforms?.find(
-                      (p) => p.id === MusicPlatform.appleMusic
-                    )?.url)}
-                type="apple-music"
-                title="open in apple music"
-                className="flex gap-2 items-center justify-center"
-              >
-                <img
-                  alt="apple music logo"
-                  class="h-6"
-                  src={AppleMusicListenOn}
-                />
-              </Button>
-            </div>
+            {#if $activeSubmission.song.platforms?.find((p) => p.id === MusicPlatform.spotify)?.url}
+              <div class="pt-2 w-52">
+                <Button
+                  on:click={() =>
+                    (window.location.href =
+                      $activeSubmission.song.platforms?.find(
+                        (p) => p.id === MusicPlatform.spotify
+                      )?.url)}
+                  type="spotify"
+                  title="open in spotify"
+                  className="flex gap-2 items-center justify-center bg-spotify"
+                >
+                  <span class="text-transparent">a</span>
+                  <img alt="spotify logo" class="h-6" src={SpotifyLogoWhite} />
+                  <span class="text-transparent">a</span>
+                </Button>
+              </div>
+            {/if}
+            {#if $activeSubmission.song.platforms?.find((p) => p.id === MusicPlatform.appleMusic)?.url}
+              <div class="pt-2 w-52 mx-auto">
+                <Button
+                  on:click={() =>
+                    (window.location.href =
+                      $activeSubmission.song.platforms?.find(
+                        (p) => p.id === MusicPlatform.appleMusic
+                      )?.url)}
+                  type="apple-music"
+                  title="open in apple music"
+                  className="flex gap-2 items-center justify-center"
+                >
+                  <img
+                    alt="apple music logo"
+                    class="h-6"
+                    src={AppleMusicListenOn}
+                  />
+                </Button>
+              </div>
+            {/if}
+            {#if !$activeSubmission.song.platforms?.find((p) => p.id === MusicPlatform.appleMusic)?.url && !$activeSubmission.song.platforms?.find((p) => p.id === MusicPlatform.spotify)?.url}
+              <div class="pt-2 w-52 mx-auto">
+                <Button
+                  on:click={() =>
+                    (window.location.href = $activeSubmission.song.url)}
+                  type={$activeSubmission.user.musicPlatform}
+                  title={`open in ${$activeSubmission.user.musicPlatform}`}
+                  className="flex gap-2 items-center justify-center"
+                >
+                  <img
+                    alt={`${$activeSubmission.user.musicPlatform} logo`}
+                    class="h-6"
+                    src={$activeSubmission.user.musicPlatform ===
+                    MusicPlatform.spotify
+                      ? SpotifyLogoWhite
+                      : AppleMusicListenOn}
+                  />
+                </Button>
+              </div>
+            {/if}
           </div>
         </div>
       {/if}

@@ -58,7 +58,7 @@
   import { IonContent } from '@ionic/core/components/ion-content';
   import Genre from './pages/genre.svelte';
   import Submission from './pages/submission.svelte';
-  import SpotifySearch from './pages/spotify_search.svelte';
+  import SearchSpotify from './pages/search_spotify.svelte';
   import PublicProfile from './pages/public_profile.svelte';
   import ModalPageWrapper from './components/ModalPageWrapper.svelte';
 
@@ -227,7 +227,7 @@
       </ModalPageWrapper>
     {:else if $currPath === '/search_spotify'}
       <ModalPageWrapper flySettings={{ y: document.body.clientHeight }}>
-        <SpotifySearch />
+        <SearchSpotify />
       </ModalPageWrapper>
     {:else if $currPath === '/public_profile'}
       <ModalPageWrapper flySettings={{ y: document.body.clientHeight }}>
