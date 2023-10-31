@@ -242,6 +242,7 @@ export default class User implements UserType {
     return {
       id: '',
       name: currentSong.item.name,
+      platforms: [],
       artist: currentSong.item.artists[0]?.name,
       url: currentSong.item.external_urls.spotify,
       length: currentSong.item.duration_ms / 1000,
@@ -373,7 +374,7 @@ export default class User implements UserType {
       });
     }
     if (this.musicPlatform === MusicPlatform.appleMusic) {
-      song = appleMusicSong;
+      song = { ...appleMusicSong, platforms: [] };
       song.platforms.push({
         id: MusicPlatform.appleMusic,
         url: song.url,

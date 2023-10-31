@@ -57,7 +57,11 @@
       <div
         class="text-left px-2 mx-4 border-b-2 border-gray-400 py-2 mb-2 flex space-x-4"
       >
-        <a href={song.url} class="flex flex-grow items-center">
+        <a
+          href={song.platforms?.find((p) => p.id === $user.musicPlatform)
+            ?.url || song.url}
+          class="flex flex-grow items-center"
+        >
           {#if song.albumArtwork}
             <div>
               <img

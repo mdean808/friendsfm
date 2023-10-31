@@ -8,7 +8,6 @@ interface ImportMetaEnv {
   readonly SENTRY_AUTH_TOKEN: string;
   readonly VITE_SENTRY_DSN: string;
   readonly PORT: string;
-  readonly APPLE_MUSIC_DEVELOPER_TOKEN: string;
 }
 
 interface ImportMeta {

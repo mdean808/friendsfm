@@ -40,6 +40,12 @@ export const authMiddleware =
 
     const { authToken }: { authToken: string } = JSON.parse(req.body);
     // load and authenticate user
+    if (!authToken) {
+      return res.status(401).json({
+        type: 'error',
+        message: 'Missing Authentication Token',
+      });
+    }
     const decodedToken = await auth.verifyIdToken(authToken).catch((e) => {
       // Firebase authentication error
       res.status(401).json({

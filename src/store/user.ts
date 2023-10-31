@@ -151,7 +151,7 @@ export const refreshUser = action(user, 'get-user-data', async (store) => {
     captureException(e.message);
     console.log(e);
   }
-  // await getNewAuthToken();
+  await getNewAuthToken();
   const res = await fetch(getFirebaseUrl('getuser'), {
     method: 'POST',
     body: JSON.stringify({

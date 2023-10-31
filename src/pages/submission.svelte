@@ -16,6 +16,7 @@
     activeGenre,
     createCommentForSubmission,
     insets,
+    user,
   } from '../store';
   import Comment from '../components/Comment.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
@@ -106,7 +107,11 @@
               {/if}
             </span>
           {/if}
-          <a href={$activeSubmission.song.url}>
+          <a
+            href={$activeSubmission.song.platforms?.find(
+              (p) => p.id === $user.musicPlatform
+            )?.url || $activeSubmission.song.url}
+          >
             <div class="flex mx-auto w-full py-1">
               {#if $activeSubmission.song.albumArtwork}
                 <img

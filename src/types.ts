@@ -75,6 +75,12 @@ export interface Song {
   length: number; // in seconds
   durationElapsed: number; // in seconds
   timestamp?: number; // date (milliseconds) when it was played
+  platforms?: {
+    id: MusicPlatform;
+    url: string;
+    artist: string;
+    albumArtwork?: string;
+  }[];
   albumArtwork?: string;
   genre: string;
   url: string;
