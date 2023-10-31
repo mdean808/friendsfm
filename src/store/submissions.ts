@@ -27,7 +27,6 @@ export const generateSubmission = action(
   async (store) => {
     // set location
     let location: Position;
-    console.log('getting location');
     try {
       await Geolocation.checkPermissions().catch(
         async () => await Geolocation.requestPermissions()
@@ -39,11 +38,9 @@ export const generateSubmission = action(
 
     let recentlyPlayed: { song: AppleMusicSong };
     if (user.get().musicPlatform === MusicPlatform.appleMusic) {
-      console.log('checking apple music perms');
       // check apple music permissions.
       const perms = await AppleMusic.checkPermissions();
       if (perms.receive !== AppleMusicPermissionsResults.granted) {
-        console.log('requesting apple music permissions');
         const permsRes = await AppleMusic.requestPermissions();
         if (permsRes.receive !== AppleMusicPermissionsResults.granted) {
           return Dialog.alert({
@@ -54,7 +51,6 @@ export const generateSubmission = action(
         }
       }
       try {
-        console.log('getting apple music recently played');
         recentlyPlayed = await AppleMusic.getRecentlyPlayed();
       } catch (e) {
         console.log(e);
@@ -248,6 +244,7 @@ export const getNearbySubmissions = action(
     const res = await fetch(getFirebaseUrl('nearbysubmissions'), {
       method: 'post',
       body: JSON.stringify({
+        authToken: authToken.get(),
         location: {
           latitude: location ? location.coords.latitude : 0,
           longitude: location ? location.coords.longitude : 0,
