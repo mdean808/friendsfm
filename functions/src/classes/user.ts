@@ -378,7 +378,13 @@ export default class User implements UserType {
       });
     }
     if (this.musicPlatform === MusicPlatform.appleMusic) {
-      song = { ...appleMusicSong, platforms: [] };
+      song = {
+        ...appleMusicSong,
+        platforms: [],
+        genre:
+          (await getTrackGenre(appleMusicSong.name, appleMusicSong.artist)) ||
+          'unkown',
+      };
       song.platforms.push({
         id: MusicPlatform.appleMusic,
         url: song.url,
