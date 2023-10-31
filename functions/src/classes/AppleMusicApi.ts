@@ -15,9 +15,8 @@ export class AppleMusicApi {
     const privateKey = AppleAuth.musicKitPrivateKey;
 
     const now = Math.floor(Date.now() / 1000);
-    const alg = 'ES256';
     const headers = {
-      alg: alg,
+      alg: 'ES256',
       kid: process.env.APPLE_MUSIC_KIT_ID,
     };
     // Exp is set to now + 6 months
@@ -27,18 +26,11 @@ export class AppleMusicApi {
       iat: now,
     };
 
-    sign(payload, privateKey, { header: headers }, async (e, token) => {
-      if (e) {
-        console.error(e);
-        process.exit(1);
-      }
-      tokenRes = token || '';
-      this.token = tokenRes;
-      if (await this.testToken()) {
-        // token failed
-        throw new CustomError('Apple Music Token Generation FAILED');
-      }
-    });
+    this.token = sign(payload, privateKey, { header: headers });
+    if (!(await this.testToken())) {
+      // token failed
+      throw new CustomError('Apple Music Token Generation FAILED');
+    }
     return tokenRes;
   }
 
@@ -57,18 +49,18 @@ export class AppleMusicApi {
   }
 
   public async isTokenExpired() {
-    const expires_at = (await db.collection('misc').doc('spotify').get()).get(
-      'expires_at'
-    ) as Timestamp;
-    return new Date() > expires_at.toDate();
+    const expires_at = (
+      await db.collection('misc').doc('apple-music').get()
+    ).get('expires_at') as Timestamp;
+    return new Date() > (expires_at?.toDate() || 0);
   }
 
   public async getToken() {
-    const doc = await db.collection('misc').doc('spotify').get();
-    const token = doc.get('access_token');
+    const doc = await db.collection('misc').doc('apple-music').get();
+    const token = doc.get('token');
     const expires_at = doc.get('expires_at') as Timestamp;
     this.token = token;
-    if (new Date() > expires_at.toDate()) {
+    if (new Date() > (expires_at?.toDate() || 0)) {
       await this.generateNewToken();
     }
     return this.token;

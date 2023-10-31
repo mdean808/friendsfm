@@ -59,7 +59,7 @@ export class SpotifyApi {
     const access_token = doc.get('access_token');
     const expires_at = doc.get('expires_at') as Timestamp;
     this.access_token = access_token;
-    if (new Date() > expires_at.toDate()) {
+    if (new Date() > (expires_at?.toDate() || 0)) {
       await this.refreshAccessToken();
     }
     return this.access_token;
@@ -69,6 +69,6 @@ export class SpotifyApi {
     const expires_at = (await db.collection('misc').doc('spotify').get()).get(
       'expires_at'
     ) as Timestamp;
-    return new Date() > expires_at.toDate();
+    return new Date() > (expires_at?.toDate() || 0);
   }
 }

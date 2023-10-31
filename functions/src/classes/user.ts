@@ -370,7 +370,7 @@ export default class User implements UserType {
         url: appleMusicRes.results.songs?.data[0]?.href,
         artist: appleMusicRes.results.songs?.data[0]?.attributes.artistName,
         albumArtwork:
-          appleMusicRes.results.songs?.data[0]?.attributes.artwork.url,
+          appleMusicRes.results.songs?.data[0]?.attributes?.artwork?.url || '',
       });
     }
     if (this.musicPlatform === MusicPlatform.appleMusic) {
@@ -387,7 +387,7 @@ export default class User implements UserType {
         id: MusicPlatform.spotify,
         url: spotifySong?.external_urls.spotify || '',
         artist: spotifySong?.artists[0]?.name || '',
-        albumArtwork: spotifySong?.album.images[0]?.url,
+        albumArtwork: spotifySong?.album.images[0]?.url || '',
       });
     }
 

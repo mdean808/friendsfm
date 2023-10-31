@@ -1,4 +1,5 @@
 import { AppleMusicApi } from '@/classes/AppleMusicApi';
+import { CustomError } from '@/classes/error';
 import { MusicKitSearchResponse } from '@/types';
 
 export const searchAppleMusic = async (
@@ -12,5 +13,9 @@ export const searchAppleMusic = async (
       Authorization: `Bearer ${musicKit.token}`,
     },
   });
-  return res.json();
+  if (res.status < 400) {
+    return (await res.json()).message;
+  } else {
+    throw new CustomError('Apple Music Search Failed.');
+  }
 };

@@ -208,11 +208,8 @@ export const getSpotifySong = async (song: Song | SavedSong) => {
     process.env.SPOTIFY_CLIENT_ID,
     process.env.SPOTIFY_CLIENT_SECRET
   );
-  if (await spotifyApi.isAccessTokenExpired()) {
-    await spotifyApi.refreshAccessToken();
-  } else {
-    await spotifyApi.getAccessToken();
-  }
+  await spotifyApi.getAccessToken();
+  console.log(spotifyApi.access_token, song.name, song.artist);
   const res = await fetch(
     `https://api.spotify.com/v1/search?type=track&limit=1&q=${encodeURI(
       `track:${song.name} artist:${song.artist}`
@@ -315,11 +312,7 @@ export const searchSpotify = async (
     process.env.SPOTIFY_CLIENT_ID,
     process.env.SPOTIFY_CLIENT_SECRET
   );
-  if (await spotifyApi.isAccessTokenExpired()) {
-    await spotifyApi.refreshAccessToken();
-  } else {
-    await spotifyApi.getAccessToken();
-  }
+  await spotifyApi.getAccessToken();
   const res = await fetch(
     `https://api.spotify.com/v1/search?q=${query}&type=${types.toString()}`,
     {
