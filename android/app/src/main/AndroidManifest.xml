@@ -37,6 +37,7 @@
         <data android:scheme="https" />
         <data android:host="audial.mogdan.xyz" />
         <data android:pathPrefix="/friendsfm" />
+        <data android:pathPrefix="/app" />
         <!-- note that the leading "/" is required for pathPrefix-->
       </intent-filter>
 
