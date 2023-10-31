@@ -359,3 +359,108 @@ export interface SpotifyTrack {
   name: string;
   preview_url: string;
 }
+export interface MusicKitSearchResponse {
+  results: {
+    artists: {
+      href: string;
+      next?: string;
+      data: {
+        id: string;
+        type: string;
+        href: string;
+        attributes: {
+          name: string;
+          genreNames: string[];
+          artwork: {
+            width: number;
+            height: number;
+            url: string;
+            bgColor: string;
+            textColor1: string;
+            textColor2: string;
+            textColor3: string;
+            textColor4: string;
+          };
+          url: string;
+        };
+        relationships: {
+          albums: {
+            href: string;
+            data: {
+              id: string;
+              type: string;
+              href: string;
+            }[];
+          };
+        };
+      }[];
+    };
+    songs: {
+      href: string;
+      next?: string;
+      data: {
+        id: string;
+        type: string;
+        href: string;
+        attributes: {
+          albumName: string;
+          genreNames: string[];
+          trackNumber: number;
+          releaseDate: String;
+          durationinMillis: number;
+          isrc: string;
+          artwork: {
+            width: number;
+            height: number;
+            url: string;
+            bgColor: string;
+            textColor1: string;
+            textColor2: string;
+            textColor3: string;
+            textColor4: string;
+          };
+          url: string;
+          playParams: {
+            id: string;
+            kind: string;
+          };
+          discNumber: number;
+          isAppleDigitalMaster: boolean;
+          hasLyrics: boolean;
+          name: string;
+          previews: { url: string }[];
+          artistName: string;
+        };
+      }[];
+    };
+    albums: {
+      href: string;
+      next?: string;
+      data: {
+        attributes: {
+          name: string;
+          artistName: string;
+          artwork: {
+            width: number;
+            height: number;
+            url: string;
+            bgColor: string;
+            textColor1: string;
+            textColor2: string;
+            textColor3: string;
+            textColor4: string;
+          };
+          trackCount: number;
+          playParams: {
+            id: string;
+            kind: string;
+          };
+          url: string;
+        };
+        href: string;
+        id: string;
+        type: string;
+      }[];
+    };
+  };
+}

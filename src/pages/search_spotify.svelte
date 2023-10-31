@@ -1,5 +1,6 @@
 <script lang="ts">
   import SpotifyLogo from '../assets/spotify_logo_green.png';
+  import AppleMusicLogo from '../assets/apple_music_logo_white.svg';
   import { getFirebaseUrl, goto, handleApiResponse } from '../lib';
   import {
     appCheckToken,
@@ -16,13 +17,15 @@
     type SpotifySearchRes,
     type SpotifyTrack,
     type User,
+    type MusicKitSearchResponse,
   } from '../types';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
 
   let query: string;
   let searching = false;
   let input: HTMLInputElement;
-  let response: SpotifySearchRes;
+  let spotifyResponse: SpotifySearchRes;
+  let appleMusicResponse: MusicKitSearchResponse;
 
   const search = async (
     query: string,
@@ -31,26 +34,45 @@
     if (!query) return;
     searching = true;
     input.blur();
-    const res = await fetch(getFirebaseUrl('searchspotify'), {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-        query,
-        types,
-      }),
-      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-    });
+    if ($user.musicPlatform === MusicPlatform.spotify) {
+      const res = await fetch(getFirebaseUrl('searchspotify'), {
+        method: 'POST',
+        body: JSON.stringify({
+          authToken: authToken.get(),
+          query,
+          types,
+        }),
+        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+      });
 
-    const json = await handleApiResponse(res);
-    if (!json) {
-      // handle login failure
-      return false;
+      const json = await handleApiResponse(res);
+      if (!json) {
+        // handle login failure
+        return false;
+      }
+      spotifyResponse = json.message as SpotifySearchRes;
+    } else if ($user.musicPlatform === MusicPlatform.appleMusic) {
+      const res = await fetch(getFirebaseUrl('searchapplemusic'), {
+        method: 'POST',
+        body: JSON.stringify({
+          authToken: authToken.get(),
+          query,
+          types,
+        }),
+        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+      });
+
+      const json = await handleApiResponse(res);
+      if (!json) {
+        // handle login failure
+        return false;
+      }
+      appleMusicResponse = json.message as MusicKitSearchResponse;
     }
-    response = json.message as SpotifySearchRes;
     searching = false;
   };
 
-  const setFavoriteTrack = async (item: SpotifyTrack) => {
+  const setFavoriteTrackSpotify = async (item: SpotifyTrack) => {
     loading.set(true);
     const profile = $user.profile || ({} as User['profile']);
     if (!profile?.favorites) profile.favorites = {};
@@ -65,7 +87,26 @@
     goto('/private_profile');
   };
 
-  const setFavoriteAlbum = async (item: SpotifyAlbum) => {
+  const setFavoriteTrackAppleMusic = async (
+    item: MusicKitSearchResponse['results']['songs']['data'][number]
+  ) => {
+    loading.set(true);
+    const profile = $user.profile || ({} as User['profile']);
+    if (!profile?.favorites) profile.favorites = {};
+    profile.favorites.song = {
+      name: item.attributes?.name,
+      artwork: item.attributes?.artwork?.url
+        .replace('{w}', '120')
+        .replace('{h}', '120'),
+      artist: item.attributes?.artistName,
+      url: item.attributes?.url,
+    };
+    await setProfile(profile);
+    loading.set(false);
+    goto('/private_profile');
+  };
+
+  const setFavoriteAlbumSpotify = async (item: SpotifyAlbum) => {
     loading.set(true);
     const profile = $user.profile || ({} as User['profile']);
     if (!profile?.favorites) profile.favorites = {};
@@ -80,7 +121,26 @@
     goto('/private_profile');
   };
 
-  const setFavoriteArtist = async (item: SpotifyArtist) => {
+  const setFavoriteAlbumAppleMusic = async (
+    item: MusicKitSearchResponse['results']['albums']['data'][number]
+  ) => {
+    loading.set(true);
+    const profile = $user.profile || ({} as User['profile']);
+    if (!profile?.favorites) profile.favorites = {};
+    profile.favorites.album = {
+      name: item.attributes?.name,
+      artwork: item.attributes?.artwork?.url
+        .replace('{w}', '120')
+        .replace('{h}', '120'),
+      artist: item.attributes?.artistName,
+      url: item.attributes?.url,
+    };
+    await setProfile(profile);
+    loading.set(false);
+    goto('/private_profile');
+  };
+
+  const setFavoriteArtistSpotify = async (item: SpotifyArtist) => {
     loading.set(true);
     const profile = $user.profile || ({} as User['profile']);
     if (!profile?.favorites) profile.favorites = {};
@@ -88,6 +148,24 @@
       name: item.name,
       artwork: item.images[0]?.url,
       url: item.external_urls.spotify,
+    };
+    await setProfile(profile);
+    loading.set(false);
+    goto('/private_profile');
+  };
+
+  const setFavoriteArtistAppleMusic = async (
+    item: MusicKitSearchResponse['results']['artists']['data'][number]
+  ) => {
+    loading.set(true);
+    const profile = $user.profile || ({} as User['profile']);
+    if (!profile?.favorites) profile.favorites = {};
+    profile.favorites.artist = {
+      name: item.attributes?.name,
+      artwork: item.attributes?.artwork?.url
+        .replace('{w}', '120')
+        .replace('{h}', '120'),
+      url: item.attributes?.url,
     };
     await setProfile(profile);
     loading.set(false);
@@ -164,16 +242,22 @@
       <div class="ml-1 text-sm flex text-gray-600">
         powered by
         {#if $user.musicPlatform === MusicPlatform.spotify}
-          <img alt="spotify logo" class=" ml-1 mt-1 h-3" src={SpotifyLogo} />
-        {:else}<!-- apple music icon-->{/if}
+          <img alt="spotify logo" class="ml-1 mt-1 h-3" src={SpotifyLogo} />
+        {:else}
+          <img
+            alt="apple music logo"
+            class="ml-1 mt-1 h-3"
+            src={AppleMusicLogo}
+          />
+        {/if}
       </div>
     </div>
     <div class="overflow-y-scroll" style={`height: calc(100vh - ${130}px)`}>
-      {#if response?.tracks?.items}
-        {#each response.tracks.items as track, i}
+      {#if spotifyResponse?.tracks?.items}
+        {#each spotifyResponse.tracks.items as track, i}
           <div
-            on:keypress={() => setFavoriteTrack(track)}
-            on:click={() => setFavoriteTrack(track)}
+            on:keypress={() => setFavoriteTrackSpotify(track)}
+            on:click={() => setFavoriteTrackSpotify(track)}
             class={`flex p-2  ${
               i % 2
                 ? 'bg-gray-900 hover:text-blue-500'
@@ -190,12 +274,35 @@
             </p>
           </div>
         {/each}
-      {/if}
-      {#if response?.albums?.items}
-        {#each response.albums.items as album, i}
+      {:else if appleMusicResponse?.results?.songs?.data}
+        {#each appleMusicResponse.results.songs?.data as songs, i}
           <div
-            on:keypress={() => setFavoriteAlbum(album)}
-            on:click={() => setFavoriteAlbum(album)}
+            on:keypress={() => setFavoriteTrackAppleMusic(songs)}
+            on:click={() => setFavoriteTrackAppleMusic(songs)}
+            class={`flex p-2  ${
+              i % 2
+                ? 'bg-gray-900 hover:text-blue-500'
+                : 'bg-gray-700 hover:text-blue-500'
+            }`}
+          >
+            <img
+              src={songs.attributes?.artwork?.url
+                ?.replace('{w}', '120')
+                .replace('{h}', '120')}
+              alt={songs.attributes?.name}
+              class="w-10 h-10 self-center"
+            />
+            <p class="pl-2 pt-2 w-9/12">
+              {songs.attributes?.name} - {songs.attributes?.artistName}
+            </p>
+          </div>
+        {/each}
+      {/if}
+      {#if spotifyResponse?.albums?.items}
+        {#each spotifyResponse.albums.items as album, i}
+          <div
+            on:keypress={() => setFavoriteAlbumSpotify(album)}
+            on:click={() => setFavoriteAlbumSpotify(album)}
             class={`flex p-2  ${
               i % 2
                 ? 'bg-gray-900 hover:text-blue-500'
@@ -212,12 +319,35 @@
             </p>
           </div>
         {/each}
-      {/if}
-      {#if response?.artists?.items}
-        {#each response.artists.items as artist, i}
+      {:else if appleMusicResponse?.results?.albums?.data}
+        {#each appleMusicResponse?.results.albums?.data as album, i}
           <div
-            on:keypress={() => setFavoriteArtist(artist)}
-            on:click={() => setFavoriteArtist(artist)}
+            on:keypress={() => setFavoriteAlbumAppleMusic(album)}
+            on:click={() => setFavoriteAlbumAppleMusic(album)}
+            class={`flex p-2  ${
+              i % 2
+                ? 'bg-gray-900 hover:text-blue-500'
+                : 'bg-gray-700 hover:text-blue-500'
+            }`}
+          >
+            <img
+              src={album.attributes?.artwork?.url
+                .replace('{w}', '120')
+                .replace('{h}', '120')}
+              alt={album.attributes?.name}
+              class="w-10 h-10 self-center"
+            />
+            <p class={`pl-2 pt-2 `}>
+              {album.attributes?.name} - {album.attributes?.artistName}
+            </p>
+          </div>
+        {/each}
+      {/if}
+      {#if spotifyResponse?.artists?.items}
+        {#each spotifyResponse.artists.items as artist, i}
+          <div
+            on:keypress={() => setFavoriteArtistSpotify(artist)}
+            on:click={() => setFavoriteArtistSpotify(artist)}
             class={`flex p-2  ${
               i % 2
                 ? 'bg-gray-900 hover:text-blue-500'
@@ -231,6 +361,29 @@
             />
             <p class={`pl-2 pt-2 `}>
               {artist.name}
+            </p>
+          </div>
+        {/each}
+      {:else if appleMusicResponse?.results?.artists?.data}
+        {#each appleMusicResponse.results?.artists?.data as artist, i}
+          <div
+            on:keypress={() => setFavoriteArtistAppleMusic(artist)}
+            on:click={() => setFavoriteArtistAppleMusic(artist)}
+            class={`flex p-2  ${
+              i % 2
+                ? 'bg-gray-900 hover:text-blue-500'
+                : 'bg-gray-700 hover:text-blue-500'
+            }`}
+          >
+            <img
+              src={artist.attributes?.artwork?.url
+                .replace('{w}', '120')
+                .replace('{h}', '120')}
+              alt={artist.attributes?.name}
+              class="w-10 h-10 rounded-full"
+            />
+            <p class={`pl-2 pt-2 `}>
+              {artist.attributes?.name}
             </p>
           </div>
         {/each}

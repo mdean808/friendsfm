@@ -365,14 +365,16 @@ export default class User implements UserType {
         name: song.name,
         albumArtwork: song.albumArtwork,
       });
-      const appleMusicRes = await searchAppleMusic(song.name);
+      const appleMusicRes = await searchAppleMusic(song.name, ['track']);
       song.platforms.push({
         id: MusicPlatform.appleMusic,
         url: appleMusicRes.results.songs?.data[0]?.attributes?.url,
         name: appleMusicRes.results.songs?.data[0]?.attributes?.name,
         artist: appleMusicRes.results.songs?.data[0]?.attributes.artistName,
         albumArtwork:
-          appleMusicRes.results.songs?.data[0]?.attributes?.artwork?.url || '',
+          appleMusicRes.results.songs?.data[0]?.attributes?.artwork?.url
+            .replace('{w}', '120')
+            .replace('{h}', '120') || '',
       });
     }
     if (this.musicPlatform === MusicPlatform.appleMusic) {
