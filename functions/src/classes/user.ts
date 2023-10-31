@@ -367,7 +367,7 @@ export default class User implements UserType {
       const appleMusicRes = await searchAppleMusic(song.name);
       song.platforms.push({
         id: MusicPlatform.appleMusic,
-        url: appleMusicRes.results.songs?.data[0]?.href,
+        url: appleMusicRes.results.songs?.data[0]?.attributes?.url,
         artist: appleMusicRes.results.songs?.data[0]?.attributes.artistName,
         albumArtwork:
           appleMusicRes.results.songs?.data[0]?.attributes?.artwork?.url || '',
