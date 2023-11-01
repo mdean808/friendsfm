@@ -125,9 +125,11 @@ export const createSongsPlaylist = action(
           'This will create a new Apple Music playlist of your saved songs. Proceed?',
       });
       if (!value) return;
+      loading.set(true);
       const { id } = await AppleMusic.createPlaylist({
         name: 'friendsfm - submissions',
       });
+      console.log(id);
       const res = await fetch(getFirebaseUrl('setsongsplaylist'), {
         method: 'POST',
         body: JSON.stringify({
@@ -137,6 +139,7 @@ export const createSongsPlaylist = action(
         headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
       });
       const json = await handleApiResponse(res);
+      console.log(json);
       loading.set(false);
       if (!json) {
         //api response failed

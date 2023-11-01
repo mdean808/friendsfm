@@ -18,6 +18,8 @@ export * from './users/setmusicplatform';
 export * from './users/setprofile';
 export * from './users/getprofile';
 export * from './users/unlinkmusicplatform';
+export * from './users/setsongsplaylist';
+export * from './users/setsubmissionsplaylist';
 export * from './songs/getsongs';
 export * from './songs/deletesong';
 export * from './songs/savesong';

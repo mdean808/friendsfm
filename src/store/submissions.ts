@@ -213,6 +213,7 @@ export const createSubmissionsPlaylist = action(
           'This will create a new Apple Music playlist of the songs on your friends submissions each day. Proceed?',
       });
       if (!value) return;
+      loading.set(true);
       const { id } = await AppleMusic.createPlaylist({
         name: 'friendsfm - submissions',
       });
