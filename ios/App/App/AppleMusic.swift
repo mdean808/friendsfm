@@ -66,8 +66,7 @@ public class AppleMusicPlugin: CAPPlugin {
             print("creating playlist with valid subscription")
                   let library = MusicLibrary.shared
                   let res = try await library.createPlaylist(name: name ?? "New Playlist", description: "rotating playlist of your friend's friendsfm submissions")
-                  print("playlist created \(res.id)")
-                  call.resolve(["id": res.id.rawValue])
+                  call.resolve(["url": res.url?.absoluteString ?? "https://music.apple.com"])
               } else {
                   call.reject("No Apple Music Subscription")
               }

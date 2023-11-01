@@ -29,7 +29,7 @@ export interface AppleMusicPlugin {
   requestPermissions(): Promise<{ receive: AppleMusicPermissionsResults }>;
   getRecentlyPlayed(): Promise<{ song: AppleMusicSong }>;
   getUserSubscriptionStatus(): Promise<AppleMusicSubscriptionStatus>;
-  createPlaylist(options: { name: string }): Promise<{ id: string }>;
+  createPlaylist(options: { name: string }): Promise<{ url: string }>;
 }
 
 const AppleMusic = registerPlugin<AppleMusicPlugin>('AppleMusic');

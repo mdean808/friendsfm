@@ -214,14 +214,14 @@ export const createSubmissionsPlaylist = action(
       });
       if (!value) return;
       loading.set(true);
-      const { id } = await AppleMusic.createPlaylist({
+      const { url } = await AppleMusic.createPlaylist({
         name: 'friendsfm - submissions',
       });
       const res = await fetch(getFirebaseUrl('setsubmissionsplaylist'), {
         method: 'POST',
         body: JSON.stringify({
           authToken: authToken.get(),
-          playlist: id,
+          playlist: url,
         }),
         headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
       });
@@ -233,9 +233,9 @@ export const createSubmissionsPlaylist = action(
         return;
       }
       // goto playlist
-      window.location.href = 'https://music.apple.com/playlist/' + id;
+      window.location.href = url;
       toast.push('playlist successfully created!');
-      return id;
+      return url;
     }
     // return the playlist id
   }

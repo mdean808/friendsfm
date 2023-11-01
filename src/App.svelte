@@ -63,12 +63,23 @@
   import PublicProfile from './pages/public_profile.svelte';
   import ModalPageWrapper from './components/ModalPageWrapper.svelte';
   import { UserState } from './types';
+  import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.data) return;
     await getUserFromPreferences();
     // handle routing for new notifications
     const data = notif.data as { [key: string]: any };
+    await FirebaseAnalytics.logEvent({
+      name: 'notification_open',
+      params: {
+        title: notif.title,
+        body: notif.body,
+        subtitle: notif.subtitle,
+        id: data.id,
+        type: data.type,
+      },
+    });
     if (data.type === 'request-create') {
       await refreshUser();
       goto('/friends');

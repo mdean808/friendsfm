@@ -16,7 +16,6 @@
     getUserStatistics,
     header,
     insets,
-    authToken,
     loginState,
     logout,
   } from '../store';
@@ -287,7 +286,7 @@
                       </a>
                     {:else if $user.musicPlatform === MusicPlatform.appleMusic}
                       <a
-                        href={`https://music.apple.com/playlist/${$user.submissionsPlaylist}`}
+                        href={$user.submissionsPlaylist}
                         class="mx-auto text-center mt-3 text-gray-300 underline"
                       >
                         open your submissions playlist

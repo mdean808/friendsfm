@@ -87,8 +87,7 @@ export const createSongsPlaylist = action(
         window.location.href =
           'https://open.spotify.com/playlist/' + u.likedSongsPlaylist;
       if (u.musicPlatform === MusicPlatform.appleMusic)
-        window.location.href =
-          'https://music.apple.com/playlist/' + u.likedSongsPlaylist;
+        window.location.href = u.likedSongsPlaylist;
       return;
     }
     if (u.musicPlatform === MusicPlatform.spotify) {
@@ -126,14 +125,14 @@ export const createSongsPlaylist = action(
       });
       if (!value) return;
       loading.set(true);
-      const { id } = await AppleMusic.createPlaylist({
+      const { url } = await AppleMusic.createPlaylist({
         name: 'friendsfm - saved songs',
       });
       const res = await fetch(getFirebaseUrl('setsongsplaylist'), {
         method: 'POST',
         body: JSON.stringify({
           authToken: authToken.get(),
-          playlist: id,
+          playlist: url,
         }),
         headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
       });
@@ -145,9 +144,9 @@ export const createSongsPlaylist = action(
         return;
       }
       // goto playlist
-      window.location.href = 'https://music.apple.com/playlist/' + id;
+      window.location.href = url;
       toast.push('playlist successfully created!');
-      return id;
+      return url;
     }
   }
 );
