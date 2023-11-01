@@ -6,6 +6,7 @@
     authToken,
     getNewAuthToken,
     loading,
+    loginState,
     loginUser,
     platform,
     updateUser,
@@ -15,6 +16,7 @@
   import { onMount } from 'svelte';
   import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
   import { captureException } from '@sentry/capacitor';
+  import { UserState } from '../types';
 
   onMount(async () => {
     // if (!appCheckToken.get()) await getAppCheckToken();
@@ -39,9 +41,13 @@
       if (await loginUser()) {
         const u = user.get();
         if (!u) return;
-        if (!u.username || u.username === u.id) goto('/username');
-        else if (!u.musicPlatform) goto('/music_provider');
-        else goto('/');
+        if (!u.username || u.username === u.id) {
+          loginState.set(UserState.registeringUsername);
+          goto('/username');
+        } else if (!u.musicPlatform) {
+          loginState.set(UserState.registeringMusicPlatform);
+          goto('/music_provider');
+        } else goto('/');
       }
     } catch (e) {
       if (!e.message.includes('closed-by-user')) {
@@ -79,9 +85,13 @@
         // don't goto username
       } else {
         const u = user.get();
-        if (!u.username || u.username === u.id) goto('/username');
-        else if (!u.musicPlatform) goto('/music_provider');
-        else goto('/');
+        if (!u.username || u.username === u.id) {
+          loginState.set(UserState.registeringUsername);
+          goto('/username');
+        } else if (!u.musicPlatform) {
+          loginState.set(UserState.registeringMusicPlatform);
+          goto('/music_provider');
+        } else goto('/');
       }
     } catch (e) {
       captureException(e.message);

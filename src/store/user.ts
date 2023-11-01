@@ -105,6 +105,8 @@ export const updateUsername = action(
       // failed to set new username
       return false;
     }
+    // update state
+    if (!u.username) loginState.set(UserState.registeringMusicPlatform);
     u.username = newUsername;
     store.set(u);
     await updateUser(u);
@@ -135,6 +137,8 @@ export const updateMusicPlatform = action(
     u.musicPlatform = newMusicPlatform;
     store.set(u);
     await updateUser(u);
+    // update state
+    loginState.set(UserState.registered);
     FirebaseAnalytics.setUserProperty({
       key: 'musicPlatform',
       value: newMusicPlatform,
