@@ -216,10 +216,24 @@ export const createSubmissionsPlaylist = action(
       const { id } = await AppleMusic.createPlaylist({
         name: 'friendsfm - submissions',
       });
+      const res = await fetch(getFirebaseUrl('setsubmissionsplaylist'), {
+        method: 'POST',
+        body: JSON.stringify({
+          authToken: authToken.get(),
+          playlist: id,
+        }),
+        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+      });
+      const json = await handleApiResponse(res);
+      loading.set(false);
+      if (!json) {
+        //api response failed
+        toast.push('playlist creation failed. please try again.');
+        return;
+      }
       // goto playlist
       window.location.href = 'https://music.apple.com/playlist/' + id;
       toast.push('playlist successfully created!');
-      //todo: create-submissions-playlist save id to database and populate playlist
       return id;
     }
     // return the playlist id

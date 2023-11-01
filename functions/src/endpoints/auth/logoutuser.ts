@@ -6,7 +6,7 @@ export const logoutuser = onRequest(
   authMiddleware(
     sentryWrapper('logout-user', async (_req, res, user) => {
       user.messagingToken = '';
-      user.dbRef.update('messagingToken', '');
+      user.dbRef.update({ messagingToken: '' });
       res.status(200).json({ type: 'success', message: 'success' });
     })
   )
