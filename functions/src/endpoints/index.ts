@@ -1,4 +1,5 @@
 export * from './auth/loginuser';
+export * from './auth/logoutuser';
 export * from './friends/accceptfriend';
 export * from './friends/rejectrequest';
 export * from './friends/requestfriend';

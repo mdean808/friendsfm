@@ -1,5 +1,10 @@
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
-import { getMessaging, Message } from 'firebase-admin/messaging';
+import {
+  getMessaging,
+  Message,
+  TokenMessage,
+  TopicMessage,
+} from 'firebase-admin/messaging';
 import * as functions from 'firebase-functions';
 import * as Sentry from '@sentry/node';
 
@@ -40,6 +45,9 @@ export const sendDaily = async () => {
 };
 
 export const newNotification = async (message: Message) => {
+  // don't send if there is no topic or token set
+  if (!(message as TopicMessage).topic || !(message as TokenMessage).token)
+    return;
   const transaction = Sentry.startTransaction({
     op: 'notifications.newNotification',
     name: 'send-notification',
