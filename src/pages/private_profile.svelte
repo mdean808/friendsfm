@@ -103,12 +103,12 @@
                 on:click={(e) => {
                   e.preventDefault();
                   searchType.set('track');
-                  goto('/search_spotify');
+                  goto('/search_music_platform');
                 }}
                 on:keypress={(e) => {
                   e.preventDefault();
                   searchType.set('track');
-                  goto('/search_spotify');
+                  goto('/search_music_platform');
                 }}
                 class="absolute bg-white text-black p-1 w-6 h-6 right-3.5 -top-2.5 rounded-full"
               >
@@ -134,11 +134,11 @@
             class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
             on:click={() => {
               searchType.set('track');
-              goto('/search_spotify');
+              goto('/search_music_platform');
             }}
             on:keyup={() => {
               searchType.set('track');
-              goto('/search_spotify');
+              goto('/search_music_platform');
             }}
           >
             <svg
@@ -174,12 +174,12 @@
                 on:click={(e) => {
                   e.preventDefault();
                   searchType.set('album');
-                  goto('/search_spotify');
+                  goto('/search_music_platform');
                 }}
                 on:keypress={(e) => {
                   e.preventDefault();
                   searchType.set('album');
-                  goto('/search_spotify');
+                  goto('/search_music_platform');
                 }}
                 class="absolute bg-white text-black p-1 w-6 h-6 right-3.5 -top-2.5 rounded-full"
               >
@@ -205,11 +205,11 @@
             class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
             on:click={() => {
               searchType.set('album');
-              goto('/search_spotify');
+              goto('/search_music_platform');
             }}
             on:keyup={() => {
               searchType.set('album');
-              goto('/search_spotify');
+              goto('/search_music_platform');
             }}
           >
             <svg
@@ -244,11 +244,11 @@
                 transition:fade={{ duration: 100 }}
                 on:click={() => {
                   searchType.set('artist');
-                  goto('/search_spotify');
+                  goto('/search_music_platform');
                 }}
                 on:keypress={() => {
                   searchType.set('artist');
-                  goto('/search_spotify');
+                  goto('/search_music_platform');
                 }}
                 class="absolute bg-white text-black p-1 w-6 h-6 right-3.5 -top-2.5 rounded-full"
               >
@@ -271,11 +271,11 @@
             class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
             on:click={() => {
               searchType.set('artist');
-              goto('/search_spotify');
+              goto('/search_music_platform');
             }}
             on:keyup={() => {
               searchType.set('artist');
-              goto('/search_spotify');
+              goto('/search_music_platform');
             }}
           >
             <svg

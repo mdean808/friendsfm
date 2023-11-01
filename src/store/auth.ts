@@ -18,7 +18,7 @@ import {
   handleApiResponse,
   registerForNotifications,
 } from '../lib';
-import type { SavedSong, User } from '../types';
+import { UserState, type SavedSong, type User } from '../types';
 
 // refresh every 10 seconds
 export const userRefreshInterval = map<NodeJS.Timer>(
@@ -38,6 +38,8 @@ export const spotifyAuthCode = atom<string>('');
 
 export const loggedIn = atom<boolean>(false);
 
+export const loginState = atom<UserState>(UserState.unregistered);
+
 export const authToken = atom<string>('');
 export const getNewAuthToken = action(
   authToken,
@@ -50,6 +52,7 @@ export const getNewAuthToken = action(
     } catch (e) {
       // user isn't logged in anymore
       loggedIn.set(false);
+      loginState.set(UserState.unregistered);
       authToken.set('');
       goto('/new_user');
       console.log('Error grabbing new authToken. User must sign in.');
@@ -75,6 +78,12 @@ export const loginUser = action(user, 'login-user', async (store) => {
   loggedIn.set(true);
   songs.set(json.message.songs as SavedSong[]);
   await updateUser(json.message.user as User);
+  // set the user's state
+  if (!store.get().username) loginState.set(UserState.registeringUsername);
+  else if (!store.get().musicPlatform)
+    loginState.set(UserState.registeringMusicPlatform);
+  else loginState.set(UserState.registered);
+  // log the event
   FirebaseAnalytics.setUserId({ userId: store.get().id });
   FirebaseAnalytics.logEvent({ name: 'login', params: { id: store.get().id } });
   return true;
@@ -82,12 +91,20 @@ export const loginUser = action(user, 'login-user', async (store) => {
 
 // Log the user out
 export const logout = action(user, 'logout', async (store) => {
+  //this removes the device's messaging token from the user in the database
+  fetch(getFirebaseUrl('logoutuser'), {
+    method: 'POST',
+    body: JSON.stringify({ authToken: authToken.get() }),
+    headers: { 'x-firebase-appcheck': appCheckToken.get() },
+  });
+
   FirebaseAnalytics.logEvent({
     name: 'logout',
     params: { id: store.get()?.id },
   });
   await FirebaseAuthentication.signOut();
   loggedIn.set(false);
+  loginState.set(UserState.unregistered);
   homepageLoaded.set(false);
   store.set(null);
   userSubmission.set(null);

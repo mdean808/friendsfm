@@ -3,7 +3,7 @@ import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { captureException } from '@sentry/capacitor';
-import { map, action, allTasks } from 'nanostores';
+import { map, action } from 'nanostores';
 import {
   appCheckToken,
   authToken,
@@ -11,15 +11,17 @@ import {
   getFriendSubmissions,
   getNewAuthToken,
   loggedIn,
+  loginState,
   songs,
 } from '.';
 import { getFirebaseUrl, goto, handleApiResponse } from '../lib';
-import type {
-  MusicPlatform,
-  SavedSong,
-  Submission,
-  User,
-  UserStatistics,
+import {
+  UserState,
+  type MusicPlatform,
+  type SavedSong,
+  type Submission,
+  type User,
+  type UserStatistics,
 } from '../types';
 
 export const user = map<User>({} as User);
@@ -49,6 +51,12 @@ export const getUserFromPreferences = action(
 
     const res5 = await Preferences.get({ key: 'friend-submissions' });
     friendSubmissions.set(JSON.parse(res5.value || '[]') as Submission[]);
+
+    // set the user's state
+    if (!store.get().username) loginState.set(UserState.registeringUsername);
+    else if (!store.get().musicPlatform)
+      loginState.set(UserState.registeringMusicPlatform);
+    else loginState.set(UserState.registered);
 
     return u;
   }
@@ -138,7 +146,8 @@ export const updateMusicPlatform = action(
 
 // get updated user data
 export const refreshUser = action(user, 'get-user-data', async (store) => {
-  if (!loggedIn.get()) return false;
+  if (!loggedIn.get() || loginState.get() !== UserState.registered)
+    return false;
   let messagingToken = '';
   try {
     if (Capacitor.getPlatform() !== 'web') {

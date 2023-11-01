@@ -1,5 +1,12 @@
 import type { Adress as Address } from '@capgo/nativegeocoder';
 
+export enum UserState {
+  unregistered = 'unregistered',
+  registered = 'registered',
+  registeringUsername = 'registering-username',
+  registeringMusicPlatform = 'registering-music-platform',
+}
+
 export interface User {
   email: string;
   likedSongsPlaylist?: string;

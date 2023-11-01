@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto } from '../lib';
+  import { getPlatformColor, goto } from '../lib';
   import {
     user,
     sendFriendRequest,
@@ -8,6 +8,7 @@
     rejectFriendRequest,
     refreshUser,
     appLoading,
+    publicProfileUsername,
   } from '../store';
   import Input from '../components/Input.svelte';
   import Button from '../components/Button.svelte';
@@ -15,6 +16,8 @@
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { slide } from 'svelte/transition';
+  import { Share } from '@capacitor/share';
+
   let newUsername = '';
   let loaders = $user.friendRequests.map(() => false);
   let loading = false;
@@ -111,9 +114,14 @@
     <h1 class="text-center pt-2 mx-auto text-2xl text-white flex-grow">
       friends
     </h1>
-    <button on:click={() => goto(prevPath.get())} class="flex-grow-0">
+    <button
+      on:click={() => goto($prevPath === '/public_profile' ? '/' : $prevPath)}
+      class="flex-grow-0"
+    >
       <svg
-        class="w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-spotify"
+        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${getPlatformColor(
+          $user.musicPlatform
+        )} `}
         fill="none"
         stroke="currentColor"
         stroke-width="1.5"
@@ -144,10 +152,49 @@
   {/if}
   <div class="bg-gray-800 max-h-[50%] h-auto overflow-scroll">
     {#each $user.friends as friend}
-      <div transition:slide class="w-full border-b-white border-b-2 py-1 px-3">
-        <span class="text-gray-200 text-xl inline-block">@</span><span
-          class="text-white inline-block">{friend.username}</span
-        >
+      <div
+        on:keypress={() => {
+          publicProfileUsername.set(friend.username);
+          goto('/public_profile');
+        }}
+        on:click={() => {
+          publicProfileUsername.set(friend.username);
+          goto('/public_profile');
+        }}
+        transition:slide
+        class="w-full border-b-white border-b-2 flex justify-between py-2 px-3"
+      >
+        <div class="">
+          <img
+            class="w-5 h-5 rounded-full inline-block mx-auto"
+            alt="User Avatar"
+            src={`https://icotar.com/avatar/${friend.username}.svg`}
+          />
+          <span class="text-white inline-block">{friend.username}</span>
+        </div>
+        <div class="">
+          <svg
+            on:click={(e) => {
+              e.stopPropagation();
+              Share.share({
+                url: `https://friendsfm.mogdan.xyz/user/${friend.username}`,
+              });
+            }}
+            on:keypress={(e) => {
+              e.stopPropagation();
+              Share.share({
+                url: `https://friendsfm.mogdan.xyz/user/${friend.username}`,
+              });
+            }}
+            class="h-6 w-6"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 256 256"
+            ><path
+              d="M216,112v96a16,16,0,0,1-16,16H56a16,16,0,0,1-16-16V112A16,16,0,0,1,56,96H80a8,8,0,0,1,0,16H56v96H200V112H176a8,8,0,0,1,0-16h24A16,16,0,0,1,216,112ZM93.66,69.66,120,43.31V136a8,8,0,0,0,16,0V43.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,69.66Z"
+            ></path></svg
+          >
+        </div>
       </div>
     {/each}
   </div>

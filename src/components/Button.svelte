@@ -32,6 +32,10 @@
       buttonCSS = 'bg-apple-music hover:bg-apple-music-secondary shadow-md';
       break;
 
+    case 'no-bg':
+      buttonCSS = 'shadow-md';
+      break;
+
     default:
       buttonCSS = 'bg-blue-600 hover:bg-blue-500';
       break;

@@ -1,9 +1,15 @@
 <script>
   import { Dialog } from '@capacitor/dialog';
   import Button from '../components/Button.svelte';
-  import { goto } from '../lib';
+  import { getPlatformColor, goto } from '../lib';
 
-  import { loading, logout, prevPath, unlinkMusicProvider } from '../store';
+  import {
+    loading,
+    user,
+    logout,
+    prevPath,
+    unlinkMusicProvider,
+  } from '../store';
 </script>
 
 <div>
@@ -13,7 +19,9 @@
     <button on:click={() => goto(prevPath.get())} class="flex-grow-0">
       <svg
         fill="none"
-        class="w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-spotify"
+        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${getPlatformColor(
+          $user.musicPlatform
+        )}`}
         stroke="currentColor"
         stroke-width="1.5"
         viewBox="0 0 24 24"

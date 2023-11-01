@@ -2,7 +2,7 @@ import { action, atom, map } from 'nanostores';
 import { Device } from '@capacitor/device';
 import type { Notification } from '@capacitor-firebase/messaging';
 
-export const currPath = atom<string>('/');
+export const currPath = atom<string>('');
 
 export const prevPath = atom<string>('');
 
@@ -13,6 +13,8 @@ export const header = atom<string>('');
 export const appLoading = atom<boolean>(true);
 
 export const homepageLoaded = atom<boolean>(false);
+
+export const deepLink = atom<boolean>(false);
 
 export const platform = atom<string>('');
 

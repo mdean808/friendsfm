@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { Share } from '@capacitor/share';
+  import { toast } from '@zerodevx/svelte-toast';
   import SpotifyLogo from '../assets/spotify_logo_green.png';
   import AppleMusicLogo from '../assets/apple_music_logo_white.svg';
   import { onMount } from 'svelte';
@@ -12,11 +14,14 @@
   import {
     appCheckToken,
     authToken,
+    getNewAuthToken,
     loading,
     prevPath,
     publicProfileUsername,
     songs,
     toggleSong,
+    user,
+    sendFriendRequest,
   } from '../store';
   import { MusicPlatform, type User } from '../types';
 
@@ -24,6 +29,7 @@
 
   onMount(async () => {
     loading.set(true);
+    if (!$authToken) await getNewAuthToken();
     const res = await fetch(getFirebaseUrl('getprofile'), {
       method: 'POST',
       body: JSON.stringify({
@@ -37,22 +43,71 @@
     if (!json) {
       // handle login failure
       loading.set(false);
+      goto('/');
       return;
     }
     profile = json.message as User['profile'];
     loading.set(false);
   });
-  //todo: public_profile.svelte: add share links, ability to add as a friend if you haven't friended them
+
+  const requestFriend = async () => {
+    loading.set(true);
+    if (await sendFriendRequest($publicProfileUsername.trim())) {
+      toast.push('Succcessfully sent friend request');
+    }
+    loading.set(false);
+  };
 </script>
 
 <div class="bg-gray-900">
   <div class="sticky top-0 w-full mx-auto p-2">
     <button
+      on:click={() =>
+        Share.share({
+          url: `https://friendsfm.mogdan.xyz/user/${$publicProfileUsername}`,
+        })}
+      class="absolute left-3 top-3 text-transparent"
+      ><svg
+        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-blue-500`}
+        fill="currentColor"
+        viewBox="0 0 256 256"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M216,112v96a16,16,0,0,1-16,16H56a16,16,0,0,1-16-16V112A16,16,0,0,1,56,96H80a8,8,0,0,1,0,16H56v96H200V112H176a8,8,0,0,1,0-16h24A16,16,0,0,1,216,112ZM93.66,69.66,120,43.31V136a8,8,0,0,0,16,0V43.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,69.66Z"
+        ></path>
+      </svg>
+    </button>
+    {#if !$user.friends.find((f) => f.username === $publicProfileUsername)}
+      <button
+        on:click={requestFriend}
+        class="absolute left-14 top-3 text-transparent"
+      >
+        <svg
+          class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-blue-500`}
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"
+          ></path>
+        </svg>
+      </button>
+    {/if}
+    <button
       on:click={() => goto($prevPath)}
       class="absolute right-3 top-3 text-transparent"
       ><svg
         fill="none"
-        class="w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-spotify"
+        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${getPlatformColor(
+          profile?.musicPlatform || $user.musicPlatform
+        )}`}
         stroke="currentColor"
         stroke-width="1.5"
         viewBox="0 0 24 24"
@@ -224,7 +279,7 @@
         </div>
         {#if profile?.musicPlatform === MusicPlatform.spotify}
           <img alt="spotify logo" class="h-4 my-1 mx-auto" src={SpotifyLogo} />
-        {:else}<!-- apple music icon-->
+        {:else if profile?.musicPlatform === MusicPlatform.appleMusic}
           <img
             alt="apple music logo"
             class="h-4 my-1 mx-auto"

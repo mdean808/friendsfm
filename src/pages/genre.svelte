@@ -9,6 +9,7 @@
     location,
     updateCurrentLocation,
     prevPath,
+    user,
   } from '../store';
   import MusicPlatformIcon from '../components/icons/MusicPlatformIcon.svelte';
   import { onMount } from 'svelte';
@@ -112,7 +113,9 @@
         class="flex-grow-0 text-transparent"
         ><svg
           fill="none"
-          class="w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-spotify"
+          class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${getPlatformColor(
+            $user.musicPlatform
+          )}`}
           stroke="currentColor"
           stroke-width="1.5"
           viewBox="0 0 24 24"

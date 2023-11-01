@@ -9,7 +9,6 @@
   } from '../store';
   import { goto } from '../lib';
   import { onMount } from 'svelte';
-  import { toast } from '@zerodevx/svelte-toast';
   import MusicPlatformIcon from '../components/icons/MusicPlatformIcon.svelte';
   import AppleMusic, {
     AppleMusicPermissionsResults,
@@ -83,8 +82,8 @@
           <input
             type="radio"
             name="provider"
-            id="spotify"
-            value="spotify"
+            id={MusicPlatform.spotify}
+            value={MusicPlatform.spotify}
             bind:group={platform}
             class="peer hidden"
             checked
@@ -105,9 +104,9 @@
           <input
             type="radio"
             name="provider"
-            value="apple-music"
+            id={MusicPlatform.appleMusic}
+            value={MusicPlatform.appleMusic}
             bind:group={platform}
-            id="apple-music"
             class="peer hidden"
           />
           <label
@@ -120,13 +119,9 @@
     </div>
     <div class="mt-20 w-full">
       <Button
-        type="muted"
+        type={'no-bg'}
         className={`mx-auto px-6 ${
-          platform === MusicPlatform.spotify
-            ? 'bg-spotify'
-            : platform === MusicPlatform.appleMusic
-            ? 'bg-apple-music'
-            : 'bg-gray-600'
+          platform ? `bg-${platform}` : 'bg-gray-600'
         }`}
         title="Finish Up"
         on:click={setProvider}>Finish Up</Button

@@ -1,7 +1,7 @@
 <script lang="ts">
   import Spotify from '../../assets/spotify_icon_white.png';
   export let id: string;
-  export let className: string;
+  export let className: string = '';
 </script>
 
 {#if id === 'spotify'}

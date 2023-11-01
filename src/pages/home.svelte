@@ -10,8 +10,6 @@
     homepageLoaded,
     notificationAction,
     appLoading,
-    loggedIn,
-    getUserFromPreferences,
     user,
     createSubmissionsPlaylist,
     getNearbySubmissions,
@@ -19,6 +17,8 @@
     header,
     insets,
     authToken,
+    loginState,
+    logout,
   } from '../store';
   import Button from '../components/Button.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
@@ -28,7 +28,11 @@
   import type { IonRefresher } from '@ionic/core/components/ion-refresher';
   import { Capacitor } from '@capacitor/core';
   import { FirebaseMessaging } from '@capacitor-firebase/messaging';
-  import { MusicPlatform, type Submission as SubmissionType } from '../types';
+  import {
+    MusicPlatform,
+    UserState,
+    type Submission as SubmissionType,
+  } from '../types';
   import { goto } from '../lib';
   import Genres from '../components/Genres.svelte';
 
@@ -122,25 +126,24 @@
       FirebaseMessaging.removeAllDeliveredNotifications();
     }
 
-    await getUserFromPreferences();
-    if (loggedIn.get() && authToken.get()) getUserStatistics();
+    if ($loginState !== UserState.registered) return logout();
+    getUserStatistics();
     if (
       (!userSubmission.get() || !Object.keys(userSubmission.get())?.length) &&
-      loggedIn.get() &&
-      !homepageLoaded.get() &&
-      authToken.get()
+      !homepageLoaded.get()
     ) {
       load();
       loadFriends();
       loadGenres();
     } else {
-      if (loggedIn.get() && !homepageLoaded.get() && authToken.get())
-        loadFriends(true);
+      if (!homepageLoaded.get()) loadFriends(true);
       loadingGenres = false;
       loadingSubmission = false;
       loadingFriendSubmissions = false;
       appLoading.set(false);
     }
+    if ($friendSubmissions)
+      sortedFriendSubmissions = [...$friendSubmissions].sort(sortByDate);
   });
 
   onDestroy(() => {
@@ -199,7 +202,7 @@
   </ion-refresher>
   {#if $userSubmission}
     <div id="home" class="text-center w-full py-2 px-4">
-      {#if !$userSubmission.song}
+      {#if !$userSubmission.song && !loadingSubmission}
         <h3>you haven't shared what you're listening to yet.</h3>
         <h4 class="mb-2">submit to see what your friends are playing!</h4>
         <span class="border-white border-t-2 block w-full" />

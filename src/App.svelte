@@ -35,7 +35,8 @@
     friendSubmissions,
     userSubmission,
     activeSubmission,
-    authToken,
+    deepLink,
+    loginState,
   } from './store';
   import { goto } from './lib';
   import Loading from './components/Loading.svelte';
@@ -58,9 +59,10 @@
   import { IonContent } from '@ionic/core/components/ion-content';
   import Genre from './pages/genre.svelte';
   import Submission from './pages/submission.svelte';
-  import SearchSpotify from './pages/search_spotify.svelte';
+  import SearchMusicPlatform from './pages/search_music_platform.svelte';
   import PublicProfile from './pages/public_profile.svelte';
   import ModalPageWrapper from './components/ModalPageWrapper.svelte';
+  import { UserState } from './types';
 
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.data) return;
@@ -137,27 +139,25 @@
       console.log('ionic error:', e);
     }
     // load user
-    await getNewAuthToken();
     await getUserFromPreferences();
-    const u = user.get();
-    if (
-      !loggedIn.get() ||
-      !u ||
-      Object.keys(u).length === 0 ||
-      !authToken.get()
-    ) {
+    await getNewAuthToken();
+    if (!$loggedIn || !$user || Object.keys($user).length === 0) {
       loggedIn.set(false);
+      loginState.set(UserState.unregistered);
       return goto('/new_user');
     }
-    if (u.username && u.username !== u.id && u.musicPlatform) {
-      goto('/');
-    } else if (!u.username || u.username === u.id) {
+
+    if ($loginState === UserState.registered) {
+      // don't goto home if we have a deeplink
+      if (!$deepLink) goto('/');
+    } else if ($loginState === UserState.registeringUsername) {
       goto('/username');
-    } else if (!u.musicPlatform) {
+    } else if ($loginState === UserState.registeringMusicPlatform) {
       goto('/music_provider');
     } else {
       goto('/new_user');
     }
+    appLoading.set(false);
   });
 </script>
 
@@ -225,9 +225,9 @@
       <ModalPageWrapper flySettings={{ y: -document.body.clientHeight }}>
         <PasteAudial />
       </ModalPageWrapper>
-    {:else if $currPath === '/search_spotify'}
+    {:else if $currPath === '/search_music_platform'}
       <ModalPageWrapper flySettings={{ y: document.body.clientHeight }}>
-        <SearchSpotify />
+        <SearchMusicPlatform />
       </ModalPageWrapper>
     {:else if $currPath === '/public_profile'}
       <ModalPageWrapper flySettings={{ y: document.body.clientHeight }}>
@@ -272,8 +272,14 @@
         <div
           class="h-full"
           in:fly={{
-            x: $prevPath === '/search_spotify' ? 0 : document.body.clientWidth,
-            y: $prevPath === '/search_spotify' ? document.body.clientHeight : 0,
+            x:
+              $prevPath === '/search_music_platform'
+                ? 0
+                : document.body.clientWidth,
+            y:
+              $prevPath === '/search_music_platform'
+                ? document.body.clientHeight
+                : 0,
           }}
         >
           <PrivateProfile />
@@ -302,6 +308,9 @@
 <div class="hidden">
   Hidden div for Tailwind JIT
   <span class="text-spotify" />
-  <span class="text-apple-music" />
+  <span class="bg-spotify" />
   <span class="border-spotify" />
+  <span class="text-apple-music" />
+  <span class="bg-apple-music" />
+  <span class="border-apple-music" />
 </div>

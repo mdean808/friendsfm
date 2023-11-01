@@ -38,6 +38,8 @@
         <data android:host="audial.mogdan.xyz" />
         <data android:pathPrefix="/friendsfm" />
         <data android:pathPrefix="/app" />
+        <data android:pathPrefix="/user" />
+        <data android:pathPrefix="/auth" />
         <!-- note that the leading "/" is required for pathPrefix-->
       </intent-filter>
 

@@ -1,7 +1,12 @@
 <script lang="ts">
   import SpotifyLogo from '../assets/spotify_logo_green.png';
   import AppleMusicLogo from '../assets/apple_music_logo_white.svg';
-  import { getFirebaseUrl, goto, handleApiResponse } from '../lib';
+  import {
+    getFirebaseUrl,
+    getPlatformColor,
+    goto,
+    handleApiResponse,
+  } from '../lib';
   import {
     appCheckToken,
     authToken,
@@ -187,7 +192,9 @@
         class="flex-grow-0 text-transparent"
         ><svg
           fill="none"
-          class="w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-spotify"
+          class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${getPlatformColor(
+            $user.musicPlatform
+          )}`}
           stroke="currentColor"
           stroke-width="1.5"
           viewBox="0 0 24 24"

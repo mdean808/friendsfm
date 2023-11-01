@@ -54,6 +54,8 @@ PODS:
     - Capacitor
   - CapacitorPreferences (5.0.6):
     - Capacitor
+  - CapacitorShare (5.0.6):
+    - Capacitor
   - CapacitorSplashScreen (5.0.6):
     - Capacitor
   - CapacitorStatusBar (5.0.6):
@@ -240,6 +242,7 @@ DEPENDENCIES:
   - "CapacitorKeyboard (from `../../node_modules/@capacitor/keyboard`)"
   - CapacitorPluginSafeArea (from `../../node_modules/capacitor-plugin-safe-area`)
   - "CapacitorPreferences (from `../../node_modules/@capacitor/preferences`)"
+  - "CapacitorShare (from `../../node_modules/@capacitor/share`)"
   - "CapacitorSplashScreen (from `../../node_modules/@capacitor/splash-screen`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
   - "CapgoNativegeocoder (from `../../node_modules/@capgo/nativegeocoder`)"
@@ -318,6 +321,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/capacitor-plugin-safe-area"
   CapacitorPreferences:
     :path: "../../node_modules/@capacitor/preferences"
+  CapacitorShare:
+    :path: "../../node_modules/@capacitor/share"
   CapacitorSplashScreen:
     :path: "../../node_modules/@capacitor/splash-screen"
   CapacitorStatusBar:
@@ -345,6 +350,7 @@ SPEC CHECKSUMS:
   CapacitorKeyboard: b978154b024a5f65e044908e37d15b7de58b9d12
   CapacitorPluginSafeArea: bfdd714827dbd89fb44fea286beec996e1b0c5c4
   CapacitorPreferences: f03954bcb0ff09c792909e46bff88e3183c16b10
+  CapacitorShare: cd41743331cb71d217c029de54b681cbd91e0fcc
   CapacitorSplashScreen: 5fa2ab5e46cf5cc530cf16a51c80c7a986579ccd
   CapacitorStatusBar: 565c0a1ebd79bb40d797606a8992b4a105885309
   CapgoNativegeocoder: 3a04ddfdf836526efbd28abb691e3919d202bb04
@@ -377,6 +383,6 @@ SPEC CHECKSUMS:
   SentryCapacitor: 724954fbb78c214200e9f70ce0edad868e647eec
   SentryPrivate: 4350d865f898224ab9fa02b37d6ee7fbb623f47e
 
-PODFILE CHECKSUM: 90a6e748ffe79b2080d198984d89bbdd1665e7ef
+PODFILE CHECKSUM: 4694aff054a71fb3d24f4bc6de364db50b46e507
 
 COCOAPODS: 1.14.2

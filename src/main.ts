@@ -4,15 +4,21 @@ import { App as CapacitorApp, type URLOpenListenerEvent } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
-// import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
-// import { getAnalytics } from 'firebase/analytics';
 import { initializeApp } from 'firebase/app';
 
 import * as Sentry from '@sentry/capacitor';
 import * as SentrySvelte from '@sentry/svelte';
 
 import { Capacitor } from '@capacitor/core';
-import { getAppCheckToken, initAppCheck, spotifyAuthCode } from './store';
+import {
+  deepLink,
+  loggedIn,
+  loginState,
+  publicProfileUsername,
+  spotifyAuthCode,
+} from './store';
+import { goto } from './lib';
+import { UserState } from './types';
 
 // Initialize Sentry
 if (import.meta.env.PROD && import.meta.env.RELEASE) {
@@ -69,11 +75,16 @@ const app = new App({
 // Handle deeplinks
 CapacitorApp.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
   const url = new URL(event.url);
-  if (url.pathname.includes('spotify-login')) {
+  if (url.pathname.includes('spotify')) {
     const spotifyAccessCode = url.searchParams.get('code');
     spotifyAuthCode.set(spotifyAccessCode);
   }
-  if (url.pathname.includes('apple-music-login')) {
+  if (url.pathname.includes('user')) {
+    if (!loggedIn.get() && loginState.get() !== UserState.registered) return;
+    deepLink.set(true);
+    const username = url.pathname.split('/')[2];
+    publicProfileUsername.set(username);
+    goto('/public_profile');
   }
 });
 
