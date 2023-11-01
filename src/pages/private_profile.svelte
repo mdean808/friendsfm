@@ -15,6 +15,7 @@
   import { fade } from 'svelte/transition';
   import Input from '../components/Input.svelte';
   import { MusicPlatform } from '../types';
+  import { Share } from '@capacitor/share';
 
   onMount(() => {
     header.set('profile');
@@ -363,4 +364,18 @@
       </div>
     </div>
   {/if}
+
+  <p
+    on:keyup={() =>
+      Share.share({
+        url: 'https://friendsfm.mogdan.xyz/user/' + $user.username,
+      })}
+    on:click={() =>
+      Share.share({
+        url: 'https://friendsfm.mogdan.xyz/user/' + $user.username,
+      })}
+    class="mx-auto text-center mt-3 text-gray-300 opacity-70 underline"
+  >
+    share your profile
+  </p>
 </div>

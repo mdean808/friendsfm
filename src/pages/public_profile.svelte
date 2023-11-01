@@ -78,7 +78,7 @@
         ></path>
       </svg>
     </button>
-    {#if !$user.friends.find((f) => f.username === $publicProfileUsername)}
+    {#if !$user.friends.find((f) => f.username === $publicProfileUsername) || $publicProfileUsername !== $user.username}
       <button
         on:click={requestFriend}
         class="absolute left-14 top-3 text-transparent"
