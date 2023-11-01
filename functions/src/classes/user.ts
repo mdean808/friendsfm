@@ -664,6 +664,8 @@ export default class User implements UserType {
   static async getByUsername(username: string) {
     const ref = db.collection('users').where('username', '==', username);
     const res = await ref.get();
+    if (!res.docs[0])
+      throw new CustomError(`No user with username ${username} found.`);
     const u = new User(res.docs[0].id);
     await u.load();
     return u;

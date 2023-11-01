@@ -21,7 +21,7 @@ export interface User {
     bio?: string;
     avatarString?: string;
     stats: UserStatistics;
-    musicPlatform: MusicPlatform;
+    musicPlatform?: MusicPlatform;
     favorites?: {
       album?: {
         artwork: string;
