@@ -371,9 +371,10 @@ export default class User implements UserType {
       );
       song.platforms.push({
         id: MusicPlatform.appleMusic,
-        url: appleMusicRes.results.songs?.data[0]?.attributes?.url,
-        name: appleMusicRes.results.songs?.data[0]?.attributes?.name,
-        artist: appleMusicRes.results.songs?.data[0]?.attributes.artistName,
+        url: appleMusicRes.results.songs?.data[0]?.attributes?.url || '',
+        name: appleMusicRes.results.songs?.data[0]?.attributes?.name || '',
+        artist:
+          appleMusicRes.results.songs?.data[0]?.attributes.artistName || '',
         albumArtwork:
           appleMusicRes.results.songs?.data[0]?.attributes?.artwork?.url
             .replace('{w}', '120')
