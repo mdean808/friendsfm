@@ -34,24 +34,19 @@ export class SpotifyApi {
       body: 'grant_type=client_credentials',
     };
 
-    fetch('https://accounts.spotify.com/api/token', options)
-      .then((response) => {
-        if (response.status === 200) {
-          return response.json();
-        } else {
-          throw new Error('Error: ' + response.status);
-        }
-      })
-      .then(async (body) => {
-        this.access_token = body.access_token;
-        const expires_at = new Date();
-        const doc = db.collection('misc').doc('spotify');
-        doc.update({
-          access_token: this.access_token,
-          expires_at: Timestamp.fromDate(expires_at),
-        });
-      })
-      .catch((error) => console.error(error));
+    const res = await fetch('https://accounts.spotify.com/api/token', options);
+    if (res.status === 200) {
+      const body = await res.json();
+      this.access_token = body.access_token;
+      const expires_at = new Date();
+      const doc = db.collection('misc').doc('spotify');
+      doc.update({
+        access_token: this.access_token,
+        expires_at: Timestamp.fromDate(expires_at),
+      });
+    } else {
+      throw new Error('Error: ' + res.status);
+    }
   }
 
   public async getAccessToken(): Promise<string> {

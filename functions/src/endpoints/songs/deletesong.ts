@@ -2,6 +2,7 @@ import { SavedSong } from '@/types';
 import { onRequest } from 'firebase-functions/v2/https';
 import { authMiddleware, sentryWrapper } from '../middleware';
 
+//todo: THIS ISN'T WORKING
 export const deletesong = onRequest(
   { cors: true },
   authMiddleware(

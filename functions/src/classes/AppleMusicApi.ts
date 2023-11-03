@@ -29,7 +29,7 @@ export class AppleMusicApi {
     this.token = sign(payload, privateKey, { header: headers });
     if (!(await this.testToken())) {
       // token failed
-      throw new CustomError('Apple Music Token Generation FAILED');
+      throw new CustomError('Apple Music Token Generation Failed.');
     }
     return tokenRes;
   }

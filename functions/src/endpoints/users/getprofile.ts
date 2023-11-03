@@ -8,7 +8,6 @@ export const getprofile = onRequest(
     sentryWrapper('get-profile', async (req, res) => {
       const { username } = JSON.parse(req.body);
       const user = await User.getByUsername(username);
-      console.log(user);
       const stats = await user.getStatistics();
       const profile = user.profile;
       profile.stats = stats;

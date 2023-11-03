@@ -387,7 +387,7 @@ export default class User implements UserType {
         platforms: [],
         genre:
           (await getTrackGenre(appleMusicSong.name, appleMusicSong.artist)) ||
-          'unkown',
+          'unknown',
       };
       song.platforms.push({
         id: MusicPlatform.appleMusic,
