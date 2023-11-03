@@ -13,9 +13,9 @@ interface ActualCreateChatCompletionResponse
 
 export const getTrackGenre = async (name: string, artist: string) => {
   const openai = new OpenAIApi(configuration);
-  const prompt = `What genre is "${name}" by "${artist}"? Pick a single genre from these comma separated options: Pop, Rock, Hip Hop, Rap, Pop, Blues, Folk, Classical, Heavy Metal, Country, R&B, Punk Rock, Electronic, Soul, Reggae, Funk, Techno, Disco, Alternative Rock, Ambient, Swing, Industrial, Gospel, Trance, Instrumental, Dubstep, EDM, Ska, Electronic, Pop Rock, Indie Rock, Psychedelic, New Wave, Grunge, Drum & Bass, House, K-Pop, New Age, Lo-Fi, Drill, Trap, Indie`;
+  const prompt = `Please identify the genre of the song '${name}' by '${artist}' from the following list of genres: Pop, Rock, Hip Hop, Rap, Pop, Blues, Folk, Classical, Heavy Metal, Country, R&B, Punk Rock, Electronic, Soul, Reggae, Funk, Techno, Disco, Alternative Rock, Ambient, Swing, Industrial, Gospel, Trance, Instrumental, Dubstep, EDM, Ska, Electronic, Pop Rock, Indie Rock, Psychedelic, New Wave, Grunge, Drum & Bass, House, K-Pop, New Age, Lo-Fi, Drill, Trap, Indie`;
   const systemPrompt =
-    'You are an assistant that knows a lot about music. You also only respond with the name of a single musical genre that best fits the question. ';
+    "You are a language model trained to provide information. Please identify the genre of a song when given the song name and artist. Users will provide song details and a list of genres for you to choose from. Ensure the response includes the correct genre based on the provided song and artist. Return only the name of the genre, with no other infromation. If the song is not found or the genre is not in the list, please return 'Unknown'";
   const res = await openai.createChatCompletion({
     model: 'gpt-3.5-turbo',
     messages: [
