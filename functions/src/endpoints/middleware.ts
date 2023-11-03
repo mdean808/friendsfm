@@ -167,7 +167,9 @@ export const sentryWrapper =
         // 4. Send any errors to Sentry
         captureException(e, { tags: { handled: true } });
 
-        firebaseLog.error('Sentry Error Handled: ' + err);
+        firebaseLog.error(
+          `Sentry Error Handled: ${err.name}: ${err.message}\n${err.stack}`
+        );
       } finally {
         // 5. Finish the Sentry transaction
         configureScope((scope) => scope.clear());
