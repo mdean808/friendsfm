@@ -18,11 +18,16 @@ export const searchAppleMusic = async (
       Authorization: `Bearer ${musicKit.token}`,
     },
   });
+  if (res.status === 400) {
+    //todo: figure out how to handle a bad request or 0 results
+  }
   if (res.status < 400) {
     return await res.json();
   } else {
     throw new CustomError(
-      `Apple Music Search Failed: ${res.status} ${res.statusText}`
+      `Apple Music Search Failed: ${res.status} ${
+        res.statusText
+      }. query: ${query}, types: ${types.toString()}`
     );
   }
 };

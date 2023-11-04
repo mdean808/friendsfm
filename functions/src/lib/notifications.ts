@@ -46,7 +46,7 @@ export const sendDaily = async () => {
 
 export const newNotification = async (message: Message) => {
   // don't send if there is no topic or token set
-  if (!(message as TopicMessage).topic || !(message as TokenMessage).token)
+  if (!(message as TopicMessage).topic && !(message as TokenMessage).token)
     return;
   const transaction = Sentry.startTransaction({
     op: 'notifications.newNotification',
