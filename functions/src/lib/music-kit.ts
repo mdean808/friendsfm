@@ -21,6 +21,8 @@ export const searchAppleMusic = async (
   if (res.status < 400) {
     return await res.json();
   } else {
-    throw new CustomError('Apple Music Search Failed.');
+    throw new CustomError(
+      `Apple Music Search Failed: ${res.status} ${res.statusText}`
+    );
   }
 };
