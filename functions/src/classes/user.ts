@@ -366,7 +366,7 @@ export default class User implements UserType {
         albumArtwork: song.albumArtwork,
       });
       const appleMusicRes = await searchAppleMusic(
-        song.name + 'by ' + song.artist,
+        song.name + ' by ' + song.artist,
         ['track']
       );
       song.platforms.push({
