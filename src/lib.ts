@@ -236,7 +236,7 @@ export const getFirebaseUrl = (endpoint: string) => {
 
 export function hashCode(str: string, seed: number) {
   let hash = seed;
-  for (let i = 0; i < str.length; i++) {
+  for (let i = 0; i < str?.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
   return hash;
@@ -261,7 +261,7 @@ export function getContrastRatio(
 
 export function intToRGB(i: number) {
   let c = (i & 0x00ffffff).toString(16).toUpperCase();
-  let hex = '#' + '00000'.substring(0, 6 - c.length) + c;
+  let hex = '#' + '00000'.substring(0, 6 - c?.length) + c;
   let rgb = hex.match(/.{2}/g).map((v) => parseInt(v, 16)) as [
     number,
     number,
@@ -271,7 +271,7 @@ export function intToRGB(i: number) {
   while (contrast < 4.5) {
     i++;
     c = (i & 0x00ffffff).toString(16).toUpperCase();
-    hex = '#' + '00000'.substring(0, 6 - c.length) + c;
+    hex = '#' + '00000'.substring(0, 6 - c?.length) + c;
     rgb = hex.match(/.{2}/g).map((v) => parseInt(v, 16)) as [
       number,
       number,

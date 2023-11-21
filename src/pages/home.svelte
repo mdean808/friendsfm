@@ -264,7 +264,7 @@
                       <Submission data={submission} />
                     </div>
                   {/each}
-                  {#if $friendSubmissions.length === 0}
+                  {#if $friendSubmissions?.length === 0}
                     <p class="mx-auto text-center mt-3">
                       nobody else has submitted yet.
                     </p>

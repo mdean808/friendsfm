@@ -25,7 +25,7 @@
     uniqueGenres = [...new Set(genres)];
     genreCounts = uniqueGenres.map((genre) => {
       return {
-        count: genres.filter((item) => item === genre).length,
+        count: genres.filter((item) => item === genre)?.length,
         name: genre,
       };
     });
@@ -44,7 +44,7 @@
         class="text-xs gap-2 inline-flex font-semibold
     leading-sm uppercase py-1 rounded-full"
       >
-        {#if uniqueGenres.length < 1}
+        {#if uniqueGenres?.length < 1}
           <div class="mt-2 text-gray-300 text-center">no nearby genres</div>
         {:else}
           {#each uniqueGenres.sort((a, b) => genreCounts.find((c) => c.name === b).count - genreCounts.find((c) => c.name === a).count) as genre}
