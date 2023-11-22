@@ -20,9 +20,6 @@ export const searchAppleMusic = async (
       Authorization: `Bearer ${musicKit.token}`,
     },
   });
-  if (res.status === 400) {
-    //todo: figure out how to handle a bad request or 0 results
-  }
   if (res.status < 400) {
     return await res.json();
   } else {
