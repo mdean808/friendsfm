@@ -24,6 +24,7 @@ import {
 import Submission from './submission';
 import { CustomError } from './error';
 import { searchAppleMusic } from '@/lib/music-kit';
+import { sendExceptionToSentry } from '@/lib/sentry';
 
 const db = getFirestore();
 
@@ -368,18 +369,24 @@ export default class User implements UserType {
       const appleMusicRes = await searchAppleMusic(
         song.name + ' by ' + song.artist,
         ['track']
-      );
-      song.platforms.push({
-        id: MusicPlatform.appleMusic,
-        url: appleMusicRes.results.songs?.data[0]?.attributes?.url || '',
-        name: appleMusicRes.results.songs?.data[0]?.attributes?.name || '',
-        artist:
-          appleMusicRes.results.songs?.data[0]?.attributes.artistName || '',
-        albumArtwork:
-          appleMusicRes.results.songs?.data[0]?.attributes?.artwork?.url
-            .replace('{w}', '120')
-            .replace('{h}', '120') || '',
+      ).catch((e) => {
+        sendExceptionToSentry('function-create-submission', e, {
+          user_id: this.id,
+        });
       });
+      if (appleMusicRes) {
+        song.platforms.push({
+          id: MusicPlatform.appleMusic,
+          url: appleMusicRes.results.songs?.data[0]?.attributes?.url || '',
+          name: appleMusicRes.results.songs?.data[0]?.attributes?.name || '',
+          artist:
+            appleMusicRes.results.songs?.data[0]?.attributes.artistName || '',
+          albumArtwork:
+            appleMusicRes.results.songs?.data[0]?.attributes?.artwork?.url
+              .replace('{w}', '120')
+              .replace('{h}', '120') || '',
+        });
+      }
     }
     if (this.musicPlatform === MusicPlatform.appleMusic) {
       song = {
