@@ -130,26 +130,58 @@ export default class Submission implements SubmissionType {
       comments: FieldValue.arrayUnion(comment),
     });
     this.comments.push(comment);
+    const notifsSentToUsernames: string[] = [];
     // send notification to the current submission user
     let u = new User(this.userId);
     if (this.userId !== user.id)
-      u.load().then(() =>
+      u.load().then(() => {
+        notifsSentToUsernames.push(u.username);
         u.sendNotification(`${user.username} commented`, content, {
           type: 'comment',
           id: this.id,
-        })
-      );
+        });
+      });
     // send notification to anyone else who commented
     for (const c of this.comments) {
       let u = new User(c.user.id);
       if (this.userId !== u.id && u.id !== user.id)
-        u.load().then(() =>
+        u.load().then(() => {
+          notifsSentToUsernames.push(u.username);
           u.sendNotification(`${user.username} commented`, content, {
             type: 'comment',
             id: this.id,
-          })
-        );
+          });
+        });
     }
+    // send notification to anyone who was mentioned
+    // grab usernames in the comment
+    const usernamesInContent = content
+      .split(' ')
+      .filter((word) => word.startsWith('@'))
+      .map((word) => word.slice(1));
+
+    // make sure we don't send duplicate notifications
+    const uniqueUsernames = [
+      ...new Set(
+        usernamesInContent
+          .filter((x) => !notifsSentToUsernames.includes(x))
+          .concat(
+            notifsSentToUsernames.filter((x) => !usernamesInContent.includes(x))
+          )
+      ),
+    ];
+    console.log('unique usernames', uniqueUsernames);
+
+    for (const username of uniqueUsernames) {
+      notifsSentToUsernames.push(username);
+      User.getByUsername(username).then((u) => {
+        u.sendNotification(`${user.username} mentioned you`, content, {
+          type: 'comment',
+          id: this.id,
+        });
+      });
+    }
+
     return comment;
   }
 
