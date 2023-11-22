@@ -83,12 +83,30 @@
     if (data.type === 'request-create') {
       await refreshUser();
       goto('/friends');
-    } else if (data.type === 'daily' || data.type === 'late-submission') {
+    } else if (data.type === 'daily') {
       goto('/');
     } else if (data.type === 'request-accept') {
       await refreshUser();
       goto('/friends');
     } else if (data.type === 'comment') {
+      const subId = data.id;
+      const sub =
+        $friendSubmissions.find((s) => s.id === subId) ||
+        ($userSubmission.id === subId ? $userSubmission : null);
+      if (sub) {
+        activeSubmission.set(sub);
+        goto('/&submission');
+      } else {
+        const toastError: SvelteToastOptions = {
+          theme: {
+            '--toastColor': 'white',
+            '--toastBackground': '#ad2626',
+            '--toastBarBackground': 'white',
+          },
+        };
+        toast.push('Error: Comment not found.', toastError);
+      }
+    } else if (data.type === 'late-submission') {
       const subId = data.id;
       const sub =
         $friendSubmissions.find((s) => s.id === subId) ||

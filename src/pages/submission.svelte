@@ -173,7 +173,7 @@
         <div class="mt-2 border-t-white border-t-2">
           <div class="flex w-72 mx-auto gap-4">
             {#if $activeSubmission.song.platforms?.find((p) => p.id === MusicPlatform.spotify)?.url}
-              <div class="pt-2 w-52">
+              <div class="pt-2 w-52 mx-auto">
                 <Button
                   on:click={() =>
                     (window.location.href =
@@ -235,7 +235,7 @@
       {/if}
       <div
         style={`height: calc(100vh - ${
-          $insets.bottom + (!focused ? 375 : 0)
+          $insets.bottom + (!focused ? 425 : 150)
         }px)`}
         class="overflow-y-scroll text-white border-t-white border-t-2 pt-2 mt-2 block"
       >
