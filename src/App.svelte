@@ -37,6 +37,7 @@
     activeSubmission,
     deepLink,
     loginState,
+    getFriendSubmissions,
   } from './store';
   import { goto } from './lib';
   import Loading from './components/Loading.svelte';
@@ -108,6 +109,7 @@
       }
     } else if (data.type === 'late-submission') {
       const subId = data.id;
+      await getFriendSubmissions();
       const sub =
         $friendSubmissions.find((s) => s.id === subId) ||
         ($userSubmission.id === subId ? $userSubmission : null);
@@ -122,7 +124,7 @@
             '--toastBarBackground': 'white',
           },
         };
-        toast.push('Error: Comment not found.', toastError);
+        toast.push('Error: Submission not found.', toastError);
       }
     }
   });
