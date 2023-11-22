@@ -62,15 +62,8 @@ export const handleApiResponse = async (res: Response) => {
   let eventParams: LogEventOptions['params'] = {};
   eventParams.status = res.status;
   eventParams.statusText = res.statusText;
-  const toastError: SvelteToastOptions = {
-    theme: {
-      '--toastColor': 'white',
-      '--toastBackground': '#ad2626',
-      '--toastBarBackground': 'white',
-    },
-  };
   if (res.status >= 500) {
-    toast.push('Error ' + res.status + ': ' + res.statusText, toastError);
+    errorToast('Error ' + res.status + ': ' + res.statusText);
     FirebaseAnalytics.logEvent({
       name: 'response',
       params: eventParams,
@@ -79,7 +72,7 @@ export const handleApiResponse = async (res: Response) => {
   }
   const json = (await res.json()) as NetworkResponse;
   if (res.status !== 200 && !json) {
-    toast.push('Error ' + res.status + ': ' + res.statusText, toastError);
+    errorToast('Error ' + res.status + ': ' + res.statusText);
     FirebaseAnalytics.logEvent({
       name: 'response',
       params: eventParams,
@@ -119,10 +112,7 @@ export const handleApiResponse = async (res: Response) => {
         window.location.href = spotifyUrl;
       }
     } else {
-      toast.push(
-        'Error: ' + json.message || json.error || 'Unknown Error.',
-        toastError
-      );
+      errorToast('Error: ' + json.message || json.error || 'Unknown Error.');
     }
     FirebaseAnalytics.logEvent({
       name: 'response',

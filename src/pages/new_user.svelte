@@ -1,6 +1,6 @@
 <script lang="ts">
   import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
-  import { goto } from '../lib';
+  import { errorToast, goto } from '../lib';
   import {
     appLoading,
     authToken,
@@ -14,7 +14,6 @@
   } from '../store';
   import Icon from '../assets/icon.png';
   import { onMount } from 'svelte';
-  import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
   import { captureException } from '@sentry/capacitor';
   import { UserState } from '../types';
 
@@ -51,15 +50,8 @@
       }
     } catch (e) {
       if (!e.message.includes('closed-by-user')) {
-        const toastError: SvelteToastOptions = {
-          theme: {
-            '--toastColor': 'white',
-            '--toastBackground': '#ad2626',
-            '--toastBarBackground': 'white',
-          },
-        };
         loading.set(false);
-        toast.push('Something went wrong. Please try again.', toastError);
+        errorToast('Something went wrong. Please try again.');
         captureException(e.message);
       }
     }

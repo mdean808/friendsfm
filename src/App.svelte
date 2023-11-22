@@ -1,10 +1,6 @@
 <script lang="ts">
   import { FirebaseMessaging } from '@capacitor-firebase/messaging';
-  import {
-    SvelteToast,
-    toast,
-    type SvelteToastOptions,
-  } from '@zerodevx/svelte-toast';
+  import { SvelteToast } from '@zerodevx/svelte-toast';
   import { Capacitor } from '@capacitor/core';
 
   import Home from './pages/home.svelte';
@@ -39,7 +35,7 @@
     loginState,
     getFriendSubmissions,
   } from './store';
-  import { goto } from './lib';
+  import { errorToast, goto } from './lib';
   import Loading from './components/Loading.svelte';
   import Friends from './pages/friends.svelte';
   import { fade, fly } from 'svelte/transition';
@@ -98,14 +94,7 @@
         activeSubmission.set(sub);
         goto('/&submission');
       } else {
-        const toastError: SvelteToastOptions = {
-          theme: {
-            '--toastColor': 'white',
-            '--toastBackground': '#ad2626',
-            '--toastBarBackground': 'white',
-          },
-        };
-        toast.push('Error: Comment not found.', toastError);
+        errorToast('Error: Comment not found.');
       }
     } else if (data.type === 'late-submission') {
       const subId = data.id;
@@ -117,14 +106,7 @@
         activeSubmission.set(sub);
         goto('/&submission');
       } else {
-        const toastError: SvelteToastOptions = {
-          theme: {
-            '--toastColor': 'white',
-            '--toastBackground': '#ad2626',
-            '--toastBarBackground': 'white',
-          },
-        };
-        toast.push('Error: Submission not found.', toastError);
+        errorToast('Error: Submission not found.');
       }
     }
   });
