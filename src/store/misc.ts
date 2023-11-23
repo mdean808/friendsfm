@@ -11,6 +11,7 @@ export const loading = atom<boolean>(false);
 export const header = atom<string>('');
 
 export const appLoading = atom<boolean>(true);
+export const secondaryAppLoading = atom<boolean>(false);
 
 export const homepageLoaded = atom<boolean>(false);
 

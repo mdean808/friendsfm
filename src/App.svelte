@@ -34,6 +34,7 @@
     deepLink,
     loginState,
     getFriendSubmissions,
+    secondaryAppLoading,
   } from './store';
   import { errorToast, goto } from './lib';
   import Loading from './components/Loading.svelte';
@@ -97,6 +98,7 @@
         errorToast('Error: Comment not found.');
       }
     } else if (data.type === 'late-submission') {
+      secondaryAppLoading.set(true);
       const subId = data.id;
       await getFriendSubmissions();
       const sub =
@@ -108,6 +110,7 @@
       } else {
         errorToast('Error: Submission not found.');
       }
+      secondaryAppLoading.set(false);
     }
   });
 
@@ -130,6 +133,7 @@
     await getInsets();
     // request permissions
     FirebaseMessaging.requestPermissions();
+    // ionic init
     try {
       initialize();
       // The rest of the ion-elements can be defined as below
@@ -216,7 +220,7 @@
       <Submission />
     {/if}
 
-    {#if $appLoading}
+    {#if $appLoading || $secondaryAppLoading}
       <div transition:fade={{ duration: 100 }}>
         <AnimatedSplashScreen />
       </div>

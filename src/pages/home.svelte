@@ -94,10 +94,10 @@
     const data: { [key: string]: any } = notif.data;
     switch (data.type) {
       case 'daily':
-        load();
+        if ($loginState === UserState.registered) load();
         break;
       case 'late-submission':
-        loadFriends();
+        if ($loginState === UserState.registered) loadFriends();
         break;
       default:
         break;

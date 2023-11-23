@@ -18,7 +18,6 @@
     activeGenre,
     createCommentForSubmission,
     insets,
-    user,
   } from '../store';
   import Comment from '../components/Comment.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
@@ -115,7 +114,7 @@
               {#if $activeSubmission.song.albumArtwork}
                 <img
                   alt="Album Artwork"
-                  class="w-24 mx-auto"
+                  class="w-24 h-24 mx-auto"
                   src={$activeSubmission.song.albumArtwork}
                 />
               {/if}
