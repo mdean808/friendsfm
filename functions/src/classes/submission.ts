@@ -170,15 +170,18 @@ export default class Submission implements SubmissionType {
           )
       ),
     ];
-    console.log('unique usernames', uniqueUsernames);
 
     for (const username of uniqueUsernames) {
       notifsSentToUsernames.push(username);
       User.getByUsername(username).then((u) => {
-        u.sendNotification(`${user.username} mentioned you`, content, {
-          type: 'comment',
-          id: this.id,
-        });
+        u.sendNotification(
+          `${user.username} mentioned you in a comment`,
+          content,
+          {
+            type: 'comment',
+            id: this.id,
+          }
+        );
       });
     }
 
