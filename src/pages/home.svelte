@@ -34,6 +34,7 @@
   } from '../types';
   import { goto } from '../lib';
   import GenreTagline from '../components/GenreTagline.svelte';
+  import Genres from '../components/Genres.svelte';
 
   // GLOBALS
   let loadingSubmission = false;
@@ -242,6 +243,10 @@
                 </div>
               {/if}
               <span class="border-white border-t-2 block w-full" />
+              <!-- TODO: CREATE SOME TABS AND INCLUDE ../components/Genres.svelte -->
+              <div class="p-4">
+                <Genres />
+              </div>
               <div class="mb-3 mt-3 px-4 mx-auto">
                 {#if loadingSubmission}
                   <LoadingIndicator className={'mx-auto w-16 h-16'} />

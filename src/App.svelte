@@ -55,7 +55,7 @@
   import { IonSpinner } from '@ionic/core/components/ion-spinner';
   import { IonApp } from '@ionic/core/components/ion-app';
   import { IonContent } from '@ionic/core/components/ion-content';
-  import Genres from './pages/genres.svelte';
+  import Genres from './components/Genres.svelte';
   import Submission from './pages/submission.svelte';
   import SearchMusicPlatform from './pages/search_music_platform.svelte';
   import PublicProfile from './pages/public_profile.svelte';
