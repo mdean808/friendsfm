@@ -1,8 +1,8 @@
 <script lang="ts">
-  import UserSubmission from '../components/UserSubmission.svelte';
-  import Submission from '../components/Submission.svelte';
+  import UserSubmission from '../components/submission/User.svelte';
+  import Submission from '../components/submission/index.svelte';
   import type { Submission as SubmissionType, HomeDay } from '../types';
-  import Genres from '../components/Genres.svelte';
+  import Genres from '../components/GenreTagline.svelte';
 
   // GLOBALS
   export let data: HomeDay;
