@@ -55,7 +55,7 @@
   import { IonSpinner } from '@ionic/core/components/ion-spinner';
   import { IonApp } from '@ionic/core/components/ion-app';
   import { IonContent } from '@ionic/core/components/ion-content';
-  import Genre from './pages/genre.svelte';
+  import Genres from './pages/genres.svelte';
   import Submission from './pages/submission.svelte';
   import SearchMusicPlatform from './pages/search_music_platform.svelte';
   import PublicProfile from './pages/public_profile.svelte';
@@ -230,9 +230,9 @@
       <ModalPageWrapper flySettings={{ x: document.body.clientWidth }}>
         <Settings />
       </ModalPageWrapper>
-    {:else if $currPath === '/genre'}
+    {:else if $currPath === '/genres'}
       <ModalPageWrapper flySettings={{ y: document.body.clientHeight }}>
-        <Genre />
+        <Genres />
       </ModalPageWrapper>
     {:else if $currPath === '/friends'}
       <ModalPageWrapper flySettings={{ x: -document.body.clientWidth }}>

@@ -152,11 +152,11 @@
               <div
                 on:keyup={() => {
                   activeGenre.set($activeSubmission.song.genre);
-                  goto('/genre');
+                  goto('/genres');
                 }}
                 on:click={() => {
                   activeGenre.set($activeSubmission.song.genre);
-                  goto('/genre');
+                  goto('/genres');
                 }}
                 class="text-xs w-fit mx-auto items-center leading-sm
         uppercase px-3 pb-1 pt-1.5 rounded-full"

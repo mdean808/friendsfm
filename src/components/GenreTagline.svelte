@@ -51,17 +51,17 @@
             <div
               on:keyup={() => {
                 activeGenre.set(genre);
-                goto('/genre');
+                goto('/genres');
               }}
               on:click={() => {
                 activeGenre.set(genre);
-                goto('/genre');
+                goto('/genres');
               }}
               class="text-xs inline-flex items-center leading-sm
         uppercase px-3 py-1 rounded-full truncate"
               style={`background: ${intToRGB(hashCode(genre, 23))}; `}
             >
-              <span class="mt-[2px]">#{getPosition(genre)}: {genre}</span>
+              <span class="mt-[2px]">{genre}</span>
             </div>
           {/each}
         {/if}

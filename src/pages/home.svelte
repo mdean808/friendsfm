@@ -33,7 +33,7 @@
     type Submission as SubmissionType,
   } from '../types';
   import { goto } from '../lib';
-  import Genres from '../components/Genres.svelte';
+  import GenreTagline from '../components/GenreTagline.svelte';
 
   // GLOBALS
   let loadingSubmission = false;
@@ -238,7 +238,7 @@
             <div id="home" class="text-center w-full overflow-y-auto h-full">
               {#if $userSubmission.song}
                 <div class="pb-2">
-                  <Genres loading={loadingGenres} />
+                  <GenreTagline loading={loadingGenres} />
                 </div>
               {/if}
               <span class="border-white border-t-2 block w-full" />

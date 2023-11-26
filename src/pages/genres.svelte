@@ -29,6 +29,7 @@
       'marker'
     )) as google.maps.MarkerLibrary;
 
+    // note: should center on the genre that was tapped
     const startingCenter =
       genreSubmissions.length > 0
         ? {
@@ -43,31 +44,33 @@
     map = new Map(mapRef, {
       mapId: '8cf3f704a1cf499b',
       center: startingCenter,
-      zoom: 15,
+      zoom: 10,
       disableDefaultUI: true,
       zoomControl: true,
     });
-    //todo: genre.svelte as the user zooms out of the map, request a wider raidus of submissions of said genre and add them as markers
+    //todo: should show all genres globally
 
-    for (const sub of genreSubmissions) {
+    for (const sub of $nearbySubmissions) {
       const markerDiv = document.createElement('div');
       markerDiv.className = `p-2 text-white relative text-md rounded-lg`;
       markerDiv.setAttribute(
         'style',
-        `background: ${intToRGB(hashCode($activeGenre, 23))}`
+        `background: ${intToRGB(hashCode(sub.song.genre, 23))}`
       );
-      markerDiv.textContent = sub.song.name + ' - ' + sub.song.artist;
-      const arrow = document.createElement('span');
+      // markerDiv.textContent = sub.song.name + ' - ' + sub.song.artist;
+      markerDiv.textContent = sub.song.genre;
+      /*const arrow = document.createElement('span');
       arrow.setAttribute(
         'style',
-        `border-top-color: ${intToRGB(hashCode($activeGenre, 23))}`
+        `border-top-color: ${intToRGB(hashCode(sub.song.genre, 23))}`
       );
       arrow.className = `-bottom-3 left-[42%] w-3 h-3 absolute 
-                        border-l-[5px] border-l-transparent
+                        border-l-[2px] border-l-transparent
                         border-t-[7px] 
-                        border-r-[5px] border-r-transparent
+                        border-r-[2px] border-r-transparent
                         `;
       markerDiv.appendChild(arrow);
+      */
       new AdvancedMarkerElement({
         map,
         position: {
@@ -106,7 +109,7 @@
     >
       <button class="flex-grow-0 text-transparent w-8 h-8 p-1"></button>
       <h1 class="text-center pt-2 mx-auto text-2xl text-white flex-grow">
-        {$activeGenre.toLowerCase()} submissions
+        nearby genres
       </h1>
       <button
         on:click={() => goto($prevPath)}
@@ -141,15 +144,16 @@
     >
   </div>
   <div class="mx-auto w-full h-full text-center py-2 px-2">
-    <div class="overflow-y-auto h-full">
-      {#each [...$nearbySubmissions].filter((sub) => sub.song.genre.toLowerCase() === $activeGenre.toLowerCase()) as sub}
+    <div class="overflow-y-auto" style="height: calc(100vh - 425px);">
+      <!--{#each [...$nearbySubmissions].filter((sub) => sub.song.genre.toLowerCase() === $activeGenre.toLowerCase()) as sub}-->
+      {#each $nearbySubmissions as sub}
         <div class={`border-white rounded-lg shadow-lg bg-gray-700 mb-4`}>
           <div class="">
             <div
               on:click={() =>
                 gotoCoords(sub.location.latitude, sub.location.longitude)}
               on:keyup={() => this.click()}
-              style={`background: ${intToRGB(hashCode($activeGenre, 23))}`}
+              style={`background: ${intToRGB(hashCode(sub.song.genre, 23))}`}
               class={`flex p-2 rounded-t-lg bg-${getPlatformColor(
                 sub.user.musicPlatform
               )}`}
@@ -162,6 +166,7 @@
                       id={sub.user ? sub.user.musicPlatform : 'spotify'}
                     />
                   </span>
+                  <span class="text-lg">{sub.song.genre}</span>
                 </h4>
               </div>
               <div class="flex-grow-0 text-right">
@@ -208,7 +213,7 @@
                         <div class={sub.song.albumArtwork ? 'w-44' : 'w-72'}>
                           <p
                             style={`color: ${intToRGB(
-                              hashCode($activeGenre, 23)
+                              hashCode(sub.song.genre, 23)
                             )}`}
                             class={`truncate text-${getPlatformColor(
                               sub.user?.musicPlatform
