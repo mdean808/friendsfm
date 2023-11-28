@@ -31,18 +31,18 @@
     });
   };
 
-  const getPosition = (name: string) => {
+  /* const getPosition = (name: string) => {
     const sorted = genreCounts.sort((a, b) => b.count - a.count);
     return sorted.findIndex((s) => s.name === name) + 1;
-  };
+  };*/
 </script>
 
-<div class="h-[34px]">
+<div class="min-h-[30px] max-h-[30px] flex place-content-center">
   {#if !loading}
-    <div class="overflow-x-auto scroll-hide">
+    <div class="overflow-x-auto self-center justify-self-center scroll-hide">
       <div
         class="text-xs gap-2 inline-flex font-semibold
-    leading-sm uppercase py-1 rounded-full"
+    leading-sm uppercase rounded-full"
       >
         {#if uniqueGenres?.length < 1}
           <div class="mt-2 text-gray-300 text-center">no nearby genres</div>
@@ -68,7 +68,7 @@
       </div>
     </div>
   {:else}
-    <div class="animate-pulse text-gray-300 text-center">
+    <div class="animate-pulse text-gray-300 text-center flex items-center">
       {#if message === 0}
         <p>analyzing submissions</p>
       {:else if message === 1}

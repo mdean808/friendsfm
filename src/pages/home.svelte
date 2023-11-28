@@ -10,31 +10,23 @@
     homepageLoaded,
     notificationAction,
     appLoading,
-    user,
-    createSubmissionsPlaylist,
     getNearbySubmissions,
     getUserStatistics,
     header,
-    insets,
     loginState,
     logout,
   } from '../store';
   import Button from '../components/Button.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
   import SkeletonSubmission from '../components/submission/Skeleton.svelte';
-  import Submission from '../components/submission/index.svelte';
-  import UserSubmission from '../components/submission/User.svelte';
   import type { IonRefresher } from '@ionic/core/components/ion-refresher';
   import { Capacitor } from '@capacitor/core';
   import { FirebaseMessaging } from '@capacitor-firebase/messaging';
-  import {
-    MusicPlatform,
-    UserState,
-    type Submission as SubmissionType,
-  } from '../types';
-  import { goto } from '../lib';
+  import { UserState, type Submission as SubmissionType } from '../types';
   import GenreTagline from '../components/GenreTagline.svelte';
   import Genres from '../components/Genres.svelte';
+  import Submissions from '../components/Submissions.svelte';
+  import Tabs from '../components/Tabs.svelte';
 
   // GLOBALS
   let loadingSubmission = false;
@@ -143,6 +135,7 @@
     loadGenres();
     loading.set(false);
   };
+
   const sortByDate = (a: SubmissionType, b: SubmissionType) => {
     return new Date(b.time).getTime() - new Date(a.time).getTime();
   };
@@ -153,7 +146,7 @@
     <ion-refresher-content />
   </ion-refresher>
   {#if $userSubmission}
-    <div id="home" class="text-center w-full py-2 px-4">
+    <div id="home" class="text-center w-full py-1 px-4">
       {#if !$userSubmission.song && !loadingSubmission}
         <h3>you haven't shared what you're listening to yet.</h3>
         <h4 class="mb-2">submit to see what your friends are playing!</h4>
@@ -174,70 +167,23 @@
                 </div>
               {/if}
               <span class="border-white border-t-2 block w-full" />
-              <!-- TODO: CREATE SOME TABS AND INCLUDE ../components/Genres.svelte -->
-              <div class="p-4">
-                <Genres />
-              </div>
-              <div class="mb-3 mt-3 px-4 mx-auto">
-                {#if loadingSubmission}
-                  <LoadingIndicator className={'mx-auto w-16 h-16'} />
-                {:else if $userSubmission.song}
-                  <UserSubmission data={$userSubmission} />
-                {/if}
-              </div>
-              <span class="border-white border-t-2 block w-full" />
-              <div
-                class="my-3"
-                style={`padding-bottom: calc(70px + ${$insets.bottom}px)`}
-              >
-                {#if loadingFriendSubmissions}
-                  <SkeletonSubmission />
-                  <SkeletonSubmission />
-                  <SkeletonSubmission />
-                {:else if !loadingFriendSubmissions}
-                  {#each sortedFriendSubmissions.sort(sortByDate) as submission}
-                    <div class="my-2">
-                      <Submission data={submission} />
-                    </div>
-                  {/each}
-                  {#if $friendSubmissions?.length === 0}
-                    <p class="mx-auto text-center mt-3">
-                      nobody else has submitted yet.
-                    </p>
-                    <p
-                      on:keyup={() => goto('/friends')}
-                      on:click={() => goto('/friends')}
-                      class="mx-auto text-center text-blue-500 underline"
-                    >
-                      add friends.
-                    </p>
-                  {/if}
-                  {#if $user.submissionsPlaylist}
-                    {#if $user.musicPlatform === MusicPlatform.spotify}
-                      <a
-                        href={`https://open.spotify.com/playlist/${$user.submissionsPlaylist}`}
-                        class="mx-auto text-center mt-3 text-gray-300 underline"
-                      >
-                        open your submissions playlist
-                      </a>
-                    {:else if $user.musicPlatform === MusicPlatform.appleMusic}
-                      <a
-                        href={$user.submissionsPlaylist}
-                        class="mx-auto text-center mt-3 text-gray-300 underline"
-                      >
-                        open your submissions playlist
-                      </a>
-                    {/if}
-                  {:else}
-                    <p
-                      on:keyup={createSubmissionsPlaylist}
-                      on:click={createSubmissionsPlaylist}
-                      class="mx-auto text-center mt-3 text-gray-300 opacity-70 underline"
-                    >
-                      create your dynamic friendsfm playlist.
-                    </p>
-                  {/if}
-                {/if}
+              <div>
+                <Tabs
+                  activeTab={'submissions'}
+                  tabs={[
+                    {
+                      name: 'Submissions',
+                      id: 'submissions',
+                      component: Submissions,
+                      props: {
+                        loadingSubmission,
+                        loadingFriendSubmissions,
+                        sortedFriendSubmissions,
+                      },
+                    },
+                    { name: 'Genres', id: 'genres', component: Genres },
+                  ]}
+                />
               </div>
             </div>
           {/if}

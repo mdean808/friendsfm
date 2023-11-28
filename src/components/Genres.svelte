@@ -44,7 +44,7 @@
     map = new Map(mapRef, {
       mapId: '8cf3f704a1cf499b',
       center: startingCenter,
-      zoom: 10,
+      zoom: 15,
       disableDefaultUI: true,
       zoomControl: true,
     });
@@ -102,37 +102,8 @@
   };
 </script>
 
-<div class="bg-gray-900">
+<div class="">
   <div class="sticky top-0 w-full mx-auto p-2">
-    <div
-      class="w-full flex border-b-white border-b-2 flex-row justify-between items-center h-[55px] px-2"
-    >
-      <button class="flex-grow-0 text-transparent w-8 h-8 p-1"></button>
-      <h1 class="text-center pt-2 mx-auto text-2xl text-white flex-grow">
-        nearby genres
-      </h1>
-      <button
-        on:click={() => goto($prevPath)}
-        class="flex-grow-0 text-transparent"
-        ><svg
-          fill="none"
-          class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${getPlatformColor(
-            $user.musicPlatform
-          )}`}
-          stroke="currentColor"
-          stroke-width="1.5"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-          ></path>
-        </svg>
-      </button>
-    </div>
     <capacitor-google-map
       id="google-map"
       class="inline-block w-full h-64 mt-2 rounded-lg"
