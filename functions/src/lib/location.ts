@@ -7,7 +7,7 @@ const db = getFirestore();
 
 export const getNearbySubmissions = async (
   location: Location,
-  radius: number
+  radius: number = 20
 ) => {
   const currentNumber = await Submission.getCurrentCount();
   const submissionsRef = db.collection('submissions');
