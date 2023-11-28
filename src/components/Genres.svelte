@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getPlatformColor, goto, hashCode, intToRGB } from '../lib';
+  import { getPlatformColor, hashCode, intToRGB } from '../lib';
   import type { SavedSong, StrippedSubmission } from '../types';
   import {
     toggleSong,
@@ -8,13 +8,18 @@
     songs,
     location,
     updateCurrentLocation,
-    prevPath,
-    user,
+    insets,
   } from '../store';
   import MusicPlatformIcon from '../components/icons/MusicPlatformIcon.svelte';
   import { onMount } from 'svelte';
 
   let map: google.maps.Map;
+  let parentDiv: HTMLDivElement;
+
+  activeGenre.listen((val) => {
+    const genreSub = $nearbySubmissions.find((s) => s.song.genre === val);
+    gotoCoords(genreSub.location.latitude, genreSub.location.longitude);
+  });
 
   onMount(async () => {
     const genreSubmissions = [...$nearbySubmissions].filter(
@@ -29,7 +34,7 @@
       'marker'
     )) as google.maps.MarkerLibrary;
 
-    // note: should center on the genre that was tapped
+    // center on the genre that was tapped
     const startingCenter =
       genreSubmissions.length > 0
         ? {
@@ -48,7 +53,7 @@
       disableDefaultUI: true,
       zoomControl: true,
     });
-    //todo: should show all genres globally
+    //todo: change available genres based on zoom amount
 
     for (const sub of $nearbySubmissions) {
       const markerDiv = document.createElement('div');
@@ -102,7 +107,11 @@
   };
 </script>
 
-<div class="">
+<div
+  bind:this={parentDiv}
+  class="scroll-m-20 scroll-smooth"
+  style={`padding-bottom: calc(70px + ${$insets.bottom}px)`}
+>
   <div class="sticky top-0 w-full mx-auto p-2">
     <capacitor-google-map
       id="google-map"
@@ -115,14 +124,16 @@
     >
   </div>
   <div class="mx-auto w-full h-full text-center py-2 px-2">
-    <div class="overflow-y-auto" style="height: calc(100vh - 425px);">
+    <div class="overflow-y-auto" style="">
       <!--{#each [...$nearbySubmissions].filter((sub) => sub.song.genre.toLowerCase() === $activeGenre.toLowerCase()) as sub}-->
       {#each $nearbySubmissions as sub}
         <div class={`border-white rounded-lg shadow-lg bg-gray-700 mb-4`}>
           <div class="">
             <div
-              on:click={() =>
-                gotoCoords(sub.location.latitude, sub.location.longitude)}
+              on:click={() => {
+                gotoCoords(sub.location.latitude, sub.location.longitude);
+                parentDiv.scrollIntoView();
+              }}
               on:keyup={() => this.click()}
               style={`background: ${intToRGB(hashCode(sub.song.genre, 23))}`}
               class={`flex p-2 rounded-t-lg bg-${getPlatformColor(

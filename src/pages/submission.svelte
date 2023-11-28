@@ -18,6 +18,7 @@
     activeGenre,
     createCommentForSubmission,
     insets,
+    activeHomeTab,
   } from '../store';
   import Comment from '../components/Comment.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
@@ -152,11 +153,13 @@
               <div
                 on:keyup={() => {
                   activeGenre.set($activeSubmission.song.genre);
-                  goto('/genres');
+                  activeHomeTab.set('genres');
+                  goto('/');
                 }}
                 on:click={() => {
                   activeGenre.set($activeSubmission.song.genre);
-                  goto('/genres');
+                  activeHomeTab.set('genres');
+                  goto('/');
                 }}
                 class="text-xs w-fit mx-auto items-center leading-sm
         uppercase px-3 pb-1 pt-1.5 rounded-full"

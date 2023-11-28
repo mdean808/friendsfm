@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { activeGenre, nearbySubmissions } from '../store';
-  import { goto, intToRGB, hashCode } from '../lib';
+  import { activeGenre, activeHomeTab, nearbySubmissions } from '../store';
+  import { intToRGB, hashCode } from '../lib';
   import type { StrippedSubmission } from '../types';
 
   let genreCounts: { count: number; name: string }[] = [];
@@ -51,11 +51,11 @@
             <div
               on:keyup={() => {
                 activeGenre.set(genre);
-                goto('/genres');
+                activeHomeTab.set('genres');
               }}
               on:click={() => {
                 activeGenre.set(genre);
-                goto('/genres');
+                activeHomeTab.set('genres');
               }}
               class="text-xs inline-flex items-center leading-sm
         uppercase px-3 py-1 rounded-full truncate"

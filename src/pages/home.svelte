@@ -15,6 +15,7 @@
     header,
     loginState,
     logout,
+    activeHomeTab,
   } from '../store';
   import Button from '../components/Button.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
@@ -169,10 +170,10 @@
               <span class="border-white border-t-2 block w-full" />
               <div>
                 <Tabs
-                  activeTab={'submissions'}
+                  activeTab={activeHomeTab}
                   tabs={[
                     {
-                      name: 'Submissions',
+                      name: 'submissions',
                       id: 'submissions',
                       component: Submissions,
                       props: {
@@ -181,7 +182,7 @@
                         sortedFriendSubmissions,
                       },
                     },
-                    { name: 'Genres', id: 'genres', component: Genres },
+                    { name: 'genres', id: 'genres', component: Genres },
                   ]}
                 />
               </div>

@@ -227,12 +227,8 @@
     {/if}
 
     {#if $currPath === '/settings'}
-      <ModalPageWrapper flySettings={{ x: document.body.clientWidth }}>
+      <ModalPageWrapper flySettings={{ x: -document.body.clientWidth }}>
         <Settings />
-      </ModalPageWrapper>
-    {:else if $currPath === '/genres'}
-      <ModalPageWrapper flySettings={{ y: document.body.clientHeight }}>
-        <Genres />
       </ModalPageWrapper>
     {:else if $currPath === '/friends'}
       <ModalPageWrapper flySettings={{ x: -document.body.clientWidth }}>
