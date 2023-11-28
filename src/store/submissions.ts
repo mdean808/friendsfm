@@ -246,7 +246,7 @@ export const nearbySubmissions = map<StrippedSubmission[]>([]);
 export const getNearbySubmissions = action(
   nearbySubmissions,
   'get-nearbysubmissions',
-  async (store, radius) => {
+  async (store, radius?, bounds?) => {
     let location: Position;
     try {
       await Geolocation.checkPermissions().catch(
@@ -264,7 +264,8 @@ export const getNearbySubmissions = action(
           latitude: location ? location.coords.latitude : 0,
           longitude: location ? location.coords.longitude : 0,
         },
-        zoomLevel: radius,
+        radius,
+        bounds,
       }),
     });
     const json = await handleApiResponse(res);

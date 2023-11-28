@@ -117,7 +117,8 @@
 
   const loadGenres = async () => {
     loadingGenres = true;
-    await getNearbySubmissions();
+    //todo: make bounding box
+    await getNearbySubmissions(20);
     loadingGenres = false;
   };
 

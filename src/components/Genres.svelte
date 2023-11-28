@@ -16,8 +16,9 @@
 
   let map: google.maps.Map;
   let parentDiv: HTMLDivElement;
+  let markers: google.maps.marker.AdvancedMarkerElement[] = [];
 
-  let prevZoom = 15;
+  let prevZoom = 12;
 
   activeGenre.listen((val) => {
     const genreSub = $nearbySubmissions.find((s) => s.song.genre === val);
@@ -33,9 +34,6 @@
     const { Map } = (await google.maps.importLibrary(
       'maps'
     )) as google.maps.MapsLibrary;
-    const { AdvancedMarkerElement } = (await google.maps.importLibrary(
-      'marker'
-    )) as google.maps.MarkerLibrary;
 
     // center on the genre that was tapped
     const startingCenter =
@@ -54,19 +52,37 @@
       center: startingCenter,
       zoom: prevZoom,
       disableDefaultUI: true,
-      zoomControl: true,
+      zoomControl: false,
     });
 
-    //todo: change available genres based on zoom amount
-    map.addListener('zoom_changed', () => {
-      const zoom = map.getZoom();
-      if (Math.abs(prevZoom - zoom) > 10) {
-        getNearbySubmissions(zoomLevelToKMRadius(zoom, map.getCenter().lat()));
-        prevZoom = zoom;
+    // change radius based on the visibleWdith
+    map.addListener('bounds_changed', async () => {
+      if (prevZoom != map.getZoom()) {
+        const bounds = map.getBounds();
+        await getNearbySubmissions(null, {
+          southWest: {
+            latitude: bounds.getSouthWest().lat(),
+            longitude: bounds.getSouthWest().lng(),
+          },
+          northEast: {
+            latitude: bounds.getNorthEast().lat(),
+            longitude: bounds.getNorthEast().lng(),
+          },
+        });
+        createMarkers();
+        prevZoom = map.getZoom();
       }
     });
+    createMarkers();
+  });
 
-    for (const sub of $nearbySubmissions) {
+  const createMarkers = async () => {
+    const { AdvancedMarkerElement } = (await google.maps.importLibrary(
+      'marker'
+    )) as google.maps.MarkerLibrary;
+    markers.map((m) => (m.map = null));
+    markers = [];
+    markers = $nearbySubmissions.map((sub) => {
       const markerDiv = document.createElement('div');
       markerDiv.className = `p-2 text-white relative text-md rounded-lg`;
       markerDiv.setAttribute(
@@ -87,7 +103,7 @@
                         `;
       markerDiv.appendChild(arrow);
       */
-      new AdvancedMarkerElement({
+      const marker = new AdvancedMarkerElement({
         map,
         position: {
           lat: sub.location.latitude,
@@ -95,8 +111,9 @@
         },
         content: markerDiv,
       });
-    }
-  });
+      return marker;
+    });
+  };
 
   let loadingHeart = false;
   const toggleHeart = async (data: StrippedSubmission) => {
@@ -117,18 +134,34 @@
     map.setCenter({ lat, lng });
   };
 
-  const zoomLevelToKMRadius = (zoom: number, lat: number) => {
-    // Earth's radius in kilometers
-    const EARTH_RADIUS = 6371;
-    // Convert latitude to radians
-    const latRad = (lat * Math.PI) / 180;
-    // The scale of the map at the given latitude for the given zoom level
-    const scale = 156543.03392 * Math.cos(latRad) * Math.pow(2, -zoom);
-    // The radius is half the circumference of the earth divided by the scale
-    const radius = (Math.PI * EARTH_RADIUS) / scale;
+  function deg2rad(deg: number) {
+    return deg * (Math.PI / 180);
+  }
 
-    return radius;
-  };
+  function mapBoundsToRadius(bounds: google.maps.LatLngBounds) {
+    var ne = bounds.getNorthEast(); // LatLng of the north-east corner
+    var sw = bounds.getSouthWest(); // LatLng of the south-west corder
+    var se = new google.maps.LatLng(sw.lat(), ne.lng()); // LatLng of the south-east corner
+
+    const lat1 = se.lat();
+    const lon1 = se.lng();
+    const lat2 = sw.lat();
+    const lon2 = sw.lng();
+
+    var R = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2 - lat1); // deg2rad below
+    var dLon = deg2rad(lon2 - lon1);
+    var a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) *
+        Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    var d = R * c; // Distance in km
+    // convert diameter to radius
+    return d / 2;
+  }
 </script>
 
 <div

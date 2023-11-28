@@ -3,51 +3,62 @@ import * as functions from 'firebase-functions';
 import Submission from '../classes/submission';
 import User from '@/classes/user';
 import type { Location, Submission as SubmissionType } from '../types';
+import { CustomError } from '@/classes/error';
 const db = getFirestore();
 
 export const getNearbySubmissions = async (
   location: Location,
-  radius: number = 20
+  radius: number = 20,
+  bounds?: {
+    southWest: { latitude: number; longitude: number };
+    northEast: { latitude: number; longitude: number };
+  }
 ) => {
   const currentNumber = await Submission.getCurrentCount();
   const submissionsRef = db.collection('submissions');
-  const bounds = getBoundingBox(location, radius);
-  const latQuery = submissionsRef
+  if (!bounds && !radius)
+    throw new CustomError(
+      "Can't find nearby submissions. Missing both bounds and radius."
+    );
+  if (!bounds) bounds = getBoundingBox(location, Math.floor(radius));
+  console.log(bounds);
+  // Query for submissions within latitude bounds
+  const queryLat = submissionsRef
     .where('location.latitude', '>', bounds.southWest.latitude)
     .where('location.latitude', '<', bounds.northEast.latitude)
     .where('number', '==', currentNumber);
-  const lonQuery = submissionsRef
+  const snapshotLat = await queryLat.get();
+
+  // Query for submissions within longitude bounds
+  const queryLong = submissionsRef
     .where('location.longitude', '>', bounds.southWest.longitude)
     .where('location.longitude', '<', bounds.northEast.longitude)
     .where('number', '==', currentNumber);
-  const [latSnapshot, lonSnapshot] = await Promise.all([
-    latQuery.get(),
-    lonQuery.get(),
-  ]);
-  const latResults = latSnapshot.docs.map((doc) => doc.id);
-  const lonResults = lonSnapshot.docs.map((doc) => doc.id);
-  const commonResults = latResults.filter((id) => lonResults.includes(id));
-  const results = commonResults.map((id) =>
-    latSnapshot.docs.find((doc) => doc.id === id)
+  const snapshotLong = await queryLong.get();
+
+  // Merge the results
+  const resultsLat = snapshotLat.docs.map(
+    (doc) => doc?.data() as SubmissionType
   );
+  const resultsLong = snapshotLong.docs.map(
+    (doc) => doc?.data() as SubmissionType
+  );
+  const results = resultsLat.filter((resultLat) =>
+    resultsLong.some((resultLong) => resultLong.id === resultLat.id)
+  );
+
   return await Promise.all(
-    results
-      .filter((doc) => {
-        const docLocation = (doc?.data() as SubmissionType).location;
-        const distanceInKm = getDistanceInKm(location, docLocation);
-        return distanceInKm <= radius;
-      })
-      .map(async (doc) => {
-        const data = doc?.data() as SubmissionType;
-        const user = new User(data.userId);
-        await user.load();
-        data.user = {
-          id: user.id,
-          username: user.username,
-          musicPlatform: user.musicPlatform,
-        };
-        return data;
-      })
+    results.map(async (result) => {
+      console.log(result.location, result.song.genre);
+      const user = new User(result.userId);
+      await user.load();
+      result.user = {
+        id: user.id,
+        username: user.username,
+        musicPlatform: user.musicPlatform,
+      };
+      return result;
+    })
   );
 };
 
@@ -56,7 +67,7 @@ function getBoundingBox(location: Location, radiusInKm: number) {
   const lat = deg2rad(location.latitude);
   const lon = deg2rad(location.longitude);
   const dLat = radiusInKm / R;
-  const dLon = Math.asin(Math.sin(dLat) / Math.cos(lat));
+  let dLon = Math.sin(dLat) / Math.cos(lat);
   const northEast = {
     latitude: rad2deg(lat + dLat),
     longitude: rad2deg(lon + dLon),
@@ -65,10 +76,25 @@ function getBoundingBox(location: Location, radiusInKm: number) {
     latitude: rad2deg(lat - dLat),
     longitude: rad2deg(lon - dLon),
   };
+
+  // Check if any of the bounding box values are NaN
+  if (
+    isNaN(northEast.latitude) ||
+    isNaN(northEast.longitude) ||
+    isNaN(southWest.latitude) ||
+    isNaN(southWest.longitude)
+  ) {
+    // Return the bounding box as the width and height of the Earth
+    return {
+      northEast: { latitude: 90, longitude: 180 },
+      southWest: { latitude: -90, longitude: -180 },
+    };
+  }
+
   return { northEast, southWest };
 }
 
-function getDistanceInKm(location1: Location, location2: Location) {
+/*function getDistanceInKm(location1: Location, location2: Location) {
   const R = 6371; // Radius of the earth in km
   const dLat = deg2rad(location2.latitude - location1.latitude);
   const dLon = deg2rad(location2.longitude - location1.longitude);
@@ -81,7 +107,7 @@ function getDistanceInKm(location1: Location, location2: Location) {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const d = R * c; // Distance in km
   return d;
-}
+}*/
 
 function deg2rad(deg: number) {
   return deg * (Math.PI / 180);
