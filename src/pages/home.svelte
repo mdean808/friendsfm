@@ -41,54 +41,6 @@
   let loadingFriendSubmissions = false;
   let sortedFriendSubmissions: SubmissionType[] = [];
   let loadingGenres = false;
-  // let previousDays: (HomeDayType | 'loading' | 'end')[] = [
-  //   'loading',
-  //   'loading',
-  // ];
-  // let currentIndex = -1;
-
-  // function renderSwiper(container: SwiperContainer, _bar: any) {
-  //   // the node has been mounted in the DOM
-  //   container.initialize();
-  //   container.swiper.slideTo(previousDays.length);
-  //   container.swiper.on('slideChange', async (a) => {
-  //     if (a.swipeDirection === 'prev') {
-  //       currentIndex++;
-  //     } else {
-  //       currentIndex--;
-  //     }
-  //     if (currentIndex === -1) return;
-  //     const res = await fetch(getFirebaseUrl('getsubmissionbynumber'), {
-  //       method: 'POST',
-  //       body: JSON.stringify({
-  //         authToken: $authToken,
-  //         number: $userSubmission.number - (currentIndex + 1),
-  //       }),
-  //     });
-  //     const json = await handleApiResponse(res);
-  //     if (!json) return; // error
-  //     const data = json.message as HomeDayType;
-  //     previousDays[currentIndex] = data;
-  //     if (
-  //       $userSubmission.number !==
-  //         $userSubmission.number - (currentIndex + 1) &&
-  //       data.userSubmission.song
-  //     )
-  //       navDate.set(new Date(data.userSubmission.time));
-  //     else if (!data.userSubmission.song) navDate.set(null);
-  //     else navDate.set(new Date());
-  //   });
-  //   return {
-  //     update(bar: string) {
-  //       console.log(bar);
-  //       // the value of `bar` has changed
-  //     },
-  //
-  //     destroy() {
-  //       // the node has been removed from the DOM
-  //     },
-  //   };
-  // }
 
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.data) return;
@@ -214,27 +166,6 @@
         >
       {:else}
         <div class="h-full">
-          <!-- <swiper-container -->
-          <!--   use:renderSwiper={'home-swiper'} -->
-          <!--   init={false} -->
-          <!--   id={'home-swiper'} -->
-          <!--   class="h-full" -->
-          <!--   pagination={true} -->
-          <!--   pagination-dynamic-bullets={true} -->
-          <!-- > -->
-          <!-- {#each [...previousDays].reverse() as day} -->
-          <!--   <swiper-slide> -->
-          <!--     {#if day === 'loading'} -->
-          <!--       loading -->
-          <!--     {:else if day === 'end'} -->
-          <!--       <p>you've reached the end of the line.</p> -->
-          <!--       <p>there are no more submissions to be viewed.</p> -->
-          <!--     {:else} -->
-          <!--       <HomeDay data={day} /> -->
-          <!--     {/if} -->
-          <!--   </swiper-slide> -->
-          <!-- {/each} -->
-          <!-- <swiper-slide> -->
           {#if $userSubmission}
             <div id="home" class="text-center w-full overflow-y-auto h-full">
               {#if $userSubmission.song}
@@ -310,8 +241,6 @@
               </div>
             </div>
           {/if}
-          <!-- </swiper-slide> -->
-          <!-- </swiper-container> -->
         </div>
       {/if}
     </div>
