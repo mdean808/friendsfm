@@ -13,7 +13,10 @@ export const nearbysubmissions = onRequest(
           res.status(400).end();
           return;
         }
-        const nearbySubs = await getNearbySubmissions(data.location, 20);
+        const nearbySubs = await getNearbySubmissions(
+          data.location,
+          data.radius
+        );
         // sanitize so only user.username, user.id, user.musicplaform, and song and audial data is sent
         const sanitizedSubs = nearbySubs.map((s) => {
           return {

@@ -9,12 +9,15 @@
     location,
     updateCurrentLocation,
     insets,
+    getNearbySubmissions,
   } from '../store';
   import MusicPlatformIcon from '../components/icons/MusicPlatformIcon.svelte';
   import { onMount } from 'svelte';
 
   let map: google.maps.Map;
   let parentDiv: HTMLDivElement;
+
+  let prevZoom = 15;
 
   activeGenre.listen((val) => {
     const genreSub = $nearbySubmissions.find((s) => s.song.genre === val);
@@ -49,11 +52,19 @@
     map = new Map(mapRef, {
       mapId: '8cf3f704a1cf499b',
       center: startingCenter,
-      zoom: 15,
+      zoom: prevZoom,
       disableDefaultUI: true,
       zoomControl: true,
     });
+
     //todo: change available genres based on zoom amount
+    map.addListener('zoom_changed', () => {
+      const zoom = map.getZoom();
+      if (Math.abs(prevZoom - zoom) > 10) {
+        getNearbySubmissions(zoomLevelToKMRadius(zoom, map.getCenter().lat()));
+        prevZoom = zoom;
+      }
+    });
 
     for (const sub of $nearbySubmissions) {
       const markerDiv = document.createElement('div');
@@ -104,6 +115,19 @@
 
   const gotoCoords = (lat: number, lng: number) => {
     map.setCenter({ lat, lng });
+  };
+
+  const zoomLevelToKMRadius = (zoom: number, lat: number) => {
+    // Earth's radius in kilometers
+    const EARTH_RADIUS = 6371;
+    // Convert latitude to radians
+    const latRad = (lat * Math.PI) / 180;
+    // The scale of the map at the given latitude for the given zoom level
+    const scale = 156543.03392 * Math.cos(latRad) * Math.pow(2, -zoom);
+    // The radius is half the circumference of the earth divided by the scale
+    const radius = (Math.PI * EARTH_RADIUS) / scale;
+
+    return radius;
   };
 </script>
 
