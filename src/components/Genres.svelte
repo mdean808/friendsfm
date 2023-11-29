@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { MarkerClusterer } from '@googlemaps/markerclusterer';
   import { getPlatformColor, hashCode, intToRGB } from '../lib';
   import type { SavedSong, StrippedSubmission } from '../types';
   import {
@@ -113,6 +114,7 @@
       });
       return marker;
     });
+    new MarkerClusterer({ markers, map, algorithmOptions: { maxZoom: 9 } });
   };
 
   let loadingHeart = false;
@@ -133,35 +135,6 @@
   const gotoCoords = (lat: number, lng: number) => {
     map.setCenter({ lat, lng });
   };
-
-  function deg2rad(deg: number) {
-    return deg * (Math.PI / 180);
-  }
-
-  function mapBoundsToRadius(bounds: google.maps.LatLngBounds) {
-    var ne = bounds.getNorthEast(); // LatLng of the north-east corner
-    var sw = bounds.getSouthWest(); // LatLng of the south-west corder
-    var se = new google.maps.LatLng(sw.lat(), ne.lng()); // LatLng of the south-east corner
-
-    const lat1 = se.lat();
-    const lon1 = se.lng();
-    const lat2 = sw.lat();
-    const lon2 = sw.lng();
-
-    var R = 6371; // Radius of the earth in km
-    var dLat = deg2rad(lat2 - lat1); // deg2rad below
-    var dLon = deg2rad(lon2 - lon1);
-    var a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(deg2rad(lat1)) *
-        Math.cos(deg2rad(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    var d = R * c; // Distance in km
-    // convert diameter to radius
-    return d / 2;
-  }
 </script>
 
 <div
