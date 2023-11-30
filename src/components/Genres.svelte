@@ -133,7 +133,7 @@
   };
 
   const gotoCoords = (lat: number, lng: number) => {
-    map.setCenter({ lat, lng });
+    if (map) map.setCenter({ lat, lng });
   };
 </script>
 

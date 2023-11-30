@@ -11,8 +11,8 @@
   export let activeTab: WritableAtom<string>;
 </script>
 
-<div class="grid grid-cols-2 bg-gray-900">
-  {#each tabs as tab}
+<div class="grid grid-cols-2 bg-gray-900 rounded-t-lg">
+  {#each tabs as tab, i}
     <div>
       <input
         type="radio"
@@ -25,7 +25,10 @@
       />
       <label
         for={tab.id}
-        class={`w-full flex cursor-pointer select-none border-b-white border-b-2 p-2 text-center outline:none peer-checked:bg-blue-500 peer-checked:text-white`}
+        class={`w-full flex cursor-pointer select-none p-2 text-center focus:outline-none outline-none peer-checked:bg-blue-500 peer-checked:text-white
+                ${i === 0 && 'rounded-tl-lg'}
+                ${i === tabs.length - 1 && 'rounded-tr-lg'}
+              `}
         ><div class="mx-auto">
           {tab.name}
         </div>

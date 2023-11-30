@@ -117,7 +117,6 @@
 
   const loadGenres = async () => {
     loadingGenres = true;
-    //todo: make bounding box
     await getNearbySubmissions(20);
     loadingGenres = false;
   };
@@ -168,7 +167,6 @@
                   <GenreTagline loading={loadingGenres} />
                 </div>
               {/if}
-              <span class="border-white border-t-2 block w-full" />
               <div>
                 <Tabs
                   activeTab={activeHomeTab}
