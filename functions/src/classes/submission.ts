@@ -130,7 +130,7 @@ export default class Submission implements SubmissionType {
       comments: FieldValue.arrayUnion(comment),
     });
     this.comments.push(comment);
-    const notifsSentToUsernames: string[] = [];
+    const notifsSentToUsernames: string[] = [user.username];
     // send notification to the current submission user
     let u = new User(this.userId);
     if (this.userId !== user.id)

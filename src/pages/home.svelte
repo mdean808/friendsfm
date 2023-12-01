@@ -181,7 +181,7 @@
                         sortedFriendSubmissions,
                       },
                     },
-                    { name: 'genres', id: 'genres', component: Genres },
+                    { name: 'nearby', id: 'genres', component: Genres },
                   ]}
                 />
               </div>
