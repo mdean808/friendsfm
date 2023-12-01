@@ -58,7 +58,7 @@
 
     // change radius based on the visibleWdith
     map.addListener('bounds_changed', async () => {
-      if (prevZoom != map.getZoom()) {
+      if (prevZoom != map.getZoom() && map.getZoom() < 15) {
         const bounds = map.getBounds();
         await getNearbySubmissions(null, {
           southWest: {
@@ -81,9 +81,17 @@
     const { AdvancedMarkerElement } = (await google.maps.importLibrary(
       'marker'
     )) as google.maps.MarkerLibrary;
-    markers.map((m) => (m.map = null));
-    markers = [];
-    markers = $nearbySubmissions.map((sub) => {
+    const missingSubs = [...$nearbySubmissions].filter((s) => {
+      const hasLat = !!markers.find(
+        (m) => m.position.lat === s.location.latitude
+      );
+      const hasLng = !!markers.find(
+        (m) => m.position.lng === s.location.longitude
+      );
+      if (hasLat && hasLng) return false;
+      else return true;
+    });
+    markers = missingSubs.map((sub) => {
       const markerDiv = document.createElement('div');
       markerDiv.className = `p-2 text-white relative text-md rounded-lg`;
       markerDiv.setAttribute(

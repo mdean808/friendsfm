@@ -22,7 +22,7 @@
   };
 </script>
 
-<div class="mb-3 mt-3 px-4 mx-auto">
+<div class="border-t-2 border-white mb-3 pt-3 px-4 mx-auto">
   {#if loadingSubmission}
     <LoadingIndicator className={'mx-auto w-16 h-16'} />
   {:else if $userSubmission.song}
