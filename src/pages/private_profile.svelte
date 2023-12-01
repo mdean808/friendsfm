@@ -17,6 +17,8 @@
   import { MusicPlatform } from '../types';
   import { Share } from '@capacitor/share';
 
+  const firstOfTheMonth = new Date().getDate() === 1;
+
   onMount(() => {
     header.set('profile');
   });
@@ -91,7 +93,49 @@
   <div class="py-2 px-2">
     <div class="grid grid-cols-3 py-2">
       <div class="relative">
-        {#if $user.profile?.favorites?.song}
+        {#if firstOfTheMonth}
+          <a
+            target="_blank"
+            href={$user.musicPlatform === MusicPlatform.spotify
+              ? 'https://open.spotify.com/track/30LPShuvQhZU4JVy95VTtM?autoplay=true'
+              : 'https://music.apple.com/album/sky/1546163603?i=1546163990'}
+          >
+            <img
+              alt="Song Artwork"
+              class="w-20 h-20 mx-auto"
+              src="https://upload.wikimedia.org/wikipedia/en/6/6c/Playboi_Carti_-_Whole_Lotta_Red.png"
+            />
+            {#if $editingProfile}
+              <div
+                transition:fade={{ duration: 100 }}
+                on:click={(e) => {
+                  e.preventDefault();
+                  searchType.set('track');
+                  goto('/search_music_platform');
+                }}
+                on:keypress={(e) => {
+                  e.preventDefault();
+                  searchType.set('track');
+                  goto('/search_music_platform');
+                }}
+                class="absolute bg-white text-black p-1 w-6 h-6 right-3.5 -top-2.5 rounded-full"
+              >
+                <svg
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z"
+                  ></path>
+                </svg>
+              </div>
+            {/if}
+          </a>
+          <p class="mt-1 text-sm">Sky</p>
+          <p class="mt-1 text-sm text-gray-400">Playboi Carti</p>
+        {:else if $user.profile?.favorites?.song}
           <a target="_blank" href={$user.profile.favorites.song.url}>
             <img
               alt="Song Artwork"
