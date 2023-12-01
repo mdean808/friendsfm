@@ -97,7 +97,7 @@
           <a
             target="_blank"
             href={$user.musicPlatform === MusicPlatform.spotify
-              ? 'https://open.spotify.com/track/30LPShuvQhZU4JVy95VTtM?autoplay=true'
+              ? 'https://open.spotify.com/track/29TPjc8wxfz4XMn21O7VsZ?si=a3f5cfd803754ea6'
               : 'https://music.apple.com/album/sky/1546163603?i=1546163990'}
           >
             <img
