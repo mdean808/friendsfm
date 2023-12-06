@@ -650,6 +650,33 @@ export default class User implements UserType {
     await this.dbRef.update({ profile: this.profile });
   }
 
+  public async getFriendSuggestions(): Promise<
+    { username: string; mutual?: string }[]
+  > {
+    if (!this.exists) throw Error('User not loaded.');
+    const suggestions: { username: string; mutual?: string }[] = [];
+
+    for (const localFriend of this.friends) {
+      const friend = new User(localFriend.id);
+      await friend.load();
+      // limit to 3 friends per friend
+      for (const friendFriend of friend.friends.slice(0, 5)) {
+        // make sure not to add this username to the list if this user is already friends with them
+        if (
+          !this.friends.find((f) => f.username === friendFriend.username) &&
+          friendFriend.username !== this.username
+        ) {
+          suggestions.push({
+            username: friendFriend.username,
+            mutual: localFriend.username,
+          });
+        }
+      }
+      //todo: if no local friends, create suggestions in another way
+    }
+    return suggestions;
+  }
+
   //STATIC METHODS
   static async create(user: UserType) {
     // check if the email. username already exists

@@ -24,7 +24,6 @@
   import { Capacitor } from '@capacitor/core';
   import { FirebaseMessaging } from '@capacitor-firebase/messaging';
   import { UserState, type Submission as SubmissionType } from '../types';
-  import GenreTagline from '../components/GenreTagline.svelte';
   import Genres from '../components/Genres.svelte';
   import Submissions from '../components/Submissions.svelte';
   import Tabs from '../components/Tabs.svelte';
@@ -162,11 +161,6 @@
         <div class="h-full">
           {#if $userSubmission}
             <div id="home" class="text-center w-full overflow-y-auto h-full">
-              {#if $userSubmission.song}
-                <div class="pb-2">
-                  <GenreTagline loading={loadingGenres} />
-                </div>
-              {/if}
               <div>
                 <Tabs
                   activeTab={activeHomeTab}

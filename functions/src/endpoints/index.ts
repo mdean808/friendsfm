@@ -28,3 +28,4 @@ export * from './comments/createcomment';
 export * from './comments/deletecomment';
 export * from './misc/searchspotify';
 export * from './misc/searchapplemusic';
+export * from './friends/getfriendsuggestions';

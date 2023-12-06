@@ -73,3 +73,21 @@ export const rejectFriendRequest = action(
     return true;
   }
 );
+
+export const getFriendSuggestions = action(
+  user,
+  'get-friend-suggestions',
+  async () => {
+    const res = await fetch(getFirebaseUrl('getfriendsuggestions'), {
+      method: 'POST',
+      body: JSON.stringify({ authToken: authToken.get() }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+    });
+    const json = await handleApiResponse(res);
+    if (!json) {
+      // failed to send request
+      return false;
+    }
+    return json.message as { username: string; mutual?: string }[];
+  }
+);

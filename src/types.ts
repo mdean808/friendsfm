@@ -158,12 +158,6 @@ export interface StrippedSubmission {
   user: { username: string; id: string; musicPlatform: MusicPlatform };
 }
 
-export interface HomeDay {
-  number?: number;
-  userSubmission: Submission;
-  friendSubmissions: readonly Submission[];
-}
-
 export interface SpotifySearchRes {
   tracks?: {
     href: string;
