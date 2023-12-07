@@ -3,7 +3,12 @@
   import LoadingIndicator from '../LoadingIndicator.svelte';
   import { onMount } from 'svelte';
   import { toast } from '@zerodevx/svelte-toast';
-  import { sendFriendRequest, getFriendSuggestions } from '../../store';
+  import {
+    sendFriendRequest,
+    getFriendSuggestions,
+    publicProfileUsername,
+  } from '../../store';
+  import { goto } from '../../lib';
 
   let suggestions: {
     username: string;
@@ -48,19 +53,29 @@
         transition:slide
         class="w-full border-b-white border-b-2 flex justify-between py-3 px-3"
       >
-        <div class="flex flex-row gap-2">
+        <button
+          on:keypress={() => {
+            publicProfileUsername.set(suggestion.username);
+            goto('/public_profile');
+          }}
+          on:click={() => {
+            publicProfileUsername.set(suggestion.username);
+            goto('/public_profile');
+          }}
+          class="flex flex-row gap-2"
+        >
           <img
             class="w-7 h-7 rounded-full mx-auto self-center"
             alt="User Avatar"
             src={`https://icotar.com/avatar/${suggestion.username}.svg`}
           />
-          <div class="">
+          <div class="text-left">
             <span class="text-white block">{suggestion.username}</span>
             <span class="text-gray-400 text-sm block"
               >mutual friend: {suggestion.mutual}</span
             >
           </div>
-        </div>
+        </button>
         <div class="self-center">
           {#if suggestion.loading}
             <LoadingIndicator className="w-6 mx-auto" />
@@ -92,5 +107,10 @@
         </div>
       </div>
     {/each}
+    <div class="pt-1">
+      <p class="text-center w-full mx-auto text-gray-400">
+        no more suggestions.
+      </p>
+    </div>
   {/if}
 </div>

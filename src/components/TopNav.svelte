@@ -156,12 +156,13 @@
     {:else}
       <!-- HOMEPAGE RIGHT BUTTON -->
       <button
-        class="flex-grow-0 bg-transparent p-3 m-2 rounded-3xl bg-gray-900"
+        on:click={() => goto('/about')}
+        class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900"
       >
         <svg
           fill="none"
           class="w-6 h-6"
-          stroke="transparent"
+          stroke="currentColor"
           stroke-width="1.5"
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
@@ -170,8 +171,8 @@
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
-            d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z"
-          />
+            d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+          ></path>
         </svg>
       </button>
     {/if}
