@@ -85,7 +85,10 @@ export const handleApiResponse = async (res: Response) => {
     if (json.message === 'User does not exist.') {
       logout();
       goto('/new_user');
-    } else if (json.message === 'Authentication Failed.') {
+    } else if (
+      json.message === 'Authentication Failed.' ||
+      json.message.includes('Missing Authentication Token')
+    ) {
       await getNewAuthToken();
     } else if (
       json.message.includes('Spotify 403 Forbidden') ||
