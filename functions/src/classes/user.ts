@@ -659,8 +659,7 @@ export default class User implements UserType {
     for (const localFriend of this.friends) {
       const friend = new User(localFriend.id);
       await friend.load();
-      // limit to 3 friends per friend
-      for (const friendFriend of friend.friends.slice(0, 5)) {
+      for (const friendFriend of friend.friends) {
         // make sure not to add this username to the list if this user is already friends with them
         if (
           !this.friends.find((f) => f.username === friendFriend.username) &&

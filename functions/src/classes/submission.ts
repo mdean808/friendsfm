@@ -130,7 +130,7 @@ export default class Submission implements SubmissionType {
       comments: FieldValue.arrayUnion(comment),
     });
     this.comments.push(comment);
-    const notifsSentToUsernames: string[] = [user.username];
+    const notifsSentToUsernames: string[] = [];
     // send notification to the current submission user
     let u = new User(this.userId);
     if (this.userId !== user.id)
@@ -155,7 +155,7 @@ export default class Submission implements SubmissionType {
     }
     // send notification to anyone who was mentioned
     // grab usernames in the comment
-    const usernamesInContent = content
+    const usernamesInContent = comment.content
       .split(' ')
       .filter((word) => word.startsWith('@'))
       .map((word) => word.slice(1));
@@ -170,6 +170,10 @@ export default class Submission implements SubmissionType {
           )
       ),
     ];
+
+    console.log(usernamesInContent);
+    console.log(uniqueUsernames);
+    console.log(notifsSentToUsernames);
 
     for (const username of uniqueUsernames) {
       notifsSentToUsernames.push(username);

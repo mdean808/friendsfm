@@ -195,10 +195,10 @@
                     on:click={() => toggleHeart(sub)}
                     on:keypress={() => toggleHeart(sub)}
                     class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
-                      loadingHeart ? 'animate-ping text-pink-500' : ''
+                      loadingHeart ? 'animate-ping text-white' : ''
                     } ${
                       $songs.find((s) => s.name === sub.song.name)
-                        ? 'text-pink-500'
+                        ? 'text-white'
                         : ''
                     } `}
                     fill={$songs.find((s) => s.name === sub.song.name)

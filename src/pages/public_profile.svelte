@@ -329,7 +329,7 @@
               on:keypress={() => toggleSong(profile.stats.topSong)}
               class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
                 $songs.find((s) => s.name === profile.stats.topSong.name) &&
-                'text-pink-500'
+                'text-white'
               }`}
               fill={`${
                 $songs.find((s) => s.name === profile.stats.topSong.name)

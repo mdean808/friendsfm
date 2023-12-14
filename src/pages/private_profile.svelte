@@ -388,7 +388,7 @@
           on:keypress={() => toggleSong($userStatistics.topSong)}
           class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
             $songs.find((s) => s.name === $userStatistics.topSong.name) &&
-            'text-pink-500'
+            'text-white'
           }`}
           fill={`${
             $songs.find((s) => s.name === $userStatistics.topSong.name)
