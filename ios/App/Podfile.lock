@@ -218,7 +218,7 @@ PODS:
     - PromisesObjC (= 2.2.0)
   - Sentry/HybridSDK (8.8.0):
     - SentryPrivate (= 8.8.0)
-  - SentryCapacitor (0.11.5):
+  - SentryCapacitor (0.15.0):
     - Capacitor
     - Sentry/HybridSDK (= 8.8.0)
   - SentryPrivate (8.8.0)
@@ -380,7 +380,7 @@ SPEC CHECKSUMS:
   PromisesObjC: 09985d6d70fbe7878040aa746d78236e6946d2ef
   PromisesSwift: cf9eb58666a43bbe007302226e510b16c1e10959
   Sentry: 927dfb29d18a14d924229a59cc2ad149f43349f2
-  SentryCapacitor: 724954fbb78c214200e9f70ce0edad868e647eec
+  SentryCapacitor: 87ad38b15cd1ffb0ca8f202af148567adfa68ae1
   SentryPrivate: 4350d865f898224ab9fa02b37d6ee7fbb623f47e
 
 PODFILE CHECKSUM: 4694aff054a71fb3d24f4bc6de364db50b46e507

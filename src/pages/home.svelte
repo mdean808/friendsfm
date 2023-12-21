@@ -18,7 +18,6 @@
     activeHomeTab,
   } from '../store';
   import Button from '../components/Button.svelte';
-  import LoadingIndicator from '../components/LoadingIndicator.svelte';
   import SkeletonSubmission from '../components/submission/Skeleton.svelte';
   import type { IonRefresher } from '@ionic/core/components/ion-refresher';
   import { Capacitor } from '@capacitor/core';
@@ -187,7 +186,7 @@
   {:else}
     <div id="home" class="text-center w-full py-2 px-4 overflow-y-auto h-full">
       <div class="mb-3 px-5 mx-auto">
-        <LoadingIndicator className={'mx-auto w-16 h-16'} />
+        <SkeletonSubmission type="user" />
       </div>
       <span class="border-white border-t-2 block w-full" />
       <div class="my-2">

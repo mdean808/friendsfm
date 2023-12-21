@@ -11,7 +11,6 @@
   import SkeletonSubmission from '../components/submission/Skeleton.svelte';
   import Submission from './submission/index.svelte';
   import UserSubmission from './submission/User.svelte';
-  import LoadingIndicator from '../components/LoadingIndicator.svelte';
 
   export let loadingSubmission: boolean;
   export let loadingFriendSubmissions: boolean;
@@ -24,7 +23,7 @@
 
 <div class="border-t-2 border-white mb-3 pt-3 px-4 mx-auto">
   {#if loadingSubmission}
-    <LoadingIndicator className={'mx-auto w-16 h-16'} />
+    <SkeletonSubmission type="user" />
   {:else if $userSubmission.song}
     <UserSubmission data={$userSubmission} />
   {/if}
