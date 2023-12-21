@@ -26,7 +26,8 @@
     )}`}
   >
     <button
-      on:click={() => {
+      on:click={(e) => {
+        e.stopPropagation();
         goto('/public_profile');
         publicProfileUsername.set(data.user.username);
       }}

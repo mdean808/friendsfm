@@ -19,6 +19,7 @@
     createCommentForSubmission,
     insets,
     activeHomeTab,
+    publicProfileUsername,
   } from '../store';
   import Comment from '../components/Comment.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
@@ -62,9 +63,16 @@
         )} flex-row rounded-t-lg justify-between items-center h-[55px] p-2`}
       >
         <button class="flex-grow-0 text-transparent w-8 h-8 p-1"></button>
-        <h1 class="text-center pt-2 mx-auto text-2xl text-white flex-grow">
-          {$activeSubmission?.user.username}
-        </h1>
+        <button
+          on:click={() => {
+            goto('/public_profile');
+            publicProfileUsername.set($activeSubmission?.user.username);
+          }}
+        >
+          <h1 class="text-center pt-2 mx-auto text-2xl text-white flex-grow">
+            {$activeSubmission?.user.username}
+          </h1>
+        </button>
         <button on:click={close} class="flex-grow-0 text-transparent"
           ><svg
             class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${getPlatformColor(
