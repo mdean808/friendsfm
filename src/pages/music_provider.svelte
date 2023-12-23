@@ -32,7 +32,7 @@
         import.meta.env.VITE_SPOTIFY_CLIENT_ID
       }&response_type=code&redirect_uri=${
         import.meta.env.VITE_SPOTIFY_REDIRECT_URL
-      }&scope=user-read-private%20user-read-currently-playing%20user-read-recently-played%20playlist-modify-private%20playlist-modify-public`;
+      }&scope=user-read-currently-playing%20user-read-recently-played%20playlist-modify-private%20playlist-modify-public`;
       window.location.href = spotifyUrl;
     } else if (platform === MusicPlatform.appleMusic) {
       loading.set(false);
