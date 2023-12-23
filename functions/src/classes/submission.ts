@@ -139,14 +139,10 @@ export default class Submission implements SubmissionType {
     if (this.userId !== user.id) {
       await subUser.load();
       notifsSentToUsernames.push(subUser.username);
-      subUser.sendNotification(
-        `${user.username} commented on your friendsfm`,
-        content,
-        {
-          type: 'comment',
-          id: this.id,
-        }
-      );
+      subUser.sendNotification(`${user.username} commented`, content, {
+        type: 'comment',
+        id: this.id,
+      });
     }
     // send notification to anyone else who commented
     // filter comments so we just get one from each commenter
@@ -162,16 +158,11 @@ export default class Submission implements SubmissionType {
       // IF the comment is not the submission user AND the commenter has not made a comment previously
       if (this.userId !== u.id && u.id !== user.id) {
         const u = new User(c.user.id);
-        u.load().then(() => {
-          notifsSentToUsernames.push(u.username);
-          u.sendNotification(
-            `${user.username} commented on ${subUser.username}'s friendsfm`,
-            content,
-            {
-              type: 'comment',
-              id: this.id,
-            }
-          );
+        await u.load();
+        notifsSentToUsernames.push(u.username);
+        u.sendNotification(`${user.username} commented`, content, {
+          type: 'comment',
+          id: this.id,
         });
       }
     }
