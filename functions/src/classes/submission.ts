@@ -118,42 +118,63 @@ export default class Submission implements SubmissionType {
     await this.dbRef.update({ audial });
   }
 
+  // user is the person who added the comment
   public async addComment(content: string, user: User): Promise<Comment> {
     if (!content) throw new CustomError('No comment content provided');
-    const id = randomUUID();
     const comment = {
-      id,
+      id: randomUUID(),
       content,
       user: { id: user.id, username: user.username },
     };
+    // add comment to submission in db and then locally
     await this.dbRef.update({
       comments: FieldValue.arrayUnion(comment),
     });
     this.comments.push(comment);
+
     const notifsSentToUsernames: string[] = [];
     // send notification to the current submission user
-    let u = new User(this.userId);
-    if (this.userId !== user.id)
-      u.load().then(() => {
-        notifsSentToUsernames.push(u.username);
-        u.sendNotification(`${user.username} commented`, content, {
+    // IF the submission user is not the commenter
+    const subUser = new User(this.userId);
+    if (this.userId !== user.id) {
+      await subUser.load();
+      notifsSentToUsernames.push(subUser.username);
+      subUser.sendNotification(
+        `${user.username} commented on your friendsfm`,
+        content,
+        {
           type: 'comment',
           id: this.id,
-        });
-      });
+        }
+      );
+    }
     // send notification to anyone else who commented
-    for (const c of this.comments) {
-      let u = new User(c.user.id);
-      if (this.userId !== u.id && u.id !== user.id)
+    // filter comments so we just get one from each commenter
+    for (const c of Object.values(
+      this.comments.reduce(
+        (acc, comment) => ({ ...acc, [comment.user.id]: comment }),
+        {} as Comment
+      )
+    )) {
+      // make sure the comment exists
+      if (!c) continue;
+      const u = new User(c.user.id);
+      // IF the comment is not the submission user AND the commenter has not made a comment previously
+      if (this.userId !== u.id && u.id !== user.id) {
+        const u = new User(c.user.id);
         u.load().then(() => {
           notifsSentToUsernames.push(u.username);
-          u.sendNotification(`${user.username} commented`, content, {
-            type: 'comment',
-            id: this.id,
-          });
+          u.sendNotification(
+            `${user.username} commented on ${subUser.username}'s friendsfm`,
+            content,
+            {
+              type: 'comment',
+              id: this.id,
+            }
+          );
         });
+      }
     }
-    // send notification to anyone who was mentioned
     // grab usernames in the comment
     const usernamesInContent = comment.content
       .split(' ')
@@ -171,6 +192,7 @@ export default class Submission implements SubmissionType {
       ),
     ];
 
+    // send notification to anyone who was mentioned
     for (const username of uniqueUsernames) {
       if (notifsSentToUsernames.find((u) => u === username)) continue;
       User.getByUsername(username).then((u) => {
