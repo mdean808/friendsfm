@@ -2,6 +2,7 @@
   import type { WritableAtom } from 'nanostores';
   import { fade } from 'svelte/transition';
 
+  export let loading = false;
   export let tabs: {
     name: string;
     id: string;
@@ -28,9 +29,15 @@
         class={`w-full flex cursor-pointer select-none p-2 text-center focus:outline-none outline-none peer-checked:bg-blue-500 peer-checked:text-white
                 ${i === 0 && 'rounded-tl-lg'}
                 ${i === tabs.length - 1 && 'rounded-tr-lg'}
+                ${loading && 'animate-pulse'}
               `}
-        ><div class="mx-auto">
-          {tab.name}
+      >
+        <div class="mx-auto">
+          {#if loading}
+            <p class="h-5 mb-1 mx-auto rounded-md bg-gray-600 w-32" />
+          {:else}
+            {tab.name}
+          {/if}
         </div>
       </label>
     </div>

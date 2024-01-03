@@ -162,6 +162,7 @@
             <div id="home" class="text-center w-full overflow-y-auto h-full">
               <div>
                 <Tabs
+                  loading={loadingSubmission && loadingGenres}
                   activeTab={activeHomeTab}
                   tabs={[
                     {
