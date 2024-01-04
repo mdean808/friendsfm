@@ -35,6 +35,7 @@
     loginState,
     getFriendSubmissions,
     secondaryAppLoading,
+    spotifyAuthCode,
   } from './store';
   import { errorToast, goto } from './lib';
   import Loading from './components/Loading.svelte';
@@ -116,8 +117,10 @@
   });
 
   onMount(async () => {
-    // await initAppCheck();
     platform.set(Capacitor.getPlatform());
+    // check for spotify auth for web
+
+    // await initAppCheck();
     SplashScreen.hide();
 
     if (Capacitor.isPluginAvailable('FirebaseMessaging')) {

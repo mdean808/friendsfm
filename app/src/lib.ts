@@ -3,6 +3,7 @@ import {
   currPath,
   getNewAuthToken,
   logout,
+  platform,
   prevPath,
   spotifyAuthCode,
   updateMusicPlatform,
@@ -32,7 +33,7 @@ export const getPlatformColor = (platform: MusicPlatform) => {
 export const goto = (url: string) => {
   prevPath.set(currPath.get());
   currPath.set(url);
-  history.pushState(null, null, url);
+  //  history.pushState(null, null, url);
   FirebaseAnalytics.setCurrentScreen({
     screenName: url,
     screenClassOverride: url,
@@ -111,7 +112,9 @@ export const handleApiResponse = async (res: Response) => {
         const spotifyUrl = `https://accounts.spotify.com/authorize?client_id=${
           import.meta.env.VITE_SPOTIFY_CLIENT_ID
         }&response_type=code&redirect_uri=${
-          import.meta.env.VITE_SPOTIFY_REDIRECT_URL
+          platform.get() === 'web'
+            ? import.meta.env.VITE_SPOTIFY_REDIRECT_URL_WEB
+            : import.meta.env.VITE_SPOTIFY_REDIRECT_URL
         }&scope=user-read-currently-playing%20user-read-recently-played%20playlist-modify-private%20playlist-modify-public`;
         window.location.href = spotifyUrl;
       }

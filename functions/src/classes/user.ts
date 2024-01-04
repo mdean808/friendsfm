@@ -692,7 +692,6 @@ export default class User implements UserType {
 
     const newUserRef = db.collection('users').doc(user.id);
     user.friends = [];
-    user.username = user.id;
     user.friendRequests = [];
     await newUserRef.set({ ...user, musicPlatform: '' });
     return user;

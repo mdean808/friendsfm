@@ -1,3 +1,4 @@
+import type { AccessToken } from '@spotify/web-api-ts-sdk';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { Capacitor } from '@capacitor/core';
@@ -119,7 +120,12 @@ export const updateUsername = action(
 export const updateMusicPlatform = action(
   user,
   'update-music-platform',
-  async (store, newMusicPlatform: MusicPlatform, authCode?: string) => {
+  async (
+    store,
+    newMusicPlatform: MusicPlatform,
+    authCode?: string,
+    musicPlatformAuth?: AccessToken
+  ) => {
     const u = store.get();
     const res = await fetch(getFirebaseUrl('setmusicplatform'), {
       method: 'POST',
@@ -127,6 +133,7 @@ export const updateMusicPlatform = action(
         authToken: authToken.get(),
         musicPlatform: newMusicPlatform,
         platformAuthCode: authCode,
+        musicPlatformAuth,
       }),
       headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
     });

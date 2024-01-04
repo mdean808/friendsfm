@@ -21,7 +21,6 @@ export const getNearbySubmissions = async (
       "Can't find nearby submissions. Missing both bounds and radius."
     );
   if (!bounds) bounds = getBoundingBox(location, Math.floor(radius));
-  console.log(bounds);
   // Query for submissions within latitude bounds
   const queryLat = submissionsRef
     .where('location.latitude', '>', bounds.southWest.latitude)

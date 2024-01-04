@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { SpotifyApi } from '@spotify/web-api-ts-sdk';
   import Button from '../components/Button.svelte';
   import { MusicPlatform } from '../types';
   import {
@@ -6,6 +7,8 @@
     loading,
     spotifyAuthCode,
     user,
+    platform as osPlatform,
+    getNewAuthToken,
   } from '../store';
   import { goto } from '../lib';
   import { onMount } from 'svelte';
@@ -24,16 +27,38 @@
     if (!platform) return;
     loading.set(true);
     if (platform == MusicPlatform.spotify) {
-      spotifyAuthCode.listen(async (value: string) => {
-        if (await updateMusicPlatform(platform, value)) goto('/');
-        loading.set(false);
-      });
-      const spotifyUrl = `https://accounts.spotify.com/authorize?client_id=${
-        import.meta.env.VITE_SPOTIFY_CLIENT_ID
-      }&response_type=code&redirect_uri=${
-        import.meta.env.VITE_SPOTIFY_REDIRECT_URL
-      }&scope=user-read-currently-playing%20user-read-recently-played%20playlist-modify-private%20playlist-modify-public`;
-      window.location.href = spotifyUrl;
+      if ($osPlatform === 'web') {
+        SpotifyApi.performUserAuthorization(
+          import.meta.env.VITE_SPOTIFY_CLIENT_ID,
+          import.meta.env.VITE_SPOTIFY_REDIRECT_URL_WEB,
+          [
+            'user-read-recently-played',
+            'user-read-currently-playing',
+            'playlist-modify-public',
+            'playlist-modify-private',
+          ],
+          // @ts-ignore
+          async (token) => {
+            await getNewAuthToken();
+            if (await updateMusicPlatform(platform, token.access_token, token))
+              goto('/');
+            loading.set(false);
+          }
+        );
+      } else {
+        spotifyAuthCode.listen(async (value: string) => {
+          if (await updateMusicPlatform(platform, value)) goto('/');
+          loading.set(false);
+        });
+        const spotifyUrl = `https://accounts.spotify.com/authorize?client_id=${
+          import.meta.env.VITE_SPOTIFY_CLIENT_ID
+        }&response_type=code&redirect_uri=${
+          $osPlatform === 'web'
+            ? import.meta.env.VITE_SPOTIFY_REDIRECT_URL_WEB
+            : import.meta.env.VITE_SPOTIFY_REDIRECT_URL
+        }&scope=user-read-currently-playing%20user-read-recently-played%20playlist-modify-private%20playlist-modify-public`;
+        window.location.href = spotifyUrl;
+      }
     } else if (platform === MusicPlatform.appleMusic) {
       loading.set(false);
       // return toast.push('Apple Music support in development!');
