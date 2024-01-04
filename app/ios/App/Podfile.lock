@@ -50,6 +50,8 @@ PODS:
     - Capacitor
   - CapacitorKeyboard (5.0.6):
     - Capacitor
+  - CapacitorNativeSettings (5.0.1):
+    - Capacitor
   - CapacitorPluginSafeArea (2.0.5):
     - Capacitor
   - CapacitorPreferences (5.0.6):
@@ -240,6 +242,7 @@ DEPENDENCIES:
   - "CapacitorFirebaseMessaging (from `../../node_modules/@capacitor-firebase/messaging`)"
   - "CapacitorGeolocation (from `../../node_modules/@capacitor/geolocation`)"
   - "CapacitorKeyboard (from `../../node_modules/@capacitor/keyboard`)"
+  - CapacitorNativeSettings (from `../../node_modules/capacitor-native-settings`)
   - CapacitorPluginSafeArea (from `../../node_modules/capacitor-plugin-safe-area`)
   - "CapacitorPreferences (from `../../node_modules/@capacitor/preferences`)"
   - "CapacitorShare (from `../../node_modules/@capacitor/share`)"
@@ -317,6 +320,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/geolocation"
   CapacitorKeyboard:
     :path: "../../node_modules/@capacitor/keyboard"
+  CapacitorNativeSettings:
+    :path: "../../node_modules/capacitor-native-settings"
   CapacitorPluginSafeArea:
     :path: "../../node_modules/capacitor-plugin-safe-area"
   CapacitorPreferences:
@@ -348,6 +353,7 @@ SPEC CHECKSUMS:
   CapacitorFirebaseMessaging: 6e50f2fbddc6056ba864015e0b46a5f3c3477d3d
   CapacitorGeolocation: 7be5f77abc205c0efe319fff8587a7183e7b0240
   CapacitorKeyboard: b978154b024a5f65e044908e37d15b7de58b9d12
+  CapacitorNativeSettings: 6e94ed3c0465206756f320df18efc52f053ce3c7
   CapacitorPluginSafeArea: bfdd714827dbd89fb44fea286beec996e1b0c5c4
   CapacitorPreferences: f03954bcb0ff09c792909e46bff88e3183c16b10
   CapacitorShare: cd41743331cb71d217c029de54b681cbd91e0fcc
@@ -383,6 +389,6 @@ SPEC CHECKSUMS:
   SentryCapacitor: 87ad38b15cd1ffb0ca8f202af148567adfa68ae1
   SentryPrivate: 4350d865f898224ab9fa02b37d6ee7fbb623f47e
 
-PODFILE CHECKSUM: 4694aff054a71fb3d24f4bc6de364db50b46e507
+PODFILE CHECKSUM: eec09a25cbf7d6cc0d1f09c7ed7808a835874ddc
 
 COCOAPODS: 1.14.2

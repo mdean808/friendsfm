@@ -29,6 +29,7 @@ def capacitor_pods
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
   pod 'CapgoNativegeocoder', :path => '../../node_modules/@capgo/nativegeocoder'
   pod 'SentryCapacitor', :path => '../../node_modules/@sentry/capacitor'
+  pod 'CapacitorNativeSettings', :path => '../../node_modules/capacitor-native-settings'
   pod 'CapacitorPluginSafeArea', :path => '../../node_modules/capacitor-plugin-safe-area'
 end
 

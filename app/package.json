@@ -52,6 +52,7 @@
     "@spotify/web-api-ts-sdk": "^1.1.2",
     "@trapezedev/configure": "^7.0.10",
     "@zerodevx/svelte-toast": "^0.8.2",
+    "capacitor-native-settings": "^5.0.1",
     "capacitor-plugin-safe-area": "^2.0.5",
     "eslint-config-prettier": "^8.9.0",
     "firebase": "^9.17.1",

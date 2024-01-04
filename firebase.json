@@ -2,9 +2,15 @@
   "hosting": [
     {
       "site": "friendsfm-app",
-      "predeploy": "yarn app:build",
       "public": "app/dist",
-      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+      "ignore": [],
+      "predeploy": "yarn app:build",
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
     },
     {
       "site": "friendsfm",

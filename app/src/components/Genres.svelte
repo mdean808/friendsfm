@@ -154,15 +154,17 @@
     <capacitor-google-map
       id="google-map"
       class="inline-block w-full h-64 mt-2 rounded-lg"
-      ><div
-        class="flex items-center justify-items-center text-center h-full w-full animate-pulse"
-      >
-        <p class="mx-auto">loading map...</p>
-        <p class="mx-auto">
-          if the map doesn't load, make sure you your ad blocker disabled.
-        </p>
-      </div></capacitor-google-map
     >
+      <div
+        class="flex flex-col items-center justify-items-center text-center h-full w-full"
+      >
+        <p class="mx-auto animate-pulse">loading map...</p>
+        <p class="mx-auto text-gray-400">
+          if the map doesn't load, make sure you have location services enabled
+        </p>
+        <p class="mx-auto text-gray-400">and your adblocker is disabled.</p>
+      </div>
+    </capacitor-google-map>
   </div>
   <div class="mx-auto w-full h-full text-center py-2 px-2">
     <div class="overflow-y-auto" style="">

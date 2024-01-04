@@ -1,8 +1,14 @@
 import { map, atom, action } from 'nanostores';
+import {
+  NativeSettings,
+  IOSSettings,
+  AndroidSettings,
+} from 'capacitor-native-settings';
 import { SafeArea, type SafeAreaInsets } from 'capacitor-plugin-safe-area';
 import type { Location, ReverseGeolocationPosition } from '../types';
 import { NativeGeocoder } from '@capgo/nativegeocoder';
 import { Geolocation } from '@capacitor/geolocation';
+import { Dialog } from '@capacitor/dialog';
 
 export const statusBarHeight = atom<number>(0);
 export const getStatusBarHeight = action(
@@ -33,7 +39,23 @@ export const updateCurrentLocation = action(
       await Geolocation.requestPermissions();
     }
     const l = store.get();
-    l.gp = await Geolocation.getCurrentPosition();
+    try {
+      l.gp = await Geolocation.getCurrentPosition();
+    } catch (e) {
+      const { value } = await Dialog.confirm({
+        title: 'Location Permissions',
+        message:
+          'Location permissions need to be enabled to use this feature. Please enable them in settings.',
+        okButtonTitle: 'Settings',
+        cancelButtonTitle: 'Ignore',
+      });
+      if (value) {
+        NativeSettings.open({
+          optionIOS: IOSSettings.App,
+          optionAndroid: AndroidSettings.ApplicationDetails,
+        });
+      }
+    }
     store.set(l);
   }
 );

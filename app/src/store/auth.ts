@@ -50,7 +50,6 @@ export const getNewAuthToken = action(
       store.set(res.token);
       return res.token;
     } catch (e) {
-      console.log(e);
       // user isn't logged in anymore
       loggedIn.set(false);
       loginState.set(UserState.unregistered);

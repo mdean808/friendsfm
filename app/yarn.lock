@@ -1694,6 +1694,11 @@ caniuse-lite@^1.0.30001464, caniuse-lite@^1.0.30001517:
   resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001518.tgz"
   integrity sha512-rup09/e3I0BKjncL+FesTayKtPrdwKhUufQFd3riFw1hHg8JmIFoInYfB102cFcY/pPgGmdyl/iy+jgiDi2vdA==
 
+capacitor-native-settings@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/capacitor-native-settings/-/capacitor-native-settings-5.0.1.tgz#b9c8445da149fea9bd527170c6486ce51e2c7e1a"
+  integrity sha512-HH7GCyaVLwWP4FEVqvOQM+cHWveQUjsA2128wfZ5yr9eOQrECVWzO5UXH9ZlikpWi1C7exnovcyEr3TlYO6l8w==
+
 capacitor-plugin-safe-area@^2.0.5:
   version "2.0.5"
   resolved "https://registry.npmjs.org/capacitor-plugin-safe-area/-/capacitor-plugin-safe-area-2.0.5.tgz"
