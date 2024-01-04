@@ -671,7 +671,7 @@ export default class User implements UserType {
           });
         }
       }
-      //todo: if no local friends, create suggestions in another way
+      //todo: get suggestions from nearby submissions
     }
     return suggestions;
   }

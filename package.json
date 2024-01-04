@@ -5,6 +5,6 @@
     "deploy": "firebase deploy",
     "app:build": "cd app && yarn build",
     "web:build": "cd web && yarn build",
-    "functions:build": "cd functions && yarn build"
+    "functions:build": "cd functions && yarn build && yarn run sentry:prepare"
   }
 }
