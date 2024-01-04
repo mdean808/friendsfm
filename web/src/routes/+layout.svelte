@@ -6,7 +6,8 @@
   import { getAuth } from 'firebase/auth';
   import { getStorage } from 'firebase/storage';
   import { getDatabase } from 'firebase/database';
-  import type { Analytics } from 'firebase/analytics';
+  import { getAnalytics, type Analytics } from 'firebase/analytics';
+  import { onMount } from 'svelte';
 
   // Your web app's Firebase configuration
   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -17,8 +18,8 @@
     projectId: 'friendsfm',
     storageBucket: 'friendsfm.appspot.com',
     messagingSenderId: '611764643709',
-    appId: '1:611764643709:web:d86a26a4918d29f9348e14',
-    measurementId: 'G-HQGHCKN11Z',
+    appId: '1:611764643709:web:6205eac2a611f00f348e14',
+    measurementId: 'G-3EBNK0XRNT',
   };
 
   // Initialize Firebase
@@ -27,7 +28,11 @@
   const auth = getAuth(app);
   const storage = getStorage(app);
   const rtdb = getDatabase(app);
-  const analytics = {} as Analytics;
+  let analytics = {} as Analytics;
+
+  onMount(() => {
+    analytics = getAnalytics(app);
+  });
 </script>
 
 <svelte:head>
@@ -60,8 +65,9 @@
     <div class="w-full mx-auto p-4 md:flex md:items-center md:justify-between">
       <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400"
         >© {new Date().getFullYear()}
-        <a href="https://mogdan.xyz/" class="hover:underline">Morgan Dean</a>.
-        All Rights Reserved.
+        <a href="https://mogdan.xyz/" target="_blank" class="hover:underline"
+          >Morgan Dean</a
+        >. All Rights Reserved.
       </span>
       <ul
         class="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0"
