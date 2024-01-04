@@ -19,6 +19,7 @@ import {
   registerForNotifications,
 } from '../lib';
 import { UserState, type SavedSong, type User } from '../types';
+import { Capacitor } from '@capacitor/core';
 
 // refresh every 10 seconds
 export const userRefreshInterval = map<NodeJS.Timer>(
@@ -50,6 +51,7 @@ export const getNewAuthToken = action(
       store.set(res.token);
       return res.token;
     } catch (e) {
+      console.log(e);
       // user isn't logged in anymore
       loggedIn.set(false);
       loginState.set(UserState.unregistered);

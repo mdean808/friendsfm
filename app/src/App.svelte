@@ -62,6 +62,7 @@
   import ModalPageWrapper from './components/ModalPageWrapper.svelte';
   import { UserState } from './types';
   import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+  import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.data) return;
@@ -157,24 +158,27 @@
     }
     // load user
     await getUserFromPreferences();
-    await getNewAuthToken();
-    if (!$loggedIn || !$user || Object.keys($user).length === 0) {
-      loggedIn.set(false);
-      loginState.set(UserState.unregistered);
-      return goto('/new_user');
-    }
+    // wait for auth state change before continuing for web support
+    FirebaseAuthentication.addListener('authStateChange', async () => {
+      await getNewAuthToken();
+      if (!$loggedIn || !$user || Object.keys($user).length === 0) {
+        loggedIn.set(false);
+        loginState.set(UserState.unregistered);
+        return goto('/new_user');
+      }
 
-    if ($loginState === UserState.registered) {
-      // don't goto home if we have a deeplink
-      if (!$deepLink) goto('/');
-    } else if ($loginState === UserState.registeringUsername) {
-      goto('/username');
-    } else if ($loginState === UserState.registeringMusicPlatform) {
-      goto('/music_provider');
-    } else {
-      goto('/new_user');
-    }
-    appLoading.set(false);
+      if ($loginState === UserState.registered) {
+        // don't goto home if we have a deeplink
+        if (!$deepLink) goto('/');
+      } else if ($loginState === UserState.registeringUsername) {
+        goto('/username');
+      } else if ($loginState === UserState.registeringMusicPlatform) {
+        goto('/music_provider');
+      } else {
+        goto('/new_user');
+      }
+      appLoading.set(false);
+    });
   });
 </script>
 
