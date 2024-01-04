@@ -33,6 +33,7 @@
 <svelte:head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-itunes-app" content="app-id=6445926913" />
   <title>friendsfm</title>
 </svelte:head>
 
