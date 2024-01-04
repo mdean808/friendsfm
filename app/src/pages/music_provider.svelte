@@ -9,6 +9,7 @@
     user,
     platform as osPlatform,
     getNewAuthToken,
+    logout,
   } from '../store';
   import { goto } from '../lib';
   import { onMount } from 'svelte';
@@ -25,6 +26,7 @@
 
   const setProvider = async () => {
     if (!platform) return;
+    if (platform === MusicPlatform.appleMusic && $osPlatform !== 'web') return;
     loading.set(true);
     if (platform == MusicPlatform.spotify) {
       if ($osPlatform === 'web') {
@@ -147,13 +149,26 @@
         type={'no-bg'}
         className={`mx-auto px-6 ${
           platform ? `bg-${platform}` : 'bg-gray-600'
+        } ${
+          $osPlatform === 'web' &&
+          platform === MusicPlatform.appleMusic &&
+          'bg-gray-600 cursor-default'
         }`}
         title="Finish Up"
-        on:click={setProvider}>Finish Up</Button
+        on:click={setProvider}
+      >
+        {#if $osPlatform === 'web' && platform === MusicPlatform.appleMusic}
+          Apple Music is only available on iOS
+        {:else}
+          Finish Up
+        {/if}</Button
       >
     </div>
     <button
-      on:click={() => goto('/new_user')}
+      on:click={() => {
+        logout();
+        goto('/new_user');
+      }}
       class="mx-auto text-blue-500 underline text-center mt-10">go back</button
     >
   </div>
