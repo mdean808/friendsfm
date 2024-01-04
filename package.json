@@ -3,7 +3,10 @@
   "license": "MIT",
   "scripts": {
     "deploy": "firebase deploy",
-    "app:build": "cd app && yarn build",
+    "app:deploy": "firebase deploy --only hosting:friendsfm-app",
+    "web:deploy": "firebase deploy --only hosting:friendsfm",
+    "functions:deploy": "firebase deploy --only functions",
+    "app:build": "cd app && yarn build:release",
     "web:build": "cd web && yarn build",
     "functions:build": "cd functions && yarn build && yarn run sentry:prepare"
   }

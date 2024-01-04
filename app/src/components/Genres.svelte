@@ -157,7 +157,10 @@
       ><div
         class="flex items-center justify-items-center text-center h-full w-full animate-pulse"
       >
-        <span class="mx-auto">loading map...</span>
+        <p class="mx-auto">loading map...</p>
+        <p class="mx-auto">
+          if the map doesn't load, make sure you your ad blocker disabled.
+        </p>
       </div></capacitor-google-map
     >
   </div>
