@@ -1,11 +1,20 @@
 {
-  "hosting": {
-    "source": "web",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "frameworksBackend": {
-      "region": "us-west1"
+  "hosting": [
+    {
+      "site": "friendsfm-app",
+      "predeploy": "yarn app:build",
+      "public": "app/dist",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    },
+    {
+      "site": "friendsfm",
+      "source": "web",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "frameworksBackend": {
+        "region": "us-west1"
+      }
     }
-  },
+  ],
 
   "functions": {
     "source": "./functions/",
