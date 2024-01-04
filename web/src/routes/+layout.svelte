@@ -37,7 +37,36 @@
 </svelte:head>
 
 <FirebaseApp {storage} {rtdb} {analytics} {firestore} {auth}>
-  <body class="container p-6">
-    <slot />
-  </body>
+  <main class="container px-3 md:px-3 mx-auto max-h-[100vh]">
+    <div class="py-4">
+      <div class="text-center mx-auto">
+        <a href="/"><h1 class="text-4xl">friendsfm</h1></a>
+        <p class="text-lg">the most social way to share your music.</p>
+      </div>
+      <slot />
+    </div>
+    <footer class="bg-white rounded-lg shadow mx-auto dark:bg-gray-700 w-full">
+      <div
+        class="w-full mx-auto p-4 md:flex md:items-center md:justify-between"
+      >
+        <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400"
+          >© {new Date().getFullYear()}
+          <a href="https://flowbite.com/" class="hover:underline">Morgan Dean</a
+          >. All Rights Reserved.
+        </span>
+        <ul
+          class="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0"
+        >
+          <li>
+            <a href="/account" class="hover:underline me-4 md:me-6">Account</a>
+          </li>
+          <li>
+            <a href="/privacy" class="hover:underline me-4 md:me-6"
+              >Privacy Policy</a
+            >
+          </li>
+        </ul>
+      </div>
+    </footer>
+  </main>
 </FirebaseApp>
