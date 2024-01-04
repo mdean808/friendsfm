@@ -34,6 +34,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="apple-itunes-app" content="app-id=6445926913" />
+  <meta property="og:title" content="FriendsFM" />
+  <meta property="og:site_name" content="FriendsFM" />
+  <meta property="og:url" content="https://friendsfm.app" />
+  <meta
+    property="og:description"
+    content="the most social way to share your music."
+  />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://friendsfm.app/img/icon.png" />
   <title>friendsfm</title>
 </svelte:head>
 
