@@ -49,6 +49,32 @@
         <category android:name="android.intent.category.BROWSABLE" />
         <!-- Accepts URIs that begin with "https://friendsfm.mogdan.xyz” -->
         <data android:scheme="https" />
+        <data android:host="friendsfm.app" />
+        <data android:pathPrefix="/friendsfm" />
+        <data android:pathPrefix="/app" />
+        <data android:pathPrefix="/user" />
+        <data android:pathPrefix="/auth" />
+      </intent-filter>
+
+      <intent-filter android:autoVerify="true">
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <!-- Accepts URIs that begin with "https://friendsfm.mogdan.xyz” -->
+        <data android:scheme="https" />
+        <data android:host="app.friendsfm.app" />
+        <data android:pathPrefix="/friendsfm" />
+        <data android:pathPrefix="/" />
+        <data android:pathPrefix="/user" />
+        <data android:pathPrefix="/auth" />
+      </intent-filter>
+
+      <intent-filter android:autoVerify="true">
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <!-- Accepts URIs that begin with "https://friendsfm.mogdan.xyz” -->
+        <data android:scheme="https" />
         <data android:host="friendsfm.mogdan.xyz" />
         <data android:pathPrefix="/friendsfm" />
         <data android:pathPrefix="/app" />

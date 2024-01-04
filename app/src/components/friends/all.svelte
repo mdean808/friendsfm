@@ -94,13 +94,13 @@
             on:click={(e) => {
               e.stopPropagation();
               Share.share({
-                url: `https://friendsfm.mogdan.xyz/user/${friend.username}`,
+                url: `https://friendsfm.app/user/${friend.username}`,
               });
             }}
             on:keypress={(e) => {
               e.stopPropagation();
               Share.share({
-                url: `https://friendsfm.mogdan.xyz/user/${friend.username}`,
+                url: `https://friendsfm.app/user/${friend.username}`,
               });
             }}
             class="h-6 w-6"

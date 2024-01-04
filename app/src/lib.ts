@@ -32,6 +32,7 @@ export const getPlatformColor = (platform: MusicPlatform) => {
 export const goto = (url: string) => {
   prevPath.set(currPath.get());
   currPath.set(url);
+  history.pushState(null, null, url);
   FirebaseAnalytics.setCurrentScreen({
     screenName: url,
     screenClassOverride: url,

@@ -10,7 +10,7 @@
 
   const showFullSubmission = () => {
     activeSubmission.set(data);
-    goto('/&submission');
+    goto('/?submission');
   };
 </script>
 

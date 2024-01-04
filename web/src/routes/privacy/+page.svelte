@@ -1,52 +1,54 @@
 <div class="document-previewer-wrapper-a717db">
   <style>
-[data-custom-class='body'],
-[data-custom-class='body'] * {
-  background: transparent !important; /* changed from transparent to black */
-}
+    [data-custom-class='body'],
+    [data-custom-class='body'] * {
+      background: transparent !important; /* changed from transparent to black */
+    }
 
-[data-custom-class='title'],
-[data-custom-class='title'] * {
-  font-family: Arial !important;
-  font-size: 26px !important;
-  color: #ffffff !important; /* changed from black to white */
-}
+    [data-custom-class='title'],
+    [data-custom-class='title'] * {
+      font-family: Arial !important;
+      font-size: 26px !important;
+      color: #ffffff !important; /* changed from black to white */
+    }
 
-[data-custom-class='subtitle'],
-[data-custom-class='subtitle'] * {
-  font-family: Arial !important;
-  color: #a8a8a8 !important; /* changed from dark gray to light gray */
-  font-size: 14px !important;
-}
+    [data-custom-class='subtitle'],
+    [data-custom-class='subtitle'] * {
+      font-family: Arial !important;
+      color: #a8a8a8 !important; /* changed from dark gray to light gray */
+      font-size: 14px !important;
+    }
 
-[data-custom-class='heading_1'],
-[data-custom-class='heading_1'] * {
-  font-family: Arial !important;
-  font-size: 19px !important;
-  color: #ffffff !important; /* changed from black to white */
-}
+    [data-custom-class='heading_1'],
+    [data-custom-class='heading_1'] * {
+      font-family: Arial !important;
+      font-size: 19px !important;
+      color: #ffffff !important; /* changed from black to white */
+    }
 
-[data-custom-class='heading_2'],
-[data-custom-class='heading_2'] * {
-  font-family: Arial !important;
-  font-size: 17px !important;
-  color: #ffffff !important; /* changed from black to white */
-}
+    [data-custom-class='heading_2'],
+    [data-custom-class='heading_2'] * {
+      font-family: Arial !important;
+      font-size: 17px !important;
+      color: #ffffff !important; /* changed from black to white */
+    }
 
-[data-custom-class='body_text'],
-[data-custom-class='body_text'] * {
-  color: #a8a8a8 !important; /* changed from dark gray to light gray */
-  font-size: 14px !important;
-  font-family: Arial !important;
-}
+    [data-custom-class='body_text'],
+    [data-custom-class='body_text'] * {
+      color: #a8a8a8 !important; /* changed from dark gray to light gray */
+      font-size: 14px !important;
+      font-family: Arial !important;
+    }
 
-[data-custom-class='link'],
-[data-custom-class='link'] * {
-  color: theme('colors.blue.500') !important; /* changed from blue to a lighter blue */
-  font-size: 14px !important;
-  font-family: Arial !important;
-  word-break: break-word !important;
-}
+    [data-custom-class='link'],
+    [data-custom-class='link'] * {
+      color: theme(
+        'colors.blue.500'
+      ) !important; /* changed from blue to a lighter blue */
+      font-size: 14px !important;
+      font-family: Arial !important;
+      word-break: break-word !important;
+    }
   </style>
   <div data-custom-class="body">
     <div>
@@ -350,11 +352,10 @@
             <bdt class="block-component"></bdt>organizational<bdt
               class="statement-end-if-in-editor"
             ></bdt>
-            and technical processes and procedures in place to protect your
-            personal information. However, no electronic transmission over the
-            internet or information storage technology can be guaranteed to be
-            100% secure, so we cannot promise or guarantee that hackers,
-            cybercriminals, or other
+            and technical processes and procedures in place to protect your personal
+            information. However, no electronic transmission over the internet or
+            information storage technology can be guaranteed to be 100% secure, so
+            we cannot promise or guarantee that hackers, cybercriminals, or other
             <bdt class="block-component"></bdt>unauthorized<bdt
               class="statement-end-if-in-editor"
             ></bdt> third parties will not be able to defeat our security and improperly
@@ -398,10 +399,9 @@
             <span style="color: rgb(0, 58, 250);"
               ><bdt class="question"
                 ><a
-                  href="https://friendsfm.mogdan.xyz/account"
+                  href="https://friendsfm.app/account"
                   target="_blank"
-                  data-custom-class="link"
-                  >https://friendsfm.mogdan.xyz/account</a
+                  data-custom-class="link">https://friendsfm.app/account</a
                 ></bdt
               ></span
             ><bdt class="else-block"></bdt>, or by contacting us. We will
@@ -1758,21 +1758,19 @@
                                                           ></bdt>,<bdt
                                                             class="statement-end-if-in-editor"
                                                           ></bdt>
-                                                          legal basis) to do so
-                                                          under applicable law,
-                                                          like with your
-                                                          consent, to comply
-                                                          with laws, to provide
-                                                          you with services to
-                                                          enter into or
+                                                          legal basis) to do so under
+                                                          applicable law, like with
+                                                          your consent, to comply
+                                                          with laws, to provide you
+                                                          with services to enter
+                                                          into or
                                                           <bdt
                                                             class="block-component"
                                                           ></bdt>fulfill<bdt
                                                             class="statement-end-if-in-editor"
                                                           ></bdt>
-                                                          our contractual
-                                                          obligations, to
-                                                          protect your rights,
+                                                          our contractual obligations,
+                                                          to protect your rights,
                                                           or to
                                                           <bdt
                                                             class="block-component"
@@ -1923,10 +1921,9 @@
                                                             >Performance of a
                                                             Contract.</strong
                                                           >
-                                                          We may process your
-                                                          personal information
-                                                          when we believe it is
-                                                          necessary to
+                                                          We may process your personal
+                                                          information when we believe
+                                                          it is necessary to
                                                           <bdt
                                                             class="block-component"
                                                           ></bdt>fulfill<bdt
@@ -1980,22 +1977,17 @@
                                                           ><strong
                                                             >Legal Obligations.</strong
                                                           >
-                                                          We may process your
-                                                          information where we
-                                                          believe it is
-                                                          necessary for
-                                                          compliance with our
-                                                          legal obligations,
-                                                          such as to cooperate
-                                                          with a law enforcement
-                                                          body or regulatory
-                                                          agency, exercise or
-                                                          defend our legal
-                                                          rights, or disclose
-                                                          your information as
-                                                          evidence in litigation
-                                                          in which we are
-                                                          involved.<bdt
+                                                          We may process your information
+                                                          where we believe it is
+                                                          necessary for compliance
+                                                          with our legal obligations,
+                                                          such as to cooperate with
+                                                          a law enforcement body
+                                                          or regulatory agency, exercise
+                                                          or defend our legal rights,
+                                                          or disclose your information
+                                                          as evidence in litigation
+                                                          in which we are involved.<bdt
                                                             class="statement-end-if-in-editor"
                                                           ></bdt><br /></span
                                                         ></span
@@ -2114,13 +2106,11 @@
                                                         ></bdt>,<bdt
                                                           class="statement-end-if-in-editor"
                                                         ></bdt>
-                                                        express consent) to use
-                                                        your personal
-                                                        information for a
-                                                        specific purpose, or in
-                                                        situations where your
-                                                        permission can be
-                                                        inferred (i.e.<bdt
+                                                        express consent) to use your
+                                                        personal information for
+                                                        a specific purpose, or in
+                                                        situations where your permission
+                                                        can be inferred (i.e.<bdt
                                                           class="block-component"
                                                         ></bdt>,<bdt
                                                           class="statement-end-if-in-editor"
@@ -2658,11 +2648,10 @@
                                                           and Other Third-Party
                                                           Service Providers.</strong
                                                         >
-                                                        We may share your data
-                                                        with third-party
-                                                        vendors, service
-                                                        providers, contractors,
-                                                        or agents (<bdt
+                                                        We may share your data with
+                                                        third-party vendors, service
+                                                        providers, contractors, or
+                                                        agents (<bdt
                                                           class="block-component"
                                                         ></bdt>"<strong
                                                           >third parties</strong
@@ -2696,11 +2685,10 @@
                                                           class="statement-end-if-in-editor"
                                                         ></bdt>
                                                         apart from us. They also
-                                                        commit to protect the
-                                                        data they hold on our
-                                                        behalf and to retain it
-                                                        for the period we
-                                                        instruct.
+                                                        commit to protect the data
+                                                        they hold on our behalf and
+                                                        to retain it for the period
+                                                        we instruct.
                                                         <bdt
                                                           class="statement-end-if-in-editor"
                                                         ></bdt>The
@@ -3603,9 +3591,8 @@
                                                             >When we use Google
                                                             Maps Platform APIs.</strong
                                                           >
-                                                          We may share your
-                                                          information with
-                                                          certain Google Maps
+                                                          We may share your information
+                                                          with certain Google Maps
                                                           Platform APIs (e.g.<bdt
                                                             class="block-component"
                                                           ></bdt>,<bdt
@@ -4415,14 +4402,11 @@
                                                                   requirements).<bdt
                                                                     class="block-component"
                                                                   ></bdt>
-                                                                  No purpose in
-                                                                  this notice
-                                                                  will require
-                                                                  us keeping
-                                                                  your personal
-                                                                  information
-                                                                  for longer
-                                                                  than
+                                                                  No purpose in this
+                                                                  notice will require
+                                                                  us keeping your
+                                                                  personal information
+                                                                  for longer than
                                                                   <span
                                                                     style="font-size: 15px;"
                                                                     ><span
@@ -4490,26 +4474,18 @@
                                                                   ></bdt>anonymize<bdt
                                                                     class="statement-end-if-in-editor"
                                                                   ></bdt>
-                                                                  such
-                                                                  information,
+                                                                  such information,
                                                                   or, if this is
-                                                                  not possible
-                                                                  (for example,
-                                                                  because your
-                                                                  personal
-                                                                  information
-                                                                  has been
-                                                                  stored in
-                                                                  backup
-                                                                  archives),
-                                                                  then we will
-                                                                  securely store
-                                                                  your personal
-                                                                  information
-                                                                  and isolate it
-                                                                  from any
-                                                                  further
-                                                                  processing
+                                                                  not possible (for
+                                                                  example, because
+                                                                  your personal information
+                                                                  has been stored
+                                                                  in backup archives),
+                                                                  then we will securely
+                                                                  store your personal
+                                                                  information and
+                                                                  isolate it from
+                                                                  any further processing
                                                                   until deletion
                                                                   is possible.<span
                                                                     style="color: rgb(89, 89, 89);"
@@ -4621,34 +4597,23 @@
                                                                   ></bdt>organizational<bdt
                                                                     class="statement-end-if-in-editor"
                                                                   ></bdt>
-                                                                  security
-                                                                  measures
-                                                                  designed to
-                                                                  protect the
-                                                                  security of
-                                                                  any personal
-                                                                  information we
-                                                                  process.
-                                                                  However,
-                                                                  despite our
-                                                                  safeguards and
-                                                                  efforts to
-                                                                  secure your
-                                                                  information,
-                                                                  no electronic
-                                                                  transmission
-                                                                  over the
-                                                                  Internet or
-                                                                  information
-                                                                  storage
-                                                                  technology can
-                                                                  be guaranteed
-                                                                  to be 100%
-                                                                  secure, so we
-                                                                  cannot promise
-                                                                  or guarantee
-                                                                  that hackers,
-                                                                  cybercriminals,
+                                                                  security measures
+                                                                  designed to protect
+                                                                  the security of
+                                                                  any personal information
+                                                                  we process. However,
+                                                                  despite our safeguards
+                                                                  and efforts to
+                                                                  secure your information,
+                                                                  no electronic transmission
+                                                                  over the Internet
+                                                                  or information
+                                                                  storage technology
+                                                                  can be guaranteed
+                                                                  to be 100% secure,
+                                                                  so we cannot promise
+                                                                  or guarantee that
+                                                                  hackers, cybercriminals,
                                                                   or other
                                                                   <bdt
                                                                     class="block-component"
@@ -4656,32 +4621,24 @@
                                                                   ></bdt>unauthorized<bdt
                                                                     class="statement-end-if-in-editor"
                                                                   ></bdt>
-                                                                  third parties
-                                                                  will not be
-                                                                  able to defeat
-                                                                  our security
+                                                                  third parties will
+                                                                  not be able to
+                                                                  defeat our security
                                                                   and improperly
-                                                                  collect,
-                                                                  access, steal,
-                                                                  or modify your
-                                                                  information.
-                                                                  Although we
-                                                                  will do our
-                                                                  best to
-                                                                  protect your
-                                                                  personal
-                                                                  information,
-                                                                  transmission
-                                                                  of personal
-                                                                  information to
-                                                                  and from our
+                                                                  collect, access,
+                                                                  steal, or modify
+                                                                  your information.
+                                                                  Although we will
+                                                                  do our best to
+                                                                  protect your personal
+                                                                  information, transmission
+                                                                  of personal information
+                                                                  to and from our
                                                                   Services is at
                                                                   your own risk.
-                                                                  You should
-                                                                  only access
-                                                                  the Services
-                                                                  within a
-                                                                  secure
+                                                                  You should only
+                                                                  access the Services
+                                                                  within a secure
                                                                   environment.<span
                                                                     style="color: rgb(89, 89, 89);"
                                                                     ><bdt
@@ -5129,37 +5086,29 @@
                                                                       consent:</u
                                                                     ></strong
                                                                   >
-                                                                  If we are
-                                                                  relying on
-                                                                  your consent
-                                                                  to process
-                                                                  your personal
-                                                                  information,<bdt
+                                                                  If we are relying
+                                                                  on your consent
+                                                                  to process your
+                                                                  personal information,<bdt
                                                                     class="block-component"
                                                                   ></bdt>
-                                                                  which may be
-                                                                  express and/or
-                                                                  implied
-                                                                  consent
-                                                                  depending on
-                                                                  the applicable
+                                                                  which may be express
+                                                                  and/or implied
+                                                                  consent depending
+                                                                  on the applicable
                                                                   law,<bdt
                                                                     class="statement-end-if-in-editor"
                                                                   ></bdt>
-                                                                  you have the
-                                                                  right to
-                                                                  withdraw your
+                                                                  you have the right
+                                                                  to withdraw your
                                                                   consent at any
-                                                                  time. You can
-                                                                  withdraw your
-                                                                  consent at any
-                                                                  time by
-                                                                  contacting us
-                                                                  by using the
-                                                                  contact
-                                                                  details
-                                                                  provided in
-                                                                  the section
+                                                                  time. You can withdraw
+                                                                  your consent at
+                                                                  any time by contacting
+                                                                  us by using the
+                                                                  contact details
+                                                                  provided in the
+                                                                  section
                                                                   <bdt
                                                                     class="block-component"
                                                                   ></bdt>"<bdt
@@ -5223,20 +5172,17 @@
                                                                 withdrawal nor,<bdt
                                                                   class="block-component"
                                                                 ></bdt>
-                                                                when applicable
-                                                                law allows,<bdt
+                                                                when applicable law
+                                                                allows,<bdt
                                                                   class="statement-end-if-in-editor"
                                                                 ></bdt>
-                                                                will it affect
-                                                                the processing
-                                                                of your personal
-                                                                information
-                                                                conducted in
-                                                                reliance on
-                                                                lawful
-                                                                processing
-                                                                grounds other
-                                                                than consent.<bdt
+                                                                will it affect the
+                                                                processing of your
+                                                                personal information
+                                                                conducted in reliance
+                                                                on lawful processing
+                                                                grounds other than
+                                                                consent.<bdt
                                                                   class="block-component"
                                                                 ></bdt></span
                                                               ></span
@@ -5459,27 +5405,21 @@
                                                                       technologies:</u
                                                                     ></strong
                                                                   >
-                                                                  Most Web
-                                                                  browsers are
-                                                                  set to accept
-                                                                  cookies by
-                                                                  default. If
-                                                                  you prefer,
-                                                                  you can
-                                                                  usually choose
-                                                                  to set your
-                                                                  browser to
+                                                                  Most Web browsers
+                                                                  are set to accept
+                                                                  cookies by default.
+                                                                  If you prefer,
+                                                                  you can usually
+                                                                  choose to set your
+                                                                  browser to remove
+                                                                  cookies and to
+                                                                  reject cookies.
+                                                                  If you choose to
                                                                   remove cookies
-                                                                  and to reject
-                                                                  cookies. If
-                                                                  you choose to
-                                                                  remove cookies
-                                                                  or reject
-                                                                  cookies, this
-                                                                  could affect
-                                                                  certain
-                                                                  features or
-                                                                  services of
+                                                                  or reject cookies,
+                                                                  this could affect
+                                                                  certain features
+                                                                  or services of
                                                                   our Services.
                                                                   <bdt
                                                                     class="block-component"
@@ -5506,8 +5446,7 @@
                                                                       ></span
                                                                     ></span
                                                                   >
-                                                                  on our
-                                                                  Services.
+                                                                  on our Services.
                                                                   <span
                                                                     style="font-size: 15px;"
                                                                     ><span
@@ -5673,10 +5612,9 @@
                                                                   ></bdt>recognizing<bdt
                                                                     class="statement-end-if-in-editor"
                                                                   ></bdt>
-                                                                  and
-                                                                  implementing
-                                                                  DNT signals
-                                                                  has been
+                                                                  and implementing
+                                                                  DNT signals has
+                                                                  been
                                                                   <bdt
                                                                     class="block-component"
 
@@ -10936,10 +10874,10 @@
                                                                                                       ><bdt
                                                                                                         class="question"
                                                                                                         ><a
-                                                                                                          href="https://friendsfm.mogdan.xyz/account"
+                                                                                                          href="https://friendsfm.app/account"
                                                                                                           target="_blank"
                                                                                                           data-custom-class="link"
-                                                                                                          >https://friendsfm.mogdan.xyz/account</a
+                                                                                                          >https://friendsfm.app/account</a
                                                                                                         ></bdt
                                                                                                       ></span
                                                                                                     >,
@@ -11427,10 +11365,10 @@
                                                                                                   class="question"
                                                                                                   style="font-size: 15px;"
                                                                                                   ><a
-                                                                                                    href="https://friendsfm.mogdan.xyz/account"
+                                                                                                    href="https://friendsfm.app/account"
                                                                                                     target="_blank"
                                                                                                     data-custom-class="link"
-                                                                                                    >https://friendsfm.mogdan.xyz/account</a
+                                                                                                    >https://friendsfm.app/account</a
                                                                                                   ></bdt
                                                                                                 ></span
                                                                                               ><bdt
@@ -11899,10 +11837,10 @@
                                                                                                 ><bdt
                                                                                                   class="question"
                                                                                                   ><a
-                                                                                                    href="https://friendsfm.mogdan.xyz/account"
+                                                                                                    href="https://friendsfm.app/account"
                                                                                                     target="_blank"
                                                                                                     data-custom-class="link"
-                                                                                                    >https://friendsfm.mogdan.xyz/account</a
+                                                                                                    >https://friendsfm.app/account</a
                                                                                                   ></bdt
                                                                                                 ></span
                                                                                               ><bdt
@@ -12322,10 +12260,10 @@
                                                                                                   ><bdt
                                                                                                     class="question"
                                                                                                     ><a
-                                                                                                      href="https://friendsfm.mogdan.xyz/account"
+                                                                                                      href="https://friendsfm.app/account"
                                                                                                       target="_blank"
                                                                                                       data-custom-class="link"
-                                                                                                      >https://friendsfm.mogdan.xyz/account</a
+                                                                                                      >https://friendsfm.app/account</a
                                                                                                     ></bdt
                                                                                                   ></span
                                                                                                 ><bdt
@@ -12955,10 +12893,10 @@
                                                                                                     ><bdt
                                                                                                       class="question"
                                                                                                       ><a
-                                                                                                        href="https://friendsfm.mogdan.xyz/account"
+                                                                                                        href="https://friendsfm.app/account"
                                                                                                         target="_blank"
                                                                                                         data-custom-class="link"
-                                                                                                        >https://friendsfm.mogdan.xyz/account</a
+                                                                                                        >https://friendsfm.app/account</a
                                                                                                       ></bdt
                                                                                                     ></span
                                                                                                   ><bdt
@@ -13702,15 +13640,14 @@
                                                                                                         <bdt
                                                                                                           class="question"
                                                                                                           >morgan@mogdan.xyz.
-                                                                                                          </bdt
-                                                                                                        ></span
+                                                                                                        </bdt></span
                                                                                                       ></span
                                                                                                     ><span
                                                                                                       style="font-size: 15px; color: rgb(89, 89, 89);"
                                                                                                       ><span
                                                                                                         style="font-size: 15px; color: rgb(89, 89, 89);"
-                                                                                                        ></span
-                                                                                                      ></span
+
+                                                                                                      ></span></span
                                                                                                     ></span
                                                                                                   ></span
                                                                                                 ></span
@@ -13724,18 +13661,13 @@
                                                                                             </div>
                                                                                             <div
                                                                                               style="line-height: 1.5;"
-                                                                                            >
-                                                                                            </div>
+                                                                                            ></div>
                                                                                             <div
                                                                                               style="line-height: 1.5;"
-                                                                                            >
-                                                                                              
-                                                                                            </div>
+                                                                                            ></div>
                                                                                             <div
                                                                                               style="line-height: 1.5;"
-                                                                                            >
-                                                                                              
-                                                                                            </div>
+                                                                                            ></div>
                                                                                             <div
                                                                                               style="line-height: 1.5;"
                                                                                             >
@@ -13933,10 +13865,10 @@
                                                                                                       ><bdt
                                                                                                         class="question"
                                                                                                         ><a
-                                                                                                          href="https://friendsfm.mogdan.xyz/account"
+                                                                                                          href="https://friendsfm.app/account"
                                                                                                           target="_blank"
                                                                                                           data-custom-class="link"
-                                                                                                          >https://friendsfm.mogdan.xyz/account</a
+                                                                                                          >https://friendsfm.app/account</a
                                                                                                         ></bdt
                                                                                                       ></span
                                                                                                     ><bdt

@@ -93,7 +93,7 @@
         ($userSubmission.id === subId ? $userSubmission : null);
       if (sub) {
         activeSubmission.set(sub);
-        goto('/&submission');
+        goto('/?submission');
       } else {
         errorToast('Error: Comment not found.');
       }
@@ -106,7 +106,7 @@
         ($userSubmission.id === subId ? $userSubmission : null);
       if (sub) {
         activeSubmission.set(sub);
-        goto('/&submission');
+        goto('/?submission');
       } else {
         errorToast('Error: Submission not found.');
       }
@@ -180,7 +180,9 @@
 
 <!-- Navigation -->
 <svelte:head>
-  <title>{$currPath?.split('/')[1] || 'home'}</title>
+  <title>
+    friendsfm | {$currPath?.split('/')[1]?.replace('_', ' ') || 'home'}
+  </title>
   <script
     defer
     async
@@ -257,7 +259,7 @@
     {/if}
     <!-- APP BODY -->
     <main style={`height: calc(100% - 65px);`}>
-      {#if $currPath === '/' || ($currPath.includes('/&') && $currPath === '/')}
+      {#if $currPath === '/' || ($currPath.includes('/?') && $currPath === '/')}
         <div
           class="h-full"
           in:fly={{

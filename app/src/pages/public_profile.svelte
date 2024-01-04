@@ -64,7 +64,7 @@
     <button
       on:click={() =>
         Share.share({
-          url: `https://friendsfm.mogdan.xyz/user/${$publicProfileUsername}`,
+          url: `https://friendsfm.app/user/${$publicProfileUsername}`,
         })}
       class="absolute left-3 top-3 text-transparent"
       ><svg

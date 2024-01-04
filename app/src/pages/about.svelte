@@ -61,9 +61,7 @@
     </div>
     <p class="text-left text-gray-400">created by morgan dean</p>
     <div class="py-6 text-blue-600 text-left">
-      <a target="_blank" href="https://friendsfm.mogdan.xyz/privacy"
-        >privacy policy</a
-      >
+      <a target="_blank" href="https://friendsfm.app/privacy">privacy policy</a>
     </div>
   </div>
 </div>
