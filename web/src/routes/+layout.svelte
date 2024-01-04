@@ -47,7 +47,7 @@
 </svelte:head>
 
 <FirebaseApp {storage} {rtdb} {analytics} {firestore} {auth}>
-  <main class="container px-3 md:px-3 mx-auto max-h-[100vh]">
+  <main class="container px-3 md:px-3 mx-auto">
     <div class="py-4">
       <div class="text-center mx-auto">
         <a href="/"><h1 class="text-4xl">friendsfm</h1></a>
@@ -60,7 +60,7 @@
     <div class="w-full mx-auto p-4 md:flex md:items-center md:justify-between">
       <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400"
         >© {new Date().getFullYear()}
-        <a href="https://flowbite.com/" class="hover:underline">Morgan Dean</a>.
+        <a href="https://mogdan.xyz/" class="hover:underline">Morgan Dean</a>.
         All Rights Reserved.
       </span>
       <ul
