@@ -222,7 +222,7 @@
       </div>
     {/if}
 
-    {#if $currPath.includes('&submission')}
+    {#if $currPath.includes('?submission')}
       <Submission />
     {/if}
 
@@ -270,12 +270,12 @@
             x:
               document.body.clientWidth *
               ($prevPath === '/songs' || $prevPath === '/friends' ? 1 : -1) *
-              ($prevPath.includes('&submission') ||
+              ($prevPath.includes('?submission') ||
               $prevPath === '/public_profile'
                 ? 0
                 : 1),
             y:
-              ($prevPath.includes('&submission') ||
+              ($prevPath.includes('?submission') ||
                 $prevPath === '/public_profile') &&
               document.body.clientHeight,
           }}
