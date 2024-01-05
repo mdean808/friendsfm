@@ -17,8 +17,8 @@ if (process.env.FUNCTIONS_EMULATOR !== 'true') {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     integrations: [new ProfilingIntegration()],
-    tracesSampleRate: 0.5,
-    profilesSampleRate: 0.5,
+    tracesSampleRate: 0.1,
+    profilesSampleRate: 0.1,
     release: process.env.COMMIT,
   });
 }
