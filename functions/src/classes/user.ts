@@ -588,9 +588,9 @@ export default class User implements UserType {
     const friend = (await friendQuery.get()).docs[0]?.data() as User;
     if (!friend) throw new CustomError('No user with provided username.');
     const friendRef = usersRef.doc(friend.id);
+    if (friend.friendRequests.find((r) => r === this.username)) return;
     const requests = [...friend.friendRequests, this.username];
-    // doesn't need to be synchronous
-    friendRef.update({ friendRequests: requests });
+    await friendRef.update({ friendRequests: requests });
     if (!friend.messagingToken) return;
     const message: Message = {
       notification: {
@@ -610,7 +610,6 @@ export default class User implements UserType {
         },
       },
     };
-    // doesn't need to be synchronous
     newNotification(message);
   }
 
