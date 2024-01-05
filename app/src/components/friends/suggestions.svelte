@@ -14,6 +14,7 @@
     username: string;
     mutual: string;
     loading: boolean;
+    sent: boolean;
   }[] = [];
   let loading = true;
 
@@ -21,22 +22,37 @@
     const res = await getFriendSuggestions();
     if (res) {
       suggestions = res.map((u) => {
-        return { username: u.username, mutual: u.mutual, loading: false };
+        return {
+          username: u.username,
+          mutual: u.mutual,
+          loading: false,
+          sent: false,
+        };
       });
     }
     loading = false;
   });
 
-  const addFriend = async (suggestion: {
-    username: string;
-    loading: boolean;
-  }) => {
+  const addFriend = async (
+    suggestion: {
+      username: string;
+      mutual: string;
+      loading: boolean;
+    },
+    sIndex: number
+  ) => {
     if (suggestion.loading) return;
-    suggestion.loading = true;
+    suggestions[sIndex].loading = true;
+    suggestions = [...suggestions];
     if (await sendFriendRequest(suggestion.username.trim())) {
       toast.push('Succcessfully sent friend request');
+      suggestions[sIndex].loading = false;
+      suggestions[sIndex].sent = true;
+      suggestions = [...suggestions];
+    } else {
+      suggestions[sIndex].loading = false;
+      suggestions = [...suggestions];
     }
-    suggestion.loading = false;
   };
 </script>
 
@@ -48,7 +64,7 @@
       <LoadingIndicator className="w-8 mx-auto" />
     </div>
   {:else}
-    {#each suggestions as suggestion}
+    {#each suggestions as suggestion, i}
       <div
         transition:slide
         class="w-full border-b-white border-b-2 flex justify-between py-3 px-3"
@@ -79,17 +95,34 @@
         <div class="self-center">
           {#if suggestion.loading}
             <LoadingIndicator className="w-6 mx-auto" />
+          {:else if suggestion.sent}
+            <svg
+              data-slot="icon"
+              fill="none"
+              stroke-width="1.5"
+              class="w-6 h-6 mx-auto"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m4.5 12.75 6 6 9-13.5"
+              ></path>
+            </svg>
           {:else}
             <svg
               fill="none"
               class="w-6 h-6 mx-auto"
               on:click={(e) => {
                 e.stopPropagation();
-                addFriend(suggestion);
+                addFriend(suggestion, i);
               }}
               on:keypress={(e) => {
                 e.stopPropagation();
-                addFriend(suggestion);
+                addFriend(suggestion, i);
               }}
               stroke="currentColor"
               stroke-width="1.5"

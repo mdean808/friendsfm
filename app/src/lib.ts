@@ -212,6 +212,10 @@ export const handleError = (e: PromiseRejectionEvent) => {
   FirebaseCrashlytics.recordException({ message: e.type });
 };
 
+export const wait = (ms: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
 export const getAppVersion = async () => {
   try {
     return (await App.getInfo()).version;

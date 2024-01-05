@@ -66,15 +66,15 @@
       // return toast.push('Apple Music support in development!');
       switch ((await AppleMusic.checkPermissions()).receive) {
         case AppleMusicPermissionsResults.granted:
-          console.log('Permissions granted.');
+          console.log('Apple Music Permissions granted.');
           if (await updateMusicPlatform(platform)) goto('/');
           break;
         case AppleMusicPermissionsResults.prompt: {
-          console.log('Permissions not granted');
+          console.log('Apple Music Permissions not granted');
           const res = await AppleMusic.requestPermissions();
           if (res.receive === AppleMusicPermissionsResults.granted) {
             if (await updateMusicPlatform(platform)) goto('/');
-          } else console.log('Permissions denied AGAIN');
+          } else console.log('Apple Music Permissions denied AGAIN');
           break;
         }
         case AppleMusicPermissionsResults.denied: {
@@ -82,14 +82,14 @@
           const res = await AppleMusic.requestPermissions();
           if (res.receive === AppleMusicPermissionsResults.granted) {
             if (await updateMusicPlatform(platform)) goto('/');
-          } else console.log('Permissions denied AGAIN');
+          } else console.log('Apple Music Permissions denied AGAIN');
           break;
         }
         default: {
           const res = await AppleMusic.requestPermissions();
           if (res.receive === AppleMusicPermissionsResults.granted) {
             if (await updateMusicPlatform(platform)) goto('/');
-          } else console.log('Permissions denied AGAIN');
+          } else console.log('Apple Music Permissions denied AGAIN');
           break;
         }
       }

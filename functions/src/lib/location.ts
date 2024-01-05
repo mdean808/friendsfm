@@ -48,7 +48,6 @@ export const getNearbySubmissions = async (
 
   return await Promise.all(
     results.map(async (result) => {
-      console.log(result.location, result.song.genre);
       const user = new User(result.userId);
       await user.load();
       result.user = {
