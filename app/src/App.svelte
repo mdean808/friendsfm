@@ -261,6 +261,7 @@
       </ModalPageWrapper>
     {/if}
     <!-- END absolute positioning -->
+
     {#if $loggedIn && $user?.username && $user?.musicPlatform && $currPath !== '/audial'}
       <TopNav />
     {/if}

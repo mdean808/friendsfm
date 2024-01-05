@@ -1,7 +1,10 @@
-import sveltePreprocess from 'svelte-preprocess'
+import { withSentryConfig } from '@sentry/svelte';
+import sveltePreprocess from 'svelte-preprocess';
 
-export default {
+const config = {
   // Consult https://github.com/sveltejs/svelte-preprocess
   // for more information about preprocessors
-  preprocess: sveltePreprocess()
-}
+  preprocess: sveltePreprocess(),
+};
+
+export default withSentryConfig(config);

@@ -21,21 +21,29 @@ import { goto } from './lib';
 import { UserState } from './types';
 
 // Initialize Sentry
-if (import.meta.env.PROD && import.meta.env.RELEASE) {
-  Sentry.init(
-    {
-      dsn: import.meta.env.VITE_SENTRY_DSN,
-      // integrations: [new SentrySvelte.BrowserTracing()] as any[],
-      // Set your dist version, such as "1"
-      dist: '1',
-      // enableTracing: true,
-      // tracesSampleRate: 0.25,
-      release: 'friendsfm@' + import.meta.env.npm_packge_version,
-      environment: 'production',
-    },
-    SentrySvelte.init
-  );
-}
+Sentry.init(
+  {
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+    integrations: [new Sentry.BrowserTracing()],
+    // Set your dist version, such as "1"
+    dist: '1',
+    enableTracing: true,
+    tracesSampleRate: 0.25,
+    tracePropagationTargets: [
+      'localhost',
+      '127.0.0.1',
+      /^https:\/\/.*-tprlxlzyxq-uc\.a\.run\.app/,
+    ],
+    release: 'friendsfm@' + import.meta.env.npm_packge_version,
+    environment:
+      import.meta.env.PROD && import.meta.env.RELEASE
+        ? 'production'
+        : import.meta.env.DEV
+        ? 'development'
+        : 'staging',
+  },
+  SentrySvelte.init
+);
 
 // Initialize Firebase
 const firebaseConfig = {

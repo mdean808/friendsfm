@@ -1,6 +1,25 @@
 <script lang="ts">
+  import * as Sentry from '@sentry/svelte';
+  import Button from '../components/Button.svelte';
+  import TextArea from '../components/TextArea.svelte';
   import { getPlatformColor, goto } from '../lib';
   import { prevPath, user } from '../store';
+  import { toast } from '@zerodevx/svelte-toast';
+  let feedback: string;
+
+  const sendFeedback = async () => {
+    const eventId = Sentry.captureMessage('User Feedback');
+
+    const userFeedback = {
+      event_id: eventId,
+      name: $user.username,
+      email: $user.email,
+      comments: feedback,
+    };
+    Sentry.captureUserFeedback(userFeedback);
+    feedback = '';
+    toast.push('Successfully sent your message!');
+  };
 </script>
 
 <div>
@@ -47,7 +66,7 @@
       </svg>
     </div>
   </div>
-  <div class="mx-auto w-full py-2 px-2">
+  <div class="mx-auto w-full py-2 px-4">
     <div class="py-4 text-left">
       <p>
         FriendsFM is a music-sharing application that sends a daily notification
@@ -59,8 +78,21 @@
         friends, fostering a continuous sharing of top tunes.
       </p>
     </div>
-    <p class="text-left text-gray-400">created by morgan dean</p>
+    <div class="py-2">
+      <h1 class="text-xl">contact us</h1>
+      <p class="text-gray-400 pb-2">
+        Need support? Want to report an issue? Use the form below to give
+        feedback!
+      </p>
+      <TextArea name="feedback" placeholder="" bind:value={feedback} />
+      <div class="w-1/3">
+        <Button type="primary" on:click={sendFeedback} title="submit"
+          >Submit</Button
+        >
+      </div>
+    </div>
     <div class="py-6 text-blue-600 text-left">
+      <p class="text-left text-gray-400">created by morgan dean</p>
       <a target="_blank" href="https://friendsfm.app/privacy">privacy policy</a>
     </div>
   </div>
