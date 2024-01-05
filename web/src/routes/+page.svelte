@@ -1,9 +1,4 @@
 <div class="text-center mx-auto">
-  <div class="grid grid-cols-1 md:grid-cols-3 py-5 gap-1">
-    <img src="/img/screenshot_1.png" alt="friendsfm screenshot 1" />
-    <img src="/img/screenshot_4.png" alt="friendsfm screenshot 4" />
-    <img src="/img/screenshot_3.png" alt="friendsfm screenshot 3" />
-  </div>
   <div class="flex mx-auto w-full items-center place-content-center pb-3 gap-5">
     <a
       href="https://apps.apple.com/us/app/friendsfm/id6445926913"
@@ -39,5 +34,10 @@
         app.friendsfm.app
       </button>
     </a>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 py-5 gap-1">
+    <img src="/img/screenshot_1.png" alt="friendsfm screenshot 1" />
+    <img src="/img/screenshot_4.png" alt="friendsfm screenshot 4" />
+    <img src="/img/screenshot_3.png" alt="friendsfm screenshot 3" />
   </div>
 </div>
