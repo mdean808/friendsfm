@@ -1,4 +1,5 @@
 import { AppleMusicApi } from '@/classes/AppleMusicApi';
+import { SentryTransaction } from '@/classes/SentryTransaction';
 import { CustomError } from '@/classes/error';
 import { MusicKitSearchResponse } from '@/types';
 
@@ -8,6 +9,11 @@ export const searchAppleMusic = async (
   query: string,
   types: SearchTypes
 ): Promise<MusicKitSearchResponse> => {
+  const transaction = new SentryTransaction(
+    'apple-music-search',
+    'searchAppleMusic',
+    { query, types }
+  );
   types = types.map((t) => t.replace(/track/g, 'song')) as SearchTypes;
   const pluralTypes = types.map((t) => t + 's');
   const musicKit = new AppleMusicApi();
@@ -20,6 +26,8 @@ export const searchAppleMusic = async (
       Authorization: `Bearer ${musicKit.token}`,
     },
   });
+  transaction.setTag('status', res.status);
+  transaction.finish();
   if (res.status < 400) {
     return await res.json();
   } else {

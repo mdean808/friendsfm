@@ -10,6 +10,7 @@ import {
 } from '../types';
 import { CustomError } from '@/classes/error';
 import { SpotifyApi } from '@/classes/SpotifyApi';
+import { SentryTransaction } from '@/classes/SentryTransaction';
 
 export const SPOTIFY_AUTH = Buffer.from(
   process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET
@@ -55,6 +56,10 @@ export const refreshSpotifyAccessCode = async (
 };
 
 export const getCurrentSpotifySong = async (accessToken: string) => {
+  const transaction = new SentryTransaction(
+    'spotify-get-currently-playing',
+    'getCurrentSpotifySong'
+  );
   const res = await fetch(
     'https://api.spotify.com/v1/me/player/currently-playing',
     {
@@ -66,6 +71,8 @@ export const getCurrentSpotifySong = async (accessToken: string) => {
       },
     }
   );
+  transaction.setTag('status', res.status);
+  transaction.finish();
 
   if (res.status !== 200) {
     console.error('get current spotify song: ' + res.status, await res.text());
@@ -81,6 +88,10 @@ export const getCurrentSpotifySong = async (accessToken: string) => {
 };
 
 export const getRecentlyPlayedSpotifySongs = async (accessToken: string) => {
+  const transaction = new SentryTransaction(
+    'spotify-get-recently-played',
+    'getRecentlyPlayedSpotifySongs'
+  );
   const res = await fetch(
     'https://api.spotify.com/v1/me/player/recently-played?limit=1',
     {
@@ -92,6 +103,8 @@ export const getRecentlyPlayedSpotifySongs = async (accessToken: string) => {
       },
     }
   );
+  transaction.setTag('status', res.status);
+  transaction.finish();
 
   if (res.status !== 200) {
     console.error(
@@ -118,6 +131,10 @@ export const getRecentlyPlayedSpotifySongs = async (accessToken: string) => {
 
 export const getSpotifyUser = async (spotifyAuth: MusicPlatformAuth) => {
   if (!spotifyAuth) throw Error('User not signed into spotify.');
+  const transaction = new SentryTransaction(
+    'spotify-get-user',
+    'getSpotifyUser'
+  );
   const res = await fetch('https://api.spotify.com/v1/me', {
     method: 'GET',
     headers: {
@@ -125,6 +142,8 @@ export const getSpotifyUser = async (spotifyAuth: MusicPlatformAuth) => {
       Authorization: 'Bearer ' + spotifyAuth.access_token,
     },
   });
+  transaction.setTag('status', res.status);
+  transaction.finish();
   if (res.status === 403) {
     throw Error('Spotify 403 Forbidden. Please re-link the Spotify account.');
   } else {
@@ -141,6 +160,10 @@ export const createSpotifyPlaylist = async (
   playlistPublic: boolean = true
 ) => {
   if (!spotifyAuth) throw Error('User not signed into spotify.');
+  const transaction = new SentryTransaction(
+    'spotify-create-playlist',
+    'createSpotifyPlaylist'
+  );
   // get user's spotify id from the api
   const spotify_id = (await getSpotifyUser(spotifyAuth)).id;
   // create a new playlist for the user
@@ -160,6 +183,8 @@ export const createSpotifyPlaylist = async (
       }),
     }
   );
+  transaction.setTag('status', res.status);
+  transaction.finish();
   if (res.status === 403 || res.status === 400) {
     throw new CustomError(
       'Spotify 403 Forbidden: Please re-link the Spotify account.'
@@ -179,6 +204,10 @@ export const addSongsToSpotifyPlaylist = async (
   spotifyAuth: MusicPlatformAuth
 ) => {
   if (!spotifyAuth) throw Error('User not signed into spotify.');
+  const transaction = new SentryTransaction(
+    'spotify-add-to-playlist',
+    'addSongsToSpotifyPlaylist'
+  );
   const songUris = [];
   for (const song of songs) {
     const uri = (await getSpotifySong(song))?.uri;
@@ -196,6 +225,8 @@ export const addSongsToSpotifyPlaylist = async (
       },
     }
   );
+  transaction.setTag('status', res.status);
+  transaction.finish();
   if (res.status === 403) {
     throw new CustomError(
       'Spotify 403 Forbidden: Adding Songs failed. Please re-link the Spotify account.'
@@ -204,6 +235,11 @@ export const addSongsToSpotifyPlaylist = async (
 };
 
 export const getSpotifySong = async (song: Song | SavedSong) => {
+  const transaction = new SentryTransaction(
+    'spotify-get-song',
+    'getSpotifySong',
+    { song }
+  );
   const spotifyApi = new SpotifyApi(
     process.env.SPOTIFY_CLIENT_ID,
     process.env.SPOTIFY_CLIENT_SECRET
@@ -220,6 +256,8 @@ export const getSpotifySong = async (song: Song | SavedSong) => {
       },
     }
   );
+  transaction.setTag('status', res.status);
+  transaction.finish();
   const json = (await res.json()) as SpotifySearchRes;
 
   return json.tracks?.items[0];
@@ -307,6 +345,10 @@ export const searchSpotify = async (
   query: string,
   types: ('artist' | 'track' | 'playlist' | 'album')[]
 ): Promise<SpotifySearchRes> => {
+  const transaction = new SentryTransaction('spotify-search', 'searchSpotify', {
+    query,
+    types,
+  });
   const spotifyApi = new SpotifyApi(
     process.env.SPOTIFY_CLIENT_ID,
     process.env.SPOTIFY_CLIENT_SECRET
@@ -323,6 +365,8 @@ export const searchSpotify = async (
       },
     }
   );
+  transaction.setTag('status', res.status);
+  transaction.finish();
   if (res.status === 403) {
     throw new CustomError(
       'Spotify 403 Forbidden: Please re-link the Spotify account.'
