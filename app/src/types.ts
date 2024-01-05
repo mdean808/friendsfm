@@ -1,4 +1,5 @@
 import type { Adress as Address } from '@capgo/nativegeocoder';
+import type { SentryTransaction } from './lib';
 
 export enum UserState {
   unregistered = 'unregistered',
@@ -464,4 +465,11 @@ export interface MusicKitSearchResponse {
       }[];
     };
   };
+}
+
+export interface ActiveRequest {
+  url: string;
+  transaction: SentryTransaction;
+  request?: Request;
+  response?: Response;
 }

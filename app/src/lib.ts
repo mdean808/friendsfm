@@ -1,5 +1,7 @@
 import { MusicPlatform, ResponseType, type NetworkResponse } from './types';
+import { type Span, type Transaction, startTransaction } from '@sentry/svelte';
 import {
+  activeRequests,
   currPath,
   getNewAuthToken,
   logout,
@@ -61,6 +63,7 @@ export const registerForNotifications = async () => {
 };
 
 export const handleApiResponse = async (res: Response) => {
+  const activeRequest = activeRequests.get().find((ar) => ar.url === res.url);
   let eventParams: LogEventOptions['params'] = {};
   eventParams.status = res.status;
   eventParams.statusText = res.statusText;
@@ -125,6 +128,10 @@ export const handleApiResponse = async (res: Response) => {
       name: 'response',
       params: eventParams,
     });
+    activeRequest.transaction.setTag('status', eventParams.status);
+    activeRequest.transaction.setTag('statusText', eventParams.status);
+    activeRequest.transaction.span.data = eventParams;
+    activeRequest.transaction.finish();
     return false;
   }
 
@@ -132,6 +139,10 @@ export const handleApiResponse = async (res: Response) => {
     name: 'response',
     params: eventParams,
   });
+  activeRequest.transaction.setTag('status', eventParams.status);
+  activeRequest.transaction.setTag('statusText', eventParams.status);
+  activeRequest.transaction.span.data = eventParams;
+  activeRequest.transaction.finish();
   return json;
 };
 
@@ -232,6 +243,8 @@ export const getFirebaseUrl = (endpoint: string) => {
     url = `https://${endpoint}-tprlxlzyxq-uc.a.run.app`;
   }
   FirebaseAnalytics.logEvent({ name: 'request', params: { url } });
+  const transaction = new SentryTransaction('fetch-' + endpoint, endpoint);
+  activeRequests.set([{ url, transaction }, ...activeRequests.get()]);
   return url;
 };
 
@@ -292,4 +305,34 @@ export function errorToast(content: string) {
     },
   };
   toast.push(content, toastError);
+}
+
+export class SentryTransaction {
+  transaction: Transaction;
+  span: Span;
+
+  constructor(name: string, op: string, data?: object, description?: string) {
+    this.transaction = startTransaction({
+      name,
+      data,
+      description,
+    });
+    this.span = this.transaction.startChild({ op });
+  }
+
+  public finish() {
+    this.span.finish();
+    this.transaction.finish();
+  }
+
+  public setTag(
+    key: string,
+    value: string | number | bigint | boolean | symbol | null | undefined
+  ) {
+    this.span.setTag(key, value);
+  }
+
+  public setData(key: string, value: any) {
+    this.span.setData(key, value);
+  }
 }

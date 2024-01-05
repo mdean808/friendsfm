@@ -1,6 +1,7 @@
 import { action, atom, map } from 'nanostores';
 import { Device } from '@capacitor/device';
 import type { Notification } from '@capacitor-firebase/messaging';
+import type { ActiveRequest } from '../types';
 
 export const currPath = atom<string>('');
 
@@ -45,3 +46,5 @@ export const searchType = atom<'track' | 'album' | 'playlist' | 'artist'>(
 export const editingProfile = atom<boolean>(false);
 
 export const publicProfileUsername = atom<string>('');
+
+export const activeRequests = atom<ActiveRequest[]>([]);
