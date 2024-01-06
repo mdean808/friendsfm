@@ -28,7 +28,7 @@ Sentry.init(
     // Set your dist version, such as "1"
     dist: '1',
     enableTracing: true,
-    tracesSampleRate: 0.25,
+    tracesSampleRate: 0.1,
     tracePropagationTargets: [
       'localhost',
       '127.0.0.1',
