@@ -150,14 +150,14 @@
         className={`mx-auto px-6 ${
           platform ? `bg-${platform}` : 'bg-gray-600'
         } ${
-          $osPlatform === 'web' &&
+          ($osPlatform === 'web' || $osPlatform === 'android') &&
           platform === MusicPlatform.appleMusic &&
           'bg-gray-600 cursor-default'
         }`}
         title="Finish Up"
         on:click={setProvider}
       >
-        {#if $osPlatform === 'web' && platform === MusicPlatform.appleMusic}
+        {#if ($osPlatform === 'web' || $osPlatform === 'android') && platform === MusicPlatform.appleMusic}
           Apple Music is only available on iOS
         {:else}
           Finish Up

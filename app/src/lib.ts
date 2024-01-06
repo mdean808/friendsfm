@@ -1,4 +1,9 @@
-import { MusicPlatform, ResponseType, type NetworkResponse } from './types';
+import {
+  MusicPlatform,
+  ResponseType,
+  type ActiveRequest,
+  type NetworkResponse,
+} from './types';
 import { type Span, type Transaction, startTransaction } from '@sentry/svelte';
 import {
   activeRequests,
@@ -63,7 +68,7 @@ export const registerForNotifications = async () => {
 };
 
 export const handleApiResponse = async (res: Response) => {
-  const activeRequest = activeRequests.get().find((ar) => ar.url === res.url);
+  const activeRequest = activeRequests.get().get(res.url);
   let eventParams: LogEventOptions['params'] = {};
   eventParams.status = res.status;
   eventParams.statusText = res.statusText;
@@ -128,10 +133,13 @@ export const handleApiResponse = async (res: Response) => {
       name: 'response',
       params: eventParams,
     });
-    activeRequest.transaction.setTag('status', eventParams.status);
-    activeRequest.transaction.setTag('statusText', eventParams.status);
-    activeRequest.transaction.span.data = eventParams;
-    activeRequest.transaction.finish();
+    if (activeRequest) {
+      activeRequest.transaction.setTag('status', eventParams.status);
+      activeRequest.transaction.setTag('statusText', eventParams.status);
+      activeRequest.transaction.span.data = eventParams;
+      activeRequest.transaction.finish();
+      activeRequests.get().remove(activeRequest);
+    }
     return false;
   }
 
@@ -139,10 +147,13 @@ export const handleApiResponse = async (res: Response) => {
     name: 'response',
     params: eventParams,
   });
-  activeRequest.transaction.setTag('status', eventParams.status);
-  activeRequest.transaction.setTag('statusText', eventParams.status);
-  activeRequest.transaction.span.data = eventParams;
-  activeRequest.transaction.finish();
+  if (activeRequest) {
+    activeRequest.transaction.setTag('status', eventParams.status);
+    activeRequest.transaction.setTag('statusText', eventParams.status);
+    activeRequest.transaction.span.data = eventParams;
+    activeRequest.transaction.finish();
+    activeRequests.get().remove(activeRequest);
+  }
   return json;
 };
 
@@ -244,7 +255,7 @@ export const getFirebaseUrl = (endpoint: string) => {
   }
   FirebaseAnalytics.logEvent({ name: 'request', params: { url } });
   const transaction = new SentryTransaction('fetch-' + endpoint, endpoint);
-  activeRequests.set([{ url, transaction }, ...activeRequests.get()]);
+  activeRequests.get().add({ url, transaction });
   return url;
 };
 
@@ -334,5 +345,23 @@ export class SentryTransaction {
 
   public setData(key: string, value: any) {
     this.span.setData(key, value);
+  }
+}
+
+export class ActiveRequests {
+  requests: ActiveRequest[] = [];
+
+  constructor() {}
+
+  public add(request: ActiveRequest) {
+    this.requests.push(request);
+  }
+
+  public get(url: string) {
+    return this.requests.find((r) => r.url === url);
+  }
+
+  public remove(request: ActiveRequest) {
+    this.requests = this.requests.filter((r) => r.url === request.url);
   }
 }

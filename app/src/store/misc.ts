@@ -2,6 +2,7 @@ import { action, atom, map } from 'nanostores';
 import { Device } from '@capacitor/device';
 import type { Notification } from '@capacitor-firebase/messaging';
 import type { ActiveRequest } from '../types';
+import { ActiveRequests } from '../lib';
 
 export const currPath = atom<string>('');
 
@@ -47,4 +48,4 @@ export const editingProfile = atom<boolean>(false);
 
 export const publicProfileUsername = atom<string>('');
 
-export const activeRequests = atom<ActiveRequest[]>([]);
+export const activeRequests = map<ActiveRequests>(new ActiveRequests());
