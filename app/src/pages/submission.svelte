@@ -271,22 +271,26 @@
         />
       </div>
       {#if !commentSubmitting}
-        <svg
+        <button
           on:click={submitComment}
-          fill="none"
-          class="p-1 h-9 w-9 mx-auto bg-blue-600 mt-1 rounded-full"
-          stroke="currentColor"
-          stroke-width="1.5"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
+          class="mx-auto mt-1 rounded-full p-2 h-9 w-9 bg-blue-600"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-          ></path>
-        </svg>
+          <svg
+            fill="none"
+            class=""
+            stroke="currentColor"
+            stroke-width="1.5"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+            ></path>
+          </svg>
+        </button>
       {:else}
         <LoadingIndicator
           className={'p-1 h-9 w-9 mx-auto bg-blue-600 mt-1 rounded-full'}

@@ -6,9 +6,12 @@
     "app:deploy": "firebase deploy --only hosting:friendsfm-app",
     "web:deploy": "firebase deploy --only hosting:friendsfm",
     "functions:deploy": "firebase deploy --only functions",
+    "app:dev": "cd app && yarn dev",
     "app:build": "cd app && yarn build:release",
     "app:release": "cd app && yarn release",
+    "web:dev": "cd web && yarn dev",
     "web:build": "cd web && yarn build",
+    "functions:dev": "cd functions && yarn serve",
     "functions:build": "cd functions && yarn build && yarn run sentry:prepare"
   }
 }

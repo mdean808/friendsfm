@@ -130,7 +130,7 @@
       {#if !loading}
         <Button
           type="primary"
-          title="Add friend"
+          title="Add Friend"
           on:click={() => addFriend()}
           className="w-full mx-1 px-0 py-0 h-full rounded-md my-auto text-3xl"
         >
@@ -178,7 +178,7 @@
             {#if !loaders[i]}
               <Button
                 type="breaking"
-                title="Add friend"
+                title="Reject Request"
                 on:click={() => rejectRequest(username, i)}
                 className="w-2/12 mr-2 rounded-md h-full my-auto text-3xl"
               >
@@ -200,7 +200,7 @@
               </Button>
               <Button
                 type="submit"
-                title="Add friend"
+                title="Accept Request"
                 on:click={() => acceptRequest(username, i)}
                 className="w-2/12 h-full my-auto text-3xl"
               >
