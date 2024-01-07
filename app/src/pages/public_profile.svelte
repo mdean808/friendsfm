@@ -53,7 +53,7 @@
   const requestFriend = async () => {
     loading.set(true);
     if (await sendFriendRequest($publicProfileUsername.trim())) {
-      toast.push('Succcessfully sent friend request');
+      toast.push('Successfully sent friend request');
     }
     loading.set(false);
   };

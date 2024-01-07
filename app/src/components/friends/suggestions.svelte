@@ -45,7 +45,7 @@
     suggestions[sIndex].loading = true;
     suggestions = [...suggestions];
     if (await sendFriendRequest(suggestion.username.trim())) {
-      toast.push('Succcessfully sent friend request');
+      toast.push('Successfully sent friend request');
       suggestions[sIndex].loading = false;
       suggestions[sIndex].sent = true;
       suggestions = [...suggestions];

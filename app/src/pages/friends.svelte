@@ -29,7 +29,7 @@
     loading = true;
     if (await sendFriendRequest(newUsername.trim())) {
       newUsername = '';
-      toast.push('Succcessfully sent friend request');
+      toast.push('Successfully sent friend request');
     }
     loading = false;
   };
@@ -37,7 +37,7 @@
     if (loaders[i]) return;
     loaders[i] = true;
     if (await acceptFriendRequest(requester))
-      toast.push('Succcessfully accepted friend request');
+      toast.push('Successfully accepted friend request');
     loaders[i] = false;
   };
 
@@ -45,7 +45,7 @@
     if (loaders[i]) return;
     loaders[i] = true;
     if (await rejectFriendRequest(requester))
-      toast.push('Succcessfully rejected friend request');
+      toast.push('Successfully rejected friend request');
     loaders[i] = false;
   };
 

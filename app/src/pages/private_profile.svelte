@@ -412,11 +412,13 @@
   <p
     on:keyup={() =>
       Share.share({
-        url: 'https://friendsfm.app/user' + $user.username + '?ref=' + $user.id,
+        url:
+          'https://friendsfm.app/user/' + $user.username + '?ref=' + $user.id,
       })}
     on:click={() =>
       Share.share({
-        url: 'https://friendsfm.app/user' + $user.username + '?ref=' + $user.id,
+        url:
+          'https://friendsfm.app/user/' + $user.username + '?ref=' + $user.id,
       })}
     class="mx-auto text-center mt-3 text-gray-300 opacity-70 underline"
   >
