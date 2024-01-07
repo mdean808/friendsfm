@@ -2,7 +2,7 @@
   import * as Sentry from '@sentry/svelte';
   import Button from '../components/Button.svelte';
   import TextArea from '../components/TextArea.svelte';
-  import { getPlatformColor, goto } from '../lib';
+  import { goto } from '../lib/util';
   import { prevPath, user } from '../store';
   import { toast } from '@zerodevx/svelte-toast';
   let feedback: string;
@@ -29,9 +29,7 @@
     <button on:click={() => goto($prevPath)} class="flex-grow-0">
       <svg
         fill="none"
-        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${getPlatformColor(
-          $user.musicPlatform
-        )} `}
+        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${$user.musicPlatform} `}
         stroke="currentColor"
         stroke-width="1.5"
         viewBox="0 0 24 24"

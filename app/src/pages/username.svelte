@@ -2,7 +2,7 @@
   import { toast } from '@zerodevx/svelte-toast';
   import Button from '../components/Button.svelte';
   import Input from '../components/Input.svelte';
-  import { goto } from '../lib';
+  import { goto } from '../lib/util';
 
   import { updateUsername, loading, user } from '../store';
 

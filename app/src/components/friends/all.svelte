@@ -2,7 +2,7 @@
   import { onDestroy, onMount } from 'svelte';
   import { publicProfileUsername, refreshUser, user } from '../../store';
   import { slide } from 'svelte/transition';
-  import { goto } from '../../lib';
+  import { goto } from '../../lib/util';
   import LoadingIndicator from '../LoadingIndicator.svelte';
   import { Share } from '@capacitor/share';
 

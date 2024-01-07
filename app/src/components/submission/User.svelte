@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto } from '../../lib';
+  import { goto } from '../../lib/util';
   import type { Submission } from '../../types';
   import { activeSubmission } from '../../store';
   import SubmissionSong from './Song.svelte';

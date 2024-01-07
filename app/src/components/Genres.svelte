@@ -1,6 +1,6 @@
 <script lang="ts">
   import { MarkerClusterer } from '@googlemaps/markerclusterer';
-  import { getPlatformColor, hashCode, intToRGB } from '../lib';
+  import { hashCode, intToRGB } from '../lib/util';
   import type { SavedSong, StrippedSubmission } from '../types';
   import {
     toggleSong,
@@ -179,9 +179,7 @@
               }}
               on:keyup={() => this.click()}
               style={`background: ${intToRGB(hashCode(sub.song.genre, 23))}`}
-              class={`flex p-2 rounded-t-lg bg-${getPlatformColor(
-                sub.user.musicPlatform
-              )}`}
+              class={`flex p-2 rounded-t-lg bg-${sub.user.musicPlatform}`}
             >
               <div class="flex-grow text-left">
                 <h4 class="text-xl">
@@ -240,9 +238,7 @@
                             style={`color: ${intToRGB(
                               hashCode(sub.song.genre, 23)
                             )}`}
-                            class={`truncate text-${getPlatformColor(
-                              sub.user?.musicPlatform
-                            )}`}
+                            class={`truncate text-${sub.user?.musicPlatform}`}
                           >
                             {sub.song?.name}
                           </p>

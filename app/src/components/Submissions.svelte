@@ -6,7 +6,7 @@
     user,
     createSubmissionsPlaylist,
   } from '../store';
-  import { goto } from '../lib';
+  import { goto } from '../lib/util';
   import { MusicPlatform, type Submission as SubmissionType } from '../types';
   import SkeletonSubmission from '../components/submission/Skeleton.svelte';
   import Submission from './submission/index.svelte';

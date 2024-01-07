@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getPlatformColor, goto } from '../../lib';
+  import { goto } from '../../lib/util';
   import type { Submission } from '../../types';
   import { activeSubmission, publicProfileUsername } from '../../store';
   import SubmissionSong from './Song.svelte';
@@ -20,11 +20,7 @@
   class={`border-white rounded-lg shadow-lg bg-gray-700`}
 >
   <!-- HEADER -->
-  <div
-    class={`flex p-2 rounded-t-lg bg-${getPlatformColor(
-      data.user.musicPlatform
-    )}`}
-  >
+  <div class={`flex p-2 rounded-t-lg bg-${data.user.musicPlatform}`}>
     <button
       on:click={(e) => {
         e.stopPropagation();
@@ -45,7 +41,7 @@
       </h4>
     </button>
     <SubmissionActions
-      commentNumberColor={`text-${getPlatformColor(data.user?.musicPlatform)}`}
+      commentNumberColor={`text-${data.user?.musicPlatform}`}
       {data}
     />
   </div>

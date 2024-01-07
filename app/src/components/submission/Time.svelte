@@ -3,7 +3,7 @@
     convertDateToLateString,
     formatTimePlayed,
     getDaysAgo,
-  } from '../../lib';
+  } from '../../lib/dates';
   import type { Submission } from '../../types';
 
   export let data: Submission;

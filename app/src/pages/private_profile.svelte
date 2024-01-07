@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import SpotifyLogo from '../assets/spotify_logo_green.png';
   import AppleMusicLogo from '../assets/apple_music_logo_white.svg';
-  import { formatDurationPlayed, getPlatformColor, goto } from '../lib';
+  import { formatDurationPlayed } from '../lib/dates';
   import {
     editingProfile,
     header,
@@ -16,6 +16,7 @@
   import Input from '../components/Input.svelte';
   import { MusicPlatform } from '../types';
   import { Share } from '@capacitor/share';
+  import { goto } from '../lib/util';
 
   const firstOfTheMonth = new Date().getDate() === 1;
 
@@ -371,7 +372,7 @@
           </div>
         {/if}
         <div class={$userStatistics.topSong.albumArtwork ? 'w-52' : 'w-64'}>
-          <h1 class={`truncate text-${getPlatformColor($user.musicPlatform)}`}>
+          <h1 class={`truncate text-${$user.musicPlatform}`}>
             {$userStatistics.topSong.name}
           </h1>
           <p class="text-white truncate">

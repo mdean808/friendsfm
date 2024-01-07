@@ -1,8 +1,7 @@
 import { action, atom, map } from 'nanostores';
 import { Device } from '@capacitor/device';
 import type { Notification } from '@capacitor-firebase/messaging';
-import type { ActiveRequest } from '../types';
-import { ActiveRequests } from '../lib';
+import ActiveRequests from '../lib/ActiveRequests';
 
 export const currPath = atom<string>('');
 

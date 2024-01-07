@@ -8,7 +8,7 @@
     getFriendSuggestions,
     publicProfileUsername,
   } from '../../store';
-  import { goto } from '../../lib';
+  import { goto } from '../../lib/util';
 
   let suggestions: {
     username: string;

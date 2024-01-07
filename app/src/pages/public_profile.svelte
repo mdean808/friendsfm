@@ -4,13 +4,8 @@
   import SpotifyLogo from '../assets/spotify_logo_green.png';
   import AppleMusicLogo from '../assets/apple_music_logo_white.svg';
   import { onMount } from 'svelte';
-  import {
-    formatDurationPlayed,
-    getFirebaseUrl,
-    getPlatformColor,
-    goto,
-    handleApiResponse,
-  } from '../lib';
+  import { formatDurationPlayed } from '../lib/dates';
+  import { getFirebaseUrl, handleApiResponse } from '../lib/network';
   import {
     appCheckToken,
     authToken,
@@ -24,6 +19,7 @@
     sendFriendRequest,
   } from '../store';
   import { MusicPlatform, type User } from '../types';
+  import { goto } from '../lib/util';
 
   let profile: User['profile'];
 
@@ -105,9 +101,9 @@
       class="absolute right-3 top-3 text-transparent"
       ><svg
         fill="none"
-        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${getPlatformColor(
+        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${
           profile?.musicPlatform || $user.musicPlatform
-        )}`}
+        }`}
         stroke="currentColor"
         stroke-width="1.5"
         viewBox="0 0 24 24"
@@ -308,11 +304,7 @@
               </div>
             {/if}
             <div class={profile.stats.topSong.albumArtwork ? 'w-52' : 'w-64'}>
-              <h1
-                class={`truncate text-${getPlatformColor(
-                  profile?.musicPlatform
-                )}`}
-              >
+              <h1 class={`truncate text-${profile?.musicPlatform}`}>
                 {profile.stats.topSong.name}
               </h1>
               <p class="text-white truncate">

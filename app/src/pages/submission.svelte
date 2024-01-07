@@ -8,11 +8,8 @@
     convertDateToLateString,
     formatTimePlayed,
     getDaysAgo,
-    getPlatformColor,
-    goto,
-    hashCode,
-    intToRGB,
-  } from '../lib';
+  } from '../lib/dates';
+  import { goto, hashCode, intToRGB } from '../lib/util';
   import {
     activeSubmission,
     activeGenre,
@@ -58,9 +55,7 @@
   >
     <div class="sticky top-0 w-full mx-auto">
       <div
-        class={`w-full flex bg-${getPlatformColor(
-          $activeSubmission.user.musicPlatform
-        )} flex-row rounded-t-lg justify-between items-center h-[55px] p-2`}
+        class={`w-full flex bg-${$activeSubmission.user.musicPlatform} flex-row rounded-t-lg justify-between items-center h-[55px] p-2`}
       >
         <button class="flex-grow-0 text-transparent w-8 h-8 p-1"></button>
         <button
@@ -75,9 +70,7 @@
         </button>
         <button on:click={close} class="flex-grow-0 text-transparent"
           ><svg
-            class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${getPlatformColor(
-              $activeSubmission.user.musicPlatform
-            )}`}
+            class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${$activeSubmission.user.musicPlatform}`}
             fill="none"
             stroke="currentColor"
             stroke-width="1.5"
@@ -131,9 +124,7 @@
             <div class="w-full mx-auto text-center">
               <div class="flex flex-col px-3 justify-start">
                 <span
-                  class={`w-full truncate text-${getPlatformColor(
-                    $activeSubmission.user.musicPlatform
-                  )}`}
+                  class={`w-full truncate text-${$activeSubmission.user.musicPlatform}`}
                 >
                   {$activeSubmission.song.name}
                 </span>

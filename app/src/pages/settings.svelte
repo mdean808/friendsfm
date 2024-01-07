@@ -1,7 +1,7 @@
 <script>
   import { Dialog } from '@capacitor/dialog';
   import Button from '../components/Button.svelte';
-  import { getPlatformColor, goto } from '../lib';
+  import { goto } from '../lib/util';
 
   import {
     loading,
@@ -32,9 +32,7 @@
     </h1>
     <button on:click={() => goto($prevPath)} class="flex-grow-0">
       <svg
-        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${getPlatformColor(
-          $user.musicPlatform
-        )} `}
+        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${$user.musicPlatform} `}
         fill="none"
         stroke="currentColor"
         stroke-width="1.5"

@@ -12,13 +12,9 @@ import {
   user,
   userSubmission,
 } from '.';
-import {
-  getFirebaseUrl,
-  goto,
-  handleApiResponse,
-  registerForNotifications,
-} from '../lib';
+import { getFirebaseUrl, handleApiResponse } from '../lib/network';
 import { UserState, type SavedSong, type User } from '../types';
+import { goto, registerForNotifications } from '../lib/util';
 
 // refresh every 10 seconds
 export const userRefreshInterval = map<NodeJS.Timer>(

@@ -1,5 +1,5 @@
 import type { Adress as Address } from '@capgo/nativegeocoder';
-import type { SentryTransaction } from './lib';
+import type SentryTransaction from './lib/SentryTransaction';
 
 export enum UserState {
   unregistered = 'unregistered',

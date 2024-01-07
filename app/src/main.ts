@@ -17,7 +17,7 @@ import {
   publicProfileUsername,
   spotifyAuthCode,
 } from './store';
-import { goto } from './lib';
+import { goto } from './lib/util';
 import { UserState } from './types';
 
 // Initialize Sentry

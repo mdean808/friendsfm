@@ -1,6 +1,6 @@
 <script lang="ts">
   import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
-  import { errorToast, goto } from '../lib';
+  import { errorToast, goto } from '../lib/util';
   import {
     appLoading,
     authToken,

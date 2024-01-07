@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { getPlatformColor } from '../../lib';
   import type { Submission } from '../../types';
   import MusicPlatformIcon from '../icons/MusicPlatformIcon.svelte';
 
@@ -17,11 +16,7 @@
         />
       {/if}
       <div class="w-3/4 flex flex-col items-end pr-3 justify-end">
-        <span
-          class={`w-full truncate text-${getPlatformColor(
-            data.user.musicPlatform
-          )}`}
-        >
+        <span class={`w-full truncate text-${data.user.musicPlatform}`}>
           {data.song.name}
         </span>
         <span class="w-full truncate text-gray-100">

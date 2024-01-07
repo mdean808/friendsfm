@@ -3,7 +3,7 @@
   import Button from '../components/Button.svelte';
   import { shareAudial } from '../store';
   import { Clipboard, type ReadResult } from '@capacitor/clipboard';
-  import { goto } from '../lib';
+  import { goto } from '../lib/util';
   import TextArea from '../components/TextArea.svelte';
   let scoreInput = '';
   let clipboard: ReadResult;

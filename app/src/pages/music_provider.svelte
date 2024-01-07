@@ -11,7 +11,7 @@
     getNewAuthToken,
     logout,
   } from '../store';
-  import { goto } from '../lib';
+  import { goto } from '../lib/util';
   import { onMount } from 'svelte';
   import MusicPlatformIcon from '../components/icons/MusicPlatformIcon.svelte';
   import AppleMusic, {

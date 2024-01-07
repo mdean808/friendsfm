@@ -3,7 +3,7 @@ import { Preferences } from '@capacitor/preferences';
 import { toast } from '@zerodevx/svelte-toast';
 import { action, atom } from 'nanostores';
 import { user } from '.';
-import { getFirebaseUrl, handleApiResponse } from '../lib';
+import { getFirebaseUrl, handleApiResponse } from '../lib/network';
 import AppleMusic from '../plugins/AppleMusic';
 import { MusicPlatform, type SavedSong } from '../types';
 import { appCheckToken, authToken } from './auth';

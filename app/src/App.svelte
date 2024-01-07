@@ -35,9 +35,8 @@
     loginState,
     getFriendSubmissions,
     secondaryAppLoading,
-    spotifyAuthCode,
   } from './store';
-  import { errorToast, goto } from './lib';
+  import { errorToast, goto } from './lib/util';
   import Loading from './components/Loading.svelte';
   import Friends from './pages/friends.svelte';
   import { fade, fly } from 'svelte/transition';

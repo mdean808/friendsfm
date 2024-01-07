@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getPlatformColor, goto } from '../lib';
+  import { goto } from '../lib/util';
   import { currPath, insets, user } from '../store';
   let elem: HTMLDivElement;
 </script>
@@ -18,14 +18,14 @@
     <div
       class={`mx-auto rounded-full border bg-gray-900 px-6 pt-1 ${
         $currPath === '/songs'
-          ? `border-${getPlatformColor($user.musicPlatform)} `
+          ? `border-${$user.musicPlatform} `
           : 'currentColor border-transparent'
       }`}
     >
       <svg
         class={`w-6 h-6 mx-auto ${
           $currPath === '/songs'
-            ? `text-${getPlatformColor($user.musicPlatform)}`
+            ? `text-${$user.musicPlatform}`
             : 'currentColor'
         }`}
         fill={'currentColor'}
@@ -42,15 +42,13 @@
     <div
       class={`mx-auto rounded-full border bg-gray-900 px-6 pt-1 ${
         $currPath === '/'
-          ? `border-${getPlatformColor($user.musicPlatform)} `
+          ? `border-${$user.musicPlatform} `
           : 'currentColor border-transparent'
       }`}
     >
       <svg
         class={`w-6 h-6 mx-auto ${
-          $currPath === '/'
-            ? `text-${getPlatformColor($user.musicPlatform)}`
-            : 'currentColor'
+          $currPath === '/' ? `text-${$user.musicPlatform}` : 'currentColor'
         }`}
         fill="currentColor"
         viewBox="0 0 20 20"
@@ -69,14 +67,14 @@
     <div
       class={`mx-auto rounded-full border bg-gray-900 px-6 pt-1 ${
         $currPath === '/private_profile'
-          ? `border-${getPlatformColor($user.musicPlatform)} `
+          ? `border-${$user.musicPlatform} `
           : 'currentColor border-transparent'
       }`}
     >
       <svg
         class={`w-6 h-6 mx-auto ${
           $currPath === '/private_profile'
-            ? `text-${getPlatformColor($user.musicPlatform)}`
+            ? `text-${$user.musicPlatform}`
             : 'currentColor'
         }`}
         fill="none"

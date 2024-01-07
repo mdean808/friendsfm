@@ -15,7 +15,8 @@ import {
   loginState,
   songs,
 } from '.';
-import { getFirebaseUrl, goto, handleApiResponse } from '../lib';
+import { getFirebaseUrl, handleApiResponse } from '../lib/network';
+import { goto } from '../lib/util';
 import {
   UserState,
   type MusicPlatform,

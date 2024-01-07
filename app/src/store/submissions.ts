@@ -7,7 +7,8 @@ import {
   MusicPlatform,
   type Song,
 } from '../types';
-import { errorToast, getFirebaseUrl, goto, handleApiResponse } from '../lib';
+import { getFirebaseUrl, handleApiResponse } from '../lib/network';
+import { errorToast, goto } from '../lib/util';
 import { appCheckToken, authToken, getNewAuthToken, loading, user } from '.';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Dialog } from '@capacitor/dialog';

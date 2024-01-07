@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { formatDurationPlayed, getPlatformColor } from '../lib';
+  import { formatDurationPlayed } from '../lib/dates';
   import { loadSongs, songs, toggleSong, user, header, insets } from '../store';
   import MusicPlatformIcon from '../components/icons/MusicPlatformIcon.svelte';
 
@@ -71,9 +71,7 @@
             </div>
           {/if}
           <div class={song.albumArtwork ? 'w-52' : 'w-64'}>
-            <h1
-              class={`truncate text-${getPlatformColor($user.musicPlatform)}`}
-            >
+            <h1 class={`truncate text-${$user.musicPlatform}`}>
               {song.name}
             </h1>
             <p class="text-white truncate">

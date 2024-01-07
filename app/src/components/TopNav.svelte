@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { getPlatformColor, goto, getShortDate } from '../lib';
+  import { goto } from '../lib/util';
+  import { getShortDate } from '../lib/dates';
   import type { User } from '../types';
 
   import {
@@ -29,9 +30,7 @@
 
 <div class={`z-30 w-full h-[65px]`}>
   <div
-    class={`w-full flex flex-row justify-between items-center text-${getPlatformColor(
-      $user?.musicPlatform
-    )}`}
+    class={`w-full flex flex-row justify-between items-center text-${$user?.musicPlatform}`}
   >
     {#if $currPath === '/private_profile'}
       <button

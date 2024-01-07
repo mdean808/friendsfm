@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { activeGenre, activeHomeTab, nearbySubmissions } from '../store';
-  import { intToRGB, hashCode } from '../lib';
+  import { intToRGB, hashCode } from '../lib/util';
   import type { StrippedSubmission } from '../types';
 
   let genreCounts: { count: number; name: string }[] = [];
