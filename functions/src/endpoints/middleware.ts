@@ -162,19 +162,18 @@ export const sentryWrapper =
               message: 'Something went wrong. Please try again later.',
               error: err.message,
             });
+            // 4. Send any errors to Sentry
+            //    only capture and send actual errors
+            captureException(e, { tags: { handled: true } });
+            firebaseLog.error(
+              `Sentry Error Handled: ${err.name}: ${err.message}\n${err.stack}`
+            );
+            // 5. Finish the Sentry transaction
+            configureScope((scope) => scope.clear());
+            transaction.finish();
+            await flush(1000);
           }
         }
-        // 4. Send any errors to Sentry
-        captureException(e, { tags: { handled: true } });
-
-        firebaseLog.error(
-          `Sentry Error Handled: ${err.name}: ${err.message}\n${err.stack}`
-        );
-      } finally {
-        // 5. Finish the Sentry transaction
-        configureScope((scope) => scope.clear());
-        transaction.finish();
-        await flush(1000);
       }
     }
   };
