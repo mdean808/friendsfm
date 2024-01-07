@@ -1,5 +1,4 @@
 import { AppleMusicApi } from '@/classes/AppleMusicApi';
-import { CustomError } from '@/classes/error';
 import { MusicKitSearchResponse } from '@/types';
 
 type SearchTypes = ('artist' | 'track' | 'playlist' | 'album')[];
@@ -23,7 +22,7 @@ export const searchAppleMusic = async (
   if (res.status < 400) {
     return await res.json();
   } else {
-    throw new CustomError(
+    throw new Error(
       `Apple Music Search Failed: ${res.status} ${
         res.statusText
       }. query: ${query}, types: ${types.toString()}`
