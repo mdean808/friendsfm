@@ -8,6 +8,7 @@
   import { getDatabase } from 'firebase/database';
   import { getAnalytics, type Analytics } from 'firebase/analytics';
   import { onMount } from 'svelte';
+  import { page } from '$app/stores';
 
   // Your web app's Firebase configuration
   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -57,7 +58,9 @@
     <div class="py-4">
       <div class="text-center mx-auto">
         <a href="/"><h1 class="text-4xl">friendsfm</h1></a>
-        <p class="text-lg">the most social way to share your music.</p>
+        {#if $page.url.pathname === '/'}
+          <p class="text-lg">the most social way to share your music.</p>
+        {/if}
       </div>
       <slot />
     </div>
