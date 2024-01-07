@@ -1,10 +1,10 @@
 import { onRequest } from 'firebase-functions/v2/https';
-import { authMiddleware, sentryWrapper } from '../middleware';
+import { emptyMiddleware, sentryWrapper } from '../middleware';
 import User from '@/classes/user';
 
 export const getprofile = onRequest(
   { cors: true },
-  authMiddleware(
+  emptyMiddleware(
     sentryWrapper('get-profile', async (req, res) => {
       const { username } = JSON.parse(req.body);
       const user = await User.getByUsername(username);
