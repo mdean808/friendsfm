@@ -660,9 +660,15 @@ export default class User implements UserType {
       await friend.load();
       for (const friendFriend of friend.friends) {
         // make sure not to add this username to the list if this user is already friends with them
+        //      or if the username is this user's username
+        //      or if the username is already in the suggestions list
+        //todo:
+        //      or if the user already has a friend request out for the username
+        //      or if the user decided to ignore the username's suggestion
         if (
           !this.friends.find((f) => f.username === friendFriend.username) &&
-          friendFriend.username !== this.username
+          friendFriend.username !== this.username &&
+          !suggestions.find((s) => s.username === friendFriend.username)
         ) {
           suggestions.push({
             username: friendFriend.username,
