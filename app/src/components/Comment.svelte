@@ -15,11 +15,15 @@
   };
 </script>
 
-
 <div class="relative bg-gray-800 rounded-md p-2">
   <p class="text-sm text-gray-400">@{comment.user.username}</p>
   <div class="pl-2">
-    <p>{comment.content}</p>
+    <p>
+      {@html comment.content.replace(
+        /(@\w+)/g,
+        '<span class="text-blue-500">$1</span>'
+      )}
+    </p>
   </div>
   <p
     class="text-blue-500 underline text-sm"

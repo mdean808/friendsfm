@@ -16,10 +16,74 @@
   import { onMount } from 'svelte';
   import { captureException } from '@sentry/capacitor';
   import { UserState } from '../types';
+  import { writable } from 'svelte/store';
+  import { Dialog } from '@capacitor/dialog';
+
+  const authTaps = writable(0);
+
+  authTaps.subscribe(async (val) => {
+    if (val === 3) {
+      const email = await Dialog.prompt({
+        title: 'Developer Sign-In - Email',
+        message: 'Sign-In using developer credentials.',
+        okButtonTitle: 'Next',
+        cancelButtonTitle: 'Cancel',
+        inputPlaceholder: 'example@email.com',
+      });
+      if (!email.cancelled && email.value) {
+        const password = await Dialog.prompt({
+          title: 'Developer Sign-In - Password',
+          message: 'Sign-In using developer credentials.',
+          okButtonTitle: 'Finish',
+          cancelButtonTitle: 'Cancel',
+          inputPlaceholder: 'password',
+        });
+        if (!password.cancelled && password.value) {
+          try {
+            const res = await FirebaseAuthentication.signInWithEmailAndPassword(
+              {
+                email: email.value,
+                password: password.value,
+              }
+            );
+            await getNewAuthToken();
+            if (res.user.email)
+              await updateUser({
+                ...res.user,
+                id: res.user.uid,
+                username: undefined,
+                friends: [],
+                friendRequests: [],
+                authToken: $authToken,
+              });
+            // send login information to the backend
+            if (await loginUser()) {
+              const u = user.get();
+              if (!u) return;
+              if (!u.username || u.username === u.id) {
+                loginState.set(UserState.registeringUsername);
+                goto('/username');
+              } else if (!u.musicPlatform) {
+                loginState.set(UserState.registeringMusicPlatform);
+                goto('/music_provider');
+              } else goto('/');
+            }
+          } catch (e) {
+            if (!e.message.includes('closed-by-user')) {
+              loading.set(false);
+              errorToast('Something went wrong. Please try again.');
+              captureException(e);
+            }
+          }
+        }
+      }
+    }
+  });
 
   onMount(async () => {
     // if (!appCheckToken.get()) await getAppCheckToken();
     appLoading.set(false);
+    setInterval(() => authTaps.set(0), 10000);
   });
 
   const signInWithGoogle = async () => {
@@ -95,7 +159,13 @@
 
 <div class="text-center flex flex-col h-full">
   <div class="pt-10">
-    <img src={Icon} alt="FriendsFM Logo" class="mx-auto w-44 h-44" />
+    <img
+      on:keypress={() => authTaps.set($authTaps + 1)}
+      on:click={() => authTaps.set($authTaps + 1)}
+      src={Icon}
+      alt="FriendsFM Logo"
+      class="mx-auto w-44 h-44"
+    />
     <div class="mx-auto py-6 px-4 w-full">
       <h1 class="text-4xl">FriendsFM</h1>
       <p class="text-lg text-gray-400">

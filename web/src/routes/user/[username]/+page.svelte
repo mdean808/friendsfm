@@ -48,6 +48,10 @@
           />
         </a>
       </div>
+      <p>
+        Add <span class="text-blue-500">{username}</span> in the FriendsFM app after
+        creating your account.
+      </p>
     </div>
     <!-- User Info -->
     <div class="px-2 pt-5">
