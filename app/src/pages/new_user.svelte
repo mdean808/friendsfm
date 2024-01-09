@@ -25,7 +25,7 @@
     if (val === 3) {
       const email = await Dialog.prompt({
         title: 'Developer Sign-In - Email',
-        message: 'Sign-In using developer credentials.',
+        message: 'Sign-In using a developer email.',
         okButtonTitle: 'Next',
         cancelButtonTitle: 'Cancel',
         inputPlaceholder: 'example@email.com',
@@ -33,7 +33,7 @@
       if (!email.cancelled && email.value) {
         const password = await Dialog.prompt({
           title: 'Developer Sign-In - Password',
-          message: 'Sign-In using developer credentials.',
+          message: 'Sign-In using a developer password.',
           okButtonTitle: 'Finish',
           cancelButtonTitle: 'Cancel',
           inputPlaceholder: 'password',
@@ -77,6 +77,7 @@
           }
         }
       }
+      authTaps.set(0);
     }
   });
 
