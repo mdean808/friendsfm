@@ -18,6 +18,14 @@ export const sendnotification = onRequest({ cors: true }, async (req, res) => {
       status: 'in_progress',
     });
     firebaseLog.info('Sending Daily Notifications!');
+    // hit the createsubmission endpoint so it's loaded before people get the notification
+    // should throw an error so we ignore it.
+    try {
+      fetch('https://createnewusersubmission-tprlxlzyxq-uc.a.run.app', {
+        method: 'post',
+      });
+    } catch {}
+
     await sendDaily().catch((e) => {
       console.log(e);
       // 🔴 Notify Sentry job has failed:
