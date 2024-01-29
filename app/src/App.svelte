@@ -5,7 +5,6 @@
   } from '@capacitor-firebase/messaging';
   import { SvelteToast } from '@zerodevx/svelte-toast';
   import { Capacitor } from '@capacitor/core';
-  import OSLogger from './plugins/OSLogger.ts'
 
   import Home from './pages/home.svelte';
   import NewUser from './pages/new_user.svelte';
