@@ -51,6 +51,7 @@ export const handleApiResponse = async (res: Response) => {
       await getNewAuthToken();
     } else if (
       json.message.includes('Spotify 403 Forbidden') ||
+      json.message.includes('Spotify now playing error. 401') ||
       json.message.includes('Spotify token refresh error')
     ) {
       const { value } = await Dialog.confirm({

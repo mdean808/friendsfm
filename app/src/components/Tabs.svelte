@@ -45,7 +45,7 @@
 </div>
 {#each tabs as tab}
   {#if tab.id === $activeTab}
-    <div transition:fade={{ duration: 150 }}>
+    <div>
       <svelte:component this={tab.component} {...tab.props} />
     </div>
   {/if}

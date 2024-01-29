@@ -9,7 +9,7 @@
   import Home from './pages/home.svelte';
   import NewUser from './pages/new_user.svelte';
   import Songs from './pages/songs.svelte';
-  // import Audial from './pages/audial.svelte';
+  import SubmissionLoadingPage from './pages/submission_loading.svelte';
   import PrivateProfile from './pages/private_profile.svelte';
   import Username from './pages/username.svelte';
   import MusicProvider from './pages/music_provider.svelte';
@@ -39,6 +39,7 @@
     getFriendSubmissions,
     getSubmissionStatus,
     secondaryAppLoading,
+    submissionLoading,
   } from './store';
   import { errorToast, goto } from './lib/util';
   import Loading from './components/Loading.svelte';
@@ -183,7 +184,8 @@
       goto('/friends');
       secondaryAppLoading.set(false);
     } else if (data.type === 'comment') {
-      secondaryAppLoading.set(true);
+      //todo: show submission loading instead
+      submissionLoading.set(true)
       const subId = data.id;
       const sub =
         $friendSubmissions.find((s) => s.id === subId) ||
@@ -204,15 +206,15 @@
           errorToast('Error: Comment not found.');
         }
       }
-      secondaryAppLoading.set(false);
+      submissionLoading.set(false)
     } else if (data.type === 'late-submission') {
-      secondaryAppLoading.set(true);
+      submissionLoading.set(true);
       const subId = data.id;
       await getFriendSubmissions();
       await getSubmissionStatus();
       // make sure we aren't trying to view submissions without sharing
       if (!$userSubmission || !$userSubmission.song) {
-        secondaryAppLoading.set(false);
+        submissionLoading.set(false);
         return;
       }
       const sub =
@@ -224,7 +226,7 @@
       } else {
         errorToast('Error: Submission not found.');
       }
-      secondaryAppLoading.set(false);
+      submissionLoading.set(false);
     }
   };
 </script>
@@ -279,6 +281,12 @@
       </div>
     {/if}
 
+    {#if $submissionLoading}
+      <div transition:fade={{ duration: 100 }}>
+        <SubmissionLoadingPage />
+      </div>
+    {/if}
+
     {#if $currPath === '/settings'}
       <ModalPageWrapper flySettings={{ x: -document.body.clientWidth }}>
         <Settings />
@@ -312,26 +320,11 @@
     <!-- APP BODY -->
     <main style={`height: calc(100% - 65px);`}>
       {#if $currPath === '/' || ($currPath.includes('/?') && $currPath === '/')}
-        <div
-          class="h-full"
-          in:fly={{
-            x:
-              document.body.clientWidth *
-              ($prevPath === '/songs' || $prevPath === '/friends' ? 1 : -1) *
-              ($prevPath.includes('?submission') ||
-              $prevPath === '/public_profile'
-                ? 0
-                : 1),
-            y:
-              ($prevPath.includes('?submission') ||
-                $prevPath === '/public_profile') &&
-              document.body.clientHeight,
-          }}
-        >
+        <div class="h-full">
           <Home />
         </div>
       {:else if $currPath === '/songs'}
-        <div class="h-full" in:fly={{ x: -document.body.clientWidth }}>
+        <div class="h-full" >
           <Songs />
         </div>
         <!--{:else if $currPath === '/audial'}
@@ -340,19 +333,7 @@
         <!-- </div>
         -->
       {:else if $currPath === '/private_profile'}
-        <div
-          class="h-full"
-          in:fly={{
-            x:
-              $prevPath === '/search_music_platform'
-                ? 0
-                : document.body.clientWidth,
-            y:
-              $prevPath === '/search_music_platform'
-                ? document.body.clientHeight
-                : 0,
-          }}
-        >
+        <div class="h-full"        >
           <PrivateProfile />
         </div>
       {:else if $currPath === '/new_user'}
