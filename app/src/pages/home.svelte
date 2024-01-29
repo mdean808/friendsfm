@@ -26,6 +26,7 @@
   import Genres from '../components/Genres.svelte';
   import Submissions from '../components/Submissions.svelte';
   import Tabs from '../components/Tabs.svelte';
+  import { App } from '@capacitor/app';
 
   // GLOBALS
   let loadingSubmission = false;
@@ -85,8 +86,18 @@
       loadingFriendSubmissions = false;
       appLoading.set(false);
     }
-    if ($friendSubmissions)
+    if ($friendSubmissions) {
       sortedFriendSubmissions = [...$friendSubmissions].sort(sortByDate);
+    }
+
+    // listener for loading w/ app state change
+    App.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) {
+        getSubmissionStatus();
+        loadGenres();
+        loadFriends(true);
+      }
+    });
   });
 
   onDestroy(() => {
@@ -158,7 +169,7 @@
         >
       {:else}
         <div class="h-full">
-          {#if $userSubmission}
+          {#if $userSubmission && Submissions && Genres}
             <div id="home" class="text-center w-full overflow-y-auto h-full">
               <div>
                 <Tabs

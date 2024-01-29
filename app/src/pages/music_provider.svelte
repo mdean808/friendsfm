@@ -10,6 +10,7 @@
     platform as osPlatform,
     getNewAuthToken,
     logout,
+    appLoading,
   } from '../store';
   import { goto } from '../lib/util';
   import { onMount } from 'svelte';
@@ -21,6 +22,7 @@
   let platform: MusicPlatform;
 
   onMount(async () => {
+    appLoading.set(false);
     if (!user.get().username) goto('/username');
   });
 

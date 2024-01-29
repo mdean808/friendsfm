@@ -1,7 +1,11 @@
 <script lang="ts">
-  import { FirebaseMessaging } from '@capacitor-firebase/messaging';
+  import {
+    FirebaseMessaging,
+    type Notification,
+  } from '@capacitor-firebase/messaging';
   import { SvelteToast } from '@zerodevx/svelte-toast';
   import { Capacitor } from '@capacitor/core';
+  import OSLogger from './plugins/OSLogger.ts'
 
   import Home from './pages/home.svelte';
   import NewUser from './pages/new_user.svelte';
@@ -34,6 +38,7 @@
     deepLink,
     loginState,
     getFriendSubmissions,
+    getSubmissionStatus,
     secondaryAppLoading,
   } from './store';
   import { errorToast, goto } from './lib/util';
@@ -63,65 +68,29 @@
   import { UserState } from './types';
   import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
   import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
+  import { writable } from 'svelte/store';
+
+  const dologin = writable(false);
 
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.data) return;
-    await getUserFromPreferences();
-    // handle routing for new notifications
-    const data = notif.data as { [key: string]: any };
-    await FirebaseAnalytics.logEvent({
-      name: 'notification_open',
-      params: {
-        title: notif.title,
-        body: notif.body,
-        subtitle: notif.subtitle,
-        id: data.id,
-        type: data.type,
-      },
-    });
-    if (data.type === 'request-create') {
-      await refreshUser();
-      goto('/friends');
-    } else if (data.type === 'daily') {
-      goto('/');
-    } else if (data.type === 'request-accept') {
-      await refreshUser();
-      goto('/friends');
-    } else if (data.type === 'comment') {
-      const subId = data.id;
-      const sub =
-        $friendSubmissions.find((s) => s.id === subId) ||
-        ($userSubmission.id === subId ? $userSubmission : null);
-      if (sub) {
-        activeSubmission.set(sub);
-        goto('/?submission');
-      } else {
-        errorToast('Error: Comment not found.');
-      }
-    } else if (data.type === 'late-submission') {
-      secondaryAppLoading.set(true);
-      const subId = data.id;
-      await getFriendSubmissions();
-      const sub =
-        $friendSubmissions.find((s) => s.id === subId) ||
-        ($userSubmission.id === subId ? $userSubmission : null);
-      if (sub) {
-        activeSubmission.set(sub);
-        goto('/?submission');
-      } else {
-        errorToast('Error: Submission not found.');
-      }
-      secondaryAppLoading.set(false);
+    if (!$dologin) {
+      dologin.subscribe((val) => {
+        if (val) {
+          handleNotif(notif);
+        }
+      });
+    } else {
+      handleNotif(notif);
     }
   });
 
   onMount(async () => {
     platform.set(Capacitor.getPlatform());
-    // check for spotify auth for web
 
-    // await initAppCheck();
     SplashScreen.hide();
 
+    // notification listners
     if (Capacitor.isPluginAvailable('FirebaseMessaging')) {
       FirebaseMessaging.addListener(
         'notificationActionPerformed',
@@ -130,12 +99,17 @@
         }
       );
     }
-    loading.set(false);
 
+    // wait for auth state change before continuing for web support
+    FirebaseAuthentication.addListener('authStateChange', doLogin);
+
+    // request messaging permissions
+    FirebaseMessaging.requestPermissions();
+
+    // margin init
     await getStatusBarHeight();
     await getInsets();
-    // request permissions
-    FirebaseMessaging.requestPermissions();
+
     // ionic init
     try {
       initialize();
@@ -158,30 +132,102 @@
     } catch (e) {
       console.log('ionic error:', e);
     }
+  });
+
+  const doLogin = async () => {
     // load user
     await getUserFromPreferences();
-    // wait for auth state change before continuing for web support
-    FirebaseAuthentication.addListener('authStateChange', async () => {
-      await getNewAuthToken();
-      if (!$loggedIn || !$user || Object.keys($user).length === 0) {
-        loggedIn.set(false);
-        loginState.set(UserState.unregistered);
-        return goto('/new_user');
-      }
+    await getNewAuthToken();
+    dologin.set(true);
+    if (!$loggedIn || !$user || Object.keys($user).length === 0) {
+      loggedIn.set(false);
+      loginState.set(UserState.unregistered);
+      return goto('/new_user');
+    }
 
-      if ($loginState === UserState.registered) {
-        // don't goto home if we have a deeplink
-        if (!$deepLink) goto('/');
-      } else if ($loginState === UserState.registeringUsername) {
-        goto('/username');
-      } else if ($loginState === UserState.registeringMusicPlatform) {
-        goto('/music_provider');
-      } else {
-        goto('/new_user');
-      }
-      appLoading.set(false);
+    if ($loginState === UserState.registered) {
+      // don't goto home if we have a deeplink
+      if (!$deepLink) return goto('/');
+    } else if ($loginState === UserState.registeringUsername) {
+      return goto('/username');
+    } else if ($loginState === UserState.registeringMusicPlatform) {
+      return goto('/music_provider');
+    } else {
+      return goto('/new_user');
+    }
+  };
+
+  const handleNotif = async (notif: Readonly<Notification>) => {
+    await getUserFromPreferences();
+    // handle routing for new notifications
+    const data = notif.data as { [key: string]: any };
+    await FirebaseAnalytics.logEvent({
+      name: 'notification_open',
+      params: {
+        title: notif.title,
+        body: notif.body,
+        subtitle: notif.subtitle,
+        id: data.id,
+        type: data.type,
+      },
     });
-  });
+    if (data.type === 'request-create') {
+      secondaryAppLoading.set(true);
+      await refreshUser();
+      goto('/friends');
+      secondaryAppLoading.set(false);
+    } else if (data.type === 'daily') {
+      goto('/');
+    } else if (data.type === 'request-accept') {
+      secondaryAppLoading.set(true);
+      await refreshUser();
+      goto('/friends');
+      secondaryAppLoading.set(false);
+    } else if (data.type === 'comment') {
+      secondaryAppLoading.set(true);
+      const subId = data.id;
+      const sub =
+        $friendSubmissions.find((s) => s.id === subId) ||
+        ($userSubmission.id === subId ? $userSubmission : null);
+      if (sub) {
+        activeSubmission.set(sub);
+        goto('/?submission');
+      } else {
+        await getFriendSubmissions();
+        await getSubmissionStatus();
+        const sub =
+          $friendSubmissions.find((s) => s.id === subId) ||
+          ($userSubmission.id === subId ? $userSubmission : null);
+        if (sub) {
+          activeSubmission.set(sub);
+          goto('/?submission');
+        } else {
+          errorToast('Error: Comment not found.');
+        }
+      }
+      secondaryAppLoading.set(false);
+    } else if (data.type === 'late-submission') {
+      secondaryAppLoading.set(true);
+      const subId = data.id;
+      await getFriendSubmissions();
+      await getSubmissionStatus();
+      // make sure we aren't trying to view submissions without sharing
+      if (!$userSubmission || !$userSubmission.song) {
+        secondaryAppLoading.set(false);
+        return;
+      }
+      const sub =
+        $friendSubmissions.find((s) => s.id === subId) ||
+        ($userSubmission.id === subId ? $userSubmission : null);
+      if (sub) {
+        activeSubmission.set(sub);
+        goto('/?submission');
+      } else {
+        errorToast('Error: Submission not found.');
+      }
+      secondaryAppLoading.set(false);
+    }
+  };
 </script>
 
 <!-- Navigation -->

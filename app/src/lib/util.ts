@@ -1,7 +1,7 @@
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
-import { currPath, prevPath } from '../store';
+import { currPath, platform, prevPath } from '../store';
 import * as Sentry from '@sentry/capacitor';
 
 export const goto = (url: string) => {
@@ -15,6 +15,7 @@ export const goto = (url: string) => {
 };
 
 export const registerForNotifications = async () => {
+  if (platform.get() === 'web') return;
   try {
     await FirebaseMessaging.checkPermissions().catch(
       async () => await FirebaseMessaging.requestPermissions()

@@ -4,9 +4,14 @@
   import Input from '../components/Input.svelte';
   import { goto } from '../lib/util';
 
-  import { updateUsername, loading, user } from '../store';
+  import { updateUsername, loading, user, appLoading } from '../store';
+  import { onMount } from 'svelte';
 
   let username: string;
+
+  onMount(() => {
+    appLoading.set(false);
+  });
 
   const setUsername = async () => {
     if (!username) return;
