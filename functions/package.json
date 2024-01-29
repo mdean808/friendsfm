@@ -3,7 +3,7 @@
   "scripts": {
     "build": "tsc && tsc-alias",
     "watch": "tsc --watch",
-    "serve": "yarn build && firebase emulators:start --import=./data --export-on-exit",
+    "serve": "yarn build && firebase emulators:start --import=./data --export-on-exit=./data",
     "shell": "yarn build && firebase functions:shell",
     "start": "yarn shell",
     "deploy": "COMMIT=$(git rev-parse HEAD) firebase deploy --only functions",
