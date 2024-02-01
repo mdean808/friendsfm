@@ -9,20 +9,19 @@ module.exports = {
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/typescript',
-    'google',
     'plugin:@typescript-eslint/recommended',
     'plugin:svelte/prettier',
     'prettier',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: ['tsconfig.json', 'tsconfig.dev.json'],
+    project: ['tsconfig.json', 'tsconfig.node.json'],
     sourceType: 'module',
   },
   ignorePatterns: [
     '/dist/**/*', // Ignore built files.
-    '/functions/**/*', // Ignore backend files.
     '/ios/**/*', // Ignore ios files.
+    '/android/**/*', // Ignore android files.
   ],
   plugins: ['@typescript-eslint', 'import'],
   rules: {

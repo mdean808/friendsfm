@@ -3,8 +3,10 @@
     FirebaseMessaging,
     type Notification,
   } from '@capacitor-firebase/messaging';
+
   import { SvelteToast } from '@zerodevx/svelte-toast';
   import { Capacitor } from '@capacitor/core';
+  import { onMount } from 'svelte';
 
   import Home from './pages/home.svelte';
   import NewUser from './pages/new_user.svelte';
@@ -14,7 +16,6 @@
   import Username from './pages/username.svelte';
   import MusicProvider from './pages/music_provider.svelte';
   import Settings from './pages/settings.svelte';
-  import { onMount } from 'svelte';
 
   import {
     user,
@@ -26,7 +27,6 @@
     getNewAuthToken,
     getUserFromPreferences,
     loggedIn,
-    prevPath,
     notificationAction,
     refreshUser,
     appLoading,
@@ -44,7 +44,7 @@
   import { errorToast, goto } from './lib/util';
   import Loading from './components/Loading.svelte';
   import Friends from './pages/friends.svelte';
-  import { fade, fly } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
   import TopNav from './components/TopNav.svelte';
   import BottomNav from './components/BottomNav.svelte';
   import PasteAudial from './pages/paste_audial.svelte';
@@ -177,6 +177,10 @@
       goto('/friends');
       secondaryAppLoading.set(false);
     } else if (data.type === 'daily') {
+      secondaryAppLoading.set(true);
+      await getSubmissionStatus();
+      secondaryAppLoading.set(false);
+
       goto('/');
     } else if (data.type === 'request-accept') {
       secondaryAppLoading.set(true);
@@ -185,7 +189,7 @@
       secondaryAppLoading.set(false);
     } else if (data.type === 'comment') {
       //todo: show submission loading instead
-      submissionLoading.set(true)
+      submissionLoading.set(true);
       const subId = data.id;
       const sub =
         $friendSubmissions.find((s) => s.id === subId) ||
@@ -206,7 +210,7 @@
           errorToast('Error: Comment not found.');
         }
       }
-      submissionLoading.set(false)
+      submissionLoading.set(false);
     } else if (data.type === 'late-submission') {
       submissionLoading.set(true);
       const subId = data.id;
@@ -324,7 +328,7 @@
           <Home />
         </div>
       {:else if $currPath === '/songs'}
-        <div class="h-full" >
+        <div class="h-full">
           <Songs />
         </div>
         <!--{:else if $currPath === '/audial'}
@@ -333,7 +337,7 @@
         <!-- </div>
         -->
       {:else if $currPath === '/private_profile'}
-        <div class="h-full"        >
+        <div class="h-full">
           <PrivateProfile />
         </div>
       {:else if $currPath === '/new_user'}
