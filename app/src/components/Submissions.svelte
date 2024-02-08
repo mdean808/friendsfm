@@ -14,6 +14,7 @@
 
   export let loadingSubmission: boolean;
   export let loadingFriendSubmissions: boolean;
+  export let loadingNewLateSubmission: boolean;
   export let sortedFriendSubmissions: SubmissionType[];
 
   const sortByDate = (a: SubmissionType, b: SubmissionType) => {
@@ -35,6 +36,12 @@
     <SkeletonSubmission />
     <SkeletonSubmission />
   {:else if !loadingFriendSubmissions}
+    {#if loadingNewLateSubmission} 
+      
+      <div class="my-2">
+        <SkeletonSubmission />
+      </div>
+    {/if}
     {#each sortedFriendSubmissions.sort(sortByDate) as submission}
       <div class="my-2">
         <Submission data={submission} />
@@ -68,6 +75,7 @@
       {/if}
     {:else}
       <p
+
         on:keyup={createSubmissionsPlaylist}
         on:click={createSubmissionsPlaylist}
         class="mx-auto text-center mt-3 text-gray-300 opacity-70 underline"

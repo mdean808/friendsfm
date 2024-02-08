@@ -5,64 +5,64 @@ PODS:
   - AppAuth/Core (1.6.2)
   - AppAuth/ExternalUserAgent (1.6.2):
     - AppAuth/Core
-  - Capacitor (5.2.2):
+  - Capacitor (5.6.0):
     - CapacitorCordova
-  - CapacitorApp (5.0.6):
+  - CapacitorApp (5.0.7):
     - Capacitor
-  - CapacitorBrowser (5.0.6):
+  - CapacitorBrowser (5.2.0):
     - Capacitor
-  - CapacitorClipboard (5.0.6):
+  - CapacitorClipboard (5.0.7):
     - Capacitor
-  - CapacitorCordova (5.2.2)
-  - CapacitorDevice (5.0.6):
+  - CapacitorCordova (5.6.0)
+  - CapacitorDevice (5.0.7):
     - Capacitor
-  - CapacitorDialog (5.0.6):
+  - CapacitorDialog (5.0.7):
     - Capacitor
-  - CapacitorFirebaseAnalytics (5.1.0):
+  - CapacitorFirebaseAnalytics (5.4.0):
     - Capacitor
-    - CapacitorFirebaseAnalytics/Lite (= 5.1.0)
-  - CapacitorFirebaseAnalytics/Analytics (5.1.0):
+    - CapacitorFirebaseAnalytics/Lite (= 5.4.0)
+  - CapacitorFirebaseAnalytics/Analytics (5.4.0):
     - Capacitor
-    - FirebaseAnalytics (= 10.8.0)
-  - CapacitorFirebaseAnalytics/Lite (5.1.0):
+    - FirebaseAnalytics (~> 10.8)
+  - CapacitorFirebaseAnalytics/Lite (5.4.0):
     - Capacitor
-  - CapacitorFirebaseAppCheck (5.1.0):
+  - CapacitorFirebaseAppCheck (5.4.0):
     - Capacitor
-    - FirebaseAppCheck (= 10.8.0)
-  - CapacitorFirebaseAuthentication (5.1.0):
+    - FirebaseAppCheck (~> 10.8)
+  - CapacitorFirebaseAuthentication (5.4.0):
     - Capacitor
-    - CapacitorFirebaseAuthentication/Lite (= 5.1.0)
-    - FirebaseAuth (= 10.8.0)
-  - CapacitorFirebaseAuthentication/Google (5.1.0):
+    - CapacitorFirebaseAuthentication/Lite (= 5.4.0)
+    - FirebaseAuth (~> 10.8)
+  - CapacitorFirebaseAuthentication/Google (5.4.0):
     - Capacitor
-    - FirebaseAuth (= 10.8.0)
+    - FirebaseAuth (~> 10.8)
     - GoogleSignIn (= 7.0.0)
-  - CapacitorFirebaseAuthentication/Lite (5.1.0):
+  - CapacitorFirebaseAuthentication/Lite (5.4.0):
     - Capacitor
-    - FirebaseAuth (= 10.8.0)
-  - CapacitorFirebaseCrashlytics (5.1.0):
+    - FirebaseAuth (~> 10.8)
+  - CapacitorFirebaseCrashlytics (5.4.0):
     - Capacitor
-    - FirebaseCrashlytics (= 10.8.0)
-  - CapacitorFirebaseMessaging (5.1.0):
+    - FirebaseCrashlytics (~> 10.8)
+  - CapacitorFirebaseMessaging (5.4.0):
     - Capacitor
-    - FirebaseMessaging (= 10.8.0)
-  - CapacitorGeolocation (5.0.6):
+    - FirebaseMessaging (~> 10.8)
+  - CapacitorGeolocation (5.0.7):
     - Capacitor
-  - CapacitorKeyboard (5.0.6):
+  - CapacitorKeyboard (5.0.8):
     - Capacitor
   - CapacitorNativeSettings (5.0.1):
     - Capacitor
-  - CapacitorPluginSafeArea (2.0.5):
+  - CapacitorPluginSafeArea (2.0.6):
     - Capacitor
-  - CapacitorPreferences (5.0.6):
+  - CapacitorPreferences (5.0.7):
     - Capacitor
-  - CapacitorShare (5.0.6):
+  - CapacitorShare (5.0.7):
     - Capacitor
-  - CapacitorSplashScreen (5.0.6):
+  - CapacitorSplashScreen (5.0.7):
     - Capacitor
-  - CapacitorStatusBar (5.0.6):
+  - CapacitorStatusBar (5.0.7):
     - Capacitor
-  - CapgoNativegeocoder (1.0.10):
+  - CapgoNativegeocoder (1.0.20):
     - Capacitor
   - Firebase (10.8.0):
     - Firebase/Core (= 10.8.0)
@@ -218,12 +218,12 @@ PODS:
   - PromisesObjC (2.2.0)
   - PromisesSwift (2.2.0):
     - PromisesObjC (= 2.2.0)
-  - Sentry/HybridSDK (8.8.0):
-    - SentryPrivate (= 8.8.0)
-  - SentryCapacitor (0.15.0):
+  - Sentry/HybridSDK (8.18.0):
+    - SentryPrivate (= 8.18.0)
+  - SentryCapacitor (0.15.1):
     - Capacitor
-    - Sentry/HybridSDK (= 8.8.0)
-  - SentryPrivate (8.8.0)
+    - Sentry/HybridSDK (= 8.18.0)
+  - SentryPrivate (8.18.0)
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
@@ -339,27 +339,27 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   AppAuth: 3bb1d1cd9340bd09f5ed189fb00b1cc28e1e8570
-  Capacitor: 070b18988e0f566728ae9a5eb3a7a974595f1626
-  CapacitorApp: 024e1b1bea5f883d79f6330d309bc441c88ad04a
-  CapacitorBrowser: 6192948e0ce804fd72aaf77f4114a3ad2e08c760
-  CapacitorClipboard: 77edf49827ea21da2a9c05c690a4a6a4d07199c4
-  CapacitorCordova: 3773395d5331add072300ff6041ca2cf7b93cb0b
-  CapacitorDevice: 2c968f98a1ec4d22357418c1521e7ddc46c675e6
-  CapacitorDialog: 0f3c15dfe9414b83bc64aef4078f1b92bcfead26
-  CapacitorFirebaseAnalytics: 8e42f3392e19f4331e21be373f4520412487bb69
-  CapacitorFirebaseAppCheck: f3ee09932a833c0d2a5e7cf2aa2bbdaaefecf824
-  CapacitorFirebaseAuthentication: a90743b8923b81945c4b5c772b95de1f9c50820f
-  CapacitorFirebaseCrashlytics: 65b525728268133c68f49567f95eb94320f32140
-  CapacitorFirebaseMessaging: 6e50f2fbddc6056ba864015e0b46a5f3c3477d3d
-  CapacitorGeolocation: 7be5f77abc205c0efe319fff8587a7183e7b0240
-  CapacitorKeyboard: b978154b024a5f65e044908e37d15b7de58b9d12
+  Capacitor: ebfc16cdb8116d04c101686b080342872da42d43
+  CapacitorApp: 17fecd0e6cb23feafac7eb0939417389038b0979
+  CapacitorBrowser: a6deae9e5bf87f62b62a753cff7992c5def9e771
+  CapacitorClipboard: 45e5e25f2271f98712985d422776cdc5a779cca1
+  CapacitorCordova: 931b48fcdbc9bc985fc2f16cec9f77c794a27729
+  CapacitorDevice: fc91bdb484dc0e70755e9b621cd557afe642613a
+  CapacitorDialog: ea1beaccb7f825191aa18b72cba8981b881b3b2d
+  CapacitorFirebaseAnalytics: 7f6190fba37be5997caedaac402f76be2f740e39
+  CapacitorFirebaseAppCheck: 33df3ec806a230b40b34e27ab9dcd81052edb6b1
+  CapacitorFirebaseAuthentication: 64eaf9727b8f29f84069595ddc239c8e5365f49a
+  CapacitorFirebaseCrashlytics: d0a9e0408cd3ef56c7f9eb56e23808a8e726e973
+  CapacitorFirebaseMessaging: e10400f4306d67738057ced4e622f35a463ae3d8
+  CapacitorGeolocation: 918a292459542bcce98433f9e7c7909f8c72838a
+  CapacitorKeyboard: aec619a578235c6ce279075009a2689c2cf5c42c
   CapacitorNativeSettings: 6e94ed3c0465206756f320df18efc52f053ce3c7
-  CapacitorPluginSafeArea: bfdd714827dbd89fb44fea286beec996e1b0c5c4
-  CapacitorPreferences: f03954bcb0ff09c792909e46bff88e3183c16b10
-  CapacitorShare: cd41743331cb71d217c029de54b681cbd91e0fcc
-  CapacitorSplashScreen: 5fa2ab5e46cf5cc530cf16a51c80c7a986579ccd
-  CapacitorStatusBar: 565c0a1ebd79bb40d797606a8992b4a105885309
-  CapgoNativegeocoder: 3a04ddfdf836526efbd28abb691e3919d202bb04
+  CapacitorPluginSafeArea: d55e4d4e70c98f611240f11dd80561438d0d70cb
+  CapacitorPreferences: 77ac427e98db83bace772455f8ba447430382c4c
+  CapacitorShare: c6a1ebbf0114ff9e863b966cd6052678fa25d480
+  CapacitorSplashScreen: dd3de3f3644710fa2a697cfb91ec262eece4d242
+  CapacitorStatusBar: f390fbb49b82ffb754ea4b3cf71dc8b048baf3e7
+  CapgoNativegeocoder: 25db7bd5770306e80968da512c30f8caf54c25c9
   Firebase: b49ef44e5ec9a3d0c1f6450f410337e97872279c
   FirebaseABTesting: 09c328e6a86d562b4e1146c8a9073deadc566b77
   FirebaseAnalytics: e1fc758bd5d71823bba970c076abee4b2450a5f4
@@ -385,10 +385,10 @@ SPEC CHECKSUMS:
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
   PromisesObjC: 09985d6d70fbe7878040aa746d78236e6946d2ef
   PromisesSwift: cf9eb58666a43bbe007302226e510b16c1e10959
-  Sentry: 927dfb29d18a14d924229a59cc2ad149f43349f2
-  SentryCapacitor: 87ad38b15cd1ffb0ca8f202af148567adfa68ae1
-  SentryPrivate: 4350d865f898224ab9fa02b37d6ee7fbb623f47e
+  Sentry: 8984a4ffb2b9bd2894d74fb36e6f5833865bc18e
+  SentryCapacitor: 5c27da09956d89b0ba715071f6a37c137d9aea50
+  SentryPrivate: 2f0c9ba4c3fc993f70eab6ca95673509561e0085
 
 PODFILE CHECKSUM: eec09a25cbf7d6cc0d1f09c7ed7808a835874ddc
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.15.0

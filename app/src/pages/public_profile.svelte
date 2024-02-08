@@ -22,6 +22,7 @@
   import { goto } from '../lib/util';
 
   let profile: User['profile'];
+  const firstOfTheMonth = new Date().getDate() === 1;
 
   onMount(async () => {
     loading.set(true);
@@ -154,7 +155,22 @@
         <h1 class={`font-semibold text-xl`}>favorites</h1>
         <div class="grid grid-cols-3 py-2">
           <div>
-            {#if profile?.favorites?.song}
+            {#if firstOfTheMonth}
+              <a
+                target="_blank"
+                href={$user.musicPlatform === MusicPlatform.spotify
+                  ? 'https://open.spotify.com/track/29TPjc8wxfz4XMn21O7VsZ?si=a3f5cfd803754ea6'
+                  : 'https://music.apple.com/album/sky/1546163603?i=1546163990'}
+              >
+                <img
+                  alt="Song Artwork"
+                  class="w-20 h-20 mx-auto"
+                  src="https://upload.wikimedia.org/wikipedia/en/6/6c/Playboi_Carti_-_Whole_Lotta_Red.png"
+                />
+              </a>
+              <p class="mt-1 text-sm">Sky</p>
+              <p class="mt-1 text-sm text-gray-400">Playboi Carti</p>
+            {:else if profile?.favorites?.song}
               <a
                 target="_blank"
                 href={profile.favorites.song.url}
@@ -317,6 +333,7 @@
           </a>
           <div class="flex-grow-0 flex-shrink">
             <svg
+              role="presentation"
               on:click={() => toggleSong(profile.stats.topSong)}
               on:keypress={() => toggleSong(profile.stats.topSong)}
               class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${

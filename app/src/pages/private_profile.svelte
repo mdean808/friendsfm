@@ -108,6 +108,7 @@
             />
             {#if $editingProfile}
               <div
+              role="presentation"
                 transition:fade={{ duration: 100 }}
                 on:click={(e) => {
                   e.preventDefault();
@@ -145,6 +146,7 @@
             />
             {#if $editingProfile}
               <div
+              role="presentation"
                 transition:fade={{ duration: 100 }}
                 on:click={(e) => {
                   e.preventDefault();
@@ -177,6 +179,7 @@
           </p>
         {:else}
           <div
+              role="presentation"
             class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
             on:click={() => {
               searchType.set('track');
@@ -216,6 +219,7 @@
             />
             {#if $editingProfile}
               <div
+              role="presentation"
                 transition:fade={{ duration: 100 }}
                 on:click={(e) => {
                   e.preventDefault();
@@ -248,6 +252,7 @@
           </p>
         {:else}
           <div
+              role="presentation"
             class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
             on:click={() => {
               searchType.set('album');
@@ -287,6 +292,7 @@
             />
             {#if $editingProfile}
               <div
+              role="presentation"
                 transition:fade={{ duration: 100 }}
                 on:click={() => {
                   searchType.set('artist');
@@ -314,6 +320,7 @@
           <p class="text-sm mt-1">{$user.profile.favorites.artist.name}</p>
         {:else}
           <div
+              role="presentation"
             class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
             on:click={() => {
               searchType.set('artist');
@@ -385,6 +392,7 @@
       </a>
       <div class="flex-grow-0 flex-shrink">
         <svg
+              role="presentation"
           on:click={() => toggleSong($userStatistics.topSong)}
           on:keypress={() => toggleSong($userStatistics.topSong)}
           class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
@@ -411,6 +419,8 @@
   {/if}
 
   <p
+
+              role="presentation"
     on:keyup={() =>
       Share.share({
         url:

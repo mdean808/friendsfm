@@ -3,19 +3,16 @@
     FirebaseMessaging,
     type Notification,
   } from '@capacitor-firebase/messaging';
-
   import { SvelteToast } from '@zerodevx/svelte-toast';
   import { Capacitor } from '@capacitor/core';
+  import { SplashScreen } from '@capacitor/splash-screen';
+  import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+  import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
+  import { writable } from 'svelte/store';
+
   import { onMount } from 'svelte';
 
-  import Home from './pages/home.svelte';
-  import NewUser from './pages/new_user.svelte';
-  import Songs from './pages/songs.svelte';
-  import SubmissionLoadingPage from './pages/submission_loading.svelte';
-  import PrivateProfile from './pages/private_profile.svelte';
-  import Username from './pages/username.svelte';
-  import MusicProvider from './pages/music_provider.svelte';
-  import Settings from './pages/settings.svelte';
+  import { fade } from 'svelte/transition';
 
   import {
     user,
@@ -41,15 +38,29 @@
     secondaryAppLoading,
     submissionLoading,
   } from './store';
+
   import { errorToast, goto } from './lib/util';
+  import { UserState } from './types';
+
   import Loading from './components/Loading.svelte';
   import Friends from './pages/friends.svelte';
-  import { fade } from 'svelte/transition';
   import TopNav from './components/TopNav.svelte';
   import BottomNav from './components/BottomNav.svelte';
   import PasteAudial from './pages/paste_audial.svelte';
-  import { SplashScreen } from '@capacitor/splash-screen';
   import AnimatedSplashScreen from './components/AnimatedSplashScreen.svelte';
+  import Home from './pages/home.svelte';
+  import NewUser from './pages/new_user.svelte';
+  import Songs from './pages/songs.svelte';
+  import SubmissionLoadingPage from './pages/submission_loading.svelte';
+  import PrivateProfile from './pages/private_profile.svelte';
+  import Username from './pages/username.svelte';
+  import MusicProvider from './pages/music_provider.svelte';
+  import Settings from './pages/settings.svelte';
+  import About from './pages/about.svelte';
+  import Submission from './pages/submission.svelte';
+  import SearchMusicPlatform from './pages/search_music_platform.svelte';
+  import PublicProfile from './pages/public_profile.svelte';
+  import ModalPageWrapper from './components/ModalPageWrapper.svelte';
 
   // IONIC SETUP
   import { initialize } from '@ionic/core/components';
@@ -60,15 +71,6 @@
   import { IonSpinner } from '@ionic/core/components/ion-spinner';
   import { IonApp } from '@ionic/core/components/ion-app';
   import { IonContent } from '@ionic/core/components/ion-content';
-  import About from './pages/about.svelte';
-  import Submission from './pages/submission.svelte';
-  import SearchMusicPlatform from './pages/search_music_platform.svelte';
-  import PublicProfile from './pages/public_profile.svelte';
-  import ModalPageWrapper from './components/ModalPageWrapper.svelte';
-  import { UserState } from './types';
-  import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
-  import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
-  import { writable } from 'svelte/store';
 
   const dologin = writable(false);
 
@@ -81,14 +83,14 @@
         }
       });
     } else {
-      handleNotif(notif);
+      await handleNotif(notif);
     }
   });
 
   onMount(async () => {
     platform.set(Capacitor.getPlatform());
 
-    SplashScreen.hide();
+    await SplashScreen.hide();
 
     // notification listners
     if (Capacitor.isPluginAvailable('FirebaseMessaging')) {
@@ -180,7 +182,6 @@
       secondaryAppLoading.set(true);
       await getSubmissionStatus();
       secondaryAppLoading.set(false);
-
       goto('/');
     } else if (data.type === 'request-accept') {
       secondaryAppLoading.set(true);
@@ -188,7 +189,6 @@
       goto('/friends');
       secondaryAppLoading.set(false);
     } else if (data.type === 'comment') {
-      //todo: show submission loading instead
       submissionLoading.set(true);
       const subId = data.id;
       const sub =
@@ -210,27 +210,19 @@
           errorToast('Error: Comment not found.');
         }
       }
+
       submissionLoading.set(false);
     } else if (data.type === 'late-submission') {
-      submissionLoading.set(true);
-      const subId = data.id;
-      await getFriendSubmissions();
+      // todo: don't show this if app launched from background
+      secondaryAppLoading.set(true);
       await getSubmissionStatus();
       // make sure we aren't trying to view submissions without sharing
       if (!$userSubmission || !$userSubmission.song) {
         submissionLoading.set(false);
         return;
       }
-      const sub =
-        $friendSubmissions.find((s) => s.id === subId) ||
-        ($userSubmission.id === subId ? $userSubmission : null);
-      if (sub) {
-        activeSubmission.set(sub);
-        goto('/?submission');
-      } else {
-        errorToast('Error: Submission not found.');
-      }
-      submissionLoading.set(false);
+      goto('/');
+      secondaryAppLoading.set(false);
     }
   };
 </script>
@@ -332,9 +324,9 @@
           <Songs />
         </div>
         <!--{:else if $currPath === '/audial'}
-        <!--<div in:fly={{ x: document.body.clientWidth }}>
-        <!--  <Audial />
-        <!-- </div>
+        <div in:fly={{ x: document.body.clientWidth }}>
+        <Audial />
+        </div>
         -->
       {:else if $currPath === '/private_profile'}
         <div class="h-full">
@@ -370,3 +362,4 @@
   <span class="bg-apple-music" />
   <span class="border-apple-music" />
 </div>
+

@@ -8,7 +8,6 @@
     getSubmissionStatus,
     getFriendSubmissions,
     homepageLoaded,
-    notificationAction,
     appLoading,
     getNearbySubmissions,
     getUserStatistics,
@@ -16,7 +15,9 @@
     loginState,
     logout,
     activeHomeTab,
+    notificationAction,
   } from '../store';
+
   import Button from '../components/Button.svelte';
   import SkeletonSubmission from '../components/submission/Skeleton.svelte';
   import type { IonRefresher } from '@ionic/core/components/ion-refresher';
@@ -33,28 +34,11 @@
   let loadingFriendSubmissions = false;
   let sortedFriendSubmissions: SubmissionType[] = [];
   let loadingGenres = false;
-
-  notificationAction.subscribe(async (notif) => {
-    if (!notif || !notif.data) return;
-    const data: { [key: string]: any } = notif.data;
-    switch (data.type) {
-      case 'daily':
-        if ($loginState === UserState.registered) load();
-        break;
-      case 'late-submission':
-        if ($loginState === UserState.registered) loadFriends();
-        break;
-      default:
-        break;
-    }
-  });
+  let loadingNewLateSubmission = false;
 
   friendSubmissions.listen((val) => {
     if (val) sortedFriendSubmissions = [...val].sort(sortByDate);
   });
-
-  // from siper/element/bundle
-  // register();
 
   onMount(async () => {
     header.set('');
@@ -72,6 +56,15 @@
 
     if ($loginState !== UserState.registered) return logout();
     getUserStatistics();
+    // check previous notification for notification-based state
+    const notifData = $notificationAction.data as { [key: string]: any };
+    if (notifData && notifData.type === 'late-submission') {
+      (async () => {
+        loadingNewLateSubmission = true;
+        await loadFriends(true);
+        loadingNewLateSubmission = false;
+      })();
+    }
     if (
       (!userSubmission.get() || !Object.keys(userSubmission.get())?.length) &&
       !homepageLoaded.get()
@@ -184,6 +177,7 @@
                         loadingSubmission,
                         loadingFriendSubmissions,
                         sortedFriendSubmissions,
+                        loadingNewLateSubmission,
                       },
                     },
                     { name: 'nearby', id: 'genres', component: Genres },
