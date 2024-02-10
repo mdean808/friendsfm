@@ -5,6 +5,7 @@
     friendSubmissions,
     user,
     createSubmissionsPlaylist,
+    singleSubmissionLoading,
   } from '../store';
   import { goto } from '../lib/util';
   import { MusicPlatform, type Submission as SubmissionType } from '../types';
@@ -14,7 +15,6 @@
 
   export let loadingSubmission: boolean;
   export let loadingFriendSubmissions: boolean;
-  export let loadingNewLateSubmission: boolean;
   export let sortedFriendSubmissions: SubmissionType[];
 
   const sortByDate = (a: SubmissionType, b: SubmissionType) => {
@@ -36,8 +36,7 @@
     <SkeletonSubmission />
     <SkeletonSubmission />
   {:else if !loadingFriendSubmissions}
-    {#if loadingNewLateSubmission} 
-      
+    {#if $singleSubmissionLoading} 
       <div class="my-2">
         <SkeletonSubmission />
       </div>

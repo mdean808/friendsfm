@@ -100,10 +100,6 @@ export const getSubmissionStatus = action(
       return false;
     }
     if (json.message.user) store.set(json.message.user as Submission);
-    // await Preferences.set({
-    //   key: 'submission',
-    //   value: JSON.stringify(userSubmission.get() || {}),
-    // });
   }
 );
 
@@ -341,3 +337,28 @@ export const deleteCommentFromSubmission = action(
     if (sub.id === userSubmission.get().id) userSubmission.set(json.message);
   }
 );
+
+
+export const getSubmissionById = action(
+  activeSubmission,
+  'get-submission-by-id',
+  async (store, id: string) => {
+    await getNewAuthToken();
+    const res = await fetch(getFirebaseUrl('getsubmissionbyid'), {
+      method: 'POST',
+      body: JSON.stringify({
+        id,
+        authToken: authToken.get(),
+      }),
+      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+    });
+    const json = await handleApiResponse(res);
+    if (!json) {
+      // failed to set new music platform
+      return false;
+    }
+    store.set(json.message as Submission);
+    return json.message as Submission
+  }
+);
+

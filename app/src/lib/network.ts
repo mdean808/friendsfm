@@ -41,7 +41,7 @@ export const handleApiResponse = async (res: Response) => {
     console.log('ERROR:', json, res.url);
     eventParams.message = json.message;
     eventParams.error = json.error;
-    if (json.message === 'User does not exist.') {
+    if (json.message === 'User does not exist.' || json.error?.includes('Firebase ID token has been revoked')) {
       logout();
       goto('/new_user');
     } else if (
@@ -51,7 +51,7 @@ export const handleApiResponse = async (res: Response) => {
       await getNewAuthToken();
     } else if (
       json.message.includes('Spotify 403 Forbidden') ||
-      json.message.includes('Spotify now playing error. 401') ||
+      json.message.includes('Spotify now playing error.') ||
       json.message.includes('Spotify token refresh error')
     ) {
       const { value } = await Dialog.confirm({
@@ -67,13 +67,11 @@ export const handleApiResponse = async (res: Response) => {
             spotifySet = true;
           }
         });
-        const spotifyUrl = `https://accounts.spotify.com/authorize?client_id=${
-          import.meta.env.VITE_SPOTIFY_CLIENT_ID
-        }&response_type=code&redirect_uri=${
-          platform.get() === 'web'
+        const spotifyUrl = `https://accounts.spotify.com/authorize?client_id=${import.meta.env.VITE_SPOTIFY_CLIENT_ID
+          }&response_type=code&redirect_uri=${platform.get() === 'web'
             ? import.meta.env.VITE_SPOTIFY_REDIRECT_URL_WEB
             : import.meta.env.VITE_SPOTIFY_REDIRECT_URL
-        }&scope=user-read-currently-playing%20user-read-recently-played%20playlist-modify-private%20playlist-modify-public`;
+          }&scope=user-read-currently-playing%20user-read-recently-played%20playlist-modify-private%20playlist-modify-public`;
         window.location.href = spotifyUrl;
       }
     } else {

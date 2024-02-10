@@ -13,12 +13,15 @@ export const header = atom<string>('');
 
 export const appLoading = atom<boolean>(true);
 export const secondaryAppLoading = atom<boolean>(false);
+export const singleSubmissionLoading = atom<boolean>(false);
 
 export const submissionLoading = atom<boolean>(false);
 
 export const activeHomeTab = atom<'submissions' | 'genres'>('submissions');
 
 export const homepageLoaded = atom<boolean>(false);
+
+export const launchStatus = atom<'background' | 'fresh'>('fresh');
 
 export const deepLink = atom<boolean>(false);
 

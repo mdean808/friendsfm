@@ -16,6 +16,7 @@
     logout,
     activeHomeTab,
     notificationAction,
+    launchStatus,
   } from '../store';
 
   import Button from '../components/Button.svelte';
@@ -177,7 +178,6 @@
                         loadingSubmission,
                         loadingFriendSubmissions,
                         sortedFriendSubmissions,
-                        loadingNewLateSubmission,
                       },
                     },
                     { name: 'nearby', id: 'genres', component: Genres },

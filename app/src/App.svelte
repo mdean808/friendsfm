@@ -8,11 +8,12 @@
   import { SplashScreen } from '@capacitor/splash-screen';
   import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
   import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
+  import { App } from '@capacitor/app';
   import { writable } from 'svelte/store';
 
   import { onMount } from 'svelte';
 
-  import { fade } from 'svelte/transition';
+  import { fade, scale } from 'svelte/transition';
 
   import {
     user,
@@ -28,7 +29,7 @@
     refreshUser,
     appLoading,
     platform,
-    friendSubmissions,
+    getSubmissionById,
     userSubmission,
     activeSubmission,
     deepLink,
@@ -37,6 +38,8 @@
     getSubmissionStatus,
     secondaryAppLoading,
     submissionLoading,
+    launchStatus,
+    singleSubmissionLoading,
   } from './store';
 
   import { errorToast, goto } from './lib/util';
@@ -111,6 +114,17 @@
     // margin init
     await getStatusBarHeight();
     await getInsets();
+    
+    // status init
+    App.addListener('appStateChange', ({ isActive }) => {
+      console.log("STATE", isActive)
+      if (isActive) {
+        launchStatus.set('background');
+      } else {
+        launchStatus.set('fresh');
+      }
+    });
+
 
     // ionic init
     try {
@@ -181,51 +195,43 @@
     } else if (data.type === 'daily') {
       secondaryAppLoading.set(true);
       await getSubmissionStatus();
-      secondaryAppLoading.set(false);
       goto('/');
+      appLoading.set(false);
+      secondaryAppLoading.set(false);
     } else if (data.type === 'request-accept') {
       secondaryAppLoading.set(true);
       await refreshUser();
       goto('/friends');
       secondaryAppLoading.set(false);
     } else if (data.type === 'comment') {
+      appLoading.set(false);
       submissionLoading.set(true);
       const subId = data.id;
-      const sub =
-        $friendSubmissions.find((s) => s.id === subId) ||
-        ($userSubmission.id === subId ? $userSubmission : null);
+      const sub = await getSubmissionById(subId)
       if (sub) {
         activeSubmission.set(sub);
         goto('/?submission');
       } else {
-        await getFriendSubmissions();
-        await getSubmissionStatus();
-        const sub =
-          $friendSubmissions.find((s) => s.id === subId) ||
-          ($userSubmission.id === subId ? $userSubmission : null);
-        if (sub) {
-          activeSubmission.set(sub);
-          goto('/?submission');
-        } else {
-          errorToast('Error: Comment not found.');
-        }
+        errorToast('Error: Submission not found.');
       }
-
       submissionLoading.set(false);
     } else if (data.type === 'late-submission') {
-      // todo: don't show this if app launched from background
-      secondaryAppLoading.set(true);
-      await getSubmissionStatus();
-      // make sure we aren't trying to view submissions without sharing
-      if (!$userSubmission || !$userSubmission.song) {
-        submissionLoading.set(false);
-        return;
+      if ($launchStatus === 'fresh') secondaryAppLoading.set(true);
+
+      if ($userSubmission && $userSubmission.song) {
+        singleSubmissionLoading.set(true);
+        appLoading.set(false);
+        secondaryAppLoading.set(false);
+        goto('/');
+        await getSubmissionStatus();
+        await getFriendSubmissions();
+        singleSubmissionLoading.set(false);
       }
-      goto('/');
-      secondaryAppLoading.set(false);
+      if ($launchStatus === 'fresh') secondaryAppLoading.set(false);
     }
   };
 </script>
+
 
 <!-- Navigation -->
 <svelte:head>
@@ -254,7 +260,7 @@
     <!-- START absolute positioning -->
 
     <!-- put the toast double the height of the bottom nav -->
-    <div class="absolute" style={`bottom: ${55 + $insets.bottom}px; `}>
+    <div class="absolute z-50" style={`bottom: ${55 + $insets.bottom}px; `}>
       <SvelteToast
         options={{
           reversed: true,
@@ -278,7 +284,7 @@
     {/if}
 
     {#if $submissionLoading}
-      <div transition:fade={{ duration: 100 }}>
+      <div transition:scale>
         <SubmissionLoadingPage />
       </div>
     {/if}

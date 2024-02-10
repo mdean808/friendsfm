@@ -5,7 +5,7 @@
 
 <div
   style={`padding-top: ${0 + $insets.top}px`}
-  class="z-50 fixed top-0 left-0 w-full h-full bg-gray-800"
+  class="z-40 fixed top-0 left-0 w-full h-full bg-gray-800"
 >
   <div class="sticky top-0 w-full mx-auto">
     <div

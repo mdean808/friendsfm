@@ -51,7 +51,7 @@
   <div
     style={`padding-top: ${0 + $insets.top}px`}
     transition:scale
-    class="z-50 fixed top-0 left-0 w-full h-full bg-gray-800"
+    class="z-40 fixed top-0 left-0 w-full h-full bg-gray-800"
   >
     <div class="sticky top-0 w-full mx-auto">
       <div
@@ -236,7 +236,7 @@
       {/if}
       <div
         style={`height: calc(100vh - ${
-          $insets.bottom + (!focused ? 425 : 150)
+          $insets.bottom + (!focused ? 425 : 100)
         }px)`}
         class="overflow-y-scroll text-white border-t-white border-t-2 pt-2 mt-2 block"
       >
