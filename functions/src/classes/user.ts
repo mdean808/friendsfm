@@ -311,7 +311,6 @@ export default class User implements UserType {
   }
 
   public get exists(): boolean {
-    this.saveSong({} as SavedSong)
     return this.loaded;
   }
 
