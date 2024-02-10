@@ -11,6 +11,7 @@ export * from './submissions/setcurrentsubmissionaudialscore';
 export * from './submissions/createnewusersubmission';
 export * from './submissions/createsubmissionsplaylist';
 export * from './submissions/getsubmissionbynumber';
+export * from './submissions/getsubmissionbyid';
 export * from './users/getuser';
 export * from './users/getuserstatistics';
 export * from './users/setusername';
