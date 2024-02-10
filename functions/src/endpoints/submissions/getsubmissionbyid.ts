@@ -6,7 +6,7 @@ export const getsubmissionbyid = onRequest(
   { cors: true },
   authMiddleware(
     sentryWrapper('get-submission-by-id', async (req, res, user) => {
-      const id = JSON.parse(req.body).id;
+      const id = JSON.parse(req.body)?.id;
       if (!id) return res.status(400);
       const submission = new Submission(id);
       await submission.load();
