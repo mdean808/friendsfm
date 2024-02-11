@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  let message = 0;
+  let message = Math.floor(Math.random() * 9);
   onMount(async () => {
-    setInterval(() => (message = Math.floor(Math.random() * 5)), 1500);
+    setInterval(() => (message = Math.floor(Math.random() * 9)), 1500);
   });
 </script>
 
@@ -30,10 +30,20 @@
       {:else if message === 1}
         <p>creating new genres</p>
       {:else if message === 2}
-        <p>locating musical hotspots</p>
+        <p>strumming a guitar</p>
       {:else if message === 3}
-        <p>asking chat-gpt for help</p>
+        <p>locating musical hotspots</p>
       {:else if message === 4}
+        <p>uploading samples</p>
+      {:else if message === 5}
+        <p>asking chat-gpt for help</p>
+      {:else if message === 6}
+        <p>judging music tastes</p>
+      {:else if message === 7}
+        <p>waiting for the drop</p>
+      {:else if message === 8}
+        <p>looking up top-40 lists</p>
+      {:else if message === 9}
         <p>learning music theory</p>
       {/if}
     </div>
