@@ -96,10 +96,12 @@
       <div class="relative">
         {#if firstOfTheMonth}
           <a
-            target="_blank"
-            href={$user.musicPlatform === MusicPlatform.spotify
-              ? 'https://open.spotify.com/track/29TPjc8wxfz4XMn21O7VsZ?si=a3f5cfd803754ea6'
-              : 'https://music.apple.com/album/sky/1546163603?i=1546163990'}
+            target={!$editingProfile ? '_blank' : null}
+            href={!$editingProfile
+              ? $user.musicPlatform === MusicPlatform.spotify
+                ? 'https://open.spotify.com/track/29TPjc8wxfz4XMn21O7VsZ?si=a3f5cfd803754ea6'
+                : 'https://music.apple.com/album/sky/1546163603?i=1546163990'
+              : 'javascript: void(0)'}
           >
             <img
               alt="Song Artwork"
@@ -108,7 +110,7 @@
             />
             {#if $editingProfile}
               <div
-              role="presentation"
+                role="presentation"
                 transition:fade={{ duration: 100 }}
                 on:click={(e) => {
                   e.preventDefault();
@@ -138,15 +140,34 @@
           <p class="mt-1 text-sm">Sky</p>
           <p class="mt-1 text-sm text-gray-400">Playboi Carti</p>
         {:else if $user.profile?.favorites?.song}
-          <a target="_blank" href={$user.profile.favorites.song.url}>
+          <a
+            target={!$editingProfile ? '_blank' : null}
+            href={!$editingProfile
+              ? $user.profile.favorites.song.url
+              : 'javascript: void(0)'}
+          >
             <img
               alt="Song Artwork"
               class="w-20 h-20 mx-auto"
               src={$user.profile.favorites.song.artwork}
+              on:click={(e) => {
+                if ($editingProfile) {
+                  e.preventDefault();
+                  searchType.set('track');
+                  goto('/search_music_platform');
+                }
+              }}
+              on:keypress={(e) => {
+                if ($editingProfile) {
+                  e.preventDefault();
+                  searchType.set('track');
+                  goto('/search_music_platform');
+                }
+              }}
             />
             {#if $editingProfile}
               <div
-              role="presentation"
+                role="presentation"
                 transition:fade={{ duration: 100 }}
                 on:click={(e) => {
                   e.preventDefault();
@@ -179,7 +200,7 @@
           </p>
         {:else}
           <div
-              role="presentation"
+            role="presentation"
             class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
             on:click={() => {
               searchType.set('track');
@@ -211,15 +232,34 @@
       </div>
       <div class="relative">
         {#if $user.profile?.favorites?.album}
-          <a target="_blank" href={$user.profile.favorites.album.url}>
+          <a
+            target={!$editingProfile ? '_blank' : null}
+            href={!$editingProfile
+              ? $user.profile.favorites.album.url
+              : 'javascript: void(0)'}
+          >
             <img
               alt="Song Artwork"
               class="w-20 h-20 mx-auto"
               src={$user.profile.favorites.album.artwork}
+              on:click={(e) => {
+                if ($editingProfile) {
+                  e.preventDefault();
+                  searchType.set('album');
+                  goto('/search_music_platform');
+                }
+              }}
+              on:keypress={(e) => {
+                if ($editingProfile) {
+                  e.preventDefault();
+                  searchType.set('album');
+                  goto('/search_music_platform');
+                }
+              }}
             />
             {#if $editingProfile}
               <div
-              role="presentation"
+                role="presentation"
                 transition:fade={{ duration: 100 }}
                 on:click={(e) => {
                   e.preventDefault();
@@ -252,7 +292,7 @@
           </p>
         {:else}
           <div
-              role="presentation"
+            role="presentation"
             class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
             on:click={() => {
               searchType.set('album');
@@ -284,15 +324,34 @@
       </div>
       <div class="relative">
         {#if $user.profile?.favorites?.artist}
-          <a target="_blank" href={$user.profile.favorites.artist.url}>
+          <a
+            target={!$editingProfile ? '_blank' : null}
+            href={!$editingProfile
+              ? $user.profile.favorites.artist.url
+              : 'javascript: void(0)'}
+          >
             <img
               alt="Artist"
               class="w-20 h-20 mx-auto"
               src={$user.profile.favorites.artist.artwork}
+              on:click={(e) => {
+                if ($editingProfile) {
+                  e.preventDefault();
+                  searchType.set('artist');
+                  goto('/search_music_platform');
+                }
+              }}
+              on:keypress={(e) => {
+                if ($editingProfile) {
+                  e.preventDefault();
+                  searchType.set('artist');
+                  goto('/search_music_platform');
+                }
+              }}
             />
             {#if $editingProfile}
               <div
-              role="presentation"
+                role="presentation"
                 transition:fade={{ duration: 100 }}
                 on:click={() => {
                   searchType.set('artist');
@@ -320,7 +379,7 @@
           <p class="text-sm mt-1">{$user.profile.favorites.artist.name}</p>
         {:else}
           <div
-              role="presentation"
+            role="presentation"
             class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
             on:click={() => {
               searchType.set('artist');
@@ -392,7 +451,7 @@
       </a>
       <div class="flex-grow-0 flex-shrink">
         <svg
-              role="presentation"
+          role="presentation"
           on:click={() => toggleSong($userStatistics.topSong)}
           on:keypress={() => toggleSong($userStatistics.topSong)}
           class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
@@ -419,8 +478,7 @@
   {/if}
 
   <p
-
-              role="presentation"
+    role="presentation"
     on:keyup={() =>
       Share.share({
         url:
