@@ -34,8 +34,8 @@ export const registerForNotifications = async () => {
   }
 };
 
-export function errorToast(content: string) {
-  showToast({ content, color: '#ad2626' })
+export function errorToast(options: { content: string, duration?: number, onClick?: () => void }) {
+  showToast({ color: '#ad2626', ...options })
 }
 
 export const wait = (ms: number): Promise<void> => {

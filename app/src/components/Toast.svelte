@@ -7,7 +7,10 @@
   class="w-11/12 mx-auto flex justify-center py-2"
 >
   <div
-    class={`mx-auto rounded-full border bg-gray-900 px-6 py-4 border-${$user.musicPlatform}`}
+    class={`mx-auto rounded-full border bg-gray-900 px-6 py-4 border-${
+      $toast.color ? '' : $user.musicPlatform
+    }`}
+    style={$toast.color ? `border-color: ${$toast.color}` : ''}
   >
     <span class="text-white w-full">{$toast.content}</span>
   </div>

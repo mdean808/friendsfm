@@ -28,7 +28,6 @@
   import Submissions from '../components/Submissions.svelte';
   import Tabs from '../components/Tabs.svelte';
   import { App } from '@capacitor/app';
-  import { showToast } from '../lib/util';
 
   // GLOBALS
   let loadingSubmission = false;
