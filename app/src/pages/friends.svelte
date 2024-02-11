@@ -8,6 +8,7 @@
     rejectFriendRequest,
     refreshUser,
     appLoading,
+    keyboardHeight,
   } from '../store';
   import Input from '../components/Input.svelte';
   import Button from '../components/Button.svelte';
@@ -23,6 +24,8 @@
   let newUsername = '';
   let loaders = $user.friendRequests.map(() => false);
   let loading = false;
+
+  let focus = false;
 
   const addFriend = async () => {
     if (loading) return;
@@ -120,6 +123,7 @@
     </div>
     <div class="w-8/12">
       <Input
+        {focus}
         placeholder="username"
         name="username"
         className="rounded-l-none"

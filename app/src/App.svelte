@@ -9,6 +9,7 @@
   import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
   import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
   import { App } from '@capacitor/app';
+  import { Keyboard } from '@capacitor/keyboard';
   import { writable } from 'svelte/store';
 
   import { onMount } from 'svelte';
@@ -39,6 +40,7 @@
     secondaryAppLoading,
     submissionLoading,
     launchStatus,
+    keyboardHeight,
     singleSubmissionLoading,
   } from './store';
 
@@ -117,7 +119,6 @@
     
     // status init
     App.addListener('appStateChange', ({ isActive }) => {
-      console.log("STATE", isActive)
       if (isActive) {
         launchStatus.set('background');
       } else {
@@ -125,6 +126,10 @@
       }
     });
 
+    // set keyboard info
+    Keyboard.addListener('keyboardWillShow', (e) => {
+      keyboardHeight.set(e.keyboardHeight)
+    });
 
     // ionic init
     try {

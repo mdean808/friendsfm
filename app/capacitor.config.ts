@@ -25,7 +25,7 @@ const config: CapacitorConfig = {
       presentationOptions: ['badge', 'sound', 'alert'],
     },
     Keyboard: {
-      resize: KeyboardResize.Native,
+      resize: KeyboardResize.None,
       style: KeyboardStyle.Dark,
       resizeOnFullScreen: true,
     },

@@ -16,7 +16,6 @@
     logout,
     activeHomeTab,
     notificationAction,
-    launchStatus,
   } from '../store';
 
   import Button from '../components/Button.svelte';
@@ -35,7 +34,6 @@
   let loadingFriendSubmissions = false;
   let sortedFriendSubmissions: SubmissionType[] = [];
   let loadingGenres = false;
-  let loadingNewLateSubmission = false;
 
   friendSubmissions.listen((val) => {
     if (val) sortedFriendSubmissions = [...val].sort(sortByDate);

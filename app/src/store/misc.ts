@@ -53,3 +53,5 @@ export const editingProfile = atom<boolean>(false);
 export const publicProfileUsername = atom<string>('');
 
 export const activeRequests = map<ActiveRequests>(new ActiveRequests());
+
+export const keyboardHeight = atom<number>(0);

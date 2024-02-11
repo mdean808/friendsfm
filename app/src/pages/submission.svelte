@@ -17,6 +17,8 @@
     insets,
     activeHomeTab,
     publicProfileUsername,
+    keyboardHeight,
+    user,
   } from '../store';
   import Comment from '../components/Comment.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
@@ -51,7 +53,7 @@
   <div
     style={`padding-top: ${0 + $insets.top}px`}
     transition:scale
-    class="z-40 fixed top-0 left-0 w-full h-full bg-gray-800"
+    class="z-40 fixed top-0 left-0 w-full h-full bg-gray-700"
   >
     <div class="sticky top-0 w-full mx-auto">
       <div
@@ -170,75 +172,85 @@
               </div>
             {/if}
           </div>
-        </div>
-        <div class="mt-2 border-t-white border-t-2">
-          <div class="flex w-72 mx-auto gap-4">
-            {#if $activeSubmission.song.platforms?.find((p) => p.id === MusicPlatform.spotify)?.url}
-              <div class="pt-2 w-52 mx-auto">
-                <Button
-                  on:click={() =>
-                    (window.location.href =
-                      $activeSubmission.song.platforms?.find(
-                        (p) => p.id === MusicPlatform.spotify
-                      )?.url)}
-                  type="spotify"
-                  title="open in spotify"
-                  className="flex gap-2 items-center justify-center bg-spotify"
-                >
-                  <span class="text-transparent">a</span>
-                  <img alt="spotify logo" class="h-6" src={SpotifyLogoWhite} />
-                  <span class="text-transparent">a</span>
-                </Button>
-              </div>
-            {/if}
-            {#if $activeSubmission.song.platforms?.find((p) => p.id === MusicPlatform.appleMusic)?.url}
-              <div class="pt-2 w-52 mx-auto">
-                <Button
-                  on:click={() =>
-                    (window.location.href =
-                      $activeSubmission.song.platforms?.find(
-                        (p) => p.id === MusicPlatform.appleMusic
-                      )?.url)}
-                  type="apple-music"
-                  title="open in apple music"
-                  className="flex gap-2 items-center justify-center"
-                >
-                  <img
-                    alt="apple music logo"
-                    class="h-6"
-                    src={AppleMusicListenOn}
-                  />
-                </Button>
-              </div>
-            {/if}
-            {#if !$activeSubmission.song.platforms?.find((p) => p.id === MusicPlatform.appleMusic)?.url && !$activeSubmission.song.platforms?.find((p) => p.id === MusicPlatform.spotify)?.url}
-              <div class="pt-2 w-52 mx-auto">
-                <Button
-                  on:click={() =>
-                    (window.location.href = $activeSubmission.song.url)}
-                  type={$activeSubmission.user.musicPlatform}
-                  title={`open in ${$activeSubmission.user.musicPlatform}`}
-                  className="flex gap-2 items-center justify-center"
-                >
-                  <img
-                    alt={`${$activeSubmission.user.musicPlatform} logo`}
-                    class="h-6"
-                    src={$activeSubmission.user.musicPlatform ===
-                    MusicPlatform.spotify
-                      ? SpotifyLogoWhite
-                      : AppleMusicListenOn}
-                  />
-                </Button>
-              </div>
-            {/if}
+          <div class="mt-2 border-t-white border-t-2">
+            <div class="flex w-72 mx-auto gap-4">
+              {#if $activeSubmission.song.platforms?.find((p) => p.id === MusicPlatform.spotify)?.url}
+                <div class="pt-2 w-52 mx-auto">
+                  <Button
+                    on:click={() =>
+                      (window.location.href =
+                        $activeSubmission.song.platforms?.find(
+                          (p) => p.id === MusicPlatform.spotify
+                        )?.url)}
+                    type="spotify"
+                    title="open in spotify"
+                    className="flex gap-2 items-center justify-center bg-spotify"
+                  >
+                    <span class="text-transparent">a</span>
+                    <img
+                      alt="spotify logo"
+                      class="h-6"
+                      src={SpotifyLogoWhite}
+                    />
+                    <span class="text-transparent">a</span>
+                  </Button>
+                </div>
+              {/if}
+              {#if $activeSubmission.song.platforms?.find((p) => p.id === MusicPlatform.appleMusic)?.url}
+                <div class="pt-2 w-52 mx-auto">
+                  <Button
+                    on:click={() =>
+                      (window.location.href =
+                        $activeSubmission.song.platforms?.find(
+                          (p) => p.id === MusicPlatform.appleMusic
+                        )?.url)}
+                    type="apple-music"
+                    title="open in apple music"
+                    className="flex gap-2 items-center justify-center"
+                  >
+                    <img
+                      alt="apple music logo"
+                      class="h-6"
+                      src={AppleMusicListenOn}
+                    />
+                  </Button>
+                </div>
+              {/if}
+              {#if !$activeSubmission.song.platforms?.find((p) => p.id === MusicPlatform.appleMusic)?.url && !$activeSubmission.song.platforms?.find((p) => p.id === MusicPlatform.spotify)?.url}
+                <div class="pt-2 w-52 mx-auto">
+                  <Button
+                    on:click={() =>
+                      (window.location.href = $activeSubmission.song.url)}
+                    type={$activeSubmission.user.musicPlatform}
+                    title={`open in ${$activeSubmission.user.musicPlatform}`}
+                    className="flex gap-2 items-center justify-center"
+                  >
+                    <img
+                      alt={`${$activeSubmission.user.musicPlatform} logo`}
+                      class="h-6"
+                      src={$activeSubmission.user.musicPlatform ===
+                      MusicPlatform.spotify
+                        ? SpotifyLogoWhite
+                        : AppleMusicListenOn}
+                    />
+                  </Button>
+                </div>
+              {/if}
+            </div>
           </div>
         </div>
       {/if}
       <div
+        transition:slide
         style={`height: calc(100vh - ${
-          $insets.bottom + (!focused ? 425 : 100)
+          $insets.bottom * 2 +
+          (focused
+            ? ($keyboardHeight ? 0 : 20) + 120
+            : $keyboardHeight
+            ? 470
+            : 430)
         }px)`}
-        class="overflow-y-scroll text-white border-t-white border-t-2 pt-2 mt-2 block"
+        class="overflow-y-scroll text-white border-t-white border-t-2 pb-1 pt-2 mt-2 block"
       >
         {#if !$activeSubmission.comments?.length}
           <span class="text-sm text-gray-300 w-full">no comments yet...</span>
@@ -253,49 +265,41 @@
           </div>
         {/each}
       </div>
-    </div>
-    <div
-      style={`bottom: ${focused ? 0 : $insets.bottom}px;`}
-      class="w-full absolute flex rounded-none border-t border-b py-1 shadow-md bg-gray-900 text-white"
-    >
-      <div class="p-2 w-10/12 rounded-none">
-        <input
-          bind:value={commentValue}
-          bind:this={input}
-          on:submit={submitComment}
-          on:keyup={(e) => e.key === 'Enter' && submitComment()}
-          on:focusin={() => (focused = true)}
-          on:focusout={() => (focused = false)}
-          class="bg-gray-900 w-full placeholder:text-gray-400 rounded-md p-1 outline-none"
-          placeholder="tap to start a comment"
-        />
-      </div>
-      {#if !commentSubmitting}
-        <button
-          on:click={submitComment}
-          class="mx-auto mt-1 rounded-full p-2 h-9 w-9 bg-blue-600"
-        >
-          <svg
-            fill="none"
-            class=""
-            stroke="currentColor"
-            stroke-width="1.5"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
+      <div
+        transition:slide
+        class={`w-full flex rounded-md pl-1 pr-2 border py-1 border-${$user.musicPlatform} shadow-md bg-gray-900 text-white`}
+      >
+        <div class="py-1 w-10/12 rounded-none">
+          <input
+            bind:value={commentValue}
+            bind:this={input}
+            on:focusin={() => (focused = true)}
+            on:focusout={() => (focused = false)}
+            on:keyup={(e) => e.key === 'Enter' && submitComment()}
+            class="bg-gray-900 w-full placeholder:text-gray-400 rounded-md p-1 outline-none"
+            placeholder="tap to start a comment"
+          />
+        </div>
+        {#if !commentSubmitting}
+          <button
+            on:click={submitComment}
+            class="ml-auto self-center rounded-full py-1 pl-1.5 pr-1 h-9 w-9 bg-blue-600 text-white"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-            ></path>
-          </svg>
-        </button>
-      {:else}
-        <LoadingIndicator
-          className={'p-1 h-9 w-9 mx-auto bg-blue-600 mt-1 rounded-full'}
-        />
-      {/if}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 256 256"
+              ><path
+                d="M232,127.89a16,16,0,0,1-8.18,14L55.91,237.9A16.14,16.14,0,0,1,48,240a16,16,0,0,1-15.05-21.34L60.3,138.71A4,4,0,0,1,64.09,136H136a8,8,0,0,0,8-8.53,8.19,8.19,0,0,0-8.26-7.47H64.16a4,4,0,0,1-3.79-2.7l-27.44-80A16,16,0,0,1,55.85,18.07l168,95.89A16,16,0,0,1,232,127.89Z"
+              ></path></svg
+            >
+          </button>
+        {:else}
+          <LoadingIndicator
+            className="ml-auto self-center rounded-full py-1 pl-1.5 pr-1 h-9 w-9 bg-blue-600 text-white"
+          />
+        {/if}
+      </div>
     </div>
   </div>
 {/if}

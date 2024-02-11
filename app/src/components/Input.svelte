@@ -5,6 +5,7 @@
   export let name: string;
   export let placeholder: string;
   export let value = '';
+  export let focus = false;
   export let className: string = '';
 </script>
 
@@ -12,6 +13,8 @@
   {name}
   {placeholder}
   bind:value
+  on:focusin={() => focus = true}
+  on:focusout={() => focus = false}
   on:input={() => dispatch('input')}
   on:keyup
   type="text"
