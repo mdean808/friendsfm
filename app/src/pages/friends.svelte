@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto } from '../lib/util';
+  import { goto, showToast } from '../lib/util';
   import {
     user,
     sendFriendRequest,
@@ -8,11 +8,10 @@
     rejectFriendRequest,
     refreshUser,
     appLoading,
-    keyboardHeight,
   } from '../store';
+
   import Input from '../components/Input.svelte';
   import Button from '../components/Button.svelte';
-  import { toast } from '@zerodevx/svelte-toast';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
@@ -32,7 +31,7 @@
     loading = true;
     if (await sendFriendRequest(newUsername.trim())) {
       newUsername = '';
-      toast.push('Successfully sent friend request');
+      showToast({ content: 'Successfully sent friend request' });
     }
     loading = false;
   };
@@ -40,7 +39,7 @@
     if (loaders[i]) return;
     loaders[i] = true;
     if (await acceptFriendRequest(requester))
-      toast.push('Successfully accepted friend request');
+      showToast({ content: 'Successfully accepted friend request' });
     loaders[i] = false;
   };
 
@@ -48,7 +47,7 @@
     if (loaders[i]) return;
     loaders[i] = true;
     if (await rejectFriendRequest(requester))
-      toast.push('Successfully rejected friend request');
+      showToast({ content: 'Successfully rejected friend request' });
     loaders[i] = false;
   };
 

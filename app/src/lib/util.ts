@@ -1,7 +1,6 @@
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
-import { toast, type SvelteToastOptions } from '@zerodevx/svelte-toast';
-import { currPath, platform, prevPath } from '../store';
+import { currPath, platform, prevPath, toast } from '../store';
 import * as Sentry from '@sentry/capacitor';
 
 export const goto = (url: string) => {
@@ -36,14 +35,7 @@ export const registerForNotifications = async () => {
 };
 
 export function errorToast(content: string) {
-  const toastError: SvelteToastOptions = {
-    theme: {
-      '--toastColor': 'white',
-      '--toastBackground': '#ad2626',
-      '--toastBarBackground': 'white',
-    },
-  };
-  toast.push(content, toastError);
+  showToast({ content, color: '#ad2626' })
 }
 
 export const wait = (ms: number): Promise<void> => {
@@ -96,4 +88,10 @@ export function intToRGB(i: number) {
     contrast = getContrastRatio(rgb, [31, 41, 55]);
   }
   return hex;
+}
+
+export const showToast = (options: { content: string, color?: string, duration?: number, onClick?: () => void }) => {
+  options.onClick = options.onClick || (() => toast.set({ visible: false, ...options }));
+  toast.set({ visible: true, ...options });
+  setTimeout(() => toast.set({ visible: false, ...options }), options.duration || 5000)
 }

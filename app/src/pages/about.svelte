@@ -2,9 +2,8 @@
   import * as Sentry from '@sentry/svelte';
   import Button from '../components/Button.svelte';
   import TextArea from '../components/TextArea.svelte';
-  import { goto } from '../lib/util';
+  import { goto, showToast } from '../lib/util';
   import { prevPath, user } from '../store';
-  import { toast } from '@zerodevx/svelte-toast';
   let feedback: string;
 
   const sendFeedback = async () => {
@@ -18,7 +17,7 @@
     };
     Sentry.captureUserFeedback(userFeedback);
     feedback = '';
-    toast.push('Successfully sent your message!');
+    showToast({ content: 'Successfully sent your message!' });
   };
 </script>
 

@@ -55,3 +55,5 @@ export const publicProfileUsername = atom<string>('');
 export const activeRequests = map<ActiveRequests>(new ActiveRequests());
 
 export const keyboardHeight = atom<number>(0);
+
+export const toast = map<{ visible: boolean, content?: string, color?: string, duration?: number, onClick?: () => void }>();

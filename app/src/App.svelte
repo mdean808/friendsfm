@@ -3,7 +3,6 @@
     FirebaseMessaging,
     type Notification,
   } from '@capacitor-firebase/messaging';
-  import { SvelteToast } from '@zerodevx/svelte-toast';
   import { Capacitor } from '@capacitor/core';
   import { SplashScreen } from '@capacitor/splash-screen';
   import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
@@ -14,7 +13,7 @@
 
   import { onMount } from 'svelte';
 
-  import { fade, scale } from 'svelte/transition';
+  import { fade, scale, slide } from 'svelte/transition';
 
   import {
     user,
@@ -42,6 +41,7 @@
     launchStatus,
     keyboardHeight,
     singleSubmissionLoading,
+    toast,
   } from './store';
 
   import { errorToast, goto } from './lib/util';
@@ -66,6 +66,7 @@
   import SearchMusicPlatform from './pages/search_music_platform.svelte';
   import PublicProfile from './pages/public_profile.svelte';
   import ModalPageWrapper from './components/ModalPageWrapper.svelte';
+  import Toast from './components/Toast.svelte';
 
   // IONIC SETUP
   import { initialize } from '@ionic/core/components';
@@ -265,13 +266,12 @@
     <!-- START absolute positioning -->
 
     <!-- put the toast double the height of the bottom nav -->
-    <div class="absolute z-50" style={`bottom: ${55 + $insets.bottom}px; `}>
-      <SvelteToast
-        options={{
-          reversed: true,
-        }}
-      />
-    </div>
+    {#if $toast.visible}
+      <div transition:slide class="absolute z-50 w-full" style={`bottom: ${75 + $insets.bottom}px; `}>
+        <Toast />
+      </div>
+    {/if}
+
     {#if $loading}
       <div transition:fade={{ duration: 100 }}>
         <Loading />

@@ -1,9 +1,9 @@
 import { Dialog } from '@capacitor/dialog';
 import { Preferences } from '@capacitor/preferences';
-import { toast } from '@zerodevx/svelte-toast';
 import { action, atom } from 'nanostores';
 import { user } from '.';
 import { getFirebaseUrl, handleApiResponse } from '../lib/network';
+import { showToast } from '../lib/util';
 import AppleMusic from '../plugins/AppleMusic';
 import { MusicPlatform, type SavedSong } from '../types';
 import { appCheckToken, authToken } from './auth';
@@ -109,13 +109,13 @@ export const createSongsPlaylist = action(
       loading.set(false);
       if (!json) {
         //api response failed
-        toast.push('playlist creation failed. please try again.');
+        showToast({ content: 'playlist creation failed. please try again.' });
         return;
       }
       // goto the playlist!
       window.location.href =
         'https://open.spotify.com/playlist/' + json.message;
-      toast.push('playlist successfully created!');
+      showToast({content: 'playlist successfully created!'});
       return json.message;
     } else if (u.musicPlatform === MusicPlatform.appleMusic) {
       const { value } = await Dialog.confirm({
@@ -140,12 +140,12 @@ export const createSongsPlaylist = action(
       loading.set(false);
       if (!json) {
         //api response failed
-        toast.push('playlist creation failed. please try again.');
+        showToast({ content: 'playlist creation failed. please try again.' });
         return;
       }
       // goto playlist
       window.location.href = url;
-      toast.push('playlist successfully created!');
+      showToast({ content: 'playlist successfully created!' });
       return url;
     }
   }

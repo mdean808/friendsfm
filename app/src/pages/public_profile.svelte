@@ -1,6 +1,5 @@
 <script lang="ts">
   import { Share } from '@capacitor/share';
-  import { toast } from '@zerodevx/svelte-toast';
   import SpotifyLogo from '../assets/spotify_logo_green.png';
   import AppleMusicLogo from '../assets/apple_music_logo_white.svg';
   import { onMount } from 'svelte';
@@ -19,7 +18,7 @@
     sendFriendRequest,
   } from '../store';
   import { MusicPlatform, type User } from '../types';
-  import { goto } from '../lib/util';
+  import { goto, showToast } from '../lib/util';
 
   let profile: User['profile'];
   const firstOfTheMonth = new Date().getDate() === 1;
@@ -50,7 +49,7 @@
   const requestFriend = async () => {
     loading.set(true);
     if (await sendFriendRequest($publicProfileUsername.trim())) {
-      toast.push('Successfully sent friend request');
+      showToast({content: 'Successfully sent friend request'});
     }
     loading.set(false);
   };

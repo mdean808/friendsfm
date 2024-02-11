@@ -2,13 +2,12 @@
   import { slide } from 'svelte/transition';
   import LoadingIndicator from '../LoadingIndicator.svelte';
   import { onMount } from 'svelte';
-  import { toast } from '@zerodevx/svelte-toast';
   import {
     sendFriendRequest,
     getFriendSuggestions,
     publicProfileUsername,
   } from '../../store';
-  import { goto } from '../../lib/util';
+  import { goto, showToast } from '../../lib/util';
 
   let suggestions: {
     username: string;
@@ -45,7 +44,7 @@
     suggestions[sIndex].loading = true;
     suggestions = [...suggestions];
     if (await sendFriendRequest(suggestion.username.trim())) {
-      toast.push('Successfully sent friend request');
+      showToast({ content: 'Successfully sent friend request' });
       suggestions[sIndex].loading = false;
       suggestions[sIndex].sent = true;
       suggestions = [...suggestions];
