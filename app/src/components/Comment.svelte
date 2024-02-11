@@ -26,7 +26,7 @@
     </p>
   </div>
   <p
-    class="text-blue-500 underline text-sm"
+    class="text-blue-500 w-fit underline text-sm"
     on:keyup={() => replyFunc(comment.user.username)}
     on:click={() => replyFunc(comment.user.username)}
   >

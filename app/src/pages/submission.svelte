@@ -245,7 +245,7 @@
         style={`height: calc(100vh - ${
           $insets.bottom * 2 +
           (focused
-            ? ($keyboardHeight ? 0 : 20) + 120
+            ? ($keyboardHeight ? $keyboardHeight : 20) + 120
             : $keyboardHeight
             ? 470
             : 430)
