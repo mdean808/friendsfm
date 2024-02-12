@@ -71,7 +71,9 @@
           } catch (e) {
             if (!e.message.includes('closed-by-user')) {
               loading.set(false);
-              errorToast('Something went wrong. Please try again.');
+              errorToast({
+                content: 'Something went wrong. Please try again.',
+              });
               captureException(e);
             }
           }
@@ -116,7 +118,7 @@
     } catch (e) {
       if (!e.message.includes('closed-by-user')) {
         loading.set(false);
-        errorToast('Something went wrong. Please try again.');
+        errorToast({ content: 'Something went wrong. Please try again.' });
         captureException(e.message);
       }
     }

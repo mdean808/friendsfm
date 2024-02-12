@@ -22,7 +22,7 @@ export const handleApiResponse = async (res: Response) => {
   eventParams.status = res.status;
   eventParams.statusText = res.statusText;
   if (res.status >= 500) {
-    errorToast('Error ' + res.status + ': ' + res.statusText);
+    errorToast({ content: 'Error ' + res.status + ': ' + res.statusText });
     FirebaseAnalytics.logEvent({
       name: 'response',
       params: eventParams,
@@ -31,7 +31,7 @@ export const handleApiResponse = async (res: Response) => {
   }
   const json = (await res.json()) as NetworkResponse;
   if (res.status !== 200 && !json) {
-    errorToast('Error ' + res.status + ': ' + res.statusText);
+    errorToast({ content: 'Error ' + res.status + ': ' + res.statusText });
     FirebaseAnalytics.logEvent({
       name: 'response',
       params: eventParams,
@@ -41,7 +41,10 @@ export const handleApiResponse = async (res: Response) => {
     console.log('ERROR:', json, res.url);
     eventParams.message = json.message;
     eventParams.error = json.error;
-    if (json.message === 'User does not exist.' || json.error?.includes('Firebase ID token has been revoked')) {
+    if (
+      json.message === 'User does not exist.' ||
+      json.error?.includes('Firebase ID token has been revoked')
+    ) {
       logout();
       goto('/new_user');
     } else if (
@@ -67,15 +70,19 @@ export const handleApiResponse = async (res: Response) => {
             spotifySet = true;
           }
         });
-        const spotifyUrl = `https://accounts.spotify.com/authorize?client_id=${import.meta.env.VITE_SPOTIFY_CLIENT_ID
-          }&response_type=code&redirect_uri=${platform.get() === 'web'
+        const spotifyUrl = `https://accounts.spotify.com/authorize?client_id=${
+          import.meta.env.VITE_SPOTIFY_CLIENT_ID
+        }&response_type=code&redirect_uri=${
+          platform.get() === 'web'
             ? import.meta.env.VITE_SPOTIFY_REDIRECT_URL_WEB
             : import.meta.env.VITE_SPOTIFY_REDIRECT_URL
-          }&scope=user-read-currently-playing%20user-read-recently-played%20playlist-modify-private%20playlist-modify-public`;
+        }&scope=user-read-currently-playing%20user-read-recently-played%20playlist-modify-private%20playlist-modify-public`;
         window.location.href = spotifyUrl;
       }
     } else {
-      errorToast('Error: ' + json.message || json.error || 'Unknown Error.');
+      errorToast({
+        content: 'Error: ' + json.message || json.error || 'Unknown Error.',
+      });
     }
     FirebaseAnalytics.logEvent({
       name: 'response',

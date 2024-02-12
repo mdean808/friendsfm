@@ -54,7 +54,7 @@ export const generateSubmission = action(
         recentlyPlayed = await AppleMusic.getRecentlyPlayed();
       } catch (e) {
         console.log(e);
-        return errorToast(e.message);
+        return errorToast({ content: e.message });
       }
     }
     const res = await fetch(getFirebaseUrl('createnewusersubmission'), {
@@ -337,7 +337,6 @@ export const deleteCommentFromSubmission = action(
   }
 );
 
-
 export const getSubmissionById = action(
   activeSubmission,
   'get-submission-by-id',
@@ -357,7 +356,6 @@ export const getSubmissionById = action(
       return false;
     }
     store.set(json.message as Submission);
-    return json.message as Submission
+    return json.message as Submission;
   }
 );
-

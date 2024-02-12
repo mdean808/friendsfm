@@ -248,7 +248,7 @@
             ? ($keyboardHeight ? $keyboardHeight : 20) + 120
             : $keyboardHeight
             ? 470
-            : 430)
+            : 450)
         }px)`}
         class="overflow-y-scroll text-white border-t-white border-t-2 pb-1 pt-2 mt-2 block"
       >

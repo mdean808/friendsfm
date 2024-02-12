@@ -218,7 +218,7 @@
         activeSubmission.set(sub);
         goto('/?submission');
       } else {
-        errorToast('Error: Submission not found.');
+        errorToast({content: 'Error: Submission not found.'});
       }
       submissionLoading.set(false);
     } else if (data.type === 'late-submission') {
