@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { hashCode, intToRGB } from '../../lib/util';
   import { songs, toggleSong } from '../../store';
   import type { SavedSong, Submission } from '../../types';
   import Heart from '../icons/Heart.svelte';
@@ -29,6 +30,11 @@
 
 <div class={className}>
   <div class="flex text-lg gap-2">
+    <span
+      class="px-1.5 py-1 border-white border text-sm text-center text-white relative text-md rounded-xl truncate"
+      style={`background: ${intToRGB(hashCode(data.song.genre, 23))}`}
+      >{data.song.genre}</span
+    >
     <Heart
       on:click={toggleHeart}
       on:keypress={toggleHeart}

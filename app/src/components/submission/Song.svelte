@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { hashCode, intToRGB } from '../../lib/util';
   import type { Submission } from '../../types';
   import MusicPlatformIcon from '../icons/MusicPlatformIcon.svelte';
 
@@ -25,7 +26,7 @@
       </div>
     </div>
   </div>
-  <div class="w-2/12 text-right mb-1 flex">
+  <div class="w-2/12 text-right mb-1 flex flex-col-reverse gap-1">
     <MusicPlatformIcon
       id={data.user ? data.user.musicPlatform : 'spotify'}
       className="h-5 w-5 self-end ml-auto"
