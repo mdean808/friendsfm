@@ -1,7 +1,7 @@
 {
   "name": "friends-fm",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -88,3 +88,4 @@
     "vite": "^4.4.8"
   }
 }
+

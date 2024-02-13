@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { hashCode, intToRGB } from '../../lib/util';
-  import { songs, toggleSong } from '../../store';
+  import { goto, hashCode, intToRGB } from '../../lib/util';
+  import { activeGenre, activeHomeTab, songs, toggleSong } from '../../store';
   import type { SavedSong, Submission } from '../../types';
   import Heart from '../icons/Heart.svelte';
   import Comment from '../icons/Comment.svelte';
@@ -31,6 +31,18 @@
 <div class={className}>
   <div class="flex text-lg gap-2">
     <span
+      on:keyup={(e) => {
+        e.stopPropagation();
+        activeGenre.set(data.song.genre);
+        activeHomeTab.set('genres');
+        goto('/');
+      }}
+      on:click={(e) => {
+        e.stopPropagation();
+        activeGenre.set(data.song.genre);
+        activeHomeTab.set('genres');
+        goto('/');
+      }}
       class="px-1.5 py-1 border-white border text-sm text-center text-white relative text-md rounded-xl truncate"
       style={`background: ${intToRGB(hashCode(data.song.genre, 23))}`}
       >{data.song.genre}</span

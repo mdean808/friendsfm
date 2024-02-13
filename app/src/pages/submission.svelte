@@ -162,7 +162,7 @@
                   activeHomeTab.set('genres');
                   goto('/');
                 }}
-                class="text-xs w-fit mx-auto items-center leading-sm
+                class="text-xs w-fit border-white border mx-auto items-center leading-sm
         uppercase px-3 pb-1 pt-1.5 rounded-full"
                 style={`background: ${intToRGB(
                   hashCode($activeSubmission.song.genre, 23)
