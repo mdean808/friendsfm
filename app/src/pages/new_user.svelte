@@ -71,6 +71,7 @@
           } catch (e) {
             if (!e.message.includes('closed-by-user')) {
               loading.set(false);
+              console.log('Login Error' + e);
               errorToast({
                 content: 'Something went wrong. Please try again.',
               });
@@ -118,6 +119,7 @@
     } catch (e) {
       if (!e.message.includes('closed-by-user')) {
         loading.set(false);
+        console.log('Login Error' + e);
         errorToast({ content: 'Something went wrong. Please try again.' });
         captureException(e.message);
       }

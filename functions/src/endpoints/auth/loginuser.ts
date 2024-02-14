@@ -14,9 +14,12 @@ export const loginuser = onRequest(
       req.body =
         typeof req.body === 'object' ? JSON.stringify(req.body) : req.body;
       const user: UserType = JSON.parse(req.body);
+
+      let authToken = req.get('Authentication')?.split(' ')[1];
+      if (!authToken) authToken = JSON.parse(req.body)?.authToken;
       // verify the auth token with firebase's backend
       const decodedTokenData = await auth
-        .verifyIdToken(user.authToken)
+        .verifyIdToken(authToken || '')
         .catch((e) => {
           // firebase authnetication failed
           firebaseLog.error(e);

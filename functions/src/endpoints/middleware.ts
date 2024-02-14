@@ -38,7 +38,8 @@ export const authMiddleware =
     const { getAuth } = await import('firebase-admin/auth');
     const auth = getAuth();
 
-    const { authToken }: { authToken: string } = JSON.parse(req.body);
+    let authToken = req.get('Authentication')?.split(' ')[1];
+    if (!authToken) authToken = JSON.parse(req.body)?.authToken;
     // load and authenticate user
     if (!authToken) {
       return res.status(401).json({

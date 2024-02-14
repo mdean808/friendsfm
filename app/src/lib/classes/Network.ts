@@ -4,7 +4,7 @@ import {
   type NetworkRequest,
   type NetworkResponse,
 } from '../../types';
-import ky, { type KyInstance } from 'ky';
+import ky from 'ky';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import SentryTransaction from './SentryTransaction';
 import { errorToast, goto } from '../util';
@@ -21,18 +21,10 @@ import { Dialog } from '@capacitor/dialog';
 
 export default class Network {
   requests: NetworkRequest[] = [];
-  firebase: KyInstance;
 
   private spotifySet = false;
 
-  constructor() {
-    this.firebase = ky.create({
-      headers: {
-        Authentication: 'Bearer ' + authToken.get(),
-        'x-firebase-appcheck': appCheckToken.get(),
-      },
-    });
-  }
+  constructor() {}
 
   public add(request: NetworkRequest) {
     this.requests.push(request);
@@ -41,8 +33,10 @@ export default class Network {
 
   public update(id: number, data: NetworkRequest): NetworkRequest {
     const req = this.requests.find((r) => r.id === id);
-    for (let key in data) {
-      req[key] = data[key];
+    if (req) {
+      for (let key of Object.keys(data)) {
+        req[key] = data[key];
+      }
     }
     return req;
   }
@@ -81,7 +75,13 @@ export default class Network {
       abortController: new AbortController(),
     });
     // make request
-    const res = await this.firebase.post(url, { json: body });
+    const res = await ky.post(url, {
+      headers: {
+        Authentication: 'Bearer ' + authToken.get(),
+        'x-firebase-appcheck': appCheckToken.get(),
+      },
+      body: JSON.stringify(body),
+    });
     // update request object with response
     this.update(id, { ...networkRequest, response: res });
     // handle response, return the message
@@ -99,9 +99,9 @@ export default class Network {
         if (json?.type === ResponseType.error) {
           errorToast({ content: `Error: ${json.error}` });
         }
-        console.log(
-          `${res.status} Success: ${json?.message}\nError: ${json?.error}\nStatus Text: ${res.statusText}`
-        );
+        //    console.log(
+        //      `${res.status} Success. \nError: ${json?.error}\nStatus Text: ${res.statusText}`
+        //   );
         break;
       case 3: // 3xx - redirection
         console.log(
@@ -178,7 +178,7 @@ export default class Network {
   }
 
   private async messageSpecificHandling(json: NetworkResponse) {
-    if (!json) return;
+    if (!json || !json.message || typeof json.message != 'string') return;
     // handle Authentication errors
     if (
       json.message === 'User does not exist.' ||

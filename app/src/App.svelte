@@ -108,6 +108,7 @@
       );
     }
 
+
     // wait for auth state change before continuing for web support
     FirebaseAuthentication.addListener('authStateChange', doLogin);
 
@@ -128,9 +129,11 @@
     });
 
     // set keyboard info
-    Keyboard.addListener('keyboardWillShow', (e) => {
-      keyboardHeight.set(e.keyboardHeight)
-    });
+    if (Capacitor.isPluginAvailable('Keyboard')) {
+      Keyboard.addListener('keyboardWillShow', (e) => {
+        keyboardHeight.set(e.keyboardHeight)
+      });
+    }
 
     // ionic init
     try {
