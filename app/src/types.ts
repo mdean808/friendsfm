@@ -467,9 +467,11 @@ export interface MusicKitSearchResponse {
   };
 }
 
-export interface ActiveRequest {
+export interface NetworkRequest {
+  id: number;
   url: string;
   transaction: SentryTransaction;
   request?: Request;
   response?: Response;
+  abortController: AbortController;
 }
