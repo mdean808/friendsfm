@@ -2,29 +2,17 @@ import { Dialog } from '@capacitor/dialog';
 import { Preferences } from '@capacitor/preferences';
 import { action, atom } from 'nanostores';
 import { user } from '.';
-import { getFirebaseUrl, handleApiResponse } from '../lib/network';
 import { showToast } from '../lib/util';
 import AppleMusic from '../plugins/AppleMusic';
 import { MusicPlatform, type SavedSong } from '../types';
 import { appCheckToken, authToken } from './auth';
-import { loading } from './misc';
+import { loading, network } from './misc';
 
 export const songs = atom<SavedSong[]>([]);
 
 export const loadSongs = action(songs, 'load-songs', async (store) => {
-  const res = await fetch(getFirebaseUrl('getsongs'), {
-    method: 'POST',
-    body: JSON.stringify({
-      authToken: authToken.get(),
-    }),
-    headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-  });
-  const json = await handleApiResponse(res);
-  if (!json) {
-    // failed to set new music platform
-    return false;
-  }
-  store.set(json.message as SavedSong[]);
+  const message = await network.get().queryFirebase('getsongs');
+  if (message) store.set(message as SavedSong[]);
 });
 
 export const toggleSong = action(
@@ -39,35 +27,12 @@ export const toggleSong = action(
       s = s.filter((s) => s.name !== song.name);
       store.set(s);
       // save to backend
-      const res = await fetch(getFirebaseUrl('deletesong'), {
-        method: 'POST',
-        body: JSON.stringify({
-          authToken: authToken.get(),
-          song,
-        }),
-        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-      });
-      const json = await handleApiResponse(res);
-      if (!json) {
-        // failed to set new music platform
-        return false;
-      }
+      const message = await network.get().queryFirebase('deletesong', { song });
+      if (!message) return;
     } else {
-      // save to the backend
-      const res = await fetch(getFirebaseUrl('savesong'), {
-        method: 'POST',
-        body: JSON.stringify({
-          authToken: authToken.get(),
-          song,
-        }),
-        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-      });
-      const json = await handleApiResponse(res);
-      if (!json) {
-        // failed to set new music platform
-        return false;
-      }
-      s.push(json.message as SavedSong);
+      const message = await network.get().queryFirebase('savesong', { song });
+      if (!message) return;
+      s.push(message as SavedSong);
       store.set(s);
       await Preferences.set({
         key: 'songs',
@@ -98,25 +63,19 @@ export const createSongsPlaylist = action(
       });
       if (!value) return;
       loading.set(true);
-      const res = await fetch(getFirebaseUrl('createlikedsongsplaylist'), {
-        method: 'POST',
-        body: JSON.stringify({
-          authToken: authToken.get(),
-        }),
-        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-      });
-      const json = await handleApiResponse(res);
+      const message = await network
+        .get()
+        .queryFirebase('createlikedsongsplaylist');
       loading.set(false);
-      if (!json) {
+      if (!message) {
         //api response failed
-        showToast({ content: 'playlist creation failed. please try again.' });
+        showToast({ content: 'Playlist creation failed. Please try again.' });
         return;
       }
       // goto the playlist!
-      window.location.href =
-        'https://open.spotify.com/playlist/' + json.message;
-      showToast({content: 'playlist successfully created!'});
-      return json.message;
+      window.location.href = 'https://open.spotify.com/playlist/' + message;
+      showToast({ content: 'playlist successfully created!' });
+      return message;
     } else if (u.musicPlatform === MusicPlatform.appleMusic) {
       const { value } = await Dialog.confirm({
         title: 'Create Apple Music Playlist',
@@ -128,24 +87,18 @@ export const createSongsPlaylist = action(
       const { url } = await AppleMusic.createPlaylist({
         name: 'friendsfm - saved songs',
       });
-      const res = await fetch(getFirebaseUrl('setsongsplaylist'), {
-        method: 'POST',
-        body: JSON.stringify({
-          authToken: authToken.get(),
-          playlist: url,
-        }),
-        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-      });
-      const json = await handleApiResponse(res);
+      const message = await network
+        .get()
+        .queryFirebase('setsongsplaylist', { playlist: url });
       loading.set(false);
-      if (!json) {
+      if (!message) {
         //api response failed
-        showToast({ content: 'playlist creation failed. please try again.' });
+        showToast({ content: 'Playlist creation failed. Please try again.' });
         return;
       }
       // goto playlist
       window.location.href = url;
-      showToast({ content: 'playlist successfully created!' });
+      showToast({ content: 'Playlist successfully created!' });
       return url;
     }
   }

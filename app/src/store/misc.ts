@@ -1,7 +1,7 @@
 import { action, atom, map } from 'nanostores';
 import { Device } from '@capacitor/device';
 import type { Notification } from '@capacitor-firebase/messaging';
-import ActiveRequests from '../lib/ActiveRequests';
+import Network from '../lib/classes/Network';
 
 export const currPath = atom<string>('');
 
@@ -52,8 +52,15 @@ export const editingProfile = atom<boolean>(false);
 
 export const publicProfileUsername = atom<string>('');
 
-export const activeRequests = map<ActiveRequests>(new ActiveRequests());
-
 export const keyboardHeight = atom<number>(0);
 
-export const toast = map<{ visible: boolean, content?: string, color?: string, duration?: number, onClick?: () => void }>();
+export const toast = map<{
+  visible: boolean;
+  content?: string;
+  color?: string;
+  duration?: number;
+  onClick?: () => void;
+}>();
+
+// network store stuff
+export const network = map<Network>(new Network());

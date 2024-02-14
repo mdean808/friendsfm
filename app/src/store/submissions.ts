@@ -7,9 +7,15 @@ import {
   MusicPlatform,
   type Song,
 } from '../types';
-import { getFirebaseUrl, handleApiResponse } from '../lib/network';
 import { errorToast, goto, showToast } from '../lib/util';
-import { appCheckToken, authToken, getNewAuthToken, loading, user } from '.';
+import {
+  appCheckToken,
+  authToken,
+  getNewAuthToken,
+  loading,
+  network,
+  user,
+} from '.';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Dialog } from '@capacitor/dialog';
 import { Geolocation, type Position } from '@capacitor/geolocation';
@@ -57,27 +63,17 @@ export const generateSubmission = action(
         return errorToast({ content: e.message });
       }
     }
-    const res = await fetch(getFirebaseUrl('createnewusersubmission'), {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: authToken.get(),
+    const message = await network
+      .get()
+      .queryFirebase('createnewusersubmission', {
         latitude: location ? location.coords.latitude : undefined,
         longitude: location ? location.coords.longitude : undefined,
         appleMusic: recentlyPlayed?.song as Song,
-      }),
-      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-    });
-    const json = await handleApiResponse(res);
-    if (!json) {
-      // failed to set new music platform
-      return false;
-    }
-    store.set(json.message.user as Submission);
+      });
+
+    if (!message) return;
+    store.set(message.user as Submission);
     FirebaseAnalytics.logEvent({ name: 'generate_submission' });
-    // await Preferences.set({
-    //   key: 'submission',
-    //   value: JSON.stringify(userSubmission.get() || {}),
-    // });
   }
 );
 
@@ -86,19 +82,11 @@ export const getSubmissionStatus = action(
   'get-submission-status',
   async (store) => {
     await getNewAuthToken();
-    const res = await fetch(getFirebaseUrl('getcurrentsubmissionstatus'), {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-      }),
-      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-    });
-    const json = await handleApiResponse(res);
-    if (!json) {
-      // failed to set new music platform
-      return false;
-    }
-    if (json.message.user) store.set(json.message.user as Submission);
+    const message = await network
+      .get()
+      .queryFirebase('getcurrentsubmissionstatus');
+    if (!message) return;
+    if (message.user) store.set(message.user as Submission);
   }
 );
 
@@ -109,22 +97,12 @@ export const getFriendSubmissions = action(
   'get-submission-status',
   async (store) => {
     await getNewAuthToken();
-    const res = await fetch(getFirebaseUrl('getfriendsubmissions'), {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-      }),
-      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-    });
-    const json = await handleApiResponse(res);
-    if (!json) {
-      // failed to set new music platform
-      return false;
-    }
-    store.set(json.message.friends as Submission[]);
+    const message = await network.get().queryFirebase('getfriendsubmissions');
+    if (!message) return;
+    store.set(message.friends as Submission[]);
     await Preferences.set({
       key: 'friend-submissions',
-      value: JSON.stringify((json.message.friends as Submission[]) || []),
+      value: JSON.stringify((message.friends as Submission[]) || []),
     });
   }
 );
@@ -145,27 +123,16 @@ export const shareAudial = action(
       number = parseInt(split[0].split('#')[1]) as number;
       score = split[1] ? split[1] : audial;
     }
-    const res = await fetch(getFirebaseUrl('setcurrentsubmissionaudialscore'), {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: authToken.get(),
+    const message = await network
+      .get()
+      .queryFirebase('setcurrentsubmissionaudialscore', {
         submissionId: sub.id,
         parsedAudial: { number, score },
-      }),
-      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-    });
-    const json = await handleApiResponse(res);
+      });
     loading.set(false);
-    if (!json) {
-      // failed to set new music platform
-      return false;
-    }
+    if (!message) return;
     sub.audial = { number, score };
     store.set(sub);
-    // await Preferences.set({
-    //   key: 'submission',
-    //   value: JSON.stringify(userSubmission.get() || {}),
-    // });
     goto('/');
   }
 );
@@ -183,25 +150,19 @@ export const createSubmissionsPlaylist = action(
       });
       if (!value) return;
       loading.set(true);
-      const res = await fetch(getFirebaseUrl('createsubmissionsplaylist'), {
-        method: 'POST',
-        body: JSON.stringify({
-          authToken: authToken.get(),
-        }),
-        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-      });
-      const json = await handleApiResponse(res);
+      const message = await network
+        .get()
+        .queryFirebase('createsubmissionsplaylist');
       loading.set(false);
-      if (!json) {
+      if (!message) {
         //api response failed
-        showToast({ content: 'playlist creation failed. please try again.' });
+        showToast({ content: 'Playlist creation failed. Please try again.' });
         return;
       }
       // goto the playlist!
-      window.location.href =
-        'https://open.spotify.com/playlist/' + json.message;
+      window.location.href = 'https://open.spotify.com/playlist/' + message;
       showToast({ content: 'playlist successfully created!' });
-      return json.message;
+      return message;
     } else if (musicPlatform === MusicPlatform.appleMusic) {
       const { value } = await Dialog.confirm({
         title: 'Create Apple Music Playlist',
@@ -213,17 +174,11 @@ export const createSubmissionsPlaylist = action(
       const { url } = await AppleMusic.createPlaylist({
         name: 'friendsfm - submissions',
       });
-      const res = await fetch(getFirebaseUrl('setsubmissionsplaylist'), {
-        method: 'POST',
-        body: JSON.stringify({
-          authToken: authToken.get(),
-          playlist: url,
-        }),
-        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-      });
-      const json = await handleApiResponse(res);
+      const message = await network
+        .get()
+        .queryFirebase('setsubmissionsplaylist', { playlist: url });
       loading.set(false);
-      if (!json) {
+      if (!message) {
         //api response failed
         showToast({ content: 'playlist creation failed. please try again.' });
         return;
@@ -252,24 +207,16 @@ export const getNearbySubmissions = action(
     } catch (e) {
       console.log('Location permissions rejected.');
     }
-    const res = await fetch(getFirebaseUrl('nearbysubmissions'), {
-      method: 'post',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-        location: {
-          latitude: location ? location.coords.latitude : 0,
-          longitude: location ? location.coords.longitude : 0,
-        },
-        radius,
-        bounds,
-      }),
+    const message = await network.get().queryFirebase('nearbysubmissions', {
+      location: {
+        latitude: location ? location.coords.latitude : 0,
+        longitude: location ? location.coords.longitude : 0,
+      },
+      radius,
+      bounds,
     });
-    const json = await handleApiResponse(res);
-    if (!json) {
-      // failed to set new music platform
-      return false;
-    }
-    const data = json.message as StrippedSubmission[];
+    if (!message) return;
+    const data = message as StrippedSubmission[];
     store.set(data);
     return data;
   }
@@ -282,28 +229,20 @@ export const createCommentForSubmission = action(
   'create-comment-submission',
   async (store, content: string) => {
     const sub = store.get() as Submission;
-    const res = await fetch(getFirebaseUrl('createcomment'), {
-      method: 'post',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-        submissionId: sub.id,
-        content,
-      }),
+    const message = await network.get().queryFirebase('createcomment', {
+      submissionId: sub.id,
+      content,
     });
-    const json = await handleApiResponse(res);
-    if (!json) {
-      // failed to set new music platform
-      return false;
-    }
-    store.set(json.message);
+    if (!message) return;
+    store.set(message);
     // update other possible locations for the submission for homepage ui updates
     let fSubs = friendSubmissions.get();
     if (fSubs.find((s) => s.id === sub.id)) {
       fSubs = fSubs.filter((s) => s.id !== sub.id);
-      fSubs.push(json.message);
+      fSubs.push(message);
       friendSubmissions.set(fSubs);
     }
-    if (sub.id === userSubmission.get().id) userSubmission.set(json.message);
+    if (sub.id === userSubmission.get().id) userSubmission.set(message);
   }
 );
 
@@ -312,28 +251,19 @@ export const deleteCommentFromSubmission = action(
   'delete-comment-submission',
   async (store, comment: Comment) => {
     const sub = store.get() as Submission;
-    const res = await fetch(getFirebaseUrl('deletecomment'), {
-      method: 'post',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-        submissionId: sub.id,
-        comment,
-      }),
-    });
-    const json = await handleApiResponse(res);
-    if (!json) {
-      // failed to set new music platform
-      return false;
-    }
-    store.set(json.message);
+    const message = await network
+      .get()
+      .queryFirebase('deletecomment', { submissionId: sub.id, comment });
+    if (!message) return;
+    store.set(message);
     // update other possible locations for the submission for homepage ui updates
     let fSubs = friendSubmissions.get();
     if (fSubs.find((s) => s.id === sub.id)) {
       fSubs = fSubs.filter((s) => s.id !== sub.id);
-      fSubs.push(json.message);
+      fSubs.push(message);
       friendSubmissions.set(fSubs);
     }
-    if (sub.id === userSubmission.get().id) userSubmission.set(json.message);
+    if (sub.id === userSubmission.get().id) userSubmission.set(message);
   }
 );
 
@@ -342,20 +272,11 @@ export const getSubmissionById = action(
   'get-submission-by-id',
   async (store, id: string) => {
     await getNewAuthToken();
-    const res = await fetch(getFirebaseUrl('getsubmissionbyid'), {
-      method: 'POST',
-      body: JSON.stringify({
-        id,
-        authToken: authToken.get(),
-      }),
-      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-    });
-    const json = await handleApiResponse(res);
-    if (!json) {
-      // failed to set new music platform
-      return false;
-    }
-    store.set(json.message as Submission);
-    return json.message as Submission;
+    const message = await network
+      .get()
+      .queryFirebase('getsubmissionbyid', { id });
+    if (!message) return;
+    store.set(message as Submission);
+    return message as Submission;
   }
 );

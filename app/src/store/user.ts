@@ -6,16 +6,14 @@ import { Preferences } from '@capacitor/preferences';
 import { captureException } from '@sentry/capacitor';
 import { map, action } from 'nanostores';
 import {
-  appCheckToken,
-  authToken,
   friendSubmissions,
   getFriendSubmissions,
   getNewAuthToken,
   loggedIn,
   loginState,
+  network,
   songs,
 } from '.';
-import { getFirebaseUrl, handleApiResponse } from '../lib/network';
 import { goto } from '../lib/util';
 import {
   UserState,
@@ -95,18 +93,11 @@ export const updateUsername = action(
   'update-username',
   async (store, newUsername: string) => {
     const u = store.get();
-    const res = await fetch(getFirebaseUrl('setusername'), {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-        username: newUsername,
-      }),
-      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-    });
-    if (!(await handleApiResponse(res))) {
-      // failed to set new username
-      return false;
-    }
+    const message = await network
+      .get()
+      .queryFirebase('setusername', { username: newUsername });
+    if (!message) return;
+
     // update state
     if (!u.username) loginState.set(UserState.registeringMusicPlatform);
     u.username = newUsername;
@@ -128,20 +119,13 @@ export const updateMusicPlatform = action(
     musicPlatformAuth?: AccessToken
   ) => {
     const u = store.get();
-    const res = await fetch(getFirebaseUrl('setmusicplatform'), {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-        musicPlatform: newMusicPlatform,
-        platformAuthCode: authCode,
-        musicPlatformAuth,
-      }),
-      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+    const message = await network.get().queryFirebase('setmusicplatform', {
+      musicPlatform: newMusicPlatform,
+      platformAuthCode: authCode,
+      musicPlatformAuth,
     });
-    if (!(await handleApiResponse(res))) {
-      // failed to set new music platform
-      return false;
-    }
+    if (!message) return;
+
     u.musicPlatform = newMusicPlatform;
     store.set(u);
     await updateUser(u);
@@ -173,21 +157,12 @@ export const refreshUser = action(user, 'get-user-data', async (store) => {
     console.log(e);
   }
   await getNewAuthToken();
-  const res = await fetch(getFirebaseUrl('getuser'), {
-    method: 'POST',
-    body: JSON.stringify({
-      authToken: authToken.get(),
-      messagingToken,
-    }),
-    headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-  });
-  const json = await handleApiResponse(res);
-  if (!json) {
-    // failed to refresh user
-    return false;
-  }
-  songs.set(json.message.songs as SavedSong[]);
-  const u = json.message.user as User;
+  const message = await network
+    .get()
+    .queryFirebase('getuser', { messagingToken });
+  if (!message) return;
+  songs.set(message.songs as SavedSong[]);
+  const u = message.user as User;
   // make sure we don't overwrite the bio or avatar
   if (u.profile.bio !== store.get()?.profile?.bio) {
     u.profile.bio = store.get()?.profile?.bio;
@@ -204,18 +179,8 @@ export const unlinkMusicProvider = action(
   user,
   'unlink-music-provider',
   async (store) => {
-    const res = await fetch(getFirebaseUrl('unlinkmusicplatform'), {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-      }),
-      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-    });
-    const json = await handleApiResponse(res);
-    if (!json) {
-      // failed to unlink provider
-      return false;
-    }
+    const message = await network.get().queryFirebase('unlinkmusicplatform');
+    if (!message) return;
     const u = store.get();
     u.musicPlatform = null;
     await updateUser(u);
@@ -227,19 +192,9 @@ export const getUserStatistics = action(
   'get-user-statistics',
   async (store) => {
     await getNewAuthToken();
-    const res = await fetch(getFirebaseUrl('getuserstatistics'), {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-      }),
-      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-    });
-    const json = await handleApiResponse(res);
-    if (!json) {
-      // failed to unlink provider
-      return false;
-    }
-    store.set(json.message as UserStatistics);
+    const message = await network.get().queryFirebase('getuserstatistics');
+    if (!message) return;
+    store.set(message as UserStatistics);
   }
 );
 
@@ -248,19 +203,10 @@ export const setProfile = action(
   'set-user-profile',
   async (store, newProfile: User['profile']) => {
     const u = store.get();
-    const res = await fetch(getFirebaseUrl('setprofile'), {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: authToken.get(),
-        newProfile,
-      }),
-      headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
-    });
-    const json = await handleApiResponse(res);
-    if (!json) {
-      // failed to unlink provider
-      return false;
-    }
+    const message = await network
+      .get()
+      .queryFirebase('setprofile', { newProfile });
+    if (!message) return;
     u.profile = newProfile;
     store.set(u);
   }

@@ -1,12 +1,12 @@
 <script lang="ts">
   import SpotifyLogo from '../assets/spotify_logo_green.png';
   import AppleMusicLogo from '../assets/apple_music_logo_white.svg';
-  import { getFirebaseUrl, handleApiResponse } from '../lib/network';
   import { goto } from '../lib/util';
   import {
     appCheckToken,
     authToken,
     loading,
+    network,
     searchType,
     setProfile,
     user,
@@ -36,39 +36,19 @@
     searching = true;
     input.blur();
     if ($user.musicPlatform === MusicPlatform.spotify) {
-      const res = await fetch(getFirebaseUrl('searchspotify'), {
-        method: 'POST',
-        body: JSON.stringify({
-          authToken: authToken.get(),
-          query,
-          types,
-        }),
-        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+      const message = await $network.queryFirebase('searchspotify', {
+        query,
+        types,
       });
-
-      const json = await handleApiResponse(res);
-      if (!json) {
-        // handle login failure
-        return false;
-      }
-      spotifyResponse = json.message as SpotifySearchRes;
+      if (!message) return;
+      spotifyResponse = message as SpotifySearchRes;
     } else if ($user.musicPlatform === MusicPlatform.appleMusic) {
-      const res = await fetch(getFirebaseUrl('searchapplemusic'), {
-        method: 'POST',
-        body: JSON.stringify({
-          authToken: authToken.get(),
-          query,
-          types,
-        }),
-        headers: { 'X-Firebase-AppCheck': appCheckToken.get() },
+      const message = await $network.queryFirebase('searchapplemusic', {
+        query,
+        types,
       });
-
-      const json = await handleApiResponse(res);
-      if (!json) {
-        // handle login failure
-        return false;
-      }
-      appleMusicResponse = json.message as MusicKitSearchResponse;
+      if (!message) return;
+      appleMusicResponse = message as MusicKitSearchResponse;
     }
     searching = false;
   };

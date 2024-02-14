@@ -4,9 +4,7 @@
   import AppleMusicLogo from '../assets/apple_music_logo_white.svg';
   import { onMount } from 'svelte';
   import { formatDurationPlayed } from '../lib/dates';
-  import { getFirebaseUrl, handleApiResponse } from '../lib/network';
   import {
-    appCheckToken,
     authToken,
     getNewAuthToken,
     loading,
@@ -16,6 +14,7 @@
     toggleSong,
     user,
     sendFriendRequest,
+    network,
   } from '../store';
   import { MusicPlatform, type User } from '../types';
   import { goto, showToast } from '../lib/util';
@@ -26,30 +25,21 @@
   onMount(async () => {
     loading.set(true);
     if (!$authToken) await getNewAuthToken();
-    const res = await fetch(getFirebaseUrl('getprofile'), {
-      method: 'POST',
-      body: JSON.stringify({
-        authToken: $authToken,
-        username: $publicProfileUsername,
-      }),
-      headers: { 'X-Firebase-AppCheck': $appCheckToken },
+    const message = await $network.queryFirebase('getprofile', {
+      username: $publicProfileUsername,
     });
-
-    const json = await handleApiResponse(res);
-    if (!json) {
-      // handle login failure
-      loading.set(false);
+    loading.set(false);
+    if (!message) {
       goto('/');
       return;
     }
-    profile = json.message as User['profile'];
-    loading.set(false);
+    profile = message as User['profile'];
   });
 
   const requestFriend = async () => {
     loading.set(true);
     if (await sendFriendRequest($publicProfileUsername.trim())) {
-      showToast({content: 'Successfully sent friend request'});
+      showToast({ content: 'Successfully sent friend request' });
     }
     loading.set(false);
   };

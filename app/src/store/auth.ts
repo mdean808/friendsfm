@@ -6,18 +6,18 @@ import { atom, action, map } from 'nanostores';
 import {
   friendSubmissions,
   homepageLoaded,
+  network,
   refreshUser,
   songs,
   updateUser,
   user,
   userSubmission,
 } from '.';
-import { getFirebaseUrl, handleApiResponse } from '../lib/network';
 import { UserState, type SavedSong, type User } from '../types';
 import { goto, registerForNotifications } from '../lib/util';
 
 // refresh every 10 seconds
-export const userRefreshInterval = map<NodeJS.Timer>(
+export const userRefreshInterval = map<NodeJS.Timeout>(
   setInterval(refreshUser, 10 * 1000)
 );
 
@@ -59,21 +59,12 @@ export const getNewAuthToken = action(
 export const loginUser = action(user, 'login-user', async (store) => {
   const u = store.get();
   u.messagingToken = await registerForNotifications();
-  const res = await fetch(getFirebaseUrl('loginuser'), {
-    method: 'POST',
-    body: JSON.stringify(u),
-    headers: { 'x-firebase-appcheck': appCheckToken.get() },
-  });
+  const message = await network.get().queryFirebase('loginuser', u);
 
-  const json = await handleApiResponse(res);
-  if (!json) {
-    // handle login failure
-    return false;
-  }
-
+  if (!message) return;
   loggedIn.set(true);
-  songs.set(json.message.songs as SavedSong[]);
-  await updateUser(json.message.user as User);
+  songs.set(message.songs as SavedSong[]);
+  await updateUser(message.user as User);
   // set the user's state
   if (!store.get().username) loginState.set(UserState.registeringUsername);
   else if (!store.get().musicPlatform)
@@ -88,11 +79,7 @@ export const loginUser = action(user, 'login-user', async (store) => {
 // Log the user out
 export const logout = action(user, 'logout', async (store) => {
   //this removes the device's messaging token from the user in the database
-  fetch(getFirebaseUrl('logoutuser'), {
-    method: 'POST',
-    body: JSON.stringify({ authToken: authToken.get() }),
-    headers: { 'x-firebase-appcheck': appCheckToken.get() },
-  });
+  await network.get().queryFirebase('logoutuser');
 
   FirebaseAnalytics.logEvent({
     name: 'logout',
