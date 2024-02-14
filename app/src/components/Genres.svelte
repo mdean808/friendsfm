@@ -33,10 +33,10 @@
   let genres: { name: string; active: boolean }[] = [];
 
   nearbySubmissions.subscribe((val) => {
+    genres = [];
     for (const sub of val) {
       const genre = sub.song.genre;
-      if (!genres.find((g) => g.name === genre))
-        genres.push({ name: genre, active: true });
+      genres.push({ name: genre, active: true });
     }
   });
 
