@@ -20,9 +20,7 @@
     "android:run": "yarn android:build && npx cap run android --target Pixel_6_Pro_API_32",
     "firebase:deploy": "cd ./functions && firebase deploy",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json",
-    "ionic:build": "npm run build",
-    "ionic:serve": "npm run dev"
+    "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
     "@capacitor-firebase/analytics": "^5.0.1",
@@ -88,4 +86,3 @@
     "vite": "^4.4.8"
   }
 }
-
