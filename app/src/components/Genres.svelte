@@ -13,9 +13,10 @@
     getNearbySubmissions,
     sendFriendRequest,
     user,
+    activeSubmission,
   } from '../store';
   import MusicPlatformIcon from '../components/icons/MusicPlatformIcon.svelte';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { slide } from 'svelte/transition';
   import LoadingIndicator from './LoadingIndicator.svelte';
 
@@ -25,28 +26,38 @@
 
   let prevZoom = 12;
 
-  activeGenre.listen((val) => {
-    const genreSub = $nearbySubmissions.find((s) => s.song.genre === val);
-    gotoCoords(genreSub.location.latitude, genreSub.location.longitude);
-  });
-
   let genres: { name: string; active: boolean }[] = [];
 
   nearbySubmissions.subscribe((val) => {
     genres = [];
     for (const sub of val) {
       const genre = sub.song.genre;
-      genres.push({ name: genre, active: true });
+      if (!genres.find((g) => g.name === genre))
+        genres.push({ name: genre, active: true });
+    }
+  });
+
+  // lsiten for notification changes
+  location.listen((val) => {
+    if (val?.gp?.coords && map && !$activeSubmission) {
+      const startingCenter = {
+        lng: $location?.gp?.coords.longitude,
+        lat: $location?.gp?.coords.latitude,
+      };
+      map.setCenter(startingCenter);
     }
   });
 
   onMount(async () => {
+    // load genres
+    genres = [];
     for (const sub of $nearbySubmissions) {
       const genre = sub.song.genre;
       if (!genres.find((g) => g.name === genre))
         genres.push({ name: genre, active: true });
     }
-    await updateCurrentLocation();
+
+    updateCurrentLocation();
     const mapRef = document.getElementById('google-map');
     const { Map } = (await google.maps.importLibrary(
       'maps'
@@ -54,7 +65,12 @@
 
     // center on the genre that was tapped
     let startingCenter = {} as { lat: number; lng: number };
-    if ($location?.gp?.coords) {
+    if ($activeSubmission) {
+      startingCenter = {
+        lat: $activeSubmission.location.latitude,
+        lng: $activeSubmission.location.longitude,
+      };
+    } else if ($location?.gp?.coords) {
       startingCenter = {
         lng: $location?.gp?.coords.longitude,
         lat: $location?.gp?.coords.latitude,
@@ -71,27 +87,42 @@
       disableDefaultUI: true,
       zoomControl: false,
     });
+    // update nearbySubmissions for this location
+    setTimeout(() => {
+      handleBoundsChange();
+    }, 100);
 
     // change radius based on the visibleWdith
     map.addListener('bounds_changed', async () => {
       if (prevZoom != map.getZoom() && map.getZoom() < 15) {
-        const bounds = map.getBounds();
-        await getNearbySubmissions(null, {
-          southWest: {
-            latitude: bounds.getSouthWest().lat(),
-            longitude: bounds.getSouthWest().lng(),
-          },
-          northEast: {
-            latitude: bounds.getNorthEast().lat(),
-            longitude: bounds.getNorthEast().lng(),
-          },
-        });
-        createMarkers();
-        prevZoom = map.getZoom();
+        handleBoundsChange();
       }
+    });
+    map.addListener('center_changed', async () => {
+      handleBoundsChange();
     });
     createMarkers();
   });
+
+  onDestroy(() => {
+    $activeSubmission = null;
+  });
+
+  const handleBoundsChange = () => {
+    // update nearbySubmissions for this location
+    const bounds = map.getBounds();
+    getNearbySubmissions(null, {
+      southWest: {
+        latitude: bounds.getSouthWest().lat(),
+        longitude: bounds.getSouthWest().lng(),
+      },
+      northEast: {
+        latitude: bounds.getNorthEast().lat(),
+        longitude: bounds.getNorthEast().lng(),
+      },
+    }).then(createMarkers);
+    prevZoom = map.getZoom();
+  };
 
   const createMarkers = async () => {
     const { AdvancedMarkerElement } = (await google.maps.importLibrary(
@@ -114,20 +145,7 @@
         'style',
         `background: ${intToRGB(hashCode(sub.song.genre, 23))}`
       );
-      // markerDiv.textContent = sub.song.name + ' - ' + sub.song.artist;
       markerDiv.textContent = sub.song.genre;
-      /*const arrow = document.createElement('span');
-      arrow.setAttribute(
-        'style',
-        `border-top-color: ${intToRGB(hashCode(sub.song.genre, 23))}`
-      );
-      arrow.className = `-bottom-3 left-[42%] w-3 h-3 absolute 
-                        border-l-[2px] border-l-transparent
-                        border-t-[7px] 
-                        border-r-[2px] border-r-transparent
-                        `;
-      markerDiv.appendChild(arrow);
-      */
       const marker = new AdvancedMarkerElement({
         map,
         position: {
@@ -277,8 +295,10 @@
 
                     {#if !loadingFr}
                       <button
-                        on:click={() =>
-                          requestFriend(sub.user.username, loadingFr)}
+                        on:click={(e) => {
+                          e.stopPropagation();
+                          requestFriend(sub.user.username, loadingFr);
+                        }}
                         class=" text-white"
                       >
                         <svg

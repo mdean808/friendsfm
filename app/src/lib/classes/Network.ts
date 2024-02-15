@@ -4,7 +4,7 @@ import {
   type NetworkRequest,
   type NetworkResponse,
 } from '../../types';
-import ky from 'ky';
+import ky, { HTTPError } from 'ky';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import SentryTransaction from './SentryTransaction';
 import { errorToast, goto } from '../util';
@@ -75,13 +75,18 @@ export default class Network {
       abortController: new AbortController(),
     });
     // make request
-    const res = await ky.post(url, {
-      headers: {
-        Authentication: 'Bearer ' + authToken.get(),
-        'x-firebase-appcheck': appCheckToken.get(),
-      },
-      body: JSON.stringify(body),
-    });
+    let res = {} as Response;
+    try {
+      res = await ky.post(url, {
+        headers: {
+          Authentication: 'Bearer ' + authToken.get(),
+          'x-firebase-appcheck': appCheckToken.get(),
+        },
+        body: JSON.stringify(body),
+      });
+    } catch (e) {
+      res = (e as HTTPError).response;
+    }
     // update request object with response
     this.update(id, { ...networkRequest, response: res });
     // handle response, return the message
@@ -156,7 +161,6 @@ export default class Network {
       params: {
         status: res.status,
         statusText: res.statusText,
-        message: json.message,
         error: json.error,
       },
     });

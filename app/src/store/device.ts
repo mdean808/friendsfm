@@ -9,6 +9,7 @@ import type { Location, ReverseGeolocationPosition } from '../types';
 import { NativeGeocoder } from '@capgo/nativegeocoder';
 import { Geolocation } from '@capacitor/geolocation';
 import { Dialog } from '@capacitor/dialog';
+import { Capacitor } from '@capacitor/core';
 
 export const statusBarHeight = atom<number>(0);
 export const getStatusBarHeight = action(
@@ -33,30 +34,42 @@ export const updateCurrentLocation = action(
   location,
   'update-location',
   async (store) => {
-    try {
-      await Geolocation.checkPermissions();
-    } catch {
-      await Geolocation.requestPermissions();
-    }
-    const l = store.get();
-    try {
-      l.gp = await Geolocation.getCurrentPosition();
-    } catch (e) {
-      const { value } = await Dialog.confirm({
-        title: 'Location Permissions',
-        message:
-          'Location permissions need to be enabled to use this feature. Please enable them in settings.',
-        okButtonTitle: 'Settings',
-        cancelButtonTitle: 'Ignore',
-      });
-      if (value) {
-        NativeSettings.open({
-          optionIOS: IOSSettings.App,
-          optionAndroid: AndroidSettings.ApplicationDetails,
-        });
+    if (Capacitor.getPlatform() !== 'web') {
+      try {
+        await Geolocation.checkPermissions();
+      } catch {
+        await Geolocation.requestPermissions();
       }
+      const l = store.get();
+      try {
+        l.gp = await Geolocation.getCurrentPosition();
+      } catch (e) {
+        if (store.get().gp) return;
+        const { value } = await Dialog.confirm({
+          title: 'Location Permissions',
+          message:
+            'Location permissions need to be enabled to use this feature. Please enable them in settings.',
+          okButtonTitle: 'Settings',
+          cancelButtonTitle: 'Ignore',
+        });
+        if (value) {
+          NativeSettings.open({
+            optionIOS: IOSSettings.App,
+            optionAndroid: AndroidSettings.ApplicationDetails,
+          });
+        }
+      }
+      store.set(l);
+    } else {
+      store.set({
+        gp: {
+          coords: {
+            latitude: 0,
+            longitude: 0,
+          },
+        },
+      } as Location);
     }
-    store.set(l);
   }
 );
 export const getReverseGeocode: () => Promise<ReverseGeolocationPosition> =

@@ -71,9 +71,10 @@
     ) {
       load();
       loadFriends();
-      loadGenres();
+      loadNearby();
     } else {
       if (!homepageLoaded.get()) loadFriends(true);
+      loadNearby();
       loadingGenres = false;
       loadingSubmission = false;
       loadingFriendSubmissions = false;
@@ -87,7 +88,7 @@
     App.addListener('appStateChange', ({ isActive }) => {
       if (isActive) {
         getSubmissionStatus();
-        loadGenres();
+        loadNearby();
         loadFriends(true);
       }
     });
@@ -117,16 +118,15 @@
     if (!hideLoadingIndicator) loadingFriendSubmissions = false;
   };
 
-  const loadGenres = async () => {
+  const loadNearby = async () => {
     loadingGenres = true;
-    await getNearbySubmissions(20);
-    loadingGenres = false;
+    getNearbySubmissions(20).then(() => (loadingGenres = false));
   };
 
   const handleRefresh = async () => {
     const refresher = document.getElementById('refresher') as IonRefresher;
     getSubmissionStatus();
-    loadGenres();
+    loadNearby();
     await loadFriends(true);
     refresher.complete();
   };
@@ -135,7 +135,7 @@
     loading.set(true);
     await generateSubmission();
     loadFriends();
-    loadGenres();
+    loadNearby();
     loading.set(false);
   };
 

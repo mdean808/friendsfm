@@ -1,6 +1,12 @@
 <script lang="ts">
   import { goto, hashCode, intToRGB } from '../../lib/util';
-  import { activeGenre, activeHomeTab, songs, toggleSong } from '../../store';
+  import {
+    activeGenre,
+    activeHomeTab,
+    activeSubmission,
+    songs,
+    toggleSong,
+  } from '../../store';
   import type { SavedSong, Submission } from '../../types';
   import Heart from '../icons/Heart.svelte';
   import Comment from '../icons/Comment.svelte';
@@ -34,12 +40,14 @@
       on:keyup={(e) => {
         e.stopPropagation();
         activeGenre.set(data.song.genre);
+        activeSubmission.set(data);
         activeHomeTab.set('genres');
         goto('/');
       }}
       on:click={(e) => {
         e.stopPropagation();
         activeGenre.set(data.song.genre);
+        activeSubmission.set(data);
         activeHomeTab.set('genres');
         goto('/');
       }}
