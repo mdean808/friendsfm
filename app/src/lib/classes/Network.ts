@@ -12,6 +12,7 @@ import {
   appCheckToken,
   authToken,
   getNewAuthToken,
+  loggedIn,
   logout,
   platform,
   spotifyAuthCode,
@@ -114,6 +115,7 @@ export default class Network {
         );
         break;
       case 4: // 4xx - client error
+        if (!loggedIn.get()) break;
         switch (res.status) {
           case 401:
             errorToast({
