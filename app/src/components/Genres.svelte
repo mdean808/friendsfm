@@ -4,7 +4,6 @@
   import type { SavedSong, StrippedSubmission } from '../types';
   import {
     toggleSong,
-    activeGenre,
     nearbySubmissions,
     songs,
     location,
@@ -177,7 +176,10 @@
   };
 
   const gotoCoords = (lat: number, lng: number) => {
-    if (map) map.setCenter({ lat, lng });
+    if (map) {
+      map.setZoom(10);
+      map.setCenter({ lat, lng });
+    }
   };
 
   const requestFriend = async (username: string, loading: boolean) => {
