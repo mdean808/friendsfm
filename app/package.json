@@ -24,7 +24,6 @@
   },
   "dependencies": {
     "@capacitor-firebase/analytics": "^5.0.1",
-    "@capacitor-firebase/app-check": "^5.0.1",
     "@capacitor-firebase/authentication": "^5.0.1",
     "@capacitor-firebase/crashlytics": "^5.0.1",
     "@capacitor-firebase/messaging": "^5.0.1",

@@ -3,8 +3,6 @@
   import AppleMusicLogo from '../assets/apple_music_logo_white.svg';
   import { goto } from '../lib/util';
   import {
-    appCheckToken,
-    authToken,
     loading,
     network,
     searchType,

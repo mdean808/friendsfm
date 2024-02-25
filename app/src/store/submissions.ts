@@ -9,8 +9,6 @@ import {
 } from '../types';
 import { errorToast, goto, showToast } from '../lib/util';
 import {
-  appCheckToken,
-  authToken,
   getNewAuthToken,
   loading,
   network,

@@ -1,6 +1,5 @@
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
-import { FirebaseAppCheck } from '@capacitor-firebase/app-check';
 import { Preferences } from '@capacitor/preferences';
 import { atom, action, map } from 'nanostores';
 import {
@@ -100,28 +99,3 @@ export const logout = action(user, 'logout', async (store) => {
   await Preferences.remove({ key: 'friend-submissions' });
 });
 
-export const appCheckToken = atom<string>('');
-
-export const getAppCheckToken = action(
-  appCheckToken,
-  'get-app-check-token',
-  async (store) => {
-    const { token } = await FirebaseAppCheck.getToken();
-    store.set(token);
-  }
-);
-
-export const initAppCheck = action(
-  appCheckToken,
-  'init-app-check',
-  async (store) => {
-    await FirebaseAppCheck.initialize({
-      debug: import.meta.env.DEV,
-      isTokenAutoRefreshEnabled: true,
-      siteKey: '6LfulmYlAAAAAJwLoH096WItcxGwHy-CpQPU-aQG',
-    });
-    await FirebaseAppCheck.addListener('tokenChanged', (event) => {
-      store.set(event.token);
-    });
-  }
-);

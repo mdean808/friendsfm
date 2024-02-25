@@ -5,7 +5,6 @@ import { user } from '.';
 import { showToast } from '../lib/util';
 import AppleMusic from '../plugins/AppleMusic';
 import { MusicPlatform, type SavedSong } from '../types';
-import { appCheckToken, authToken } from './auth';
 import { loading, network } from './misc';
 
 export const songs = atom<SavedSong[]>([]);

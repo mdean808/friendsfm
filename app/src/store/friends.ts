@@ -1,6 +1,6 @@
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { action } from 'nanostores';
-import { appCheckToken, authToken, network, refreshUser, user } from '.';
+import { network, refreshUser, user } from '.';
 
 export const sendFriendRequest = action(
   user,

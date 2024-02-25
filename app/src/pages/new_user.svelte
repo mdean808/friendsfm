@@ -85,7 +85,6 @@
   });
 
   onMount(async () => {
-    // if (!appCheckToken.get()) await getAppCheckToken();
     appLoading.set(false);
     setInterval(() => authTaps.set(0), 10000);
   });

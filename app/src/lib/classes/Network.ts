@@ -9,7 +9,6 @@ import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import SentryTransaction from './SentryTransaction';
 import { errorToast, goto } from '../util';
 import {
-  appCheckToken,
   authToken,
   getNewAuthToken,
   loggedIn,
@@ -81,7 +80,6 @@ export default class Network {
       res = await ky.post(url, {
         headers: {
           Authentication: 'Bearer ' + authToken.get(),
-          'x-firebase-appcheck': appCheckToken.get(),
         },
         body: JSON.stringify(body),
         hooks: {
