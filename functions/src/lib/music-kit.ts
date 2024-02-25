@@ -13,7 +13,7 @@ export const searchAppleMusic = async (
   await musicKit.getToken();
   const url = `https://api.music.apple.com/v1/catalog/us/search?types=${encodeURIComponent(
     pluralTypes.toString()
-  )}&term=${query}&limit=20`;
+  )}&term=${encodeURIComponent(query)}&limit=20`;
   const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${musicKit.token}`,
