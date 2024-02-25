@@ -84,6 +84,20 @@ export default class Network {
           'x-firebase-appcheck': appCheckToken.get(),
         },
         body: JSON.stringify(body),
+        hooks: {
+          afterResponse: [
+            async (req, _opt, res) => {
+              // authentication failed, refresh auth token.
+              if (res.status === 401 || res.status === 403) {
+                await getNewAuthToken();
+                // check if refresh failed, if so, log user out
+                if (!authToken.get()) return await logout();
+                req.headers.set('Authentication', 'Bearer ' + authToken.get());
+                return ky(req);
+              }
+            },
+          ],
+        },
       });
     } catch (e) {
       res = (e as HTTPError).response;

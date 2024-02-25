@@ -115,7 +115,7 @@
   const loadFriends = async (hideLoadingIndicator?: boolean) => {
     if (!hideLoadingIndicator) loadingFriendSubmissions = true;
     await getFriendSubmissions();
-    if (!hideLoadingIndicator) loadingFriendSubmissions = false;
+    loadingFriendSubmissions = false;
   };
 
   const loadNearby = async () => {

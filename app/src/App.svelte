@@ -83,15 +83,19 @@
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.data) return;
     if (!$dologin) {
-      dologin.subscribe((val) => {
+      dologin.subscribe(async (val) => {
         if (val) {
-          handleNotif(notif);
+          await handleNotif(notif);
         }
       });
     } else {
       await handleNotif(notif);
     }
   });
+
+  appLoading.subscribe((data) => {
+    errorToast({content: 'appLoading value: ' + data, offset: 300})
+  })
 
   onMount(async () => {
     platform.set(Capacitor.getPlatform());
@@ -156,6 +160,7 @@
       document.documentElement.classList.add('ion-ce');
     } catch (e) {
       console.log('ionic error:', e);
+      errorToast({content: e})
     }
   });
 
@@ -186,7 +191,7 @@
     await getUserFromPreferences();
     // handle routing for new notifications
     const data = notif.data as { [key: string]: any };
-    await FirebaseAnalytics.logEvent({
+    FirebaseAnalytics.logEvent({
       name: 'notification_open',
       params: {
         title: notif.title,
@@ -202,41 +207,50 @@
       goto('/friends');
       secondaryAppLoading.set(false);
     } else if (data.type === 'daily') {
-      secondaryAppLoading.set(true);
-      await getSubmissionStatus();
-      goto('/');
-      appLoading.set(false);
-      secondaryAppLoading.set(false);
+      try {
+        secondaryAppLoading.set(true);
+        await getSubmissionStatus();
+        goto('/');
+        secondaryAppLoading.set(false);
+      } catch (e) {
+        errorToast({content: e})
+      }
     } else if (data.type === 'request-accept') {
       secondaryAppLoading.set(true);
       await refreshUser();
       goto('/friends');
       secondaryAppLoading.set(false);
     } else if (data.type === 'comment') {
-      appLoading.set(false);
-      submissionLoading.set(true);
-      const subId = data.id;
-      const sub = await getSubmissionById(subId)
-      if (sub) {
-        activeSubmission.set(sub);
-        goto('/?submission');
-      } else {
-        errorToast({content: 'Error: Submission not found.'});
+      try {
+        submissionLoading.set(true);
+        const subId = data.id;
+        const sub = await getSubmissionById(subId)
+        if (sub) {
+          activeSubmission.set(sub);
+          goto('/?submission');
+        } else {
+          errorToast({content: 'Error: Submission not found.'});
+        }
+        submissionLoading.set(false);
+      } catch (e) {
+        errorToast({content: e})
       }
-      submissionLoading.set(false);
     } else if (data.type === 'late-submission') {
-      if ($launchStatus === 'fresh') secondaryAppLoading.set(true);
+      try {
+        if ($launchStatus === 'fresh') secondaryAppLoading.set(true);
 
-      if ($userSubmission && $userSubmission.song) {
-        singleSubmissionLoading.set(true);
-        appLoading.set(false);
-        secondaryAppLoading.set(false);
-        goto('/');
-        await getSubmissionStatus();
-        await getFriendSubmissions();
-        singleSubmissionLoading.set(false);
+        if ($userSubmission && $userSubmission.song) {
+          singleSubmissionLoading.set(true);
+          secondaryAppLoading.set(false);
+          goto('/');
+          await getSubmissionStatus();
+          await getFriendSubmissions();
+          singleSubmissionLoading.set(false);
+        }
+        if ($launchStatus === 'fresh') secondaryAppLoading.set(false);
+      } catch (e) {
+        errorToast({content: e})
       }
-      if ($launchStatus === 'fresh') secondaryAppLoading.set(false);
     }
   };
 </script>
@@ -270,7 +284,7 @@
 
     <!-- put the toast double the height of the bottom nav -->
     {#if $toast.visible}
-      <div transition:slide class="absolute z-50 w-full" style={`bottom: ${75 + $insets.bottom}px; `}>
+      <div transition:slide class="absolute z-50 w-full" style={`bottom: ${75 + $insets.bottom + ($toast.offset || 0)}px; `}>
         <Toast />
       </div>
     {/if}

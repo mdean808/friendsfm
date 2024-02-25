@@ -34,8 +34,13 @@ export const registerForNotifications = async () => {
   }
 };
 
-export function errorToast(options: { content: string, duration?: number, onClick?: () => void }) {
-  showToast({ color: '#ad2626', ...options })
+export function errorToast(options: {
+  content: string;
+  duration?: number;
+  offset?: number;
+  onClick?: () => void;
+}) {
+  showToast({ color: '#ad2626', ...options });
 }
 
 export const wait = (ms: number): Promise<void> => {
@@ -90,8 +95,18 @@ export function intToRGB(i: number) {
   return hex;
 }
 
-export const showToast = (options: { content: string, color?: string, duration?: number, onClick?: () => void }) => {
-  options.onClick = options.onClick || (() => toast.set({ visible: false, ...options }));
+export const showToast = (options: {
+  content: string;
+  color?: string;
+  duration?: number;
+  offset?: number;
+  onClick?: () => void;
+}) => {
+  options.onClick =
+    options.onClick || (() => toast.set({ visible: false, ...options }));
   toast.set({ visible: true, ...options });
-  setTimeout(() => toast.set({ visible: false, ...options }), options.duration || 5000)
-}
+  setTimeout(
+    () => toast.set({ visible: false, ...options }),
+    options.duration || 5000
+  );
+};

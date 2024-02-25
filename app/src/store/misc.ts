@@ -59,6 +59,7 @@ export const toast = map<{
   content?: string;
   color?: string;
   duration?: number;
+  offset?: number;
   onClick?: () => void;
 }>();
 
