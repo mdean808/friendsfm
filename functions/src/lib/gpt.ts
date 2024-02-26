@@ -30,8 +30,11 @@ export const getTrackGenre = async (name: string, artist: string) => {
   } else {
     try {
       const json = JSON.parse(data?.choices[0].message?.content || '{}');
+      if (!json?.genre)
+        console.log('GPT ERROR: ' + data?.choices[0].message?.content);
       return json?.genre || 'Unkown';
     } catch (e) {
+      console.log('GPT ERROR: ' + data?.choices[0].message?.content);
       return 'Unkown';
     }
   }
