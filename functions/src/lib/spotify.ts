@@ -68,7 +68,6 @@ export const getCurrentSpotifySong = async (accessToken: string) => {
   );
 
   if (res.status !== 200) {
-    console.error('get current spotify song: ' + res.status, await res.text());
     if (res.status === 204) {
       return await getRecentlyPlayedSpotifySongs(accessToken);
     }
