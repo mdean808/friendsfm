@@ -6,6 +6,7 @@
   import LoadingIndicator from '../LoadingIndicator.svelte';
   import { Share } from '@capacitor/share';
   import { Keyboard, KeyboardResize } from '@capacitor/keyboard';
+  import { Capacitor } from '@capacitor/core';
 
   const swipePosStart = { x: 0, y: 0 };
   const swipePosCurrent = { x: 0, y: 0 };
@@ -41,13 +42,15 @@
     }
   };
   onMount(async () => {
-    Keyboard.setResizeMode({ mode: KeyboardResize.Native });
+    if (Capacitor.isPluginAvailable('Keyboard'))
+      Keyboard.setResizeMode({ mode: KeyboardResize.Native });
     document.addEventListener('touchstart', swipeStart, false);
     document.addEventListener('touchmove', swipeMove, false);
     document.addEventListener('touchend', swipeEnd, false);
   });
   onDestroy(() => {
-    Keyboard.setResizeMode({ mode: KeyboardResize.None });
+    if (Capacitor.isPluginAvailable('Keyboard'))
+      Keyboard.setResizeMode({ mode: KeyboardResize.None });
     document.addEventListener('touchstart', swipeStart, false);
     document.addEventListener('touchmove', swipeMove, false);
     document.addEventListener('touchend', swipeEnd, false);
