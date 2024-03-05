@@ -11,6 +11,15 @@ import { Geolocation } from '@capacitor/geolocation';
 import { Dialog } from '@capacitor/dialog';
 import { Capacitor } from '@capacitor/core';
 
+export const keyboardHeight = atom<number>(0);
+
+export const platform = atom<string>('');
+
+export const getPlatform = action(platform, 'get-platform', async (store) => {
+  const platform = Capacitor.getPlatform();
+  store.set(platform);
+});
+
 export const statusBarHeight = atom<number>(0);
 export const getStatusBarHeight = action(
   statusBarHeight,
@@ -34,7 +43,7 @@ export const updateCurrentLocation = action(
   location,
   'update-location',
   async (store) => {
-    if (Capacitor.getPlatform() !== 'web') {
+    if (platform.get() !== 'web') {
       try {
         await Geolocation.checkPermissions();
       } catch {

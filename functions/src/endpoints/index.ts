@@ -30,3 +30,4 @@ export * from './comments/deletecomment';
 export * from './misc/searchspotify';
 export * from './misc/searchapplemusic';
 export * from './friends/getfriendsuggestions';
+export * from './users/getusercurrentlylistening';

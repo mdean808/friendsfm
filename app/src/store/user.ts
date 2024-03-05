@@ -12,6 +12,7 @@ import {
   loggedIn,
   loginState,
   network,
+  platform,
   songs,
 } from '.';
 import { goto } from '../lib/util';
@@ -19,6 +20,7 @@ import {
   UserState,
   type MusicPlatform,
   type SavedSong,
+  type Song,
   type Submission,
   type User,
   type UserStatistics,
@@ -146,7 +148,7 @@ export const refreshUser = action(user, 'get-user-data', async (store) => {
     return false;
   let messagingToken = '';
   try {
-    if (Capacitor.getPlatform() !== 'web') {
+    if (platform.get() !== 'web') {
       await FirebaseMessaging.checkPermissions().catch(
         async () => await FirebaseMessaging.requestPermissions()
       );
@@ -209,5 +211,17 @@ export const setProfile = action(
     if (!message) return;
     u.profile = newProfile;
     store.set(u);
+  }
+);
+
+export const getUserCurrentlyListening = action(
+  user,
+  'get-user-currently-listening',
+  async (_store, id, username?) => {
+    const message = await network
+      .get()
+      .queryFirebase('getusercurrentlylistening', { id, username });
+    if (!message) return;
+    return message as Song;
   }
 );

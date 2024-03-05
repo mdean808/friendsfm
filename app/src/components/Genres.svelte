@@ -40,8 +40,8 @@
   location.listen((val) => {
     if (val?.gp?.coords && map && !$activeSubmission) {
       const startingCenter = {
-        lng: $location?.gp?.coords.longitude,
-        lat: $location?.gp?.coords.latitude,
+        lng: $location?.gp?.coords?.longitude || 0,
+        lat: $location?.gp?.coords?.latitude || 0,
       };
       map.setCenter(startingCenter);
     }
@@ -64,15 +64,18 @@
 
     // center on the genre that was tapped
     let startingCenter = {} as { lat: number; lng: number };
-    if ($activeSubmission) {
+    if ($activeSubmission?.location) {
       startingCenter = {
-        lat: $activeSubmission.location.latitude,
-        lng: $activeSubmission.location.longitude,
+        lat: $activeSubmission.location?.latitude,
+        lng: $activeSubmission.location?.longitude,
       };
-    } else if ($location?.gp?.coords) {
+    } else if (
+      $location?.gp?.coords?.latitude &&
+      $location?.gp?.coords?.longitude
+    ) {
       startingCenter = {
-        lng: $location?.gp?.coords.longitude,
-        lat: $location?.gp?.coords.latitude,
+        lng: $location?.gp?.coords?.longitude,
+        lat: $location?.gp?.coords?.latitude,
       };
     } else {
       startingCenter = { lng: 0, lat: 0 };
@@ -129,10 +132,10 @@
     )) as google.maps.MarkerLibrary;
     const missingSubs = [...$nearbySubmissions].filter((s) => {
       const hasLat = !!markers.find(
-        (m) => m.position.lat === s.location.latitude
+        (m) => m.position.lat === s.location?.latitude
       );
       const hasLng = !!markers.find(
-        (m) => m.position.lng === s.location.longitude
+        (m) => m.position.lng === s.location?.longitude
       );
       if (hasLat && hasLng) return false;
       else return true;
@@ -148,8 +151,8 @@
       const marker = new AdvancedMarkerElement({
         map,
         position: {
-          lat: sub.location.latitude,
-          lng: sub.location.longitude,
+          lat: sub.location?.latitude,
+          lng: sub.location?.longitude,
         },
         content: markerDiv,
       });
@@ -271,10 +274,13 @@
             <div class="">
               <div
                 on:click={() => {
-                  gotoCoords(sub.location.latitude, sub.location.longitude);
+                  gotoCoords(sub.location?.latitude, sub.location?.longitude);
                   parentDiv.scrollIntoView();
                 }}
-                on:keyup={() => this.click()}
+                on:keyup={() => {
+                  gotoCoords(sub.location?.latitude, sub.location?.longitude);
+                  parentDiv.scrollIntoView();
+                }}
                 style={`background: ${intToRGB(hashCode(sub.song.genre, 23))}`}
                 class={`flex p-2 rounded-t-lg bg-${sub.user.musicPlatform}`}
               >

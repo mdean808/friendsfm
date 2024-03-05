@@ -51,7 +51,7 @@
         activeHomeTab.set('genres');
         goto('/');
       }}
-      class="px-1.5 py-1 border-white border text-sm text-center text-white relative text-md rounded-xl truncate"
+      class="px-1.5 py-1 h-7 border-white border text-sm text-center text-white relative text-md rounded-xl truncate"
       style={`background: ${intToRGB(hashCode(data.song.genre, 23))}`}
       >{data.song.genre}</span
     >

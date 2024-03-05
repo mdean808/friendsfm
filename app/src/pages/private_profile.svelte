@@ -5,6 +5,7 @@
   import { formatDurationPlayed } from '../lib/dates';
   import {
     editingProfile,
+    getUserCurrentlyListening,
     header,
     searchType,
     songs,
@@ -18,7 +19,17 @@
   import { Share } from '@capacitor/share';
   import { goto } from '../lib/util';
 
+  import Skeleton from '../components/submission/Skeleton.svelte';
+
   const firstOfTheMonth = new Date().getDate() === 1;
+
+  const currentlyListening = async () => {
+    const song = await getUserCurrentlyListening($user.id);
+    if (!song) throw 'No song';
+    return song;
+  };
+
+  let currentListeningPromise = currentlyListening();
 
   onMount(() => {
     header.set('profile');
@@ -421,61 +432,115 @@
     {/if}
   </div>
   <hr class="w-28 border-gray-400 border-[1.5px] rounded-full mx-auto" />
-  <!-- User Common Song -->
-  {#if $userStatistics?.topSong}
-    <h2 class="mt-2 mb-1 font-semibold text-xl">most common song</h2>
+  {#await currentListeningPromise}
+    <p class="h-5 my-1.5 rounded-md animate-pulse bg-gray-700 mx-auto w-1/2" />
+    <div class="mx-4 mb-2">
+      <Skeleton type="user" />
+    </div>
+  {:then song}
+    <h2 class="mt-2 mb-1 font-semibold text-xl">
+      currently listening to
+    </h2>
     <div
-      class="text-left bg-gray-700 rounded-md px-2 mx-4 py-2 mb-2 flex space-x-4"
+      class={`p-1 rounded-md mx-4 mb-2 bg-gradient-to-r from-${$user.musicPlatform} via-blue-500 to-${$user.musicPlatform}   background-animate`}
     >
-      <a href={$userStatistics.topSong.url} class="flex flex-grow items-center">
-        {#if $userStatistics.topSong.albumArtwork}
-          <div>
-            <img
-              alt="Album Artwork"
-              class="w-16 h-16 mr-3"
-              src={$userStatistics.topSong.albumArtwork}
-            />
-          </div>
+      <div
+        class="text-left bg-gray-700 relative rounded-md px-2 py-2 flex space-x-4"
+      >
+        <!-- SONG DURATION BACKGROUND -->
+        {#if song.timestamp === 0}
+          <div
+            style={`
+            width: ${(song.durationElapsed / song.length) * 100}%
+          `}
+            class="absolute rounded-l-md left-0 top-0 right-0 h-full bg-blue-700 opacity-60 z-0"
+          />
         {/if}
-        <div class={$userStatistics.topSong.albumArtwork ? 'w-52' : 'w-64'}>
-          <h1 class={`truncate text-${$user.musicPlatform}`}>
-            {$userStatistics.topSong.name}
-          </h1>
-          <p class="text-white truncate">
-            {$userStatistics.topSong.artist}
-          </p>
-          <p class="text-sm truncate text-gray-500">
-            {formatDurationPlayed($userStatistics.topSong.length)}
-          </p>
-        </div>
-      </a>
-      <div class="flex-grow-0 flex-shrink">
-        <svg
-          role="presentation"
-          on:click={() => toggleSong($userStatistics.topSong)}
-          on:keypress={() => toggleSong($userStatistics.topSong)}
-          class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
-            $songs.find((s) => s.name === $userStatistics.topSong.name) &&
-            'text-white'
-          }`}
-          fill={`${
-            $songs.find((s) => s.name === $userStatistics.topSong.name)
-              ? 'currentColor'
-              : 'transparent'
-          }`}
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-          ><path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-          /></svg
-        >
+        <a href={song.url} class="flex sticky flex-grow items-center">
+          {#if song.albumArtwork}
+            <div>
+              <img
+                alt="Album Artwork"
+                class="w-16 h-16 mr-3"
+                src={song.albumArtwork}
+              />
+            </div>
+          {/if}
+          <div class={song.albumArtwork ? 'w-52' : 'w-64'}>
+            <h1 class={`truncate text-${$user.musicPlatform}`}>
+              {song.name}
+            </h1>
+            <p class="text-white truncate">
+              {song.artist}
+            </p>
+            <p class="text-sm truncate text-gray-500">
+              {formatDurationPlayed(song.length)}
+            </p>
+          </div>
+        </a>
+        <div class="flex-grow-0 flex-shrink"></div>
       </div>
     </div>
-  {/if}
+  {:catch}
+    <!-- User Top Song -->
+    {#if $userStatistics?.topSong}
+      <h2 class="mt-2 mb-1 font-semibold text-xl">most common song</h2>
+      <div
+        class="text-left bg-gray-700 rounded-md px-2 mx-4 py-2 mb-2 flex space-x-4"
+      >
+        <a
+          href={$userStatistics.topSong.url}
+          class="flex flex-grow items-center"
+        >
+          {#if $userStatistics.topSong.albumArtwork}
+            <div>
+              <img
+                alt="Album Artwork"
+                class="w-16 h-16 mr-3"
+                src={$userStatistics.topSong.albumArtwork}
+              />
+            </div>
+          {/if}
+          <div class={$userStatistics.topSong.albumArtwork ? 'w-52' : 'w-64'}>
+            <h1 class={`truncate text-${$user.musicPlatform}`}>
+              {$userStatistics.topSong.name}
+            </h1>
+            <p class="text-white truncate">
+              {$userStatistics.topSong.artist}
+            </p>
+            <p class="text-sm truncate text-gray-500">
+              {formatDurationPlayed($userStatistics.topSong.length)}
+            </p>
+          </div>
+        </a>
+        <div class="flex-grow-0 flex-shrink">
+          <svg
+            role="presentation"
+            on:click={() => toggleSong($userStatistics.topSong)}
+            on:keypress={() => toggleSong($userStatistics.topSong)}
+            class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
+              $songs.find((s) => s.name === $userStatistics.topSong.name) &&
+              'text-white'
+            }`}
+            fill={`${
+              $songs.find((s) => s.name === $userStatistics.topSong.name)
+                ? 'currentColor'
+                : 'transparent'
+            }`}
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            ><path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+            /></svg
+          >
+        </div>
+      </div>
+    {/if}
+  {/await}
 
   <p
     role="presentation"

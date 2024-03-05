@@ -8,12 +8,7 @@ import {
   type Song,
 } from '../types';
 import { errorToast, goto, showToast } from '../lib/util';
-import {
-  getNewAuthToken,
-  loading,
-  network,
-  user,
-} from '.';
+import { getNewAuthToken, loading, network, user, location } from '.';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Dialog } from '@capacitor/dialog';
 import { Geolocation, type Position } from '@capacitor/geolocation';
@@ -196,19 +191,10 @@ export const getNearbySubmissions = action(
   nearbySubmissions,
   'get-nearbysubmissions',
   async (store, radius?, bounds?) => {
-    let location: Position;
-    try {
-      await Geolocation.checkPermissions().catch(
-        async () => await Geolocation.requestPermissions()
-      );
-      location = await Geolocation.getCurrentPosition();
-    } catch (e) {
-      console.log('Location permissions rejected.');
-    }
     const message = await network.get().queryFirebase('nearbysubmissions', {
       location: {
-        latitude: location ? location.coords.latitude : 0,
-        longitude: location ? location.coords.longitude : 0,
+        latitude: location.get() ? location.get().gp.coords.latitude : 0,
+        longitude: location.get() ? location.get().gp.coords.longitude : 0,
       },
       radius,
       bounds,

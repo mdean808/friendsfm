@@ -33,7 +33,7 @@
     <!-- SONG -->
     <div class="sticky px-2 py-2">
       <div class="flex">
-        <SubmissionTime className="w-7/10 text-left truncate" {data} />
+        <SubmissionTime className="w-7/10 text-left truncate" split {data} />
         <SubmissionActions
           className="ml-auto flex gap-2 w-3/10 flex-grow-0 flex-shrink"
           {data}

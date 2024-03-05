@@ -11,6 +11,7 @@ import { errorToast, goto } from '../util';
 import {
   authToken,
   getNewAuthToken,
+  loading,
   loggedIn,
   logout,
   platform,
@@ -18,6 +19,7 @@ import {
   updateMusicPlatform,
 } from '../../store';
 import { Dialog } from '@capacitor/dialog';
+import { SpotifyApi } from '@spotify/web-api-ts-sdk';
 
 export default class Network {
   requests: NetworkRequest[] = [];
@@ -56,8 +58,6 @@ export default class Network {
   public async queryFirebase(endpoint: string, body?: object) {
     // generate url
     const url = this.firebaseUrl(endpoint);
-    //TODO: figure out if this breaks things or not
-    // check if a request is already running abort in favor of this new request
     const existingRequest = this.getByUrl(url);
     if (existingRequest) {
       existingRequest.abortController.abort();
@@ -73,6 +73,7 @@ export default class Network {
       url: endpoint,
       transaction,
       abortController: new AbortController(),
+      body,
     });
     // make request
     let res = {} as Response;
@@ -89,9 +90,22 @@ export default class Network {
               if (res.status === 401 || res.status === 403) {
                 await getNewAuthToken();
                 // check if refresh failed, if so, log user out
-                if (!authToken.get()) return await logout();
-                req.headers.set('Authentication', 'Bearer ' + authToken.get());
-                return ky(req);
+                if (authToken.get()) {
+                  req.headers.set(
+                    'Authentication',
+                    'Bearer ' + authToken.get()
+                  );
+                  return ky(req);
+                } else {
+                  return new Response(
+                    JSON.stringify({
+                      type: ResponseType.error,
+                      error: 'Authorization Error.',
+                      message: 'Authorization Error.',
+                    } as NetworkResponse),
+                    { status: 401 }
+                  );
+                }
               }
             },
           ],
@@ -110,6 +124,12 @@ export default class Network {
     res: Response,
     networkRequest: NetworkRequest
   ): Promise<any> {
+    if (!res) {
+      // response failed, retry.
+      console.log('no network response received');
+      this.queryFirebase(networkRequest.url, networkRequest.body);
+      return false;
+    }
     const json: NetworkResponse = await res.json();
 
     switch (Math.floor(res.status / 100)) {
@@ -223,20 +243,47 @@ export default class Network {
       });
       if (value) {
         this.spotifySet = false;
-        spotifyAuthCode.listen(async (value: string) => {
-          if (!this.spotifySet) {
-            await updateMusicPlatform(MusicPlatform.spotify, value);
-            this.spotifySet = true;
-          }
-        });
-        const spotifyUrl = `https://accounts.spotify.com/authorize?client_id=${
-          import.meta.env.VITE_SPOTIFY_CLIENT_ID
-        }&response_type=code&redirect_uri=${
-          platform.get() === 'web'
-            ? import.meta.env.VITE_SPOTIFY_REDIRECT_URL_WEB
-            : import.meta.env.VITE_SPOTIFY_REDIRECT_URL
-        }&scope=user-read-currently-playing%20user-read-recently-played%20playlist-modify-private%20playlist-modify-public`;
-        window.location.href = spotifyUrl;
+
+        if (platform.get() === 'web') {
+          SpotifyApi.performUserAuthorization(
+            import.meta.env.VITE_SPOTIFY_CLIENT_ID,
+            import.meta.env.VITE_SPOTIFY_REDIRECT_URL_WEB,
+            [
+              'user-read-recently-played',
+              'user-read-currently-playing',
+              'playlist-modify-public',
+              'playlist-modify-private',
+            ],
+            // @ts-ignore
+            async (token) => {
+              await getNewAuthToken();
+              if (
+                await updateMusicPlatform(
+                  MusicPlatform.spotify,
+                  token.access_token,
+                  token
+                )
+              )
+                goto('/');
+              loading.set(false);
+            }
+          );
+        } else {
+          spotifyAuthCode.listen(async (value: string) => {
+            if (!this.spotifySet) {
+              await updateMusicPlatform(MusicPlatform.spotify, value);
+              this.spotifySet = true;
+            }
+          });
+          const spotifyUrl = `https://accounts.spotify.com/authorize?client_id=${
+            import.meta.env.VITE_SPOTIFY_CLIENT_ID
+          }&response_type=code&redirect_uri=${
+            platform.get() === 'web'
+              ? import.meta.env.VITE_SPOTIFY_REDIRECT_URL_WEB
+              : import.meta.env.VITE_SPOTIFY_REDIRECT_URL
+          }&scope=user-read-currently-playing%20user-read-recently-played%20playlist-modify-private%20playlist-modify-public`;
+          window.location.href = spotifyUrl;
+        }
       }
     }
   }

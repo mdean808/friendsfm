@@ -8,6 +8,7 @@
 
   export let data: Submission;
   export let className: string = '';
+  export let split = false;
 </script>
 
 <div class={className}>
@@ -25,12 +26,21 @@
     </span>
   {/if}
   {#if data.song.timestamp > 0}
-    -
-    <span class="text-gray-400 text-sm">
-      played {getDaysAgo(new Date(data.song?.timestamp))}
-      {#if !getDaysAgo(new Date(data.song?.timestamp)).includes('days ago')}at
-        {formatTimePlayed(data.song?.timestamp)}
-      {/if}
-    </span>
+    {#if split}
+      <p class="text-gray-400 text-sm">
+        played {getDaysAgo(new Date(data.song?.timestamp))}
+        {#if !getDaysAgo(new Date(data.song?.timestamp)).includes('days ago')}at
+          {formatTimePlayed(data.song?.timestamp)}
+        {/if}
+      </p>
+    {:else}
+      -
+      <span class="text-gray-400 text-sm">
+        played {getDaysAgo(new Date(data.song?.timestamp))}
+        {#if !getDaysAgo(new Date(data.song?.timestamp)).includes('days ago')}at
+          {formatTimePlayed(data.song?.timestamp)}
+        {/if}
+      </span>
+    {/if}
   {/if}
 </div>

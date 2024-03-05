@@ -7,7 +7,6 @@
   import { SplashScreen } from '@capacitor/splash-screen';
   import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
   import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
-  import { App } from '@capacitor/app';
   import { Keyboard } from '@capacitor/keyboard';
   import { writable } from 'svelte/store';
 
@@ -38,10 +37,11 @@
     getSubmissionStatus,
     secondaryAppLoading,
     submissionLoading,
-    launchStatus,
     keyboardHeight,
     singleSubmissionLoading,
     toast,
+    getPlatform,
+    homepageLoaded,
   } from './store';
 
   import { errorToast, goto } from './lib/util';
@@ -80,6 +80,9 @@
 
   const dologin = writable(false);
 
+  let logs = [];
+  let debugView = false;
+
   notificationAction.subscribe(async (notif) => {
     if (!notif || !notif.data) return;
     if (!$dologin) {
@@ -93,15 +96,13 @@
     }
   });
 
-  appLoading.subscribe((data) => {
-    errorToast({content: 'appLoading value: ' + data, offset: 300})
-  })
-
   onMount(async () => {
-    platform.set(Capacitor.getPlatform());
+    logs = [...logs, 'app mount'];
+    getPlatform();
 
     await SplashScreen.hide();
 
+     logs = [...logs, 'splash hid'];
     // notification listners
     if (Capacitor.isPluginAvailable('FirebaseMessaging')) {
       FirebaseMessaging.addListener(
@@ -111,33 +112,28 @@
         }
       );
     }
+     logs = [...logs, 'notificaton listener added'];
 
-
-    // wait for auth state change before continuing for web support
-    FirebaseAuthentication.addListener('authStateChange', doLogin);
 
     // request messaging permissions
     FirebaseMessaging.requestPermissions();
 
+     logs = [...logs, 'permissions requested'];
+
     // margin init
     await getStatusBarHeight();
     await getInsets();
-    
-    // status init
-    App.addListener('appStateChange', ({ isActive }) => {
-      if (isActive) {
-        launchStatus.set('background');
-      } else {
-        launchStatus.set('fresh');
-      }
-    });
+    logs = [...logs, 'insets and status bar'];
 
+
+    
     // set keyboard info
     if (Capacitor.isPluginAvailable('Keyboard')) {
       Keyboard.addListener('keyboardWillShow', (e) => {
         keyboardHeight.set(e.keyboardHeight)
       });
     }
+    logs = [...logs, 'keyboard settings set'];
 
     // ionic init
     try {
@@ -158,9 +154,20 @@
       }
       // Applies required global styles
       document.documentElement.classList.add('ion-ce');
+      logs = [...logs, 'ionic initialized'];
     } catch (e) {
       console.log('ionic error:', e);
       errorToast({content: e})
+    }
+    if ($homepageLoaded) {
+      appLoading.set(false);
+    }
+    // wait for auth state change before continuing for web support
+    if ($platform === 'web') {
+      FirebaseAuthentication.addListener('authStateChange', doLogin);
+      logs = [...logs, 'auth state listener added'];
+    } else {
+      await doLogin();
     }
   });
 
@@ -169,6 +176,8 @@
     await getUserFromPreferences();
     await getNewAuthToken();
     dologin.set(true);
+    logs = [...logs, 'login done'];
+    FirebaseAuthentication.removeAllListeners();
     if (!$loggedIn || !$user || Object.keys($user).length === 0) {
       loggedIn.set(false);
       loginState.set(UserState.unregistered);
@@ -237,7 +246,6 @@
       }
     } else if (data.type === 'late-submission') {
       try {
-        if ($launchStatus === 'fresh') secondaryAppLoading.set(true);
 
         if ($userSubmission && $userSubmission.song) {
           singleSubmissionLoading.set(true);
@@ -247,7 +255,6 @@
           await getFriendSubmissions();
           singleSubmissionLoading.set(false);
         }
-        if ($launchStatus === 'fresh') secondaryAppLoading.set(false);
       } catch (e) {
         errorToast({content: e})
       }
@@ -266,28 +273,36 @@
     async
     src={'https://maps.googleapis.com/maps/api/js?key=' +
       import.meta.env.VITE_GOOGLE_MAPS_KEY +
-      '&callback=mapready'}
+      '&callback=mapready&loading=async'}
   >
   </script>
 </svelte:head>
 
 <ion-app>
+  {#if debugView}
+  <div on:click={() => debugView = false} class="absolute top-10 pr-2 w-full text-right" style="z-index: 99999">
+      {#each logs as log}
+        <p class="text-sm">{log}</p>
+      {/each}
+  </div>
+  {/if}
   <!-- FULL APP WRAPPER -->
   <!-- padding handles device-specific insets -->
   <div
-    style={`padding-top: ${$insets.top}px; padding-bottom: ${
-      $insets.bottom / 2
+    style={`padding-top: ${$insets?.top}px; padding-bottom: ${
+      $insets?.bottom / 2
     }px`}
     class="relative h-screen max-h-screen"
   >
     <!-- START absolute positioning -->
 
     <!-- put the toast double the height of the bottom nav -->
-    {#if $toast.visible}
-      <div transition:slide class="absolute z-50 w-full" style={`bottom: ${75 + $insets.bottom + ($toast.offset || 0)}px; `}>
+    {#if $toast?.visible}
+      <div transition:slide class="absolute z-50 w-full" style={`bottom: ${75 + $insets?.bottom + ($toast?.offset || 0)}px; `}>
         <Toast />
       </div>
     {/if}
+
 
     {#if $loading}
       <div transition:fade={{ duration: 100 }}>
@@ -295,7 +310,7 @@
       </div>
     {/if}
 
-    {#if $currPath.includes('?submission')}
+    {#if $currPath?.includes('?submission')}
       <Submission />
     {/if}
 
@@ -343,7 +358,7 @@
     {/if}
     <!-- APP BODY -->
     <main style={`height: calc(100% - 65px);`}>
-      {#if $currPath === '/' || ($currPath.includes('/?') && $currPath === '/')}
+      {#if $currPath === '/' || ($currPath?.includes('/?') && $currPath === '/')}
         <div class="h-full">
           <Home />
         </div>
@@ -384,10 +399,14 @@
 <div class="hidden">
   Hidden div for Tailwind JIT
   <span class="text-spotify" />
+  <span class="to-spotify" />
+  <span class="from-spotify" />
   <span class="bg-spotify" />
   <span class="border-spotify" />
   <span class="text-apple-music" />
   <span class="bg-apple-music" />
   <span class="border-apple-music" />
+  <span class="to-apple-music" />
+  <span class="from-apple-music" />
 </div>
 

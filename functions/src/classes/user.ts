@@ -44,7 +44,7 @@ export default class User implements UserType {
   savedSongs: SavedSong[] = []; // song ids
   messagingToken: string = '';
   authToken: string = '';
-  musicPlatformAcessCode?: string;
+  musicPlatformAccessCode?: string;
   loaded = false;
   profile: UserType['profile'] = {} as UserType['profile'];
 
@@ -171,7 +171,7 @@ export default class User implements UserType {
       this.musicPlatformAuth,
       this.dbRef
     );
-    this.musicPlatformAcessCode = accessCode;
+    this.musicPlatformAccessCode = accessCode;
     return accessCode;
   }
 
@@ -235,10 +235,10 @@ export default class User implements UserType {
 
   public async getRecentSpotifySong(): Promise<Song> {
     if (!this.exists) throw Error('User not loaded.');
-    if (!this.musicPlatformAcessCode)
+    if (!this.musicPlatformAccessCode)
       throw Error('No access code provided. Cannot get most recent song.');
     const currentSong = await getCurrentSpotifySong(
-      this.musicPlatformAcessCode
+      this.musicPlatformAccessCode
     );
     return {
       id: '',

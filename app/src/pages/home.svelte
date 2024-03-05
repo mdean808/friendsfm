@@ -15,19 +15,19 @@
     loginState,
     logout,
     activeHomeTab,
+    platform,
     notificationAction,
+    updateCurrentLocation,
   } from '../store';
 
   import Button from '../components/Button.svelte';
   import SkeletonSubmission from '../components/submission/Skeleton.svelte';
   import type { IonRefresher } from '@ionic/core/components/ion-refresher';
-  import { Capacitor } from '@capacitor/core';
   import { FirebaseMessaging } from '@capacitor-firebase/messaging';
   import { UserState, type Submission as SubmissionType } from '../types';
   import Genres from '../components/Genres.svelte';
   import Submissions from '../components/Submissions.svelte';
   import Tabs from '../components/Tabs.svelte';
-  import { App } from '@capacitor/app';
 
   // GLOBALS
   let loadingSubmission = false;
@@ -38,19 +38,17 @@
 
   friendSubmissions.listen((val) => {
     if (val) sortedFriendSubmissions = [...val].sort(sortByDate);
+    if (val?.length > 0) loadingFriendSubmissions = false;
   });
 
   onMount(async () => {
     header.set('');
-    if (
-      Capacitor.getPlatform() !== 'ios' ||
-      Capacitor.getPlatform() !== 'android'
-    ) {
+    if ($platform === 'web') {
       const refresher = document.getElementById('refresher') as IonRefresher;
       refresher.addEventListener('ionRefresh', handleRefresh);
     }
 
-    if (Capacitor.getPlatform() != 'web') {
+    if ($platform != 'web') {
       FirebaseMessaging.removeAllDeliveredNotifications();
     }
 
@@ -61,6 +59,7 @@
     if (notifData && notifData.type === 'late-submission') {
       (async () => {
         loadingNewLateSubmission = true;
+        console.log('notifData: loading friends w/out indicator')
         await loadFriends(true);
         loadingNewLateSubmission = false;
       })();
@@ -70,28 +69,25 @@
       !homepageLoaded.get()
     ) {
       load();
+        console.log('homepageNotLoaded: loading friends w/indicator')
       loadFriends();
       loadNearby();
     } else {
-      if (!homepageLoaded.get()) loadFriends(true);
+      if (!homepageLoaded.get()) {
+        console.log('homepageNotLoaded: loading friends w/out indicator')
+      loadFriends(true);}
       loadNearby();
       loadingGenres = false;
       loadingSubmission = false;
       loadingFriendSubmissions = false;
       appLoading.set(false);
+      setTimeout(() => {
+        appLoading.set(false);
+      }, 1000);
     }
     if ($friendSubmissions) {
       sortedFriendSubmissions = [...$friendSubmissions].sort(sortByDate);
     }
-
-    // listener for loading w/ app state change
-    App.addListener('appStateChange', ({ isActive }) => {
-      if (isActive) {
-        getSubmissionStatus();
-        loadNearby();
-        loadFriends(true);
-      }
-    });
   });
 
   onDestroy(() => {
@@ -120,6 +116,7 @@
 
   const loadNearby = async () => {
     loadingGenres = true;
+    await updateCurrentLocation();
     getNearbySubmissions(20).then(() => (loadingGenres = false));
   };
 
@@ -128,6 +125,7 @@
     getSubmissionStatus();
     loadNearby();
     await loadFriends(true);
+    loadingNewLateSubmission = false;
     refresher.complete();
   };
 

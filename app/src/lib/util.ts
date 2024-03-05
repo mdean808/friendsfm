@@ -40,6 +40,7 @@ export function errorToast(options: {
   offset?: number;
   onClick?: () => void;
 }) {
+  console.log('error toast: ' + options.content);
   showToast({ color: '#ad2626', ...options });
 }
 

@@ -93,27 +93,4 @@
       <span class="text-white">profile</span>
     </div>
   </button>
-  <!--  <button
-    on:click={() => goto('/audial')}
-    class="w-1/3 flex justify-center py-2"
-  >
-    <div class="mx-auto">
-      <svg
-        class={`w-6 h-6 mx-auto ${
-          $currPath === '/audial'
-            ? `text-${getPlatformColor($user.musicPlatform)}`
-            : 'currentColor'
-        }`}
-        fill="currentColor"
-        viewBox="0 0 20 20"
-        xmlns="http://www.w3.org/2000/svg"
-        ><path
-          fill-rule="evenodd"
-          d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-          clip-rule="evenodd"
-        /></svg
-      >
-      <span class="text-white">audial</span>
-    </div>
-  </button> -->
 </div>

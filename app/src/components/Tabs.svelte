@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { WritableAtom } from 'nanostores';
-  import { fade } from 'svelte/transition';
 
   export let loading = false;
   export let tabs: {

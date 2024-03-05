@@ -1,5 +1,5 @@
-import type { Adress as Address } from '@capgo/nativegeocoder';
-import type SentryTransaction from './lib/SentryTransaction';
+import type { Address } from '@capgo/nativegeocoder';
+import type SentryTransaction from './lib/classes/SentryTransaction';
 
 export enum UserState {
   unregistered = 'unregistered',
@@ -474,4 +474,5 @@ export interface NetworkRequest {
   request?: Request;
   response?: Response;
   abortController: AbortController;
+  body: object;
 }
