@@ -85,5 +85,15 @@
         await logout();
       }}>log out</Button
     >
+    <br />
+    <p class="text-sm text-gray-500 text-center my-2 mt-10">
+      want to delete your account?
+    </p>
+    <p class="text-sm text-gray-500 text-center">
+      visit <a
+        class="text-blue-500 underline"
+        href="https://friendsfm.app/account">friendsfm.app/account</a
+      > to learn more.
+    </p>
   </div>
 </div>
