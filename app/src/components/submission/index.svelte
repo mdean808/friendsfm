@@ -1,17 +1,30 @@
 <script lang="ts">
   import { goto } from '../../lib/util';
   import type { Submission } from '../../types';
-  import { activeSubmission, publicProfileUsername } from '../../store';
+  import {
+    activeSubmission,
+    getUserCurrentlyListening,
+    publicProfileUsername,
+  } from '../../store';
   import SubmissionSong from './Song.svelte';
   import SubmissionTime from './Time.svelte';
   import SubmissionActions from './Actions.svelte';
+  import { onMount } from 'svelte';
 
   export let data: Submission;
+
+  let currentlyListening = false;
 
   const showFullSubmission = () => {
     activeSubmission.set(data);
     goto('/?submission');
   };
+
+  onMount(async () => {
+    getUserCurrentlyListening(data.user.id).then((song) => {
+      if (song) currentlyListening = true;
+    });
+  });
 </script>
 
 <div
@@ -20,7 +33,13 @@
   class={`border-white rounded-lg shadow-lg bg-gray-700`}
 >
   <!-- HEADER -->
-  <div class={`flex p-2 rounded-t-lg bg-${data.user.musicPlatform}`}>
+  <div
+    class={`flex p-2 rounded-t-lg ${
+      currentlyListening
+        ? `bg-gradient-to-r from-${data.user.musicPlatform} via-blue-500 to-${data.user.musicPlatform} background-animate`
+        : `bg-${data.user.musicPlatform}`
+    }`}
+  >
     <button
       on:click={(e) => {
         e.stopPropagation();

@@ -438,11 +438,9 @@
       <Skeleton type="user" />
     </div>
   {:then song}
-    <h2 class="mt-2 mb-1 font-semibold text-xl">
-      currently listening to
-    </h2>
+    <h2 class="mt-2 mb-1 font-semibold text-xl">currently listening to</h2>
     <div
-      class={`p-1 rounded-md mx-4 mb-2 bg-gradient-to-r from-${$user.musicPlatform} via-blue-500 to-${$user.musicPlatform}   background-animate`}
+      class={`p-1 rounded-md mx-4 mb-2 bg-gradient-to-r from-${$user.musicPlatform} via-blue-500 to-${$user.musicPlatform} background-animate`}
     >
       <div
         class="text-left bg-gray-700 relative rounded-md px-2 py-2 flex space-x-4"
