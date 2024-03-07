@@ -1,4 +1,8 @@
-import { DocumentReference, getFirestore } from 'firebase-admin/firestore';
+import {
+  DocumentReference,
+  FieldValue,
+  getFirestore,
+} from 'firebase-admin/firestore';
 import { Message } from 'firebase-admin/messaging';
 import { SPOTIFY_AUTH } from '../lib/spotify';
 import { getTrackGenre } from '../lib/gpt';
@@ -679,6 +683,19 @@ export default class User implements UserType {
       //todo: get suggestions from nearby submissions
     }
     return suggestions;
+  }
+
+  public async delete() {
+    if (!this.loaded) await this.load();
+    for (const fr of this.friends) {
+      const friend = new User(fr.id);
+      await friend.removeFriend({ id: this.id, username: this.username });
+    }
+    await this.dbRef.delete();
+  }
+
+  public async removeFriend(friend: { id: string; username: string }) {
+    this.dbRef.update({ friends: FieldValue.arrayRemove(friend) });
   }
 
   //STATIC METHODS

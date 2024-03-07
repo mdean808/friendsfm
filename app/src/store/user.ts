@@ -225,3 +225,13 @@ export const getUserCurrentlyListening = action(
     return message as Song;
   }
 );
+
+export const deleteUserAccount = action(
+  user,
+  'delete-user-account',
+  async (_store) => {
+    const message = await network.get().queryFirebase('deleteuser');
+    if (!message) return;
+    return message;
+  }
+);

@@ -76,26 +76,29 @@ export const loginUser = action(user, 'login-user', async (store) => {
 });
 
 // Log the user out
-export const logout = action(user, 'logout', async (store) => {
-  //this removes the device's messaging token from the user in the database
-  await network.get().queryFirebase('logoutuser');
+export const logout = action(
+  user,
+  'logout',
+  async (store, keepToken?: boolean) => {
+    //this removes the device's messaging token from the user in the database
+    if (!keepToken) await network.get().queryFirebase('logoutuser');
 
-  FirebaseAnalytics.logEvent({
-    name: 'logout',
-    params: { id: store.get()?.id },
-  });
-  await FirebaseAuthentication.signOut();
-  loggedIn.set(false);
-  loginState.set(UserState.unregistered);
-  homepageLoaded.set(false);
-  store.set(null);
-  userSubmission.set(null);
-  friendSubmissions.set(null);
-  authToken.set(null);
-  await Preferences.remove({ key: 'user' });
-  await Preferences.remove({ key: 'songs' });
-  await Preferences.set({ key: 'logged_in', value: '0' });
-  await Preferences.remove({ key: 'submission' });
-  await Preferences.remove({ key: 'friend-submissions' });
-});
-
+    FirebaseAnalytics.logEvent({
+      name: 'logout',
+      params: { id: store.get()?.id },
+    });
+    await FirebaseAuthentication.signOut();
+    loggedIn.set(false);
+    loginState.set(UserState.unregistered);
+    homepageLoaded.set(false);
+    store.set(null);
+    userSubmission.set(null);
+    friendSubmissions.set(null);
+    authToken.set(null);
+    await Preferences.remove({ key: 'user' });
+    await Preferences.remove({ key: 'songs' });
+    await Preferences.set({ key: 'logged_in', value: '0' });
+    await Preferences.remove({ key: 'submission' });
+    await Preferences.remove({ key: 'friend-submissions' });
+  }
+);

@@ -1,18 +1,32 @@
 <script>
   import { Dialog } from '@capacitor/dialog';
-  import Button from '../components/Button.svelte';
   import { goto } from '../lib/util';
 
   import {
-    loading,
     user,
     logout,
     prevPath,
+    deleteUserAccount,
+    loading,
     unlinkMusicProvider,
   } from '../store';
+  import Button from '../components/Button.svelte';
+
+  const deleteAccount = async () => {
+    const { value } = await Dialog.confirm({
+      title: 'Delete your FriendsFM Account.',
+      message: `Are you sure? Your data will not save if you try logging in again.`,
+    });
+    if (!value) return;
+    loading.set(true);
+    await deleteUserAccount();
+    await logout(true);
+    goto('/new_user');
+    loading.set(false);
+  };
 </script>
 
-<div>
+<div class="">
   <div
     class="w-full flex border-b-white border-b-2 flex-row justify-between items-center h-[55px] px-2"
   >
@@ -32,7 +46,7 @@
     </h1>
     <button on:click={() => goto($prevPath)} class="flex-grow-0">
       <svg
-        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${$user.musicPlatform} `}
+        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${$user?.musicPlatform} `}
         fill="none"
         stroke="currentColor"
         stroke-width="1.5"
@@ -48,18 +62,15 @@
       </svg>
     </button>
   </div>
-  <div class="mx-auto w-full text-center py-2 px-2">
+  <div class="mx-4 flex h-full space-y-4 mt-4 flex-col">
     <Button
-      className="mt-2 mx-auto"
       type="primary"
       title="reset"
       on:click={async () => {
         goto('/username');
       }}>change username</Button
     >
-    <br />
     <Button
-      className="mt-2 mx-auto"
       type="primary"
       title="reset"
       on:click={async () => {
@@ -75,9 +86,7 @@
         goto('/music_provider');
       }}>unlink music provider</Button
     >
-    <br />
     <Button
-      className="mt-2 mx-auto"
       type="breaking"
       title="reset"
       on:click={async () => {
@@ -85,15 +94,13 @@
         await logout();
       }}>log out</Button
     >
-    <br />
-    <p class="text-sm text-gray-500 text-center my-2 mt-10">
-      want to delete your account?
-    </p>
-    <p class="text-sm text-gray-500 text-center">
-      visit <a
-        class="text-blue-500 underline"
-        href="https://friendsfm.app/account">friendsfm.app/account</a
-      > to learn more.
-    </p>
+    <div class="pt-24">
+      <button
+        on:click={deleteAccount}
+        class="text-sm mx-auto w-full text-blue-500 underline text-center mt-auto py-2 px-2"
+      >
+        remove your data and delete your account</button
+      >
+    </div>
   </div>
 </div>
