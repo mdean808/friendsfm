@@ -1,5 +1,5 @@
 # FriendsFM Monorepo
-This is the mono repo for the FriendFM mobile app.
+This is the mono repo for FriendFM, a way to share what you're listening to with your friends.
 ## Links
 [FriendsFM](https://friendsfm.app)
 
@@ -13,9 +13,9 @@ This is the mono repo for the FriendFM mobile app.
 ## Development
 * Run `yarn install` in each folder to install dependencies
 * Run `yarn app:deploy` to deploy the web app.
-* Run `yarn app:deploy` to deploy the serverless functions.
+* Run `yarn functions:deploy` to deploy the serverless functions.
 * Run `yarn web:deploy` to deploy the website.
-* Run `yarn deploy` to deploy all firebase projects (web, web-app, functions).
+* Run `yarn deploy` to deploy all firebase projects (website, web app, functions).
 * `app`
   * `yarn dev` for local development. (Requires an active firebase emulator instance running in `functions`)
   * `yarn build` to build for production.
