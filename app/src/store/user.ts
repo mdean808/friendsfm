@@ -9,6 +9,7 @@ import {
   friendSubmissions,
   getFriendSubmissions,
   getNewAuthToken,
+  getPlatform,
   loggedIn,
   loginState,
   network,
@@ -147,6 +148,7 @@ export const refreshUser = action(user, 'get-user-data', async (store) => {
   if (!loggedIn.get() || loginState.get() !== UserState.registered)
     return false;
   let messagingToken = '';
+  getPlatform();
   try {
     if (platform.get() !== 'web') {
       await FirebaseMessaging.checkPermissions().catch(

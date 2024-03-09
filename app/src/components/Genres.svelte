@@ -24,6 +24,7 @@
   let markers: google.maps.marker.AdvancedMarkerElement[] = [];
 
   let prevZoom = 12;
+  let prevBounds = null;
 
   let genres: { name: string; active: boolean }[] = [];
 
@@ -110,21 +111,45 @@
     $activeSubmission = null;
   });
 
-  const handleBoundsChange = () => {
-    // update nearbySubmissions for this location
-    const bounds = map.getBounds();
-    getNearbySubmissions(null, {
-      southWest: {
-        latitude: bounds.getSouthWest().lat(),
-        longitude: bounds.getSouthWest().lng(),
-      },
-      northEast: {
-        latitude: bounds.getNorthEast().lat(),
-        longitude: bounds.getNorthEast().lng(),
-      },
-    }).then(createMarkers);
-    prevZoom = map.getZoom();
-  };
+  let boundsChangeTimeout: NodeJS.Timeout | null = null;
+
+  function handleBoundsChange() {
+    if (boundsChangeTimeout !== null) {
+      clearTimeout(boundsChangeTimeout);
+    }
+
+    boundsChangeTimeout = setTimeout(() => {
+      const bounds = map.getBounds();
+      let shouldGetSubmissions = true;
+      // compare previous bounds to current bounds
+      // make sure they are different enough to justify an update
+      // first check for zoom change
+      if (prevZoom === map.getZoom()) shouldGetSubmissions = false;
+      // then check for difference of .25 lng and lat
+      if (
+        Math.abs(bounds.getCenter().lat() - prevBounds?.getCenter().lat()) >
+          0.25 ||
+        Math.abs(bounds.getCenter().lng() - prevBounds?.getCenter().lng()) >
+          0.25
+      )
+        shouldGetSubmissions = true;
+      if (shouldGetSubmissions) {
+        // update nearbySubmissions for this location
+        getNearbySubmissions(null, {
+          southWest: {
+            latitude: bounds.getSouthWest().lat(),
+            longitude: bounds.getSouthWest().lng(),
+          },
+          northEast: {
+            latitude: bounds.getNorthEast().lat(),
+            longitude: bounds.getNorthEast().lng(),
+          },
+        }).then(createMarkers);
+        prevZoom = map.getZoom();
+        prevBounds = map.getBounds();
+      }
+    }, 500); // Adjust debounce time as needed
+  }
 
   const createMarkers = async () => {
     const { AdvancedMarkerElement } = (await google.maps.importLibrary(

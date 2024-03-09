@@ -59,7 +59,6 @@
     if (notifData && notifData.type === 'late-submission') {
       (async () => {
         loadingNewLateSubmission = true;
-        console.log('notifData: loading friends w/out indicator')
         await loadFriends(true);
         loadingNewLateSubmission = false;
       })();
@@ -69,13 +68,12 @@
       !homepageLoaded.get()
     ) {
       load();
-        console.log('homepageNotLoaded: loading friends w/indicator')
       loadFriends();
       loadNearby();
     } else {
       if (!homepageLoaded.get()) {
-        console.log('homepageNotLoaded: loading friends w/out indicator')
-      loadFriends(true);}
+        loadFriends(true);
+      }
       loadNearby();
       loadingGenres = false;
       loadingSubmission = false;
@@ -122,9 +120,9 @@
 
   const handleRefresh = async () => {
     const refresher = document.getElementById('refresher') as IonRefresher;
+    loadFriends(true);
     getSubmissionStatus();
-    loadNearby();
-    await loadFriends(true);
+    await loadNearby();
     loadingNewLateSubmission = false;
     refresher.complete();
   };

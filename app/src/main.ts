@@ -12,6 +12,7 @@ import * as SentrySvelte from '@sentry/svelte';
 import { Capacitor } from '@capacitor/core';
 import {
   deepLink,
+  getPlatform,
   loggedIn,
   loginState,
   publicProfileUsername,
@@ -72,8 +73,9 @@ if (import.meta.env.DEV) {
 // Initialize Status Bar
 if (Capacitor.isPluginAvailable('StatusBar'))
   StatusBar.setStyle({ style: Style.Dark });
-// Force a crash
-// FirebaseCrashlytics.crash();
+
+// get platform information
+getPlatform();
 
 // Initialize Svelte
 const app = new App({

@@ -28,7 +28,7 @@
 
   const setProvider = async () => {
     if (!platform) return;
-    if (platform === MusicPlatform.appleMusic && $osPlatform !== 'web') return;
+    if (platform === MusicPlatform.appleMusic && $osPlatform !== 'ios') return;
     loading.set(true);
     if (platform == MusicPlatform.spotify) {
       if ($osPlatform === 'web') {
@@ -64,7 +64,6 @@
         window.location.href = spotifyUrl;
       }
     } else if (platform === MusicPlatform.appleMusic) {
-      loading.set(false);
       // return toast.push('Apple Music support in development!');
       switch ((await AppleMusic.checkPermissions()).receive) {
         case AppleMusicPermissionsResults.granted:
@@ -95,6 +94,7 @@
           break;
         }
       }
+      loading.set(false);
     }
   };
 </script>

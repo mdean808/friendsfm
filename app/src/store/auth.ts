@@ -81,6 +81,7 @@ export const logout = action(
   'logout',
   async (store, keepToken?: boolean) => {
     //this removes the device's messaging token from the user in the database
+    loggedIn.set(false);
     if (!keepToken) await network.get().queryFirebase('logoutuser');
 
     FirebaseAnalytics.logEvent({
@@ -88,7 +89,6 @@ export const logout = action(
       params: { id: store.get()?.id },
     });
     await FirebaseAuthentication.signOut();
-    loggedIn.set(false);
     loginState.set(UserState.unregistered);
     homepageLoaded.set(false);
     store.set(null);
