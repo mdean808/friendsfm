@@ -285,6 +285,7 @@ export default class User implements UserType {
       submissionData.time,
       submissionData.lateTime,
       submissionData.comments,
+      await this.getCurrentlyListening(),
       this
     );
   }
@@ -496,6 +497,7 @@ export default class User implements UserType {
       newSubmission.time,
       newSubmission.lateTime,
       newSubmission.comments,
+      await this.getCurrentlyListening(),
       this
     );
   }
@@ -696,6 +698,15 @@ export default class User implements UserType {
 
   public async removeFriend(friend: { id: string; username: string }) {
     this.dbRef.update({ friends: FieldValue.arrayRemove(friend) });
+  }
+
+  public async getCurrentlyListening(): Promise<Song | undefined> {
+    if (!this.loaded) await this.load();
+    if (this.musicPlatform !== MusicPlatform.spotify) return;
+    await this.updateSpotifyAuth();
+    let song = await this.getRecentSpotifySong();
+    if (!song.timestamp) return;
+    return song;
   }
 
   //STATIC METHODS

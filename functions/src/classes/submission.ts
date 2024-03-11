@@ -35,6 +35,7 @@ export default class Submission implements SubmissionType {
   lateTime: Date | Timestamp;
   comments: Comment[];
   userId: string;
+  currentlyListening?: Song | undefined;
 
   constructor(
     id: string,
@@ -46,6 +47,7 @@ export default class Submission implements SubmissionType {
     time?: Date | Timestamp,
     lateTime?: Date | Timestamp,
     comments?: Comment[],
+    currentlyListening?: Song,
     user?: User
   ) {
     this.id = id;
@@ -57,6 +59,7 @@ export default class Submission implements SubmissionType {
     this.time = time || new Date();
     this.lateTime = lateTime || new Date();
     this.comments = comments || [];
+    this.currentlyListening = currentlyListening;
     this.user = {
       id: user?.id || '',
       username: user?.username || '',
@@ -75,6 +78,7 @@ export default class Submission implements SubmissionType {
     this.user.id = u.id;
     this.user.username = u.username;
     this.user.musicPlatform = u.musicPlatform;
+    this.currentlyListening = await u.getCurrentlyListening();
     return this;
   }
 
@@ -109,6 +113,7 @@ export default class Submission implements SubmissionType {
       comments: this.comments,
       user: this.user,
       userId: this.user.id,
+      currentlyListening: this.currentlyListening,
     };
   }
 

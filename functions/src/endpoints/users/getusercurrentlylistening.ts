@@ -9,26 +9,28 @@ export const getusercurrentlylistening = onRequest(
     sentryWrapper('get-user-currently-listening', async (req, res) => {
       const { id, username } = JSON.parse(req.body);
       let user;
-      if (id) user = new User(id);
-      else user = await User.getByUsername(username);
-      await user.load();
+      if (id) {
+        user = new User(id);
+        await user.load();
+      } else {
+        user = await User.getByUsername(username);
+      }
       if (user.musicPlatform === MusicPlatform.appleMusic) {
         res.status(200).type('json').send({ type: 'success', message: null });
       } else {
         try {
-          await user.updateSpotifyAuth();
-          let song = await user.getRecentSpotifySong();
+          const song = await user.getCurrentlyListening();
           // check if it's a current song
-          if (song.timestamp) {
-            res
-              .status(200)
-              .type('json')
-              .send({ type: 'success', message: null });
-          } else {
+          if (song) {
             res
               .status(200)
               .type('json')
               .send({ type: 'success', message: song });
+          } else {
+            res
+              .status(200)
+              .type('json')
+              .send({ type: 'success', message: null });
           }
         } catch (e) {
           console.log('get-user-currently-listening error: ', e);
