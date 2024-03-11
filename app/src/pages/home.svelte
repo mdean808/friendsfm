@@ -120,9 +120,9 @@
 
   const handleRefresh = async () => {
     const refresher = document.getElementById('refresher') as IonRefresher;
-    loadFriends(true);
     getSubmissionStatus();
-    await loadNearby();
+    loadNearby();
+    await loadFriends(true);
     loadingNewLateSubmission = false;
     refresher.complete();
   };

@@ -1,7 +1,6 @@
 import type { AccessToken } from '@spotify/web-api-ts-sdk';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
-import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { captureException } from '@sentry/capacitor';
 import { map, action } from 'nanostores';

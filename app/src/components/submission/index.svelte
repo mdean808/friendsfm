@@ -1,30 +1,17 @@
 <script lang="ts">
   import { goto } from '../../lib/util';
   import type { Submission } from '../../types';
-  import {
-    activeSubmission,
-    getUserCurrentlyListening,
-    publicProfileUsername,
-  } from '../../store';
+  import { activeSubmission, publicProfileUsername } from '../../store';
   import SubmissionSong from './Song.svelte';
   import SubmissionTime from './Time.svelte';
   import SubmissionActions from './Actions.svelte';
-  import { onMount } from 'svelte';
 
   export let data: Submission;
-
-  let currentlyListening = false;
 
   const showFullSubmission = () => {
     activeSubmission.set(data);
     goto('/?submission');
   };
-
-  onMount(async () => {
-    getUserCurrentlyListening(data.user.id).then((song) => {
-      if (song) currentlyListening = true;
-    });
-  });
 </script>
 
 <div
@@ -35,7 +22,7 @@
   <!-- HEADER -->
   <div
     class={`flex p-2 rounded-t-lg ${
-      currentlyListening
+      data.currentlyListening
         ? `bg-gradient-to-r from-${data.user.musicPlatform} via-blue-500 to-${data.user.musicPlatform} background-animate`
         : `bg-${data.user.musicPlatform}`
     }`}
@@ -49,13 +36,21 @@
       class="flex-grow text-left"
     >
       <h4 class="text-xl">
-        <img
-          class="w-5 h-5 inline rounded-full"
-          src={`https://icotar.com/avatar/${
-            data.user?.username || 'undefined'
-          }.svg`}
-          alt="avatar"
-        />
+        {#if data.currentlyListening?.albumArtwork}
+          <img
+            class="w-5 h-5 inline"
+            src={data.currentlyListening.albumArtwork}
+            alt="avatar"
+          />
+        {:else}
+          <img
+            class="w-5 h-5 inline rounded-full"
+            src={`https://icotar.com/avatar/${
+              data.user?.username || 'undefined'
+            }.svg`}
+            alt="avatar"
+          />
+        {/if}
         {data.user ? data.user.username : 'Unknown'}
       </h4>
     </button>

@@ -4,9 +4,11 @@
   import AppleMusicLogo from '../assets/apple_music_logo_white.svg';
   import { formatDurationPlayed } from '../lib/dates';
   import {
+    activeSubmission,
     editingProfile,
     getUserCurrentlyListening,
     header,
+    publicProfileUsername,
     searchType,
     songs,
     toggleSong,
@@ -20,6 +22,7 @@
   import { goto } from '../lib/util';
 
   import Skeleton from '../components/submission/Skeleton.svelte';
+  import Username from './username.svelte';
 
   const firstOfTheMonth = new Date().getDate() === 1;
 
@@ -49,6 +52,10 @@
   <div class="px-2">
     <div class="relative w-20 h-20 mx-auto">
       <img
+        on:click={() => {
+          publicProfileUsername.set($user.username);
+          goto('/public_profile');
+        }}
         class="w-20 h-20 rounded-full mx-auto"
         alt="User Avatar"
         src={`https://icotar.com/avatar/${$user.username}.svg`}

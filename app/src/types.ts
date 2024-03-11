@@ -122,6 +122,7 @@ export interface Submission {
   lateTime: Date;
   comments: Comment[];
   audial: Audial;
+  currentlyListening?: Song;
 }
 
 export interface Comment {
@@ -475,4 +476,5 @@ export interface NetworkRequest {
   response?: Response;
   abortController: AbortController;
   body: object;
+  attempts?: number;
 }

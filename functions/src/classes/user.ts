@@ -705,7 +705,7 @@ export default class User implements UserType {
     if (this.musicPlatform !== MusicPlatform.spotify) return;
     await this.updateSpotifyAuth();
     let song = await this.getRecentSpotifySong();
-    if (!song.timestamp) return;
+    if (song.timestamp) return;
     return song;
   }
 

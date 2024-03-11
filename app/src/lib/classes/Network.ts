@@ -55,7 +55,11 @@ export default class Network {
     this.requests = this.requests.filter((r) => r.url === request.url);
   }
 
-  public async queryFirebase(endpoint: string, body?: object) {
+  public async queryFirebase(
+    endpoint: string,
+    body?: object,
+    attempts?: number
+  ) {
     // generate url
     const url = this.firebaseUrl(endpoint);
     const existingRequest = this.getByUrl(url);
@@ -63,6 +67,8 @@ export default class Network {
       existingRequest.abortController.abort();
       this.remove(existingRequest);
     }
+    // don't attempt again if we'ves already tried 3 times.
+    if (attempts > 2) return;
     // register with analytics
     FirebaseAnalytics.logEvent({ name: 'request', params: { url } });
     const transaction = new SentryTransaction('fetch-' + endpoint, endpoint);
@@ -126,8 +132,13 @@ export default class Network {
   ): Promise<any> {
     if (!res) {
       // response failed, retry.
-      console.log('no network response received');
-      this.queryFirebase(networkRequest.url, networkRequest.body);
+      console.log('no network response received. retrying');
+      networkRequest.attempts++;
+      this.queryFirebase(
+        networkRequest.url,
+        networkRequest.body,
+        networkRequest.attempts
+      );
       return false;
     }
     const json: NetworkResponse = await res.json();

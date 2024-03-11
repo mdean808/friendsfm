@@ -38,7 +38,7 @@
       {:else if message === 5}
         <p>asking chat-gpt for help</p>
       {:else if message === 6}
-        <p>judging music tastes</p>
+        <p>judging your music tastes</p>
       {:else if message === 7}
         <p>waiting for the drop</p>
       {:else if message === 8}
