@@ -12,11 +12,6 @@ export const sendnotification = onRequest({ cors: true }, async (req, res) => {
   }
   const secret = data.split('__')[1];
   if (secret === process.env.SECRET) {
-    // 🟡 Notify Sentry job is running:
-    const checkInId = captureCheckIn({
-      monitorSlug: 'daily-notification-sent',
-      status: 'in_progress',
-    });
     firebaseLog.info('Sending Daily Notifications!');
     // hit the createsubmission endpoint so it's loaded before people get the notification
     // should throw an error so we ignore it.
@@ -28,22 +23,10 @@ export const sendnotification = onRequest({ cors: true }, async (req, res) => {
 
     await sendDaily().catch((e) => {
       console.log(e);
-      // 🔴 Notify Sentry job has failed:
-      captureCheckIn({
-        checkInId,
-        monitorSlug: 'daily-notification-sent',
-        status: 'error',
-      });
     });
     res.status(200).type('json').send({
       type: 'success',
       message: 'Daily notification sent.',
-    });
-    // 🟢 Notify Sentry job has completed successfully:
-    captureCheckIn({
-      checkInId,
-      monitorSlug: 'daily-notification-sent',
-      status: 'ok',
     });
   } else {
     firebaseLog.info(
