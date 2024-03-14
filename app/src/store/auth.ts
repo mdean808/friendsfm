@@ -17,7 +17,15 @@ import { goto, registerForNotifications } from '../lib/util';
 
 // refresh every 10 seconds
 export const userRefreshInterval = map<NodeJS.Timeout>(
-  setInterval(refreshUser, 10 * 1000)
+  setInterval(refreshUser, 20 * 1000)
+);
+
+export const startRefreshInterval = action(
+  userRefreshInterval,
+  'start-refresh-interval',
+  (store) => {
+    store.set(setInterval(refreshUser, 20 * 1000));
+  }
 );
 
 export const stopRefreshInterval = action(
@@ -50,6 +58,7 @@ export const getNewAuthToken = action(
       loginState.set(UserState.unregistered);
       authToken.set('');
       goto('/new_user');
+      stopRefreshInterval();
       console.log('Error grabbing new authToken. User must sign in.');
     }
   }
@@ -72,6 +81,7 @@ export const loginUser = action(user, 'login-user', async (store) => {
   // log the event
   FirebaseAnalytics.setUserId({ userId: store.get().id });
   FirebaseAnalytics.logEvent({ name: 'login', params: { id: store.get().id } });
+  startRefreshInterval();
   return true;
 });
 

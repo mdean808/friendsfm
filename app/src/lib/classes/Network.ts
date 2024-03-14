@@ -63,12 +63,13 @@ export default class Network {
     // generate url
     const url = this.firebaseUrl(endpoint);
     const existingRequest = this.getByUrl(url);
+    // cancel existing request to url if it already exists
     if (existingRequest) {
       existingRequest.abortController.abort();
       this.remove(existingRequest);
     }
-    // don't attempt again if we'ves already tried 3 times.
-    if (attempts > 2) return;
+    // don't attempt again if we'ves already tried 2+ times.
+    if (attempts >= 2) return;
     // register with analytics
     FirebaseAnalytics.logEvent({ name: 'request', params: { url } });
     const transaction = new SentryTransaction('fetch-' + endpoint, endpoint);
@@ -80,6 +81,7 @@ export default class Network {
       transaction,
       abortController: new AbortController(),
       body,
+      attempts: attempts || 0,
     });
     // make request
     let res = {} as Response;
@@ -94,6 +96,9 @@ export default class Network {
             async (req, _opt, res) => {
               // authentication failed, refresh auth token.
               if (res.status === 401 || res.status === 403) {
+                console.log(
+                  '401 or 403 response from server. Refreshing auth token.'
+                );
                 await getNewAuthToken();
                 // check if refresh failed, if so, log user out
                 if (authToken.get()) {
@@ -106,8 +111,8 @@ export default class Network {
                   return new Response(
                     JSON.stringify({
                       type: ResponseType.error,
-                      error: 'Authorization Error.',
-                      message: 'Authorization Error.',
+                      error: 'client_auth_error',
+                      message: 'Client Authorization Error.',
                     } as NetworkResponse),
                     { status: 401 }
                   );
@@ -120,6 +125,7 @@ export default class Network {
     } catch (e) {
       res = (e as HTTPError).response;
     }
+
     // update request object with response
     this.update(id, { ...networkRequest, response: res });
     // handle response, return the message
@@ -231,15 +237,11 @@ export default class Network {
     // handle Authentication errors
     if (
       json.message === 'User does not exist.' ||
-      json.error?.includes('Firebase ID token has been revoked')
+      json.error?.includes('Firebase ID token has been revoked') ||
+      json.error === 'client_auth_error'
     ) {
       logout();
       goto('/new_user');
-    } else if (
-      json.message === 'Authentication Failed.' ||
-      json.message.includes('Missing Authentication Token')
-    ) {
-      await getNewAuthToken();
     }
     // handle spotify errors
     if (

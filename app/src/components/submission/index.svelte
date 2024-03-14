@@ -1,17 +1,37 @@
 <script lang="ts">
   import { goto } from '../../lib/util';
-  import type { Submission } from '../../types';
-  import { activeSubmission, publicProfileUsername } from '../../store';
+  import type { Song, Submission } from '../../types';
+  import {
+    activeSubmission,
+    getUserCurrentlyListening,
+    publicProfileUsername,
+  } from '../../store';
   import SubmissionSong from './Song.svelte';
   import SubmissionTime from './Time.svelte';
   import SubmissionActions from './Actions.svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   export let data: Submission;
+
+  let currentlyListening: Song;
+  let interval: NodeJS.Timeout;
 
   const showFullSubmission = () => {
     activeSubmission.set(data);
     goto('/?submission');
   };
+
+  onMount(async () => {
+    //currentlyListening = await getUserCurrentlyListening(data.user.id);
+    // get current listening every 15 seconds
+    interval = setInterval(async () => {
+      currentlyListening = await getUserCurrentlyListening(data.user.id);
+    }, 15000);
+  });
+
+  onDestroy(() => {
+    clearInterval(interval);
+  });
 </script>
 
 <div
@@ -22,7 +42,7 @@
   <!-- HEADER -->
   <div
     class={`flex p-2 rounded-t-lg ${
-      data.currentlyListening
+      currentlyListening
         ? `bg-gradient-to-r from-${data.user.musicPlatform} via-blue-500 to-${data.user.musicPlatform} background-animate`
         : `bg-${data.user.musicPlatform}`
     }`}
@@ -36,21 +56,13 @@
       class="flex-grow text-left"
     >
       <h4 class="text-xl">
-        {#if data.currentlyListening?.albumArtwork}
-          <img
-            class="w-5 h-5 inline"
-            src={data.currentlyListening.albumArtwork}
-            alt="avatar"
-          />
-        {:else}
-          <img
-            class="w-5 h-5 inline rounded-full"
-            src={`https://icotar.com/avatar/${
-              data.user?.username || 'undefined'
-            }.svg`}
-            alt="avatar"
-          />
-        {/if}
+        <img
+          class="w-5 h-5 inline rounded-full"
+          src={`https://icotar.com/avatar/${
+            data.user?.username || 'undefined'
+          }.svg`}
+          alt="avatar"
+        />
         {data.user ? data.user.username : 'Unknown'}
       </h4>
     </button>
