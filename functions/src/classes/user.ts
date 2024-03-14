@@ -285,7 +285,7 @@ export default class User implements UserType {
       submissionData.time,
       submissionData.lateTime,
       submissionData.comments,
-      await this.getCurrentlyListening(),
+      undefined,
       this
     );
   }
@@ -497,7 +497,7 @@ export default class User implements UserType {
       newSubmission.time,
       newSubmission.lateTime,
       newSubmission.comments,
-      await this.getCurrentlyListening(),
+      undefined,
       this
     );
   }
