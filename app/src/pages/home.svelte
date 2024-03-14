@@ -43,10 +43,8 @@
 
   onMount(async () => {
     header.set('');
-    if ($platform === 'web') {
-      const refresher = document.getElementById('refresher') as IonRefresher;
-      refresher.addEventListener('ionRefresh', handleRefresh);
-    }
+    const refresher = document.getElementById('refresher') as IonRefresher;
+    refresher.addEventListener('ionRefresh', handleRefresh);
 
     if ($platform != 'web') {
       FirebaseMessaging.removeAllDeliveredNotifications();
