@@ -6,7 +6,6 @@ import {
   TopicMessage,
 } from 'firebase-admin/messaging';
 import * as functions from 'firebase-functions';
-import * as Sentry from '@sentry/node';
 
 const messaging = getMessaging();
 const db = getFirestore();
@@ -48,19 +47,10 @@ export const newNotification = async (message: Message) => {
   // don't send if there is no topic or token set
   if (!(message as TopicMessage).topic && !(message as TokenMessage).token)
     return;
-  const transaction = Sentry.startTransaction({
-    op: 'notifications.newNotification',
-    name: 'send-notification',
-  });
   try {
     await messaging.send(message);
   } catch (e) {
     functions.logger.info('Error sending notification:', e);
-    transaction.setContext('Notification context', {
-      message,
-    });
-    Sentry.captureException(e);
-  } finally {
-    transaction.finish();
+    functions.logger.info('Notification context: ', message);
   }
 };
