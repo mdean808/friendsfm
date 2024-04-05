@@ -20,6 +20,41 @@ import AppleMusic, {
 
 export const userSubmission = map<Submission>();
 
+export const previewSubmission = action(
+  userSubmission,
+  'preview-submission',
+  async () => {
+    let recentlyPlayed: { song: AppleMusicSong };
+    if (user.get().musicPlatform === MusicPlatform.appleMusic) {
+      // check apple music permissions.
+      const perms = await AppleMusic.checkPermissions();
+      if (perms.receive !== AppleMusicPermissionsResults.granted) {
+        const permsRes = await AppleMusic.requestPermissions();
+        if (permsRes.receive !== AppleMusicPermissionsResults.granted) {
+          return Dialog.alert({
+            message:
+              "We can't see what you're listening to! Please allow apple music permissions in settings.",
+            title: 'Permissions Denied.',
+          });
+        }
+      }
+      try {
+        recentlyPlayed = await AppleMusic.getRecentlyPlayed();
+      } catch (e) {
+        console.log(e);
+        return errorToast({ content: e.message });
+      }
+    }
+    const message = await network.get().queryFirebase('previewusersubmission', {
+      appleMusic: recentlyPlayed?.song as Song,
+    });
+
+    if (!message) return;
+    FirebaseAnalytics.logEvent({ name: 'preview_submission' });
+    return message;
+  }
+);
+
 export const generateSubmission = action(
   userSubmission,
   'generate-submission',

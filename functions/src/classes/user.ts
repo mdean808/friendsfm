@@ -345,6 +345,102 @@ export default class User implements UserType {
     await newNotification(message);
   }
 
+  public async previewSubmission(appleMusicSong: Song): Promise<Submission> {
+    if (!this.exists) throw Error('User not loaded.');
+    // make sure we have the latest access tokens for the user's music oauth before we get their song
+    let song = {} as Song;
+    if (this.musicPlatform === MusicPlatform.spotify) {
+      await this.updateSpotifyAuth();
+      song = await this.getRecentSpotifySong();
+      song.platforms.push({
+        id: MusicPlatform.spotify,
+        url: song.url,
+        artist: song.artist,
+        name: song.name,
+        albumArtwork: song.albumArtwork,
+      });
+      const appleMusicRes = await searchAppleMusic(
+        song.name + ' by ' + song.artist,
+        ['track']
+      );
+      if (appleMusicRes) {
+        song.platforms.push({
+          id: MusicPlatform.appleMusic,
+          url: appleMusicRes.results.songs?.data[0]?.attributes?.url || '',
+          name: appleMusicRes.results.songs?.data[0]?.attributes?.name || '',
+          artist:
+            appleMusicRes.results.songs?.data[0]?.attributes.artistName || '',
+          albumArtwork:
+            appleMusicRes.results.songs?.data[0]?.attributes?.artwork?.url
+              .replace('{w}', '120')
+              .replace('{h}', '120') || '',
+        });
+      }
+    }
+    if (this.musicPlatform === MusicPlatform.appleMusic) {
+      song = {
+        ...appleMusicSong,
+        platforms: [],
+        genre:
+          (await getTrackGenre(appleMusicSong.name, appleMusicSong.artist)) ||
+          'unknown',
+      };
+      song.platforms.push({
+        id: MusicPlatform.appleMusic,
+        url: song.url,
+        name: song.name,
+        artist: song.artist,
+        albumArtwork: song.albumArtwork,
+      });
+      // spotify information
+      const spotifySong = await getSpotifySong(song);
+      song.platforms.push({
+        id: MusicPlatform.spotify,
+        url: spotifySong?.external_urls.spotify || '',
+        name: spotifySong?.name || '',
+        artist: spotifySong?.artists[0]?.name || '',
+        albumArtwork: spotifySong?.album.images[0]?.url || '',
+      });
+    }
+
+    // get a snapshot of the current submission state
+    const notificationsSnapshot = await db
+      .collection('misc')
+      .doc('notifications')
+      .get();
+    // calculate time and late information if the submission is late
+    const { late, time, lateTime } = Submission.calculateCurrentTimeData(
+      notificationsSnapshot
+    );
+    // create the submission
+    const newSubmission: SubmissionType = {
+      time,
+      late,
+      lateTime,
+      number: notificationsSnapshot.get('count'),
+      audial: { number: -1, score: '' },
+      song,
+      location: { latitude: 0, longitude: 0 },
+      comments: [],
+      userId: this.id,
+    };
+
+    // return a new submission class from the result
+    return new Submission(
+      '69',
+      newSubmission.number,
+      newSubmission.song,
+      newSubmission.audial,
+      newSubmission.location,
+      newSubmission.late,
+      newSubmission.time,
+      newSubmission.lateTime,
+      newSubmission.comments,
+      undefined,
+      this
+    );
+  }
+
   public async createSubmission(
     latitude: number,
     longitude: number,

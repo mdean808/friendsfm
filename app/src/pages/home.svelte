@@ -27,6 +27,7 @@
   import { UserState, type Submission as SubmissionType } from '../types';
   import Genres from '../components/Genres.svelte';
   import Submissions from '../components/Submissions.svelte';
+  import SubmissionPreview from '../components/SubmissionPreview.svelte';
   import Tabs from '../components/Tabs.svelte';
   import { App } from '@capacitor/app';
 
@@ -154,15 +155,24 @@
   {#if $userSubmission}
     <div id="home" class="text-center w-full py-1 px-4">
       {#if !$userSubmission.song && !loadingSubmission}
-        <h3>you haven't shared what you're listening to yet.</h3>
-        <h4 class="mb-2">submit to see what your friends are playing!</h4>
-        <span class="border-white border-t-2 block w-full" />
-        <Button
-          type="primary"
-          className="my-2 bg-blue-500"
-          title="Share current song."
-          on:click={createSubmission}>share</Button
-        >
+        <div class="">
+          <SubmissionPreview />
+          <div class="fixed bottom-20 px-2 w-full left-0">
+            <div
+              class="border-white rounded-lg backdrop-blur-md py-3 px-3 border-2"
+            >
+              <p class="text-center">
+                share to see what your friends are listening to.
+              </p>
+              <Button
+                type="primary"
+                className="my-2 bg-blue-500"
+                title="Share current song."
+                on:click={createSubmission}>share now!</Button
+              >
+            </div>
+          </div>
+        </div>
       {:else}
         <div class="h-full">
           {#if $userSubmission && Submissions && Genres}

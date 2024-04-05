@@ -6,7 +6,7 @@ export const createnewusersubmission = onRequest(
   authMiddleware(
     sentryWrapper('create-new-user-submission', async (req, res, user) => {
       const { latitude, longitude, appleMusic } = JSON.parse(req.body);
-      const userSub = await user.createSubmission(
+      const submission = await user.createSubmission(
         latitude,
         longitude,
         appleMusic
@@ -16,7 +16,7 @@ export const createnewusersubmission = onRequest(
       res.status(200).json({
         type: 'success',
         message: {
-          user: userSub.json || {},
+          user: submission.json || {},
         },
       });
     })

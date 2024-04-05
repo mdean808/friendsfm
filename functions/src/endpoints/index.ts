@@ -32,3 +32,4 @@ export * from './misc/searchapplemusic';
 export * from './friends/getfriendsuggestions';
 export * from './users/deleteuser';
 export * from './users/getusercurrentlylistening';
+export * from './submissions/previewusersubmission';
