@@ -28,6 +28,7 @@
   import Genres from '../components/Genres.svelte';
   import Submissions from '../components/Submissions.svelte';
   import Tabs from '../components/Tabs.svelte';
+  import { App } from '@capacitor/app';
 
   // GLOBALS
   let loadingSubmission = false;
@@ -84,6 +85,14 @@
     if ($friendSubmissions) {
       sortedFriendSubmissions = [...$friendSubmissions].sort(sortByDate);
     }
+
+    App.addListener('resume', () => {
+      if (!loadingGenres && !loadingFriendSubmissions && !loadingSubmission) {
+        load(true);
+        loadFriends(true);
+        loadNearby();
+      }
+    });
   });
 
   onDestroy(() => {
@@ -91,9 +100,9 @@
     refresher?.removeEventListener('ionRefresh', handleRefresh);
   });
 
-  const load = async () => {
+  const load = async (shouldHideLoader?: boolean) => {
     homepageLoaded.set(false);
-    loadingSubmission = true;
+    if (!shouldHideLoader) loadingSubmission = true;
     await getSubmissionStatus();
     loadingSubmission = false;
     if (!userSubmission.get() || !userSubmission.get().song) {

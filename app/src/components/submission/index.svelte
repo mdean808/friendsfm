@@ -22,7 +22,7 @@
   };
 
   onMount(async () => {
-    //currentlyListening = await getUserCurrentlyListening(data.user.id);
+    currentlyListening = await getUserCurrentlyListening(data.user.id);
     // get current listening every 15 seconds
     interval = setInterval(async () => {
       currentlyListening = await getUserCurrentlyListening(data.user.id);

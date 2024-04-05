@@ -20,17 +20,18 @@
   import { MusicPlatform, type User } from '../types';
   import { goto, showToast } from '../lib/util';
   import Skeleton from '../components/submission/Skeleton.svelte';
+  import LoadingIndicator from '../components/LoadingIndicator.svelte';
 
   let profile: User['profile'];
   const firstOfTheMonth = new Date().getDate() === 1;
+  let loadingProfile = true;
 
   onMount(async () => {
-    loading.set(true);
     if (!$authToken) await getNewAuthToken();
     const message = await $network.queryFirebase('getprofile', {
       username: $publicProfileUsername,
     });
-    loading.set(false);
+    loadingProfile = false;
     if (!message) {
       goto('/');
       return;
@@ -132,7 +133,11 @@
         <h1 class="py-2 font-semibold text-xl">{$publicProfileUsername}</h1>
         <hr class="w-28 border-gray-400 border-[1.5px] rounded-full mx-auto" />
         <div class="py-1 flex max-h-20 h-14 w-full">
-          {#if profile?.bio}
+          {#if loadingProfile}
+            <p
+              class="align-middle self-center mx-auto h-4 w-44 rounded-md animate-pulse bg-gray-700"
+            />
+          {:else if profile?.bio}
             <p
               class="align-middle self-center text-center w-full font-mono text-xs"
             >
@@ -168,6 +173,10 @@
               </a>
               <p class="mt-1 text-sm">Sky</p>
               <p class="mt-1 text-sm text-gray-400">Playboi Carti</p>
+            {:else if loadingProfile}
+              <div
+                class="p-5 border-2 border-gray-700 bg-gray-700 rounded-md w-20 h-20 mx-auto animate-pulse transition-all duration-100"
+              />
             {:else if profile?.favorites?.song}
               <a
                 target="_blank"
@@ -209,7 +218,11 @@
           </div>
           <div>
             <div>
-              {#if profile?.favorites?.album}
+              {#if loadingProfile}
+                <div
+                  class="p-5 border-2 border-gray-700 bg-gray-700 rounded-md w-20 h-20 mx-auto animate-pulse transition-all duration-100"
+                />
+              {:else if profile?.favorites?.album}
                 <a
                   target="_blank"
                   href={profile.favorites.album.url}
@@ -250,7 +263,11 @@
             </div>
           </div>
           <div>
-            {#if profile?.favorites?.artist}
+            {#if loadingProfile}
+              <div
+                class="p-5 border-2 border-gray-700 bg-gray-700 rounded-md w-20 h-20 mx-auto animate-pulse transition-all duration-100"
+              />
+            {:else if profile?.favorites?.artist}
               <a
                 target="_blank"
                 href={profile.favorites.artist.url}
@@ -287,7 +304,12 @@
             {/if}
           </div>
         </div>
-        {#if profile?.musicPlatform === MusicPlatform.spotify}
+
+        {#if loadingProfile}
+          <div
+            class="h-5 w-12 rounded-md bg-gray-700 mx-auto animate-pulse"
+          ></div>
+        {:else if profile?.musicPlatform === MusicPlatform.spotify}
           <img alt="spotify logo" class="h-4 my-1 mx-auto" src={SpotifyLogo} />
         {:else if profile?.musicPlatform === MusicPlatform.appleMusic}
           <img
@@ -312,7 +334,7 @@
             {$publicProfileUsername} is listening to
           </h2>
           <div
-            class={`p-1 rounded-md mx-4 mb-2 bg-gradient-to-r from-${profile.musicPlatform} via-blue-500 to-${profile.musicPlatform}   background-animate`}
+            class={`p-1 rounded-md mx-4 mb-2 bg-gradient-to-r from-${profile?.musicPlatform} via-blue-500 to-${profile?.musicPlatform}   background-animate`}
           >
             <div
               class="text-left bg-gray-700 relative rounded-md px-2 py-2 flex space-x-4"
@@ -337,7 +359,7 @@
                   </div>
                 {/if}
                 <div class={song.albumArtwork ? 'w-52' : 'w-64'}>
-                  <h1 class={`truncate text-${profile.musicPlatform}`}>
+                  <h1 class={`truncate text-${profile?.musicPlatform}`}>
                     {song.name}
                   </h1>
                   <p class="text-white truncate">
@@ -353,7 +375,14 @@
           </div>
         {:else}
           <!-- User Top Song -->
-          {#if profile?.stats?.topSong}
+          {#if loadingProfile}
+            <p
+              class="h-5 my-1.5 rounded-md animate-pulse bg-gray-700 mx-auto w-1/2"
+            />
+            <div class="mx-4 mb-2">
+              <Skeleton type="user" />
+            </div>
+          {:else if profile?.stats?.topSong}
             <h2 class="mt-3 mb-1 font-semibold text-xl">most common song</h2>
             <div
               class="text-left bg-gray-700 rounded-md px-2 mx-4 py-2 mb-2 flex space-x-4"

@@ -33,8 +33,8 @@
   const submitComment = async () => {
     if (!commentValue) return;
     commentSubmitting = true;
-    await createCommentForSubmission(commentValue);
     commentValue = '';
+    await createCommentForSubmission(commentValue);
     commentSubmitting = false;
   };
 

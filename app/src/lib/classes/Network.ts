@@ -62,12 +62,12 @@ export default class Network {
   ) {
     // generate url
     const url = this.firebaseUrl(endpoint);
-    const existingRequest = this.getByUrl(url);
+    /* const existingRequest = this.getByUrl(url);
     // cancel existing request to url if it already exists
     if (existingRequest) {
       existingRequest.abortController.abort();
       this.remove(existingRequest);
-    }
+    } */
     // don't attempt again if we'ves already tried 2+ times.
     if (attempts >= 2) return;
     // register with analytics
