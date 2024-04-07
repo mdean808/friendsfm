@@ -10,6 +10,7 @@ import { NativeGeocoder } from '@capgo/nativegeocoder';
 import { Geolocation } from '@capacitor/geolocation';
 import { Dialog } from '@capacitor/dialog';
 import { Capacitor } from '@capacitor/core';
+import { Preferences } from '@capacitor/preferences';
 
 export const keyboardHeight = atom<number>(0);
 
@@ -53,7 +54,7 @@ export const updateCurrentLocation = action(
       try {
         l.gp = await Geolocation.getCurrentPosition();
       } catch (e) {
-        if (store.get().gp) return;
+        if (store.get().gp || (await Preferences.get({ key: 'location-permissions' })).value == '1') return;
         const { value } = await Dialog.confirm({
           title: 'Location Permissions',
           message:
@@ -61,6 +62,7 @@ export const updateCurrentLocation = action(
           okButtonTitle: 'Settings',
           cancelButtonTitle: 'Ignore',
         });
+        await Preferences.set({ key: 'location-permissions', value: '1' });
         if (value) {
           NativeSettings.open({
             optionIOS: IOSSettings.App,

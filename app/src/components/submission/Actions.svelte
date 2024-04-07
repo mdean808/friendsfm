@@ -14,6 +14,7 @@
   export let data: Submission;
   export let className: string = '';
   export let commentNumberColor: string = 'text-gray-600';
+  export let user = false;
 
   let loadingHeart = false;
 
@@ -34,8 +35,8 @@
   };
 </script>
 
-<div class={className}>
-  <div class="flex text-lg gap-2">
+<div class={className + 'flex'}>
+  <div class={`flex text-lg gap-2 ${!user && 'self-center'}`}>
     <span
       on:keyup={(e) => {
         e.stopPropagation();
@@ -55,23 +56,27 @@
       style={`background: ${intToRGB(hashCode(data.song.genre, 23))}`}
       >{data.song.genre}</span
     >
-    <Heart
-      on:click={toggleHeart}
-      on:keypress={toggleHeart}
-      className={`w-6 h-6 flex-grow-0 flex-shrink ${
-        loadingHeart ? 'animate-ping text-white' : ''
-      } ${$songs.find((s) => s.name === data.song.name) ? 'text-white' : ''} `}
-      fill={$songs.find((s) => s.name === data.song.name)
-        ? 'currentColor'
-        : 'none'}
-    />
-    <div class="relative">
-      <div
-        class={`absolute inline-flex items-center justify-center w-4 h-4 text-xs pt-0.5 font-bold ${commentNumberColor} bg-white rounded-full -top-1 -right-1`}
-      >
-        {data.comments.length > 9 ? 9 + '+' : data.comments.length}
+    {#if user}
+      <Heart
+        on:click={toggleHeart}
+        on:keypress={toggleHeart}
+        className={`w-6 h-6 flex-grow-0 flex-shrink ${
+          loadingHeart ? 'animate-ping text-white' : ''
+        } ${
+          $songs.find((s) => s.name === data.song.name) ? 'text-white' : ''
+        } `}
+        fill={$songs.find((s) => s.name === data.song.name)
+          ? 'currentColor'
+          : 'none'}
+      />
+      <div class="relative">
+        <div
+          class={`absolute inline-flex items-center justify-center w-4 h-4 text-xs pt-0.5 font-bold ${commentNumberColor} bg-white rounded-full -top-1 -right-1`}
+        >
+          {data.comments.length > 9 ? 9 + '+' : data.comments.length}
+        </div>
+        <Comment className="w-6 h-6" />
       </div>
-      <Comment className="w-6 h-6" />
-    </div>
+    {/if}
   </div>
 </div>

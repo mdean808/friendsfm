@@ -123,6 +123,7 @@ export interface Submission {
   comments: Comment[];
   audial: Audial;
   currentlyListening?: Song;
+  caption?: string;
 }
 
 export interface Comment {

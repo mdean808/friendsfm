@@ -33,8 +33,9 @@
   const submitComment = async () => {
     if (!commentValue) return;
     commentSubmitting = true;
+    const tempVal = commentValue
     commentValue = '';
-    await createCommentForSubmission(commentValue);
+    await createCommentForSubmission(tempVal);
     commentSubmitting = false;
   };
 

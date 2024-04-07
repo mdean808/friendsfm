@@ -8,7 +8,13 @@ export const previewusersubmission = onRequest(
       const { appleMusic } = JSON.parse(req.body);
       const submission = await user.previewSubmission(appleMusic);
       let friendSubs = await user.getFriendSubmissions();
-      const friends = friendSubs.map((f) => { return { id: f.id, username: f.user.username, musicPlatform: f.user.musicPlatform } })
+      const friends = friendSubs.map((f) => {
+        return {
+          id: f.id,
+          username: f.user.username,
+          musicPlatform: f.user.musicPlatform,
+        };
+      });
       // because some of our functions aren't running synchronously
       if (res.headersSent) return;
       res.status(200).json({

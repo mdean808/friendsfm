@@ -18,6 +18,7 @@
 
   onMount(async () => {
     const res = await previewSubmission();
+    if (!res) return;
     submission = res.submission;
     friends = res.friends;
     loading = false;

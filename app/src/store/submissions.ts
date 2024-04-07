@@ -299,3 +299,19 @@ export const getSubmissionById = action(
     return message as Submission;
   }
 );
+
+export const setSubmissionCaption = action(
+  activeSubmission,
+  'update-submission-caption',
+  async (store, caption: string) => {
+    await getNewAuthToken();
+    const message = await network
+      .get()
+      .queryFirebase('setsubmissioncaption', { caption });
+    if (!message) return;
+    const s = store.get();
+    s.caption = message;
+    store.set(s);
+    return message;
+  }
+);

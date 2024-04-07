@@ -36,18 +36,42 @@
     loading = false;
   };
   const acceptRequest = async (requester: string, i: number) => {
+    // remove friendRequest from list
+    const temp = [...$user.friendRequests][i];
+    user.set({
+      ...$user,
+      friendRequests: [...$user.friendRequests].filter((fr) => fr != temp),
+    });
     if (loaders[i]) return;
     loaders[i] = true;
     if (await acceptFriendRequest(requester))
       showToast({ content: 'Successfully accepted friend request' });
+    // add fr back
+    else
+      user.set({
+        ...$user,
+        friendRequests: [...$user.friendRequests, temp],
+      });
     loaders[i] = false;
   };
 
   const rejectRequest = async (requester: string, i: number) => {
+    // remove friendRequest from list
+    const temp = [...$user.friendRequests][i];
+    user.set({
+      ...$user,
+      friendRequests: [...$user.friendRequests].filter((fr) => fr != temp),
+    });
     if (loaders[i]) return;
     loaders[i] = true;
     if (await rejectFriendRequest(requester))
-      showToast({ content: 'Successfully rejected friend request' });
+      showToast({ content: 'Successfully accepted friend request' });
+    // add fr back
+    else
+      user.set({
+        ...$user,
+        friendRequests: [...$user.friendRequests, temp],
+      });
     loaders[i] = false;
   };
 

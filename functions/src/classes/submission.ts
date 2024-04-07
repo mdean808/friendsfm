@@ -36,6 +36,7 @@ export default class Submission implements SubmissionType {
   comments: Comment[];
   userId: string;
   currentlyListening?: Song | undefined;
+  caption?: string;
 
   constructor(
     id: string,
@@ -48,6 +49,7 @@ export default class Submission implements SubmissionType {
     lateTime?: Date | Timestamp,
     comments?: Comment[],
     currentlyListening?: Song,
+    caption?: string,
     user?: User
   ) {
     this.id = id;
@@ -60,6 +62,7 @@ export default class Submission implements SubmissionType {
     this.lateTime = lateTime || new Date();
     this.comments = comments || [];
     this.currentlyListening = currentlyListening;
+    this.caption = caption;
     this.user = {
       id: user?.id || '',
       username: user?.username || '',
@@ -114,6 +117,7 @@ export default class Submission implements SubmissionType {
       user: this.user,
       userId: this.user.id,
       currentlyListening: this.currentlyListening,
+      caption: this.caption,
     };
   }
 
@@ -212,6 +216,12 @@ export default class Submission implements SubmissionType {
     await this.dbRef.update({
       comments: FieldValue.arrayRemove(comment),
     });
+  }
+
+  public async setCaption(caption: string) {
+    if (!caption) throw new CustomError('No caption provided');
+    this.caption = caption;
+    await this.dbRef.update({ caption });
   }
 
   public static async getCurrentCount() {

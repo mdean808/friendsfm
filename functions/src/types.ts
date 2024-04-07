@@ -105,6 +105,7 @@ export interface Submission {
   lateTime: Date | Timestamp;
   userId: string;
   currentlyListening?: Song;
+  caption?: string;
 }
 
 export interface Comment {

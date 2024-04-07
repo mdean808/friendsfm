@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { hashCode, intToRGB } from '../../lib/util';
   import type { Submission } from '../../types';
   import MusicPlatformIcon from '../icons/MusicPlatformIcon.svelte';
 

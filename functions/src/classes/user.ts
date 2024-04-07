@@ -286,6 +286,7 @@ export default class User implements UserType {
       submissionData.lateTime,
       submissionData.comments,
       undefined,
+      submissionData.caption,
       this
     );
   }
@@ -423,6 +424,7 @@ export default class User implements UserType {
       location: { latitude: 0, longitude: 0 },
       comments: [],
       userId: this.id,
+      caption: '',
     };
 
     // return a new submission class from the result
@@ -437,6 +439,7 @@ export default class User implements UserType {
       newSubmission.lateTime,
       newSubmission.comments,
       undefined,
+      newSubmission.caption,
       this
     );
   }
@@ -594,6 +597,7 @@ export default class User implements UserType {
       newSubmission.lateTime,
       newSubmission.comments,
       undefined,
+      newSubmission.caption,
       this
     );
   }
