@@ -10,6 +10,7 @@
   import type { SavedSong, Submission } from '../../types';
   import Heart from '../icons/Heart.svelte';
   import Comment from '../icons/Comment.svelte';
+  import MusicPlatformIcon from '../icons/MusicPlatformIcon.svelte';
 
   export let data: Submission;
   export let className: string = '';
@@ -77,6 +78,11 @@
         </div>
         <Comment className="w-6 h-6" />
       </div>
+    {:else}
+      <MusicPlatformIcon
+        id={data.user ? data.user.musicPlatform : 'spotify'}
+        className="h-5 w-5 self-center ml-auto"
+      />
     {/if}
   </div>
 </div>

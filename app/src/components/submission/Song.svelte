@@ -1,21 +1,24 @@
 <script lang="ts">
+  import { user } from '../../store';
   import type { Submission } from '../../types';
   import MusicPlatformIcon from '../icons/MusicPlatformIcon.svelte';
 
   export let data: Submission;
 </script>
 
-<div class="flex">
-  <div class="w-10/12 text-left">
-    <div class="flex mb-1 mt-0.5">
+<div class="w-full">
+  <div
+    class={`${data.user.id === $user.id ? 'w-10/12' : ''} max-w-full text-left`}
+  >
+    <div class="flex items-center">
       {#if data.song.albumArtwork}
         <img
           alt="Album Artwork"
-          class="w-1/4 mr-2 max-w-[3rem] max-h-[3rem]"
+          class="w-16 h-16 mr-2"
           src={data.song.albumArtwork}
         />
       {/if}
-      <div class="w-3/4 flex flex-col items-end pr-3 justify-end">
+      <div class="flex flex-col">
         <span class={`w-full truncate text-${data.user.musicPlatform}`}>
           {data.song.name}
         </span>
@@ -25,10 +28,12 @@
       </div>
     </div>
   </div>
-  <div class="w-2/12 text-right mb-1 flex flex-col-reverse gap-1">
-    <MusicPlatformIcon
-      id={data.user ? data.user.musicPlatform : 'spotify'}
-      className="h-5 w-5 self-end ml-auto"
-    />
-  </div>
+  {#if data.user.id === $user.id}
+    <div class="w-2/12 text-right mb-1 flex flex-col-reverse gap-1">
+      <MusicPlatformIcon
+        id={data.user ? data.user.musicPlatform : 'spotify'}
+        className="h-5 w-5 self-end ml-auto"
+      />
+    </div>
+  {/if}
 </div>
