@@ -33,7 +33,7 @@
   const submitComment = async () => {
     if (!commentValue) return;
     commentSubmitting = true;
-    const tempVal = commentValue
+    const tempVal = commentValue;
     commentValue = '';
     await createCommentForSubmission(tempVal);
     commentSubmitting = false;
@@ -173,7 +173,7 @@
               </div>
             {/if}
           </div>
-          <div class="mt-2 border-t-white border-t-2">
+          <div class="flex pb-2 mt-2 border-white border-b-2 border-t-2">
             <div class="flex w-72 mx-auto gap-4">
               {#if $activeSubmission.song.platforms?.find((p) => p.id === MusicPlatform.spotify)?.url}
                 <div class="pt-2 w-52 mx-auto">
@@ -241,17 +241,24 @@
           </div>
         </div>
       {/if}
+      {#if $activeSubmission.caption}
+        <div class="flex py-1 border-white border-b-2">
+          <p class="text-center w-full italic">
+            {$activeSubmission?.caption}
+          </p>
+        </div>
+      {/if}
       <div
         transition:slide
         style={`height: calc(100vh - ${
           $insets.bottom * 2 +
           (focused
-            ? ($keyboardHeight ? $keyboardHeight : 20) + 120
+            ? ($keyboardHeight ? $keyboardHeight : 20) + 145
             : $keyboardHeight
-            ? 470
-            : 450)
+            ? 495
+            : 475)
         }px)`}
-        class="overflow-y-scroll text-white border-t-white border-t-2 pb-1 pt-2 mt-2 block"
+        class="overflow-y-scroll text-white pb-1 pt-2 block"
       >
         {#if !$activeSubmission.comments?.length}
           <span class="text-sm text-gray-300 w-full">no comments yet...</span>

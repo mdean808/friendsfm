@@ -68,31 +68,32 @@
         : `bg-${data.user.musicPlatform}`
     }`}
   >
-    <button
-      on:click={(e) => {
-        e.stopPropagation();
-        goto('/public_profile');
-        publicProfileUsername.set(data.user.username);
-      }}
-      class="flex-grow text-left"
-    >
-      <h4 class="text-xl">
-        <img
-          class="w-5 h-5 inline rounded-full"
-          src={`https://icotar.com/avatar/${
-            data.user?.username || 'undefined'
-          }.svg`}
-          alt="avatar"
-        />
-        {data.user ? data.user.username : 'Unknown'}
-      </h4>
-
+    <div class="flex-grow text-left">
+      <button
+        on:click={(e) => {
+          e.stopPropagation();
+          goto('/public_profile');
+          publicProfileUsername.set(data.user.username);
+        }}
+        class="text-left"
+      >
+        <h4 class="text-xl">
+          <img
+            class="w-5 h-5 inline rounded-full"
+            src={`https://icotar.com/avatar/${
+              data.user?.username || 'undefined'
+            }.svg`}
+            alt="avatar"
+          />
+          {data.user ? data.user.username : 'Unknown'}
+        </h4>
+      </button>
       {#if data?.caption}
         <p class="truncate italic text-sm">
           {data.caption}
         </p>
       {/if}
-    </button>
+    </div>
     <SubmissionActions {data} />
   </div>
   <!-- SONG -->
