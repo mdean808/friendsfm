@@ -183,6 +183,11 @@ export default class User implements UserType {
     if (!this.exists) throw Error('User not loaded.');
     const songsRef = this.dbRef.collection('songs');
 
+    const songExists = this.savedSongs.find((s: SavedSong) => s.id === song.id);
+    if (songExists) {
+      return songExists;
+    }
+
     const songRef = await songsRef.add(song);
     const songRes = await songRef.get();
     const songData = { ...songRes.data(), id: songRes.id } as SavedSong;
@@ -287,6 +292,7 @@ export default class User implements UserType {
       submissionData.comments,
       undefined,
       submissionData.caption,
+      submissionData.likes,
       this
     );
   }
@@ -425,6 +431,7 @@ export default class User implements UserType {
       comments: [],
       userId: this.id,
       caption: '',
+      likes: 0,
     };
 
     // return a new submission class from the result
@@ -440,6 +447,7 @@ export default class User implements UserType {
       newSubmission.comments,
       undefined,
       newSubmission.caption,
+      newSubmission.likes,
       this
     );
   }
@@ -533,6 +541,7 @@ export default class User implements UserType {
       location: { latitude: latitude || 135, longitude: longitude || 90.0 },
       comments: [],
       userId: this.id,
+      likes: 0,
     };
     const newSubmissionId = (
       await db.collection('submissions').add(newSubmission)
@@ -598,6 +607,7 @@ export default class User implements UserType {
       newSubmission.comments,
       undefined,
       newSubmission.caption,
+      newSubmission.likes,
       this
     );
   }

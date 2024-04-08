@@ -54,15 +54,22 @@ export const updateCurrentLocation = action(
       try {
         l.gp = await Geolocation.getCurrentPosition();
       } catch (e) {
-        if (store.get().gp || (await Preferences.get({ key: 'location-permissions' })).value == '1') return;
+        if (
+          store.get().gp ||
+          (await Preferences.get({ key: 'location-permissions' })).value == '0'
+        )
+          return;
         const { value } = await Dialog.confirm({
           title: 'Location Permissions',
           message:
-            'Location permissions need to be enabled to use this feature. Please enable them in settings.',
+            'FriendsFM needs location services to work correctly. Please enable them in settings.',
           okButtonTitle: 'Settings',
           cancelButtonTitle: 'Ignore',
         });
-        await Preferences.set({ key: 'location-permissions', value: '1' });
+        await Preferences.set({
+          key: 'location-permissions',
+          value: value ? '1' : '0',
+        });
         if (value) {
           NativeSettings.open({
             optionIOS: IOSSettings.App,

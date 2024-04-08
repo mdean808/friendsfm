@@ -13,6 +13,7 @@
   import { Dialog } from '@capacitor/dialog';
 
   export let data: Submission;
+  let tempCap = '';
 
   const showFullSubmission = () => {
     activeSubmission.set(data);
@@ -24,7 +25,7 @@
       if ($platform === 'web') {
         const res = prompt('Enter your caption below.');
         if (!res.trim()) return;
-        loading.set(true);
+        tempCap = res;
         data.caption = await setSubmissionCaption(res.trim());
       } else {
         const res = await Dialog.prompt({
@@ -32,7 +33,7 @@
           message: 'Enter your caption below.',
         });
         if (res.cancelled || !res.value.trim()) return;
-        loading.set(true);
+        tempCap = res.value;
         data.caption = await setSubmissionCaption(res.value.trim());
       }
       showToast({ content: 'successfully updated your caption.' });
@@ -76,13 +77,16 @@
     </div>
   </div>
 
-  <div class={`p-1 rounded-b-lg border-t border-gray-400 bg-gray-700`}>
-    {#if data.caption}
-      <button on:click={createCaption} class="text-white w-full">
-        {data.caption}</button
+  <div class={`p-1 rounded-b-lg border-t italic border-gray-400 bg-gray-700`}>
+    {#if data.caption || tempCap}
+      <button on:click={createCaption} class="text-white italic w-full">
+        {data.caption ? data.caption : tempCap}</button
       >
     {:else}
-      <button on:click={createCaption} class="text-white underline w-full">
+      <button
+        on:click={createCaption}
+        class="text-white underline italic w-full"
+      >
         add a caption</button
       >
     {/if}

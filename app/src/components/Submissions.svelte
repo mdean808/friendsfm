@@ -36,13 +36,13 @@
     <SkeletonSubmission />
     <SkeletonSubmission />
   {:else if !loadingFriendSubmissions}
-    {#if $singleSubmissionLoading} 
+    {#if $singleSubmissionLoading}
       <div class="my-2">
         <SkeletonSubmission />
       </div>
     {/if}
     {#each sortedFriendSubmissions.sort(sortByDate) as submission}
-      <div class="my-2">
+      <div class="my-4">
         <Submission data={submission} />
       </div>
     {/each}
@@ -74,7 +74,6 @@
       {/if}
     {:else}
       <p
-
         on:keyup={createSubmissionsPlaylist}
         on:click={createSubmissionsPlaylist}
         class="mx-auto text-center mt-3 text-gray-300 opacity-70 underline"

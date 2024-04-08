@@ -106,6 +106,7 @@ export interface Submission {
   userId: string;
   currentlyListening?: Song;
   caption?: string;
+  likes: number;
 }
 
 export interface Comment {

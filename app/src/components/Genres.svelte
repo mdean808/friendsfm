@@ -37,7 +37,7 @@
     }
   });
 
-  // lsiten for notification changes
+  // lsiten for location changes
   location.listen((val) => {
     if (val?.gp?.coords && map && !$activeSubmission) {
       const startingCenter = {
@@ -97,7 +97,7 @@
 
     // change radius based on the visibleWdith
     map.addListener('bounds_changed', async () => {
-      if (prevZoom != map.getZoom() && map.getZoom() < 15) {
+      if (prevZoom != map.getZoom()) {
         handleBoundsChange();
       }
     });
@@ -117,6 +117,8 @@
     if (boundsChangeTimeout !== null) {
       clearTimeout(boundsChangeTimeout);
     }
+
+    console.log('handling a bounds change!');
 
     boundsChangeTimeout = setTimeout(() => {
       const bounds = map.getBounds();
@@ -148,7 +150,7 @@
         prevZoom = map.getZoom();
         prevBounds = map.getBounds();
       }
-    }, 500); // Adjust debounce time as needed
+    }, 1000); // Adjust debounce time as needed
   }
 
   const createMarkers = async () => {

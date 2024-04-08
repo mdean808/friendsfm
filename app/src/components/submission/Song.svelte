@@ -6,7 +6,7 @@
   export let data: Submission;
 </script>
 
-<div class="w-full">
+<div class="w-full flex mb-1">
   <div
     class={`${data.user.id === $user.id ? 'w-10/12' : ''} max-w-full text-left`}
   >
@@ -14,7 +14,7 @@
       {#if data.song.albumArtwork}
         <img
           alt="Album Artwork"
-          class="w-16 h-16 mr-2"
+          class="w-14 h-14 mr-2"
           src={data.song.albumArtwork}
         />
       {/if}

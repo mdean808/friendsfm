@@ -30,6 +30,7 @@
   import SubmissionPreview from '../components/SubmissionPreview.svelte';
   import Tabs from '../components/Tabs.svelte';
   import { App } from '@capacitor/app';
+  import { Preferences } from '@capacitor/preferences';
 
   // GLOBALS
   let loadingSubmission = false;
@@ -123,7 +124,19 @@
   const loadNearby = async () => {
     loadingGenres = true;
     await updateCurrentLocation();
-    getNearbySubmissions(20).then(() => (loadingGenres = false));
+    // grab all submissions for the world if we don't have location permissions
+    if ((await Preferences.get({ key: 'location-permissions' })).value === '0')
+      getNearbySubmissions(null, {
+        southWest: {
+          latitude: 80,
+          longitude: 180,
+        },
+        northEast: {
+          latitude: -80,
+          longitude: -180,
+        },
+      }).then(() => (loadingGenres = false));
+    else getNearbySubmissions(20).then(() => (loadingGenres = false));
   };
 
   const handleRefresh = async () => {

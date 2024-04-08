@@ -17,7 +17,7 @@ export const loadSongs = action(songs, 'load-songs', async (store) => {
 export const toggleSong = action(
   songs,
   'add-song',
-  async (store, song: SavedSong) => {
+  async (store, song: SavedSong, subId?: string) => {
     let s = store.get();
     if (s.find((s) => s.name === song.name)) {
       // make sure the ID is present
@@ -26,10 +26,14 @@ export const toggleSong = action(
       s = s.filter((s) => s.name !== song.name);
       store.set(s);
       // save to backend
-      const message = await network.get().queryFirebase('deletesong', { song });
+      const message = await network
+        .get()
+        .queryFirebase('deletesong', { song, subId });
       if (!message) return;
     } else {
-      const message = await network.get().queryFirebase('savesong', { song });
+      const message = await network
+        .get()
+        .queryFirebase('savesong', { song, subId });
       if (!message) return;
       s.push(message as SavedSong);
       store.set(s);

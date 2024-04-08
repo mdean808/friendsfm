@@ -228,8 +228,12 @@ export const getNearbySubmissions = action(
   async (store, radius?, bounds?) => {
     const message = await network.get().queryFirebase('nearbysubmissions', {
       location: {
-        latitude: location.get() ? location.get().gp.coords.latitude : 0,
-        longitude: location.get() ? location.get().gp.coords.longitude : 0,
+        latitude: location.get()?.gp?.coords
+          ? location.get().gp.coords.latitude
+          : 0,
+        longitude: location.get()?.gp?.coords
+          ? location.get().gp.coords.longitude
+          : 0,
       },
       radius,
       bounds,

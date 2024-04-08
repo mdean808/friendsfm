@@ -37,6 +37,7 @@ export default class Submission implements SubmissionType {
   userId: string;
   currentlyListening?: Song | undefined;
   caption?: string;
+  likes: number;
 
   constructor(
     id: string,
@@ -50,6 +51,7 @@ export default class Submission implements SubmissionType {
     comments?: Comment[],
     currentlyListening?: Song,
     caption?: string,
+    likes?: number,
     user?: User
   ) {
     this.id = id;
@@ -63,6 +65,7 @@ export default class Submission implements SubmissionType {
     this.comments = comments || [];
     this.currentlyListening = currentlyListening;
     this.caption = caption;
+    this.likes = likes || 0;
     this.user = {
       id: user?.id || '',
       username: user?.username || '',
@@ -81,7 +84,11 @@ export default class Submission implements SubmissionType {
     this.user.id = u.id;
     this.user.username = u.username;
     this.user.musicPlatform = u.musicPlatform;
-    this.currentlyListening = await u.getCurrentlyListening();
+    try {
+      this.currentlyListening = await u.getCurrentlyListening();
+    } catch (e) {
+      console.log("Getting submission users's current listening song failed.");
+    }
     return this;
   }
 
@@ -118,6 +125,7 @@ export default class Submission implements SubmissionType {
       userId: this.user.id,
       currentlyListening: this.currentlyListening,
       caption: this.caption,
+      likes: this.likes,
     };
   }
 
@@ -222,6 +230,15 @@ export default class Submission implements SubmissionType {
     if (!caption) throw new CustomError('No caption provided');
     this.caption = caption;
     await this.dbRef.update({ caption });
+  }
+
+  public async incrementLikes() {
+    this.likes++;
+    await this.dbRef.update({ likes: this.likes });
+  }
+  public async decrementLikes() {
+    if (this.likes !== 0) this.likes--;
+    await this.dbRef.update({ likes: this.likes });
   }
 
   public static async getCurrentCount() {

@@ -50,7 +50,7 @@
         musicPlatform: data.user.musicPlatform,
       },
     };
-    await toggleSong(savedSong);
+    await toggleSong(savedSong, data.id);
     loadingHeart = false;
   };
 </script>
@@ -58,7 +58,7 @@
 <div
   on:keypress={showFullSubmission}
   on:click={showFullSubmission}
-  class={`border-white rounded-lg shadow-lg bg-gray-700`}
+  class={`border-white rounded-lg shadow-2xl bg-gray-700`}
 >
   <!-- HEADER -->
   <div
@@ -75,7 +75,7 @@
           goto('/public_profile');
           publicProfileUsername.set(data.user.username);
         }}
-        class="text-left"
+        class="text-left w-full"
       >
         <h4 class="text-xl">
           <img
@@ -133,7 +133,7 @@
           ? 'currentColor'
           : 'none'}
       />
-      <span class="mt-0.5">2 likes</span>
+      <span class="mt-0.5">{data.likes || 0} likes</span>
     </div>
     <div
       class="text-white py-1 flex gap-2 place-content-center text-center w-full truncate"
