@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { goto } from '../../lib/util';
-  import type { SavedSong, Song, Submission } from '../../types';
+  import { goto } from '../lib/util';
+  import type { SavedSong, Song, Submission } from '../types';
   import {
     activeSubmission,
     getUserCurrentlyListening,
     publicProfileUsername,
     songs,
     toggleSong,
-  } from '../../store';
-  import SubmissionTime from '../submission/Time.svelte';
-  import SubmissionActions from '../submission/Actions.svelte';
-  import Comment from '../icons/Comment.svelte';
+  } from '../store';
+  import SubmissionTime from './submission/Time.svelte';
+  import SubmissionActions from './submission/Actions.svelte';
+  import Comment from './icons/Comment.svelte';
+  import Heart from './icons/Heart.svelte';
   import { onDestroy, onMount } from 'svelte';
-  import Heart from '../icons/Heart.svelte';
 
   export let data: Submission;
 
@@ -61,7 +61,7 @@
 <div
   on:keypress={showFullSubmission}
   on:click={showFullSubmission}
-  class={`border-white rounded-lg shadow-2xl bg-gray-700`}
+  class={`rounded-lg shadow-2xl bg-gray-700`}
 >
   <!-- HEADER -->
   <div

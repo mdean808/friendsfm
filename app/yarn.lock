@@ -5066,6 +5066,11 @@ slice-ansi@^4.0.0:
     astral-regex "^2.0.0"
     is-fullwidth-code-point "^3.0.0"
 
+smarquee@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/smarquee/-/smarquee-1.0.5.tgz#98683b4dd52c30d6ddb1a83caff719e272134bfd"
+  integrity sha512-1AaZdeTqZvQVypkJGA25AYEqd/0jwIUC9zQy0x2pTh3vfR8BTOkY7hQr27UOx9BAuLt9PLScNr+jaL+u7omVfg==
+
 sorcery@^0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/sorcery/-/sorcery-0.10.0.tgz#8ae90ad7d7cb05fc59f1ab0c637845d5c15a52b7"

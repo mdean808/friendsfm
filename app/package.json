@@ -59,6 +59,7 @@
     "nanostores": "^0.7.1",
     "prettier": "3.0.0",
     "prettier-plugin-svelte": "^3.0.3",
+    "smarquee": "^1.0.5",
     "swiper": "^10.1.0"
   },
   "devDependencies": {

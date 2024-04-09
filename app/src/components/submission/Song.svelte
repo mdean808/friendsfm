@@ -14,7 +14,7 @@
       {#if data.song.albumArtwork}
         <img
           alt="Album Artwork"
-          class="w-14 h-14 mr-2"
+          class="w-14 h-14 mr-2 mt-1"
           src={data.song.albumArtwork}
         />
       {/if}

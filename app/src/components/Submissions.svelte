@@ -11,8 +11,9 @@
   import { MusicPlatform, type Submission as SubmissionType } from '../types';
   import SkeletonSubmission from '../components/submission/Skeleton.svelte';
   import Submission from './submission/index.svelte';
-  import LargeSubmission from './largesubmission//index.svelte';
+  import LargeSubmission from './LargeSubmission.svelte';
   import UserSubmission from './submission/User.svelte';
+  import { slide } from 'svelte/transition';
 
   export let loadingSubmission: boolean;
   export let loadingFriendSubmissions: boolean;
@@ -43,7 +44,7 @@
       </div>
     {/if}
     {#each sortedFriendSubmissions.sort(sortByDate) as submission}
-      <div class="my-4">
+      <div in:slide class="my-4">
         <LargeSubmission data={submission} />
         <!--<Submission data={submission} />-->
       </div>

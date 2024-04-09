@@ -1,10 +1,13 @@
 <script lang="ts">
   import type { MusicPlatform, Submission } from '../types';
-  import SubmissionSong from './submission/Song.svelte';
   import SubmissionTime from './submission/Time.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { goto } from '../lib/util';
   import { user, previewSubmission, publicProfileUsername } from '../store';
+  import Heart from './icons/Heart.svelte';
+  import Comment from './icons/Comment.svelte';
+  import SubmissionActions from './submission/Actions.svelte';
+  import MusicPlatformIcon from './icons/MusicPlatformIcon.svelte';
 
   let submission: Submission;
   let interval: NodeJS.Timeout;
@@ -38,36 +41,48 @@
 <div class={`border-white rounded-lg shadow-lg bg-gray-700`}>
   <!-- HEADER -->
   <div
-    class={`flex p-2 rounded-t-lg ${
-      submission?.song?.timestamp === 0
+    class={`flex p-2 relative rounded-t-lg ${
+      submission?.currentlyListening
         ? `bg-gradient-to-r from-${$user.musicPlatform} via-blue-500 to-${$user.musicPlatform} background-animate`
         : `bg-${$user.musicPlatform}`
     }`}
   >
     <div class="flex-grow text-center">
-      <h4 class="text-lg">submission preview</h4>
+      <p>submission preview</p>
+    </div>
+    <div class="absolute right-2">
+      <MusicPlatformIcon className="h-5 w-5" id={$user.musicPlatform} />
     </div>
   </div>
-  {#if submission && submission?.song}
+  {#if submission?.song}
     <!-- SONG -->
-    <div class="relative">
-      <!-- BLUE DURATION BACKGROUND -->
-      {#if submission.song.timestamp === 0}
-        <div
-          style={`
-      width: ${
-        (submission.song.durationElapsed / submission.song.length) * 100
-      }%
-      `}
-          class="absolute rounded-bl-lg left-0 right-0 h-full bg-blue-700 opacity-80 z-0"
-        />
-      {/if}
-      <div class="sticky">
-        <div class="px-2 py-1">
-          <div class="w-full text-left">
-            <SubmissionTime className="truncate w-full" data={submission} />
+    <div>
+      <div
+        class="bg-no-repeat bg-cover aspect-square rounded-b-lg"
+        style={`background-image: url('${submission.song.albumArtwork}');`}
+      >
+        <div class="flex w-full items-end h-full text-center">
+          <div
+            class="relative p-2 rounded-md backdrop-blur-lg bg-gray-800 border-white shadow-md bg-opacity-60 border mx-auto mb-10 w-4/5"
+          >
+            <!-- BLUE DURATION BACKGROUND -->
+            {#if submission.song.timestamp === 0}
+              <div
+                style={`width: ${
+                  (submission.song.durationElapsed / submission.song.length) *
+                  100
+                }%`}
+                class="absolute rounded-l-md left-0 top-0 h-full bg-blue-700 opacity-50 z-0"
+              />
+            {/if}
+            <div class="sticky z-10">
+              <SubmissionTime className="truncate w-full" data={submission} />
+              <h2 class={`text-xl text-white`}>
+                {submission.song.name}
+              </h2>
+              <h2 class="text-white">{submission.song.artist}</h2>
+            </div>
           </div>
-          <SubmissionSong data={submission} />
         </div>
       </div>
     </div>
@@ -85,7 +100,7 @@
   {/if}
 </div>
 
-<div class="my-2 border-t-2 border-white relative py-2">
+<div class="my-2 border-t-2 border-white relative pt-2 pb-48">
   {#each friends as friend}
     <div
       class={`flex p-2 rounded-t-lg ${

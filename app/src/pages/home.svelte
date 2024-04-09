@@ -172,10 +172,10 @@
           <SubmissionPreview />
           <div class="fixed bottom-20 px-2 w-full left-0">
             <div
-              class="border-white rounded-lg backdrop-blur-md py-3 px-3 border-2"
+              class="border-white rounded-lg bg-gray-800 bg-opacity-70 backdrop-blur-md py-3 px-3 border-2"
             >
               <p class="text-center">
-                share to see what your friends are listening to.
+                see what your friends are listening to...
               </p>
               <Button
                 type="primary"
