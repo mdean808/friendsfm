@@ -20,7 +20,7 @@ export const activeHomeTab = atom<'submissions' | 'genres'>('submissions');
 
 export const homepageLoaded = atom<boolean>(false);
 
-export const loadingSubmission = atom<boolean>(false);
+export const loadingSubmission = atom<boolean>(true);
 
 export const deepLink = atom<boolean>(false);
 

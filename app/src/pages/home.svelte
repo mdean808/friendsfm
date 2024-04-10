@@ -166,7 +166,7 @@
   </ion-refresher>
   {#if $userSubmission}
     <div id="home" class="text-center w-full py-1 px-4">
-      {#if !$userSubmission.song && !$loadingSubmission}
+      {#if !$userSubmission?.song && !$loadingSubmission}
         <div class="">
           <SubmissionPreview />
         </div>
