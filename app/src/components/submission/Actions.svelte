@@ -4,10 +4,11 @@
     activeGenre,
     activeHomeTab,
     activeSubmission,
+    getNearbySubmissions,
     songs,
-    toggleSong,
+    toggleLike,
   } from '../../store';
-  import type { SavedSong, Submission } from '../../types';
+  import type { Submission } from '../../types';
   import Heart from '../icons/Heart.svelte';
   import Comment from '../icons/Comment.svelte';
   import MusicPlatformIcon from '../icons/MusicPlatformIcon.svelte';
@@ -23,15 +24,7 @@
     e.stopPropagation();
     if (loadingHeart) return;
     loadingHeart = true;
-    const savedSong: SavedSong = {
-      ...data.song,
-      user: {
-        id: data.user.id,
-        username: data.user.username,
-        musicPlatform: data.user.musicPlatform,
-      },
-    };
-    await toggleSong(savedSong);
+    await toggleLike(data.id);
     loadingHeart = false;
   };
 </script>
@@ -44,6 +37,16 @@
         activeGenre.set(data.song.genre);
         activeSubmission.set(data);
         activeHomeTab.set('genres');
+        getNearbySubmissions(null, {
+          southWest: {
+            latitude: data.location.latitude - 5,
+            longitude: data.location.longitude - 5,
+          },
+          northEast: {
+            latitude: data.location.latitude + 5,
+            longitude: data.location.longitude + 5,
+          },
+        });
         goto('/');
       }}
       on:click={(e) => {
@@ -62,7 +65,7 @@
         <div
           class={`absolute inline-flex items-center justify-center w-4 h-4 text-xs pt-0.5 font-bold ${commentNumberColor} bg-white rounded-full -top-1 -right-1`}
         >
-          {data.likes > 9 ? 9 + '+' : data.likes}
+          {data.likes.length > 9 ? 9 + '+' : data.likes.length}
         </div>
         <Heart
           on:click={toggleHeart}

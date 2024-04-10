@@ -10,7 +10,6 @@
   import { goto } from '../lib/util';
   import { MusicPlatform, type Submission as SubmissionType } from '../types';
   import SkeletonSubmission from '../components/submission/Skeleton.svelte';
-  import Submission from './submission/index.svelte';
   import LargeSubmission from './LargeSubmission.svelte';
   import UserSubmission from './submission/User.svelte';
   import { slide } from 'svelte/transition';
@@ -49,7 +48,7 @@
         <!--<Submission data={submission} />-->
       </div>
     {/each}
-    {#if $friendSubmissions?.length === 0}
+    {#if $friendSubmissions && [...$friendSubmissions].length === 0}
       <p class="mx-auto text-center mt-3">nobody else has submitted yet.</p>
       <p
         on:keyup={() => goto('/friends')}

@@ -45,6 +45,7 @@
         lat: $location?.gp?.coords?.latitude || 0,
       };
       map.setCenter(startingCenter);
+      createMarkers();
     }
   });
 
@@ -118,9 +119,8 @@
       clearTimeout(boundsChangeTimeout);
     }
 
-    console.log('handling a bounds change!');
-
     boundsChangeTimeout = setTimeout(() => {
+      console.log('bounds changing');
       const bounds = map.getBounds();
       let shouldGetSubmissions = true;
       // compare previous bounds to current bounds
@@ -132,7 +132,8 @@
         Math.abs(bounds.getCenter().lat() - prevBounds?.getCenter().lat()) >
           0.25 ||
         Math.abs(bounds.getCenter().lng() - prevBounds?.getCenter().lng()) >
-          0.25
+          0.25 ||
+        $nearbySubmissions.length == 0
       )
         shouldGetSubmissions = true;
       if (shouldGetSubmissions) {
@@ -188,7 +189,7 @@
     new MarkerClusterer({ markers, map, algorithmOptions: { maxZoom: 9 } });
   };
 
-  const toggleHeart = async (
+  const toggleSongHelper = async (
     data: StrippedSubmission,
     loadingHeart: boolean
   ) => {
@@ -358,8 +359,8 @@
                   {/if}
                   <div class="h-full">
                     <svg
-                      on:click={() => toggleHeart(sub, loadingHeart)}
-                      on:keypress={() => toggleHeart(sub, loadingHeart)}
+                      on:click={() => toggleSongHelper(sub, loadingHeart)}
+                      on:keypress={() => toggleSongHelper(sub, loadingHeart)}
                       class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
                         loadingHeart ? 'animate-ping text-white' : ''
                       } ${

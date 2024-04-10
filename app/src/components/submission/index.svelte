@@ -1,12 +1,13 @@
 <script lang="ts">
   import { goto } from '../../lib/util';
-  import type { SavedSong, Song, Submission } from '../../types';
+  import type { Song, Submission } from '../../types';
   import {
     activeSubmission,
     getUserCurrentlyListening,
     publicProfileUsername,
     songs,
-    toggleSong,
+    toggleLike,
+    toggleSong as togleLiek,
   } from '../../store';
   import SubmissionSong from './Song.svelte';
   import SubmissionTime from './Time.svelte';
@@ -42,15 +43,7 @@
     e.stopPropagation();
     if (loadingHeart) return;
     loadingHeart = true;
-    const savedSong: SavedSong = {
-      ...data.song,
-      user: {
-        id: data.user.id,
-        username: data.user.username,
-        musicPlatform: data.user.musicPlatform,
-      },
-    };
-    await toggleSong(savedSong, data.id);
+    await toggleLike(data.id);
     loadingHeart = false;
   };
 </script>

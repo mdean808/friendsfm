@@ -421,6 +421,7 @@ export default class User implements UserType {
     );
     // create the submission
     const newSubmission: SubmissionType = {
+      id: '',
       time,
       late,
       lateTime,
@@ -431,7 +432,7 @@ export default class User implements UserType {
       comments: [],
       userId: this.id,
       caption: '',
-      likes: 0,
+      likes: [],
     };
 
     // return a new submission class from the result
@@ -445,7 +446,7 @@ export default class User implements UserType {
       newSubmission.time,
       newSubmission.lateTime,
       newSubmission.comments,
-      undefined,
+      song.timestamp === 0 ? song : undefined,
       newSubmission.caption,
       newSubmission.likes,
       this
@@ -532,6 +533,7 @@ export default class User implements UserType {
     );
     // create and store the submission
     const newSubmission: SubmissionType = {
+      id: '',
       time,
       late,
       lateTime,
@@ -541,7 +543,7 @@ export default class User implements UserType {
       location: { latitude: latitude || 135, longitude: longitude || 90.0 },
       comments: [],
       userId: this.id,
-      likes: 0,
+      likes: [],
     };
     const newSubmissionId = (
       await db.collection('submissions').add(newSubmission)
@@ -576,9 +578,11 @@ export default class User implements UserType {
         // Add submission song to their friend's playlists
         const friendIds = [];
         for (const sub of friendSubmissions) {
+          if (!sub.user) continue;
           friendIds.push(sub.user.id);
         }
         for (const fid of friendIds) {
+          if (!fid) continue;
           const friend = new User(fid);
           await friend.load();
           await friend.updateSpotifyAuth();

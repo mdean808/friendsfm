@@ -20,38 +20,34 @@ import { CustomError } from './error';
 const db = getFirestore();
 
 export default class Submission implements SubmissionType {
-  id: string;
-  number: number;
-  late: boolean;
+  id: SubmissionType['id'];
+  number: SubmissionType['number'];
+  late: SubmissionType['late'];
   song: Song;
-  time: Date | Timestamp;
-  audial: Audial;
-  user: {
-    username: string;
-    musicPlatform?: MusicPlatform;
-    id: string;
-  };
-  location: Location;
-  lateTime: Date | Timestamp;
-  comments: Comment[];
-  userId: string;
-  currentlyListening?: Song | undefined;
-  caption?: string;
-  likes: number;
+  time: SubmissionType['time'];
+  audial: SubmissionType['audial'];
+  user: SubmissionType['user'];
+  location: SubmissionType['location'];
+  lateTime: SubmissionType['lateTime'];
+  comments: SubmissionType['comments'];
+  userId: SubmissionType['userId'];
+  currentlyListening?: SubmissionType['currentlyListening'];
+  caption?: SubmissionType['caption'];
+  likes: SubmissionType['likes'];
 
   constructor(
-    id: string,
-    number?: number,
-    song?: Song,
-    audial?: Audial,
-    location?: { longitude: number; latitude: number },
-    late?: boolean,
-    time?: Date | Timestamp,
-    lateTime?: Date | Timestamp,
-    comments?: Comment[],
-    currentlyListening?: Song,
-    caption?: string,
-    likes?: number,
+    id: SubmissionType['id'] = '',
+    number?: SubmissionType['number'],
+    song?: SubmissionType['song'],
+    audial?: SubmissionType['audial'],
+    location?: SubmissionType['location'],
+    late?: SubmissionType['late'],
+    time?: SubmissionType['time'],
+    lateTime?: SubmissionType['lateTime'],
+    comments?: SubmissionType['comments'],
+    currentlyListening?: SubmissionType['currentlyListening'],
+    caption?: SubmissionType['caption'],
+    likes?: SubmissionType['likes'],
     user?: User
   ) {
     this.id = id;
@@ -65,7 +61,7 @@ export default class Submission implements SubmissionType {
     this.comments = comments || [];
     this.currentlyListening = currentlyListening;
     this.caption = caption;
-    this.likes = likes || 0;
+    this.likes = likes || [];
     this.user = {
       id: user?.id || '',
       username: user?.username || '',
@@ -81,9 +77,11 @@ export default class Submission implements SubmissionType {
     }
     const u = new User(this.userId);
     await u.load();
-    this.user.id = u.id;
-    this.user.username = u.username;
-    this.user.musicPlatform = u.musicPlatform;
+    this.user = {
+      id: u.id,
+      username: u.username,
+      musicPlatform: u.musicPlatform,
+    };
     try {
       this.currentlyListening = await u.getCurrentlyListening();
     } catch (e) {
@@ -122,7 +120,7 @@ export default class Submission implements SubmissionType {
       lateTime: this.lateTime,
       comments: this.comments,
       user: this.user,
-      userId: this.user.id,
+      userId: this.user?.id || '',
       currentlyListening: this.currentlyListening,
       caption: this.caption,
       likes: this.likes,
@@ -232,12 +230,12 @@ export default class Submission implements SubmissionType {
     await this.dbRef.update({ caption });
   }
 
-  public async incrementLikes() {
-    this.likes++;
+  public async addLike(user: User) {
+    this.likes.push({ id: user.id, username: user.username });
     await this.dbRef.update({ likes: this.likes });
   }
-  public async decrementLikes() {
-    if (this.likes !== 0) this.likes--;
+  public async unlike(user: User) {
+    this.likes = this.likes.filter((l) => l.id !== user.id);
     await this.dbRef.update({ likes: this.likes });
   }
 

@@ -36,7 +36,7 @@
         tempCap = res.value;
         data.caption = await setSubmissionCaption(res.value.trim());
       }
-      showToast({ content: 'successfully updated your caption.' });
+      showToast({ content: 'successfully updated your caption' });
     } catch (e) {
       console.log(e);
     } finally {

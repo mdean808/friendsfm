@@ -34,3 +34,5 @@ export * from './users/deleteuser';
 export * from './users/getusercurrentlylistening';
 export * from './submissions/previewusersubmission';
 export * from './submissions/setsubmissioncaption';
+export * from './submissions/likesubmission';
+export * from './submissions/unlikesubmission';

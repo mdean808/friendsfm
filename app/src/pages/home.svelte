@@ -7,6 +7,7 @@
     userSubmission,
     getSubmissionStatus,
     getFriendSubmissions,
+    loadingSubmission,
     homepageLoaded,
     appLoading,
     getNearbySubmissions,
@@ -20,7 +21,6 @@
     updateCurrentLocation,
   } from '../store';
 
-  import Button from '../components/Button.svelte';
   import SkeletonSubmission from '../components/submission/Skeleton.svelte';
   import type { IonRefresher } from '@ionic/core/components/ion-refresher';
   import { FirebaseMessaging } from '@capacitor-firebase/messaging';
@@ -33,7 +33,6 @@
   import { Preferences } from '@capacitor/preferences';
 
   // GLOBALS
-  let loadingSubmission = false;
   let loadingFriendSubmissions = false;
   let sortedFriendSubmissions: SubmissionType[] = [];
   let loadingGenres = false;
@@ -41,7 +40,7 @@
 
   friendSubmissions.listen((val) => {
     if (val) sortedFriendSubmissions = [...val].sort(sortByDate);
-    if (val?.length > 0) loadingFriendSubmissions = false;
+    if (val?.size > 0) loadingFriendSubmissions = false;
   });
 
   onMount(async () => {
@@ -77,7 +76,7 @@
       }
       loadNearby();
       loadingGenres = false;
-      loadingSubmission = false;
+      $loadingSubmission = false;
       loadingFriendSubmissions = false;
       appLoading.set(false);
       setTimeout(() => {
@@ -89,7 +88,7 @@
     }
 
     App.addListener('resume', () => {
-      if (!loadingGenres && !loadingFriendSubmissions && !loadingSubmission) {
+      if (!loadingGenres && !loadingFriendSubmissions && !$loadingSubmission) {
         load(true);
         loadFriends(true);
         loadNearby();
@@ -104,9 +103,9 @@
 
   const load = async (shouldHideLoader?: boolean) => {
     homepageLoaded.set(false);
-    if (!shouldHideLoader) loadingSubmission = true;
+    if (!shouldHideLoader) $loadingSubmission = true;
     await getSubmissionStatus();
-    loadingSubmission = false;
+    $loadingSubmission = false;
     if (!userSubmission.get() || !userSubmission.get().song) {
       loadingFriendSubmissions = false;
       loadingGenres = false;
@@ -148,7 +147,7 @@
     refresher.complete();
   };
 
-  const createSubmission = async () => {
+  export const createSubmission = async () => {
     loading.set(true);
     await generateSubmission();
     loadFriends();
@@ -167,24 +166,9 @@
   </ion-refresher>
   {#if $userSubmission}
     <div id="home" class="text-center w-full py-1 px-4">
-      {#if !$userSubmission.song && !loadingSubmission}
+      {#if !$userSubmission.song && !$loadingSubmission}
         <div class="">
           <SubmissionPreview />
-          <div class="fixed bottom-20 px-2 w-full left-0">
-            <div
-              class="border-white rounded-lg bg-gray-800 bg-opacity-70 backdrop-blur-md py-3 px-3 border-2"
-            >
-              <p class="text-center">
-                see what your friends are listening to...
-              </p>
-              <Button
-                type="primary"
-                className="my-2 bg-blue-500"
-                title="Share current song."
-                on:click={createSubmission}>share now!</Button
-              >
-            </div>
-          </div>
         </div>
       {:else}
         <div class="h-full">
@@ -192,7 +176,7 @@
             <div id="home" class="text-center w-full overflow-y-auto h-full">
               <div>
                 <Tabs
-                  loading={loadingSubmission && loadingGenres}
+                  loading={$loadingSubmission && loadingGenres}
                   activeTab={activeHomeTab}
                   tabs={[
                     {
@@ -200,7 +184,7 @@
                       id: 'submissions',
                       component: Submissions,
                       props: {
-                        loadingSubmission,
+                        loadingSubmission: $loadingSubmission,
                         loadingFriendSubmissions,
                         sortedFriendSubmissions,
                       },

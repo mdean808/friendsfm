@@ -89,7 +89,7 @@ export interface SavedSong extends Song {
 }
 
 export interface Submission {
-  id?: string;
+  id: string;
   number: number;
   late: boolean;
   song: Song; // song id
@@ -106,7 +106,7 @@ export interface Submission {
   userId: string;
   currentlyListening?: Song;
   caption?: string;
-  likes: number;
+  likes: { id: string; username: string }[];
 }
 
 export interface Comment {

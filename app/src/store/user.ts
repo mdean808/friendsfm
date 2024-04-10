@@ -52,7 +52,9 @@ export const getUserFromPreferences = action(
     // userSubmission.set(JSON.parse(res4.value || '{}') as Submission);
 
     const res5 = await Preferences.get({ key: 'friend-submissions' });
-    friendSubmissions.set(JSON.parse(res5.value || '[]') as Submission[]);
+    friendSubmissions.set(
+      new Set(JSON.parse(res5.value || '[]') as Submission[])
+    );
 
     // set the user's state
     if (!store.get().username) loginState.set(UserState.registeringUsername);

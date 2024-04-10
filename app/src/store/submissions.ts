@@ -118,7 +118,7 @@ export const getSubmissionStatus = action(
   }
 );
 
-export const friendSubmissions = atom<Submission[]>([]);
+export const friendSubmissions = atom<Set<Submission>>(new Set());
 
 export const getFriendSubmissions = action(
   friendSubmissions,
@@ -127,7 +127,7 @@ export const getFriendSubmissions = action(
     await getNewAuthToken();
     const message = await network.get().queryFirebase('getfriendsubmissions');
     if (!message) return;
-    store.set(message.friends as Submission[]);
+    store.set(new Set(message.friends as Submission[]));
     await Preferences.set({
       key: 'friend-submissions',
       value: JSON.stringify((message.friends as Submission[]) || []),
@@ -259,11 +259,11 @@ export const createCommentForSubmission = action(
     if (!message) return;
     store.set(message);
     // update other possible locations for the submission for homepage ui updates
-    let fSubs = friendSubmissions.get();
+    let fSubs = [...friendSubmissions.get()];
     if (fSubs.find((s) => s.id === sub.id)) {
       fSubs = fSubs.filter((s) => s.id !== sub.id);
       fSubs.push(message);
-      friendSubmissions.set(fSubs);
+      friendSubmissions.set(new Set(fSubs));
     }
     if (sub.id === userSubmission.get().id) userSubmission.set(message);
   }
@@ -280,11 +280,11 @@ export const deleteCommentFromSubmission = action(
     if (!message) return;
     store.set(message);
     // update other possible locations for the submission for homepage ui updates
-    let fSubs = friendSubmissions.get();
+    let fSubs = [...friendSubmissions.get()];
     if (fSubs.find((s) => s.id === sub.id)) {
       fSubs = fSubs.filter((s) => s.id !== sub.id);
       fSubs.push(message);
-      friendSubmissions.set(fSubs);
+      friendSubmissions.set(new Set(fSubs));
     }
     if (sub.id === userSubmission.get().id) userSubmission.set(message);
   }
@@ -294,7 +294,6 @@ export const getSubmissionById = action(
   activeSubmission,
   'get-submission-by-id',
   async (store, id: string) => {
-    await getNewAuthToken();
     const message = await network
       .get()
       .queryFirebase('getsubmissionbyid', { id });
@@ -308,7 +307,6 @@ export const setSubmissionCaption = action(
   activeSubmission,
   'update-submission-caption',
   async (store, caption: string) => {
-    await getNewAuthToken();
     const message = await network
       .get()
       .queryFirebase('setsubmissioncaption', { caption });
@@ -317,5 +315,21 @@ export const setSubmissionCaption = action(
     s.caption = message;
     store.set(s);
     return message;
+  }
+);
+
+export const toggleLike = action(
+  friendSubmissions,
+  'toggle-like',
+  async (store, subId) => {
+    const sub = [...store.get()].find((fs) => fs.id === subId) as Submission;
+    const exists = !!sub.likes.find((l) => l.id == user.get().id);
+    const url = exists ? 'unlikesubmission' : 'likesubmission';
+    const message = await network.get().queryFirebase(url, { subId: sub.id });
+    if (!message) return;
+    store.get().delete(sub);
+    sub.likes = message;
+    store.get().add(sub);
+    return sub.likes;
   }
 );

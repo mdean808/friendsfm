@@ -11,8 +11,8 @@ export const previewusersubmission = onRequest(
       const friends = friendSubs.map((f) => {
         return {
           id: f.id,
-          username: f.user.username,
-          musicPlatform: f.user.musicPlatform,
+          username: f.user?.username,
+          musicPlatform: f.user?.musicPlatform,
         };
       });
       // because some of our functions aren't running synchronously

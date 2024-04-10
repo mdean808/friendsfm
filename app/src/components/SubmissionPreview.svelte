@@ -4,9 +4,6 @@
   import { onDestroy, onMount } from 'svelte';
   import { goto } from '../lib/util';
   import { user, previewSubmission, publicProfileUsername } from '../store';
-  import Heart from './icons/Heart.svelte';
-  import Comment from './icons/Comment.svelte';
-  import SubmissionActions from './submission/Actions.svelte';
   import MusicPlatformIcon from './icons/MusicPlatformIcon.svelte';
 
   let submission: Submission;

@@ -20,6 +20,8 @@ export const activeHomeTab = atom<'submissions' | 'genres'>('submissions');
 
 export const homepageLoaded = atom<boolean>(false);
 
+export const loadingSubmission = atom<boolean>(false);
+
 export const deepLink = atom<boolean>(false);
 
 // export const FIREBASE_URL = atom<string>(

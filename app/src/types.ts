@@ -124,7 +124,7 @@ export interface Submission {
   audial: Audial;
   currentlyListening?: Song;
   caption?: string;
-  likes: number;
+  likes: { id: string; username: string }[];
 }
 
 export interface Comment {

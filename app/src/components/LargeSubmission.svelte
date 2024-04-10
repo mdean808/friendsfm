@@ -1,12 +1,12 @@
 <script lang="ts">
   import { goto } from '../lib/util';
-  import type { SavedSong, Song, Submission } from '../types';
+  import type { Song, Submission } from '../types';
   import {
     activeSubmission,
     getUserCurrentlyListening,
     publicProfileUsername,
-    songs,
-    toggleSong,
+    toggleLike,
+    user,
   } from '../store';
   import SubmissionTime from './submission/Time.svelte';
   import SubmissionActions from './submission/Actions.svelte';
@@ -41,20 +41,8 @@
     e.stopPropagation();
     if (loadingHeart) return;
     loadingHeart = true;
-    try {
-      const savedSong: SavedSong = {
-        ...data.song,
-        user: {
-          id: data.user.id,
-          username: data.user.username,
-          musicPlatform: data.user.musicPlatform,
-        },
-      };
-      await toggleSong(savedSong, data.id);
-      loadingHeart = false;
-    } catch (e) {
-      loadingHeart = false;
-    }
+    data.likes = await toggleLike(data.id);
+    loadingHeart = false;
   };
 </script>
 
@@ -145,15 +133,13 @@
       <Heart
         className={`w-6 h-6 flex-grow-0 flex-shrink ${
           loadingHeart ? 'animate-ping text-white' : ''
-        } ${
-          $songs.find((s) => s.name === data.song.name) ? 'text-white' : ''
-        } `}
-        fill={$songs.find((s) => s.name === data.song.name)
+        } ${data.likes?.find((l) => l.id === $user.id) ? 'text-white' : ''} `}
+        fill={data.likes?.find((l) => l.id === $user.id)
           ? 'currentColor'
           : 'none'}
       />
       <span class="mt-0.5">
-        {data.likes || 0} like{#if data.likes !== 1}s{/if}
+        {data.likes?.length || 0} like{#if data.likes?.length !== 1}s{/if}
       </span>
     </div>
     <div
