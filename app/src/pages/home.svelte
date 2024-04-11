@@ -144,7 +144,10 @@
 </script>
 
 {#if $userSubmission}
-  <div id="home" class={`text-center w-full h-full py-1 px-4`}>
+  <div
+    id="home"
+    class={`text-center w-full h-full py-1 px-4 overflow-y-scroll`}
+  >
     {#if !$userSubmission?.song && !$loadingSubmission}
       <SubmissionPreview />
     {:else}

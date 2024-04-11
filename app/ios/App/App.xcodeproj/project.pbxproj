@@ -15,6 +15,7 @@
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
+		AC199A5B2BC7C6C6003663FD /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AC199A5A2BC7C6C6003663FD /* PrivacyInfo.xcprivacy */; };
 		AC42C85729BFE16100902F1B /* OSLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = AC42C85629BFE16100902F1B /* OSLogger.m */; };
 		AC42C85929BFE17500902F1B /* OSLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C85829BFE17500902F1B /* OSLogger.swift */; };
 		AC42C85B29CF66C400902F1B /* AppleMusic.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C85A29CF66C400902F1B /* AppleMusic.swift */; };
@@ -33,6 +34,7 @@
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
+		AC199A5A2BC7C6C6003663FD /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AC42C85529BFE16000902F1B /* FriendsFM-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FriendsFM-Bridging-Header.h"; sourceTree = "<group>"; };
 		AC42C85629BFE16100902F1B /* OSLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OSLogger.m; sourceTree = "<group>"; };
 		AC42C85829BFE17500902F1B /* OSLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSLogger.swift; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 		504EC3061FED79650016851F /* App */ = {
 			isa = PBXGroup;
 			children = (
+				AC199A5A2BC7C6C6003663FD /* PrivacyInfo.xcprivacy */,
 				ACA0E7C72990ECC100B47C81 /* App.entitlements */,
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
@@ -186,6 +189,7 @@
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
+				AC199A5B2BC7C6C6003663FD /* PrivacyInfo.xcprivacy in Resources */,
 				ACA0E7C52990EB3400B47C81 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
