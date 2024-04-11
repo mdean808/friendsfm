@@ -42,17 +42,12 @@
   };
 </script>
 
-<div
-  class={`w-full absolute left-0 `}
-  bind:this={elem}
-  style={`bottom: calc(${$insets.bottom}px - ${
-    $insets.bottom ? '35' : '0'
-  }px); `}
->
+<div class={`w-full absolute left-0 bottom-0`} bind:this={elem}>
   {#if !$userSubmission?.song && !$loadingSubmission}
     <div class="px-4 w-full mb-2">
       <div
         class="border-white rounded-lg bg-gray-800 bg-opacity-70 backdrop-blur-md py-3 px-3 border-2"
+        style={`padding-bottom: ${$insets.bottom}px`}
       >
         <p class="text-center">see what your friends are listening to...</p>
         <Button
@@ -64,7 +59,10 @@
       </div>
     </div>
   {/if}
-  <div class="flex backdrop-blur-xl h-full rounded-t-lg">
+  <div
+    class="flex backdrop-blur-xl h-full rounded-t-lg"
+    style={`padding-bottom: ${$insets.bottom}px`}
+  >
     <button
       on:click={() => goto('/songs')}
       class="w-1/3 flex justify-center py-2"

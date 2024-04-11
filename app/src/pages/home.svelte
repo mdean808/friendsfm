@@ -144,16 +144,13 @@
 </script>
 
 {#if $userSubmission}
-  <div
-    id="home"
-    class={`text-center w-full h-full overflow-y-scroll py-1 px-4`}
-  >
+  <div id="home" class={`text-center w-full h-full py-1 px-4`}>
     {#if !$userSubmission?.song && !$loadingSubmission}
       <SubmissionPreview />
     {:else}
       <div class="h-full">
         {#if $userSubmission && Submissions && Genres}
-          <div id="home" class="text-center w-full overflow-y-auto h-full">
+          <div id="home" class="text-center w-full h-full">
             <div>
               <Tabs
                 loading={$loadingSubmission && loadingGenres}

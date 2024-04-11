@@ -90,7 +90,7 @@
 <ion-content
   id="ion-content-submissions"
   style={`height: calc(100vh - 110px)`}
-  class="overflow-hidden no-scroll"
+  class=""
 >
   <ion-refresher id="refresher" slot="fixed">
     <ion-refresher-content />
@@ -103,7 +103,10 @@
     {/if}
   </div>
   <span class="border-white border-t-2 block w-full" />
-  <div class="my-3" style={`padding-bottom: calc(70px + ${$insets.bottom}px)`}>
+  <div
+    class="mb-3 mt-1 overflow-y-scroll"
+    style={`padding-bottom: calc(120px + ${$insets.bottom}px)`}
+  >
     {#if $singleSubmissionLoading || loadingNewLateSubmission}
       <div class="my-2">
         <SkeletonSubmission />

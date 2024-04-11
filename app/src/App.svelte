@@ -350,7 +350,7 @@
       <TopNav />
     {/if}
     <!-- APP BODY -->
-    <main style={`height: calc(100% - 60px);`}>
+    <main style={`height: calc(100% - 64px);`}>
       {#if $currPath === '/' || ($currPath?.includes('/?') && $currPath === '/')}
         <div class="h-full">
           <Home />

@@ -252,7 +252,7 @@
     >
       <capacitor-google-map
         id="google-map"
-        class="inline-block w-full h-56 mt-2 rounded-lg"
+        class="inline-block w-full h-56 mt-2 rounded-lg outline:boder-none focus:border-none"
       >
         <div
           class="flex flex-col items-center justify-items-center text-center h-full w-full"

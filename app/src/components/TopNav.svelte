@@ -28,7 +28,7 @@
   };
 </script>
 
-<div class={`z-30 w-full h-[60px]`}>
+<div class={`z-30 w-full`}>
   <div
     class={`w-full flex flex-row justify-between items-center text-${$user?.musicPlatform}`}
   >
