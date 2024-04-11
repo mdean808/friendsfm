@@ -278,7 +278,7 @@
   </script>
 </svelte:head>
 
-<ion-app>
+<ion-app class="no-scroll">
   <!-- FULL APP WRAPPER -->
   <!-- padding handles device-specific insets -->
   <div

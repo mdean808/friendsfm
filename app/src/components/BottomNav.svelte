@@ -47,9 +47,7 @@
   bind:this={elem}
   style={`bottom: calc(${$insets.bottom}px - ${
     $insets.bottom ? '35' : '0'
-  }px); height: calc(${
-    !$userSubmission?.song && !$loadingSubmission ? 178 : 70
-  }px + ${$insets.bottom}px);`}
+  }px); `}
 >
   {#if !$userSubmission?.song && !$loadingSubmission}
     <div class="px-4 w-full mb-2">

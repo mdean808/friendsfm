@@ -90,7 +90,7 @@
 <ion-content
   id="ion-content-submissions"
   style={`height: calc(100vh - 110px)`}
-  class="overflow-hidden"
+  class="overflow-hidden no-scroll"
 >
   <ion-refresher id="refresher" slot="fixed">
     <ion-refresher-content />

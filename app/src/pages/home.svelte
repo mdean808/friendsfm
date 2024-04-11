@@ -144,11 +144,12 @@
 </script>
 
 {#if $userSubmission}
-  <div id="home" class="text-center w-full py-1 px-4">
+  <div
+    id="home"
+    class={`text-center w-full h-full overflow-y-scroll py-1 px-4`}
+  >
     {#if !$userSubmission?.song && !$loadingSubmission}
-      <div class="">
-        <SubmissionPreview />
-      </div>
+      <SubmissionPreview />
     {:else}
       <div class="h-full">
         {#if $userSubmission && Submissions && Genres}

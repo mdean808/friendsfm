@@ -20,7 +20,6 @@
 body {
   user-select: none;
   margin: 0;
-  /* overflow-y: hidden; */
   font-family: 'League Spartan', sans-serif;
   background: theme('colors.gray.800');
   color: theme('colors.gray.200');
@@ -64,14 +63,34 @@ a {
   display: none;
 }
 
-ion-content {
-  /* --offset-bottom: auto !important; */
-  /* --overflow: hidden; */
-  /* overflow: auto; */
+.no-scroll {
+  --offset-bottom: auto !important;
+
+  --overflow: hidden;
+
+  overflow: auto;
+
   &::-webkit-scrollbar {
     display: none;
   }
 }
+
+ion-content {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+ion-content::part(scroll)::-webkit-scrollbar {
+  display: none;
+}
+/*ion-content {
+  width: calc(100% + 15px);
+  overflow-x: hidden;
+}
+ion-content::part(scroll) {
+  padding-right: 15px;
+  overflow-x: hidden;
+}*/
 
 .background-animate {
   background-size: 200%;
