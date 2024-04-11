@@ -11,7 +11,7 @@
   export let activeTab: WritableAtom<string>;
 </script>
 
-<div class="grid grid-cols-2 bg-gray-900 rounded-t-lg">
+<div class="grid grid-cols-2 bg-gray-900 rounded-t-lg border-b-2 border-white">
   {#each tabs as tab, i}
     <div>
       <input

@@ -55,9 +55,7 @@
   };
 </script>
 
-<div
-  class="bg-gray-800 border-t-2 border-white max-h-[50vh] h-auto overflow-scroll"
->
+<div class="bg-gray-800 max-h-[50vh] h-auto overflow-scroll">
   {#if loading}
     <div transition:slide class="w-full flex justify-between py-4 px-3">
       <LoadingIndicator className="w-8 mx-auto" />

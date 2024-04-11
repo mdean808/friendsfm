@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount } from 'svelte';
   import {
     friendSubmissions,
     loading,
@@ -22,7 +22,6 @@
   } from '../store';
 
   import SkeletonSubmission from '../components/submission/Skeleton.svelte';
-  import type { IonRefresher } from '@ionic/core/components/ion-refresher';
   import { FirebaseMessaging } from '@capacitor-firebase/messaging';
   import { UserState, type Submission as SubmissionType } from '../types';
   import Genres from '../components/Genres.svelte';
@@ -45,8 +44,6 @@
 
   onMount(async () => {
     header.set('');
-    const refresher = document.getElementById('refresher') as IonRefresher;
-    refresher.addEventListener('ionRefresh', handleRefresh);
 
     if ($platform != 'web') {
       FirebaseMessaging.removeAllDeliveredNotifications();
@@ -96,11 +93,6 @@
     });
   });
 
-  onDestroy(() => {
-    const refresher = document.getElementById('refresher') as IonRefresher;
-    refresher?.removeEventListener('ionRefresh', handleRefresh);
-  });
-
   const load = async (shouldHideLoader?: boolean) => {
     homepageLoaded.set(false);
     if (!shouldHideLoader) $loadingSubmission = true;
@@ -138,15 +130,6 @@
     else getNearbySubmissions(20).then(() => (loadingGenres = false));
   };
 
-  const handleRefresh = async () => {
-    const refresher = document.getElementById('refresher') as IonRefresher;
-    getSubmissionStatus();
-    loadNearby();
-    await loadFriends(true);
-    loadingNewLateSubmission = false;
-    refresher.complete();
-  };
-
   export const createSubmission = async () => {
     loading.set(true);
     await generateSubmission();
@@ -160,56 +143,51 @@
   };
 </script>
 
-<ion-content>
-  <ion-refresher id="refresher" slot="fixed">
-    <ion-refresher-content />
-  </ion-refresher>
-  {#if $userSubmission}
-    <div id="home" class="text-center w-full py-1 px-4">
-      {#if !$userSubmission?.song && !$loadingSubmission}
-        <div class="">
-          <SubmissionPreview />
-        </div>
-      {:else}
-        <div class="h-full">
-          {#if $userSubmission && Submissions && Genres}
-            <div id="home" class="text-center w-full overflow-y-auto h-full">
-              <div>
-                <Tabs
-                  loading={$loadingSubmission && loadingGenres}
-                  activeTab={activeHomeTab}
-                  tabs={[
-                    {
-                      name: 'submissions',
-                      id: 'submissions',
-                      component: Submissions,
-                      props: {
-                        loadingSubmission: $loadingSubmission,
-                        loadingFriendSubmissions,
-                        sortedFriendSubmissions,
-                        loadingNewLateSubmission,
-                      },
+{#if $userSubmission}
+  <div id="home" class="text-center w-full py-1 px-4">
+    {#if !$userSubmission?.song && !$loadingSubmission}
+      <div class="">
+        <SubmissionPreview />
+      </div>
+    {:else}
+      <div class="h-full">
+        {#if $userSubmission && Submissions && Genres}
+          <div id="home" class="text-center w-full overflow-y-auto h-full">
+            <div>
+              <Tabs
+                loading={$loadingSubmission && loadingGenres}
+                activeTab={activeHomeTab}
+                tabs={[
+                  {
+                    name: 'submissions',
+                    id: 'submissions',
+                    component: Submissions,
+                    props: {
+                      loadingSubmission: $loadingSubmission,
+                      loadingFriendSubmissions,
+                      sortedFriendSubmissions,
+                      loadingNewLateSubmission,
                     },
-                    { name: 'nearby', id: 'genres', component: Genres },
-                  ]}
-                />
-              </div>
+                  },
+                  { name: 'nearby', id: 'genres', component: Genres },
+                ]}
+              />
             </div>
-          {/if}
-        </div>
-      {/if}
-    </div>
-  {:else}
-    <div id="home" class="text-center w-full py-2 px-4 overflow-y-auto h-full">
-      <div class="mb-3 px-5 mx-auto">
-        <SkeletonSubmission type="user" />
+          </div>
+        {/if}
       </div>
-      <span class="border-white border-t-2 block w-full" />
-      <div class="my-2">
-        <SkeletonSubmission />
-        <SkeletonSubmission />
-        <SkeletonSubmission />
-      </div>
+    {/if}
+  </div>
+{:else}
+  <div id="home" class="text-center w-full py-2 px-4 overflow-y-auto h-full">
+    <div class="mb-3 px-5 mx-auto">
+      <SkeletonSubmission type="user" />
     </div>
-  {/if}
-</ion-content>
+    <span class="border-white border-t-2 block w-full" />
+    <div class="my-2">
+      <SkeletonSubmission />
+      <SkeletonSubmission />
+      <SkeletonSubmission />
+    </div>
+  </div>
+{/if}

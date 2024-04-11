@@ -57,7 +57,7 @@
   });
 </script>
 
-<div id="friends" class="border-t-2 border-white">
+<div id="friends">
   {#if shouldRefreshOnSwipeEnd}
     <div transition:slide class="mx-auto">
       {#if !loadingFriends}

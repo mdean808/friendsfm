@@ -55,3 +55,5 @@ export const toast = map<{
 
 // network store stuff
 export const network = map<Network>(new Network());
+
+export const submissionsScroll = atom<number>(0);

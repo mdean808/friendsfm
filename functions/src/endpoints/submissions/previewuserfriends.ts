@@ -1,12 +1,10 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import { authMiddleware, sentryWrapper } from '../middleware';
 
-export const previewusersubmission = onRequest(
+export const previewuserfriends = onRequest(
   { cors: true },
   authMiddleware(
-    sentryWrapper('preview-user-submission', async (req, res, user) => {
-      const { appleMusic } = JSON.parse(req.body);
-      const submission = await user.previewSubmission(appleMusic);
+    sentryWrapper('preview-user-friends', async (_req, res, user) => {
       let friendSubs = await user.getFriendSubmissions();
       const friends = friendSubs.map((f) => {
         return {
@@ -17,7 +15,7 @@ export const previewusersubmission = onRequest(
       });
       res.status(200).json({
         type: 'success',
-        message: { submission: submission.json, friends } || {},
+        message: { friends } || {},
       });
     })
   )

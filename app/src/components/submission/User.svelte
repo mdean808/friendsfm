@@ -34,9 +34,12 @@
         });
         if (res.cancelled || !res.value.trim()) return;
         tempCap = res.value;
-        data.caption = await setSubmissionCaption(res.value.trim());
+        data = {
+          ...data,
+          caption: await setSubmissionCaption(res.value.trim()),
+        };
       }
-      showToast({ content: 'successfully updated your caption' });
+      showToast({ content: 'successfully updated your caption.' });
     } catch (e) {
       console.log(e);
     } finally {

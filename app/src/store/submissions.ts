@@ -55,6 +55,16 @@ export const previewSubmission = action(
   }
 );
 
+export const previewFriendSubmissions = action(
+  userSubmission,
+  'preview-friend-submissions',
+  async () => {
+    const message = await network.get().queryFirebase('previewuserfriends');
+    if (!message) return;
+    return message;
+  }
+);
+
 export const generateSubmission = action(
   userSubmission,
   'generate-submission',

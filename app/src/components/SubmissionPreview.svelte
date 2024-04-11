@@ -3,7 +3,12 @@
   import SubmissionTime from './submission/Time.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { goto } from '../lib/util';
-  import { user, previewSubmission, publicProfileUsername } from '../store';
+  import {
+    user,
+    previewSubmission,
+    publicProfileUsername,
+    previewFriendSubmissions,
+  } from '../store';
   import MusicPlatformIcon from './icons/MusicPlatformIcon.svelte';
 
   let submission: Submission;
@@ -17,10 +22,10 @@
   }[] = [];
 
   onMount(async () => {
-    const res = await previewSubmission();
-    if (!res) return;
-    submission = res.submission;
-    friends = res.friends;
+    previewFriendSubmissions().then((res) => (friends = res.friends));
+    const resSub = await previewSubmission();
+    if (!resSub) return;
+    submission = resSub.submission;
     loading = false;
     // update the preview every 15 seconds
     interval = setInterval(async () => {
