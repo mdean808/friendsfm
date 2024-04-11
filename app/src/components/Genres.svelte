@@ -28,6 +28,8 @@
 
   let genres: { name: string; active: boolean }[] = [];
 
+  let loadingNearby = false;
+
   nearbySubmissions.subscribe((val) => {
     genres = [];
     for (const sub of val) {
@@ -93,16 +95,19 @@
     });
     // update nearbySubmissions for this location
     setTimeout(() => {
+      loadingNearby = true;
       handleBoundsChange();
     }, 100);
 
     // change radius based on the visibleWdith
     map.addListener('bounds_changed', async () => {
       if (prevZoom != map.getZoom()) {
+        loadingNearby = true;
         handleBoundsChange();
       }
     });
     map.addListener('center_changed', async () => {
+      loadingNearby = true;
       handleBoundsChange();
     });
     createMarkers();
@@ -120,14 +125,20 @@
     }
 
     boundsChangeTimeout = setTimeout(() => {
-      console.log('bounds changing');
-      const bounds = map.getBounds();
+      let bounds = map.getBounds();
       let shouldGetSubmissions = true;
       // compare previous bounds to current bounds
       // make sure they are different enough to justify an update
       // first check for zoom change
       if (prevZoom === map.getZoom()) shouldGetSubmissions = false;
       // then check for difference of .25 lng and lat
+      if (!bounds) {
+        map.setCenter({
+          lat: $location?.gp?.coords?.latitude || 51.4934,
+          lng: $location?.gp?.coords?.longitude || 0.0098,
+        });
+        bounds = map.getBounds();
+      }
       if (
         Math.abs(bounds.getCenter().lat() - prevBounds?.getCenter().lat()) >
           0.25 ||
@@ -138,6 +149,7 @@
         shouldGetSubmissions = true;
       if (shouldGetSubmissions) {
         // update nearbySubmissions for this location
+        loadingNearby = true;
         getNearbySubmissions(null, {
           southWest: {
             latitude: bounds.getSouthWest().lat(),
@@ -147,10 +159,13 @@
             latitude: bounds.getNorthEast().lat(),
             longitude: bounds.getNorthEast().lng(),
           },
-        }).then(createMarkers);
+        }).then(() => {
+          loadingNearby = false;
+          createMarkers();
+        });
         prevZoom = map.getZoom();
         prevBounds = map.getBounds();
-      }
+      } else loadingNearby = false;
     }, 1000); // Adjust debounce time as needed
   }
 
@@ -227,21 +242,30 @@
   class="scroll-m-20 scroll-smooth overflow-hidden"
   style={`height: calc(100vh - ${250 - $insets.bottom}px)`}
 >
-  <div class="w-full mx-auto p-2">
-    <capacitor-google-map
-      id="google-map"
-      class="inline-block w-full h-56 mt-2 rounded-lg"
+  <div class={`w-full mx-auto py-2`}>
+    <div
+      class={`px-1.5 py-0.25 transition-all duration-200 rounded-lg ${
+        loadingNearby
+          ? `bg-gradient-to-r from-${$user.musicPlatform} via-blue-500 to-${$user.musicPlatform} background-animate`
+          : 'bg-transparent'
+      }`}
     >
-      <div
-        class="flex flex-col items-center justify-items-center text-center h-full w-full"
+      <capacitor-google-map
+        id="google-map"
+        class="inline-block w-full h-56 mt-2 rounded-lg"
       >
-        <p class="mx-auto animate-pulse">loading map...</p>
-        <p class="mx-auto text-gray-400">
-          if the map doesn't load, make sure you have location services enabled
-        </p>
-        <p class="mx-auto text-gray-400">and your adblocker is disabled.</p>
-      </div>
-    </capacitor-google-map>
+        <div
+          class="flex flex-col items-center justify-items-center text-center h-full w-full"
+        >
+          <p class="mx-auto animate-pulse">loading map...</p>
+          <p class="mx-auto text-gray-400">
+            if the map doesn't load, make sure you have location services
+            enabled
+          </p>
+          <p class="mx-auto text-gray-400">and your adblocker is disabled.</p>
+        </div>
+      </capacitor-google-map>
+    </div>
   </div>
   <div
     style={`height: calc(100vh - ${400 - $insets.bottom}px);`}

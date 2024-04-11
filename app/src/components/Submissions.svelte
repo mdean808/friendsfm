@@ -12,11 +12,11 @@
   import SkeletonSubmission from '../components/submission/Skeleton.svelte';
   import LargeSubmission from './LargeSubmission.svelte';
   import UserSubmission from './submission/User.svelte';
-  import { slide } from 'svelte/transition';
 
   export let loadingSubmission: boolean;
   export let loadingFriendSubmissions: boolean;
   export let sortedFriendSubmissions: SubmissionType[];
+  export let loadingNewLateSubmission: boolean;
 
   const sortByDate = (a: SubmissionType, b: SubmissionType) => {
     return new Date(b.time).getTime() - new Date(a.time).getTime();
@@ -32,18 +32,18 @@
 </div>
 <span class="border-white border-t-2 block w-full" />
 <div class="my-3" style={`padding-bottom: calc(70px + ${$insets.bottom}px)`}>
+  {#if $singleSubmissionLoading || loadingNewLateSubmission}
+    <div class="my-2">
+      <SkeletonSubmission />
+    </div>
+  {/if}
   {#if loadingFriendSubmissions}
     <SkeletonSubmission />
     <SkeletonSubmission />
     <SkeletonSubmission />
   {:else if !loadingFriendSubmissions}
-    {#if $singleSubmissionLoading}
-      <div class="my-2">
-        <SkeletonSubmission />
-      </div>
-    {/if}
     {#each sortedFriendSubmissions.sort(sortByDate) as submission}
-      <div in:slide class="my-4">
+      <div class="my-4">
         <LargeSubmission data={submission} />
         <!--<Submission data={submission} />-->
       </div>

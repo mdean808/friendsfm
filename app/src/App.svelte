@@ -279,13 +279,6 @@
 </svelte:head>
 
 <ion-app>
-  {#if debugView}
-  <div on:click={() => debugView = false} class="absolute top-10 pr-2 w-full text-right" style="z-index: 99999">
-      {#each logs as log}
-        <p class="text-sm">{log}</p>
-      {/each}
-  </div>
-  {/if}
   <!-- FULL APP WRAPPER -->
   <!-- padding handles device-specific insets -->
   <div

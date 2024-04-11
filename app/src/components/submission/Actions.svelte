@@ -5,8 +5,8 @@
     activeHomeTab,
     activeSubmission,
     getNearbySubmissions,
-    songs,
     toggleLike,
+    user as userStore,
   } from '../../store';
   import type { Submission } from '../../types';
   import Heart from '../icons/Heart.svelte';
@@ -24,7 +24,7 @@
     e.stopPropagation();
     if (loadingHeart) return;
     loadingHeart = true;
-    await toggleLike(data.id);
+    data.likes = await toggleLike(data.id);
     loadingHeart = false;
   };
 </script>
@@ -70,12 +70,12 @@
         <Heart
           on:click={toggleHeart}
           on:keypress={toggleHeart}
-          className={`w-6 h-6 ${
+          className={`w-6 h-6 flex-grow-0 flex-shrink ${
             loadingHeart ? 'animate-ping text-white' : ''
           } ${
-            $songs.find((s) => s.name === data.song.name) ? 'text-white' : ''
+            data?.likes?.find((l) => l.id === $userStore.id) ? 'text-white' : ''
           } `}
-          fill={$songs.find((s) => s.name === data.song.name)
+          fill={data?.likes?.find((l) => l.id === $userStore.id)
             ? 'currentColor'
             : 'none'}
         />

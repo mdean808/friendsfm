@@ -52,10 +52,6 @@
   <div class="px-2">
     <div class="relative w-20 h-20 mx-auto">
       <img
-        on:click={() => {
-          publicProfileUsername.set($user.username);
-          goto('/public_profile');
-        }}
         class="w-20 h-20 rounded-full mx-auto"
         alt="User Avatar"
         src={`https://icotar.com/avatar/${$user.username}.svg`}

@@ -40,7 +40,7 @@
 
   friendSubmissions.listen((val) => {
     if (val) sortedFriendSubmissions = [...val].sort(sortByDate);
-    if (val?.size > 0) loadingFriendSubmissions = false;
+    if (val?.length > 0) loadingFriendSubmissions = false;
   });
 
   onMount(async () => {
@@ -187,6 +187,7 @@
                         loadingSubmission: $loadingSubmission,
                         loadingFriendSubmissions,
                         sortedFriendSubmissions,
+                        loadingNewLateSubmission,
                       },
                     },
                     { name: 'nearby', id: 'genres', component: Genres },

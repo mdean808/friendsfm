@@ -106,7 +106,7 @@ export default class Network {
                     'Authentication',
                     'Bearer ' + authToken.get()
                   );
-                  return ky(req);
+                  return;
                 } else {
                   return new Response(
                     JSON.stringify({
