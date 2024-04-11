@@ -247,7 +247,7 @@
       class={`px-1.5 py-0.25 transition-all duration-200 rounded-lg ${
         loadingNearby
           ? `bg-gradient-to-r from-${$user.musicPlatform} via-blue-500 to-${$user.musicPlatform} background-animate`
-          : 'bg-transparent'
+          : 'bg-blue-500'
       }`}
     >
       <capacitor-google-map
