@@ -53,22 +53,22 @@
 >
   <!-- HEADER -->
   <div
-    class={`flex p-2 rounded-t-lg ${
+    class={`flex gap-2 p-2 rounded-t-lg ${
       currentlyListening
         ? `bg-gradient-to-r from-${data.user.musicPlatform} via-blue-500 to-${data.user.musicPlatform} background-animate`
         : `bg-${data.user.musicPlatform}`
     }`}
   >
-    <div class="flex-grow text-left">
+    <div class="flex-grow-0 text-left">
       <button
         on:click={(e) => {
           e.stopPropagation();
           goto('/public_profile');
           publicProfileUsername.set(data.user.username);
         }}
-        class="text-left w-full"
+        class="text-left w-full flex gap-2 mb-1"
       >
-        <h4 class="text-xl">
+        <h4 class="text-xl truncate">
           <img
             class="w-5 h-5 inline rounded-full"
             src={`https://icotar.com/avatar/${
@@ -78,14 +78,14 @@
           />
           {data.user ? data.user.username : 'Unknown'}
         </h4>
+        <SubmissionActions className="ml-auto" {data} />
       </button>
       {#if data?.caption}
-        <p class="truncate italic text-sm">
+        <p class="italic break-word text-sm">
           {data.caption}
         </p>
       {/if}
     </div>
-    <SubmissionActions {data} />
   </div>
   <!-- SONG -->
   <div>

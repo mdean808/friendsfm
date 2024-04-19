@@ -24,7 +24,7 @@
   <div>
     <h2 class="text-2xl">Access on the Web</h2>
     <p class="text-gray-400 pb-5 text-sm">
-      While the web app exists, we reccomend using the mobile app for the best
+      While the web app exists, we recommend using the mobile app for the best
       experience.
     </p>
     <a href="https://app.friendsfm.app">

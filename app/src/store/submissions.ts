@@ -338,6 +338,7 @@ export const toggleLike = action(
     const url = exists ? 'unlikesubmission' : 'likesubmission';
     const message = await network.get().queryFirebase(url, { subId: sub.id });
     if (!message) return;
+    //WARN: this removes all submissions except the liked one
     if (sub.id !== userSubmission.get().id) {
       store.set(store.get().filter((s) => s.id == sub.id));
       sub.likes = message;

@@ -29,8 +29,8 @@
   };
 </script>
 
-<div class={className + 'flex'}>
-  <div class={`flex text-lg gap-2 ${!user && 'self-center'}`}>
+<div class={className}>
+  <div class={`flex text-lg gap-2`}>
     <span
       on:keyup={(e) => {
         e.stopPropagation();
@@ -56,7 +56,7 @@
         activeHomeTab.set('genres');
         goto('/');
       }}
-      class="px-1.5 py-1 h-7 border-white border text-sm text-center text-white relative text-md rounded-xl truncate"
+      class="px-1.5 py-1 h-7 border-white whitespace-nowrap border text-sm text-center text-white text-md rounded-xl"
       style={`background: ${intToRGB(hashCode(data.song.genre, 23))}`}
       >{data.song.genre}</span
     >

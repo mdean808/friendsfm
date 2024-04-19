@@ -10,7 +10,7 @@
   <div
     class={`${data.user.id === $user.id ? 'w-10/12' : ''} max-w-full text-left`}
   >
-    <div class="flex items-center">
+    <div class="flex items-normal">
       {#if data.song.albumArtwork}
         <img
           alt="Album Artwork"
@@ -19,10 +19,10 @@
         />
       {/if}
       <div class="flex flex-col">
-        <span class={`w-full truncate text-${data.user.musicPlatform}`}>
+        <span class={`w-full text-${data.user.musicPlatform}`}>
           {data.song.name}
         </span>
-        <span class="w-full truncate text-gray-100">
+        <span class="w-full text-gray-100">
           {data.song.artist}
         </span>
       </div>

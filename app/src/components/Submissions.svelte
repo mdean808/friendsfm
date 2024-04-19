@@ -87,11 +87,7 @@
   };
 </script>
 
-<ion-content
-  id="ion-content-submissions"
-  style={`height: calc(100vh - 110px)`}
-  class="no-scroll"
->
+<ion-content id="ion-content-submissions" style={`height: calc(100vh - 110px)`}>
   <ion-refresher id="refresher" slot="fixed">
     <ion-refresher-content />
   </ion-refresher>
