@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-  <string name="app_name">FriendsFM</string>
-  <string name="title_activity_main">FriendsFM</string>
-  <string name="package_name">xyz.mogdan.friendsfm</string>
-  <string name="custom_url_scheme">xyz.mogdan.friendsfm</string>
+    <string name="app_name">friendsfm</string>
+    <string name="title_activity_main">friendsfm</string>
+    <string name="package_name">xyz.mogdan.friendsfm</string>
+    <string name="custom_url_scheme">xyz.mogdan.friendsfm</string>
 </resources>

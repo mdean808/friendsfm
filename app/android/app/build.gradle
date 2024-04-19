@@ -1,21 +1,15 @@
-plugins {
-    id 'com.google.firebase.crashlytics'
-}
-
 apply plugin: 'com.android.application'
 
 android {
-
-    namespace 'xyz.mogdan.friendsfm'
-    compileSdkVersion 34
+    namespace "xyz.mogdan.friendsfm"
+    compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "xyz.mogdan.friendsfm"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 38
-        versionName "0.2.0"
+        versionCode 1
+        versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        manifestPlaceholders = [API_KEY: "$System.env.VITE_GOOGLE_MAPS_KEY"]
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
@@ -29,7 +23,6 @@ android {
         }
     }
 }
-
 
 repositories {
     flatDir{
@@ -47,9 +40,7 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
-    implementation 'com.google.android.gms:play-services-auth:21.0.0'
 }
-
 
 apply from: 'capacitor.build.gradle'
 
@@ -61,5 +52,3 @@ try {
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
 }
-
-
