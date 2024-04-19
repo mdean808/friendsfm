@@ -14,7 +14,7 @@
     "sentry:prepare": "yarn sentry:release && yarn sentry:inject && yarn sentry:upload"
   },
   "engines": {
-    "node": "18"
+    "node": "20"
   },
   "main": "bin/index.js",
   "dependencies": {
@@ -22,7 +22,7 @@
     "@sentry/node": "^7.59.3",
     "@sentry/profiling-node": "^1.1.2",
     "firebase-admin": "^11.10.1",
-    "firebase-functions": "^4.4.1",
+    "firebase-functions": "^4.9.0",
     "jsonwebtoken": "^9.0.2",
     "openai": "^3.2.1",
     "tslib": "^2.6.0"
