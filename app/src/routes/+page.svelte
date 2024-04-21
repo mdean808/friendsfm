@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Icon from '$lib/assets/icon.png';
-  import LoadingIndicator from '$lib/components/LoadingIndicator.svelte';
+  import Icon from '../assets/icon.png';
+  import LoadingIndicator from '../components/LoadingIndicator.svelte';
 </script>
 
 <div class="z-40 fixed top-0 left-0 bg-gray-800 w-full h-full flex">

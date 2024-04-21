@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+    match /databases/{database}/documents {
+        match /{document=**} {
+            allow read, write: if false;
+        }
+        // allow logged in users to preview notifications
+        match /misc/notifications {
+            allow get: if request.auth.uid != null;
+        }
+
+        match /submissions/{submissionId} {
+            // allow logged in users to view submissions
+            allow read: if request.auth.uid != null;
+            // allow submission owners to edit their submissions
+            allow write: if request.auth != null && resource != null && request.auth.uid == request.resource.data.userId
+            // allow all users to like/comment on submissions
+            allow write: if request.auth != null && resource != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['comments', 'likes'])
+        }
+
+        match /users/{userId} {
+            // allow submission owners to edit their submissions
+            allow write: if request.auth != null && resource != null && request.auth.uid == request.resource.data.userId
+            // allow all users to read public user data
+            allow read: if resource != null && request.resource.data // TODO: fix this up
+        }
+    }
+}

@@ -1,5 +1,4 @@
-import type { Address } from '@capgo/nativegeocoder';
-import type SentryTransaction from './lib/classes/SentryTransaction';
+import type { Position } from '@capacitor/geolocation';
 
 export enum UserState {
   unregistered = 'unregistered',
@@ -8,14 +7,23 @@ export enum UserState {
   registeringMusicPlatform = 'registering-music-platform',
 }
 
+export interface Toast {
+  visible: boolean;
+  content?: string;
+  color?: string;
+  duration?: number;
+  offset?: number;
+  onClick?: () => void;
+}
+
 export interface User {
-  email: string;
+  email: string | null;
   likedSongsPlaylist?: string;
   submissionsPlaylist?: string;
-  displayName?: string;
+  displayName: string | null;
   photoURL?: string;
   uid: string;
-  username: string;
+  username: string | undefined;
   musicPlatform?: MusicPlatform;
   friends: Friend[];
   friendRequests: string[];
@@ -23,7 +31,6 @@ export interface User {
   savedSongs?: SavedSong[];
   audials?: Audial[];
   messagingToken?: string;
-  authToken: string;
   id: string;
   profile?: {
     bio?: string;
@@ -64,12 +71,7 @@ export interface Friend {
 }
 
 export interface Location {
-  gp: GeolocationPosition;
-  rgp: ReverseGeolocationPosition;
-}
-
-export interface ReverseGeolocationPosition {
-  addresses: Address[];
+  gp: Position;
 }
 
 export enum MusicPlatform {
@@ -364,6 +366,7 @@ export interface SpotifyTrack {
   name: string;
   preview_url: string;
 }
+
 export interface MusicKitSearchResponse {
   results: {
     artists: {
@@ -473,7 +476,6 @@ export interface MusicKitSearchResponse {
 export interface NetworkRequest {
   id: number;
   url: string;
-  transaction: SentryTransaction;
   request?: Request;
   response?: Response;
   abortController: AbortController;
