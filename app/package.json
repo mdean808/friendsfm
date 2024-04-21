@@ -1,7 +1,7 @@
 {
-  "name": "friendsfm-app",
-  "version": "0.0.1",
+  "name": "friends-fm",
   "private": true,
+  "version": "0.2.0",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",

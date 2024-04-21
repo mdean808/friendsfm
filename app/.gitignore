@@ -9,5 +9,14 @@ node_modules
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+certificates
 # Capacitor
 capacitor.config.json.timestamp-*
