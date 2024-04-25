@@ -6,8 +6,9 @@ export const getUser = async () => {
   if (!userRes.value) return {} as User;
   return JSON.parse(userRes.value) as User;
 };
-export const setUser = async (user: User = {} as User) => {
-  await Preferences.set({ key: 'user', value: JSON.stringify(user) });
+export const setUser = async (user?: User) => {
+  if (!user) await Preferences.remove({ key: 'user' });
+  else await Preferences.set({ key: 'user', value: JSON.stringify(user) });
 };
 
 export const getLogin = async () => {
@@ -23,8 +24,9 @@ export const getSongs = async () => {
   if (!res.value) return [];
   return JSON.parse(res.value) as SavedSong[];
 };
-export const setSongs = async (songs: SavedSong[] = [] as SavedSong[]) => {
-  await Preferences.set({ key: 'songs', value: JSON.stringify(songs) });
+export const setSongs = async (songs?: SavedSong[]) => {
+  if (!songs) await Preferences.remove({ key: 'songs' });
+  else await Preferences.set({ key: 'songs', value: JSON.stringify(songs) });
 };
 
 export const getFriendSubmissions = async () => {
@@ -32,8 +34,25 @@ export const getFriendSubmissions = async () => {
   if (!res.value) return [];
   return JSON.parse(res.value) as Submission[];
 };
-export const setFriendSubmissions = async (friendSubmissions: Submission[] = [] as Submission[]) => {
-  await Preferences.set({ key: 'friend-submissions', value: JSON.stringify(friendSubmissions) });
+export const setFriendSubmissions = async (
+  friendSubmissions?: Submission[]
+) => {
+  if (!friendSubmissions)
+    await Preferences.remove({ key: 'friend-submissions' });
+  else
+    await Preferences.set({
+      key: 'friend-submissions',
+      value: JSON.stringify(friendSubmissions),
+    });
 };
 
-export default { getUser, setUser, getLogin, setLogin, getSongs, setSongs, getFriendSubmissions, setFriendSubmissions };
+export default {
+  getUser,
+  setUser,
+  getLogin,
+  setLogin,
+  getSongs,
+  setSongs,
+  getFriendSubmissions,
+  setFriendSubmissions,
+};

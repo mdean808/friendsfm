@@ -1,15 +1,18 @@
 import type { SavedSong, Submission, User } from './types';
 import { writable, type Writable } from 'svelte/store';
 import Preferences from './preferences';
-import { FirebaseAuthentication, type SignInResult } from '@capacitor-firebase/authentication';
+import {
+  FirebaseAuthentication,
+  type SignInResult,
+} from '@capacitor-firebase/authentication';
 
 export type Session = {
   user: User;
   loggedIn: boolean;
-  songs: SavedSong[]
-  friendSubmissions: Submission[]
+  songs: SavedSong[];
+  friendSubmissions: Submission[];
   token?: string;
-}
+};
 
 export const session = <Writable<Session>>writable();
 
@@ -31,10 +34,14 @@ export const loadSession = async () => {
   });
 };
 
-export const endSession = () => {
+export const endSession = async () => {
+  await FirebaseAuthentication.signOut();
+  await Preferences.setUser();
+  await Preferences.setLogin(false);
+  await Preferences.setSongs();
+  await Preferences.setFriendSubmissions();
   session.set({} as Session);
 };
-
 
 export const authSession = async (res: SignInResult) => {
   // auth failed!

@@ -77,6 +77,7 @@ export interface Location {
 export enum MusicPlatform {
   spotify = 'spotify',
   appleMusic = 'apple-music',
+  MusicPlatform = 'MusicPlatform',
 }
 
 export interface Song {
@@ -481,4 +482,5 @@ export interface NetworkRequest {
   abortController: AbortController;
   body: object;
   attempts?: number;
+  [key: string]: any;
 }

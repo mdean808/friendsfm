@@ -6,7 +6,7 @@
   import { endSession, loadSession, session } from '$lib/session';
   import { page } from '$app/stores';
   import { insets } from '$lib/device';
-  import { loading, toast } from '$lib/util';
+  import { loading, toast, errorToast } from '$lib/util';
   import { fade, slide } from 'svelte/transition';
 
   // IONIC SETUP
@@ -19,7 +19,7 @@
   import { IonApp } from '@ionic/core/components/ion-app';
   import { IonContent } from '@ionic/core/components/ion-content';
   import Toast from '$components/Toast.svelte';
-  import LoadingIndicator from '$/components/LoadingIndicator.svelte';
+  import LoadingIndicator from '$components/LoadingIndicator.svelte';
 
 
   onMount(async () => {
@@ -44,11 +44,12 @@
 
       // Applies required global styles
       document.documentElement.classList.add('ion-ce');
-      logs = [...logs, 'ionic initialized'];
     } catch (e) {
       console.log('ionic error:', e);
-      errorToast({ content: e });
+      errorToast({ content: e as string });
     }
+
+    // init session
     await loadSession();
     if ($session.loggedIn) {
       await goto('/home');

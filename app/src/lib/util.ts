@@ -1,7 +1,16 @@
 import { writable, type Writable } from 'svelte/store';
 import type { Toast } from './types';
+import Network from './network';
 
 export const loading = <Writable<boolean>>writable(false);
+
+export const network = new Network();
+
+export const activeHomeTab = <Writable<'submissions' | 'genres'>>(
+  writable('submissions')
+);
+
+export const submissionsScroll = <Writable<number>>writable();
 
 export const toast = <Writable<Toast>>writable();
 export const showToast = (options: {
@@ -16,7 +25,7 @@ export const showToast = (options: {
   toast.set({ visible: true, ...options });
   setTimeout(
     () => toast.set({ visible: false, ...options }),
-    options.duration || 5000,
+    options.duration || 5000
   );
 };
 
@@ -52,7 +61,7 @@ export function getRelativeLuminance(rgb: [number, number, number]) {
 
 export function getContrastRatio(
   rgb1: [number, number, number],
-  rgb2: [number, number, number],
+  rgb2: [number, number, number]
 ) {
   let l1 = getRelativeLuminance(rgb1);
   let l2 = getRelativeLuminance(rgb2);
@@ -81,4 +90,3 @@ export function intToRGB(i: number) {
   }
   return hex;
 }
-

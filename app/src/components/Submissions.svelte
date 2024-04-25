@@ -1,0 +1,125 @@
+<script lang="ts">
+  import { onDestroy, onMount } from 'svelte';
+  import { slide } from 'svelte/transition';
+  import type { IonRefresher } from '@ionic/core/components/ion-refresher';
+  import type { IonContent } from '@ionic/core/components/ion-content';
+  import SkeletonSubmission from '$components/submission/Skeleton.svelte';
+  import LargeSubmission from './LargeSubmission.svelte';
+  import UserSubmission from './submission/User.svelte';
+  import { MusicPlatform, type Submission as SubmissionType } from '$lib/types';
+  import { submissionsScroll } from '$lib/util';
+  import { createSubmissionsPlaylist, userSubmission } from '$lib/submission';
+  import { friendSubmissions } from '$lib/submission';
+  import { insets } from '$lib/device';
+  import { goto } from '$app/navigation';
+  import { user } from '$lib/user';
+
+  export let loadingSubmission: boolean;
+  export let loadingFriendSubmissions: boolean;
+  export let sortedFriendSubmissions: SubmissionType[];
+  export let loadingNewLateSubmission: boolean;
+
+  onMount(async () => {
+    const ionContent = window.document.getElementById(
+      'ion-content-submissions'
+    ) as IonContent;
+    ionContent.scrollByPoint(0, $submissionsScroll, 0);
+    const scrollElement = await ionContent.getScrollElement();
+    scrollElement.addEventListener('scroll', () => {
+      $submissionsScroll = scrollElement.scrollTop;
+    });
+    const refresher = window.document.getElementById(
+      'refresher'
+    ) as IonRefresher;
+    refresher.addEventListener('ionRefresh', handleRefresh);
+  });
+
+  onDestroy(async () => {
+    const refresher = window.document.getElementById(
+      'refresher'
+    ) as IonRefresher;
+    refresher?.removeEventListener('ionRefresh', handleRefresh);
+  });
+  const sortByDate = (a: SubmissionType, b: SubmissionType) => {
+    return new Date(b.time).getTime() - new Date(a.time).getTime();
+  };
+
+  const handleRefresh = async () => {
+    const refresher = window.document.getElementById(
+      'refresher'
+    ) as IonRefresher;
+    //todo: 1. check if user has existiong submission for this day, 2. refresh nearby, 3. refresh friends (await this)
+    refresher.complete();
+  };
+</script>
+
+<ion-content id="ion-content-submissions" style={`height: calc(100vh - 110px)`}>
+  <ion-refresher id="refresher" slot="fixed">
+    <ion-refresher-content />
+  </ion-refresher>
+  <div class="mb-3 pt-3 px-4 mx-auto overflow-hidden">
+    {#if loadingSubmission}
+      <SkeletonSubmission type="user" />
+    {:else if $userSubmission.song}
+      <UserSubmission data={$userSubmission} />
+    {/if}
+  </div>
+  <span class="border-white border-t-2 block w-full" />
+  <div
+    class="mb-3 mt-1 overflow-y-scroll"
+    style={`padding-bottom: calc(120px + ${$insets.bottom}px)`}
+  >
+    {#if loadingNewLateSubmission}
+      <div class="my-2">
+        <SkeletonSubmission />
+      </div>
+    {/if}
+    {#if loadingFriendSubmissions}
+      <SkeletonSubmission />
+      <SkeletonSubmission />
+      <SkeletonSubmission />
+    {:else if !loadingFriendSubmissions}
+      {#each sortedFriendSubmissions.sort(sortByDate) as submission}
+        <div in:slide class="my-4">
+          <LargeSubmission data={submission} />
+          <!--<Submission data={submission} />-->
+        </div>
+      {/each}
+      {#if $friendSubmissions && [...$friendSubmissions].length === 0}
+        <p class="mx-auto text-center mt-3">nobody else has submitted yet.</p>
+        <p
+          on:keyup={() => goto('/friends')}
+          on:click={() => goto('/friends')}
+          class="mx-auto text-center text-blue-500 underline"
+        >
+          add friends.
+        </p>
+      {/if}
+      {#if $user.submissionsPlaylist}
+        {#if $user.musicPlatform === MusicPlatform.spotify}
+          <a
+            href={`https://open.spotify.com/playlist/${$user.submissionsPlaylist}`}
+            class="mx-auto text-center mt-3 text-gray-300 underline"
+          >
+            open your submissions playlist
+          </a>
+        {:else if $user.musicPlatform === MusicPlatform.appleMusic}
+          <a
+            href={$user.submissionsPlaylist}
+            class="mx-auto text-center mt-3 text-gray-300 underline"
+          >
+            open your submissions playlist
+          </a>
+        {/if}
+      {:else}
+        <p
+          on:keyup={createSubmissionsPlaylist}
+          on:click={createSubmissionsPlaylist}
+          class="mx-auto text-center mt-3 text-gray-300 opacity-70 underline"
+        >
+          create your dynamic friendsfm playlist.
+        </p>
+      {/if}
+    {/if}
+  </div>
+</ion-content>
