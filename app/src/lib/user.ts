@@ -1,5 +1,5 @@
 import { writable, type Writable } from 'svelte/store';
-import type { MusicPlatform, User } from '$lib/types';
+import type { MusicPlatform, Song, User } from '$lib/types';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { network } from '$lib/util';
 import type { AccessToken } from '@spotify/web-api-ts-sdk';
@@ -31,4 +31,16 @@ export const updateMusicPlatform = async (
   });
   // musuc platform set succeeded!
   return true;
+};
+
+export const getCurrentSong = async (
+  id: string,
+  username?: string
+): Promise<Song | undefined> => {
+  const message = await network.queryFirebase('getusercurrentlylistening', {
+    id,
+    username,
+  });
+  if (!message) return;
+  return message;
 };

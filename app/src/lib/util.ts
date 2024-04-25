@@ -6,6 +6,8 @@ export const loading = <Writable<boolean>>writable(false);
 
 export const network = new Network();
 
+export const publicProfileUsername = <Writable<string>>writable();
+
 export const activeHomeTab = <Writable<'submissions' | 'genres'>>(
   writable('submissions')
 );

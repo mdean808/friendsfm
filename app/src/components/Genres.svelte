@@ -270,6 +270,8 @@
       <div
         on:click={() => (genre.active = !genre.active)}
         on:keypress={() => (genre.active = !genre.active)}
+        role="button"
+        tabindex="0"
         style={`border-color: ${intToRGB(hashCode(genre.name, 23))}`}
         class={`p-1 border-b-2 mb-2 flex w-full border-white`}
       >
@@ -328,6 +330,8 @@
                   gotoCoords(sub.location?.latitude, sub.location?.longitude);
                   parentDiv.scrollIntoView();
                 }}
+                role="button"
+                tabindex="0"
                 style={`background: ${intToRGB(hashCode(sub.song.genre, 23))}`}
                 class={`flex p-2 rounded-t-lg bg-${sub.user.musicPlatform}`}
               >
@@ -380,6 +384,8 @@
                     <svg
                       on:click={() => toggleSongHelper(sub, loadingHeart)}
                       on:keypress={() => toggleSongHelper(sub, loadingHeart)}
+                      role="button"
+                      tabindex="0"
                       class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
                         loadingHeart ? 'animate-ping text-white' : ''
                       } ${
