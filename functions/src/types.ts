@@ -1,44 +1,45 @@
 import { Timestamp } from 'firebase-admin/firestore';
 
 export interface User {
+  id: string;
+  // secure parameters
+  messagingToken?: string;
   email: string;
+  musicPlatformAuth: MusicPlatformAuth;
+  // private parameters
   likedSongsPlaylist?: string;
   submissionsPlaylist?: string;
-  musicPlatformAuth: MusicPlatformAuth;
-  displayName?: string;
-  photoURL?: string;
-  username: string;
-  musicPlatform?: MusicPlatform;
   friends: Friend[];
   friendRequests: string[]; // usernames
-  submissions?: string[]; // submission ids
-  savedSongs?: SavedSong[]; // song ids
-  audials?: string[]; // audial ids
-  messagingToken?: string;
-  id: string;
-  authToken: string;
-  profile: {
-    bio?: string;
-    avatarString?: string;
-    stats: UserStatistics;
+  //public parameters
+  // this is in the database under /{user_id}/public/info
+  public: {
+    username: string;
     musicPlatform?: MusicPlatform;
-    favorites?: {
-      album?: {
-        artwork: string;
-        name: string;
-        artist: string;
-        url: string;
-      };
-      artist?: {
-        artwork: string;
-        name: string;
-        url: string;
-      };
-      song?: {
-        artwork: string;
-        name: string;
-        artist: string;
-        url: string;
+    savedSongs?: SavedSong[];
+    profile: {
+      bio?: string;
+      avatarString?: string;
+      stats: UserStatistics;
+      musicPlatform?: MusicPlatform;
+      favorites?: {
+        album?: {
+          artwork: string;
+          name: string;
+          artist: string;
+          url: string;
+        };
+        artist?: {
+          artwork: string;
+          name: string;
+          url: string;
+        };
+        song?: {
+          artwork: string;
+          name: string;
+          artist: string;
+          url: string;
+        };
       };
     };
   };

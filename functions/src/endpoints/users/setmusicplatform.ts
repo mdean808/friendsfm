@@ -11,7 +11,7 @@ export const setmusicplatform = onRequest(
       // special musicPlatformAuth for web authentication
       if (musicPlatformAuth) {
         user.musicPlatformAuth = musicPlatformAuth;
-        user.musicPlatform = musicPlatform;
+        user.public.musicPlatform = musicPlatform;
         await user.dbRef.update({ musicPlatformAuth, musicPlatform });
       } else {
         await user.setMusicPlatform(musicPlatform, platformAuthCode);

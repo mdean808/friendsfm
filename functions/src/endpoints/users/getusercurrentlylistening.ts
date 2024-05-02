@@ -15,7 +15,7 @@ export const getusercurrentlylistening = onRequest(
       } else {
         user = await User.getByUsername(username);
       }
-      if (user.musicPlatform === MusicPlatform.appleMusic) {
+      if (user.public.musicPlatform === MusicPlatform.appleMusic) {
         res.status(200).type('json').send({ type: 'success', message: null });
       } else {
         try {

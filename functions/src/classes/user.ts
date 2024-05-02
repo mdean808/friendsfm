@@ -33,49 +33,38 @@ import { sendExceptionToSentry } from '@/lib/sentry';
 const db = getFirestore();
 
 export default class User implements UserType {
+  // UserType
   id: string;
   email: string = '';
-  likedSongsPlaylist: string = '';
-  submissionsPlaylist: string = '';
+  messagingToken: string = '';
   musicPlatformAuth: MusicPlatformAuth = {} as MusicPlatformAuth;
-  displayName: string = '';
-  photoURL: string = '';
-  username: string = '';
-  musicPlatform?: MusicPlatform = undefined;
   friends: Friend[] = [];
   friendRequests: string[] = []; // usernames
-  submissions: string[] = []; // submission ids
   savedSongs: SavedSong[] = []; // song ids
-  messagingToken: string = '';
-  authToken: string = '';
+  likedSongsPlaylist: string = '';
+  submissionsPlaylist: string = '';
+  // this is in the database under /{user_id}/public/info
+  public: UserType['public'] = {} as UserType['public'];
+  // User
   musicPlatformAccessCode?: string;
   loaded = false;
-  profile: UserType['profile'] = {} as UserType['profile'];
 
-  constructor(id: string, authToken?: string) {
+  constructor(id: string) {
     if (!id) throw Error('No user id passed to constructor');
     this.id = id;
-    this.authToken = authToken || '';
   }
 
   public get json() {
     return {
       id: this.id,
       email: this.email,
+      messagingToken: this.messagingToken,
+      musicPlatformAuth: this.musicPlatformAuth,
+      friendRequests: this.friendRequests,
+      friends: this.friends,
       likedSongsPlaylist: this.likedSongsPlaylist,
       submissionsPlaylist: this.submissionsPlaylist,
-      musicPlatformAuth: this.musicPlatformAuth,
-      displayName: this.displayName,
-      photoURL: this.photoURL,
-      username: this.username,
-      musicPlatform: this.musicPlatform,
-      friends: this.friends,
-      friendRequests: this.friendRequests,
-      submissions: this.submissions,
-      savedSongs: this.savedSongs,
-      messagingToken: this.messagingToken,
-      authToken: this.authToken,
-      profile: this.profile,
+      public: this.public,
     } as UserType;
   }
 
@@ -83,13 +72,41 @@ export default class User implements UserType {
     const res = await this.dbRef.get();
     if (res.exists) {
       for (const key in this) {
-        this[key] = res.get(key) || this[key];
+        if (key === 'public') {
+          // get from 'public' sub-collection
+          const info = await this.dbRef.collection('public').doc('info').get();
+          if (info.exists) {
+            this['public'] = info.data() as UserType['public'];
+          } else {
+            // info doesn't exists, run function to copy public info to the document
+            this['public'] = await this.migratePublicInfo();
+          }
+        } else {
+          this[key] = res.get(key) || this[key];
+        }
       }
       this.loaded = true;
     } else {
       this.loaded = false;
     }
     return this;
+  }
+
+  public async migratePublicInfo() {
+    const infoRef = this.dbRef.collection('public').doc('info');
+    if ((await infoRef.get()).exists)
+      return (await infoRef.get()).data() as UserType['public'];
+    // create public info object
+    const data = await this.dbRef.get();
+    const publicInfo: UserType['public'] = {
+      username: data.get('username'),
+      musicPlatform: data.get('musicPlatform'),
+      savedSongs: data.get('savedSongs'),
+      profile: data.get('profile'),
+    };
+    // insert public info into the document
+    infoRef.set(publicInfo);
+    return publicInfo;
   }
 
   public async setMessagingToken(token: string) {
@@ -151,7 +168,7 @@ export default class User implements UserType {
           access_token: spotifyAuthRes.access_token,
           refresh_token: spotifyAuthRes.refresh_token,
         };
-        this.musicPlatform = musicPlatform;
+        this.public.musicPlatform = musicPlatform;
         this.musicPlatformAuth = musicPlatformAuth;
         await this.dbRef.update({
           musicPlatform,
@@ -160,7 +177,7 @@ export default class User implements UserType {
       }
     } else {
       // apple music
-      this.musicPlatform = musicPlatform;
+      this.public.musicPlatform = musicPlatform;
       await this.dbRef.update({
         musicPlatform,
       });
@@ -194,7 +211,7 @@ export default class User implements UserType {
 
     // add the new song to the playlist
     if (this.likedSongsPlaylist) {
-      if (this.musicPlatform === MusicPlatform.spotify) {
+      if (this.public.musicPlatform === MusicPlatform.spotify) {
         await this.updateSpotifyAuth();
         // this doesn't need to be synchronous
         addSongsToSpotifyPlaylist(
@@ -216,7 +233,7 @@ export default class User implements UserType {
 
     // remove the song from the playlist
     if (this.likedSongsPlaylist) {
-      if (this.musicPlatform === MusicPlatform.spotify) {
+      if (this.public.musicPlatform === MusicPlatform.spotify) {
         await this.updateSpotifyAuth();
         // this doesn't need to synchronous
         removeSongsFromSpotifyPlaylist(
@@ -356,7 +373,7 @@ export default class User implements UserType {
     if (!this.exists) throw Error('User not loaded.');
     // make sure we have the latest access tokens for the user's music oauth before we get their song
     let song = {} as Song;
-    if (this.musicPlatform === MusicPlatform.spotify) {
+    if (this.public.musicPlatform === MusicPlatform.spotify) {
       await this.updateSpotifyAuth();
       song = await this.getRecentSpotifySong();
       song.platforms.push({
@@ -384,7 +401,7 @@ export default class User implements UserType {
         });
       }
     }
-    if (this.musicPlatform === MusicPlatform.appleMusic) {
+    if (this.public.musicPlatform === MusicPlatform.appleMusic) {
       song = {
         ...appleMusicSong,
         platforms: [],
@@ -469,7 +486,7 @@ export default class User implements UserType {
     }
     // make sure we have the latest access tokens for the user's music oauth before we get their song
     let song = {} as Song;
-    if (this.musicPlatform === MusicPlatform.spotify) {
+    if (this.public.musicPlatform === MusicPlatform.spotify) {
       await this.updateSpotifyAuth();
       song = await this.getRecentSpotifySong();
       song.platforms.push({
@@ -501,7 +518,7 @@ export default class User implements UserType {
         });
       }
     }
-    if (this.musicPlatform === MusicPlatform.appleMusic) {
+    if (this.public.musicPlatform === MusicPlatform.appleMusic) {
       song = {
         ...appleMusicSong,
         platforms: [],
@@ -553,7 +570,7 @@ export default class User implements UserType {
       // don't await so it happens asynchonously
       this.sendNotificationToFriends(
         'late submission',
-        `${this.username} just shared what they're listening to.`,
+        `${this.public.username} just shared what they're listening to.`,
         { type: 'late-submission', id: newSubmissionId }
       );
     }
@@ -636,24 +653,27 @@ export default class User implements UserType {
     const friendQuery = usersRef.where('username', '==', requester);
     const friend = (await friendQuery.get()).docs[0]?.data() as UserType;
     // if we have such a friend and there is an actual request from them to the user
-    if (!friend || !this.friendRequests.find((u) => u === friend.username))
+    if (
+      !friend ||
+      !this.friendRequests.find((u) => u === friend.public.username)
+    )
       throw new CustomError('Friend request does not exist.');
     // update user friends
     const userFriends = this.friends;
-    this.friends.push({ username: friend.username, id: friend.id });
+    this.friends.push({ username: friend.public.username, id: friend.id });
     // doesn't need to be synchronous
     this.dbRef.update({ friends: userFriends });
     // remove from friend request array
     const userFriendRequests = this.friendRequests;
     const updatedRequests = userFriendRequests.filter(
-      (u) => u !== friend.username
+      (u) => u !== friend.public.username
     );
     // doesn't need to be synchronous
     this.dbRef.update({ friendRequests: updatedRequests });
 
     // update friend friends
     const friendFriends = friend.friends;
-    friendFriends.push({ username: this.username, id: this.id });
+    friendFriends.push({ username: this.public.username, id: this.id });
     const friendRef = usersRef.doc(friend.id);
     // doesn't need to be synchronous
     friendRef.update({ friends: friendFriends });
@@ -662,7 +682,7 @@ export default class User implements UserType {
     if (!friend.messagingToken) return;
     const message: Message = {
       notification: {
-        title: this.username + ' accepted your friend request!',
+        title: this.public.username + ' accepted your friend request!',
         body: "tap to see what they're listening to",
       },
       data: {
@@ -689,12 +709,15 @@ export default class User implements UserType {
     const friendQuery = usersRef.where('username', '==', requester);
     const friend = (await friendQuery.get()).docs[0]?.data() as UserType;
     // if we have such a friend and there is an actual request from them to the user
-    if (!friend || !this.friendRequests.find((u) => u === friend.username))
+    if (
+      !friend ||
+      !this.friendRequests.find((u) => u === friend.public.username)
+    )
       throw new CustomError('Friend request does not exist.');
     // remove from friend request array
     const userFriendRequests = this.friendRequests;
     const updatedRequests = userFriendRequests.filter(
-      (u) => u !== friend.username
+      (u) => u !== friend.public.username
     );
     // doesn't need to be synchronous
     this.dbRef.update({ friendRequests: updatedRequests });
@@ -708,13 +731,13 @@ export default class User implements UserType {
     const friend = (await friendQuery.get()).docs[0]?.data() as User;
     if (!friend) throw new CustomError('No user with provided username.');
     const friendRef = usersRef.doc(friend.id);
-    if (friend.friendRequests.find((r) => r === this.username)) return;
-    const requests = [...friend.friendRequests, this.username];
+    if (friend.friendRequests.find((r) => r === this.public.username)) return;
+    const requests = [...friend.friendRequests, this.public.username];
     await friendRef.update({ friendRequests: requests });
     if (!friend.messagingToken) return;
     const message: Message = {
       notification: {
-        title: this.username + ' added you as a friend!',
+        title: this.public.username + ' added you as a friend!',
         body: 'tap to accept their request',
       },
       token: friend.messagingToken,
@@ -763,10 +786,10 @@ export default class User implements UserType {
     return stats;
   }
 
-  public async setProfile(profile: UserType['profile']) {
+  public async setProfile(profile: UserType['public']['profile']) {
     if (!profile) throw new CustomError('No new profile provided.');
-    this.profile = profile;
-    await this.dbRef.update({ profile: this.profile });
+    this.public.profile = profile;
+    await this.dbRef.update({ profile: this.public.profile });
   }
 
   public async getFriendSuggestions(): Promise<
@@ -787,7 +810,7 @@ export default class User implements UserType {
         //      or if the user decided to ignore the username's suggestion
         if (
           !this.friends.find((f) => f.username === friendFriend.username) &&
-          friendFriend.username !== this.username &&
+          friendFriend.username !== this.public.username &&
           !suggestions.find((s) => s.username === friendFriend.username)
         ) {
           suggestions.push({
@@ -805,7 +828,10 @@ export default class User implements UserType {
     if (!this.loaded) await this.load();
     for (const fr of this.friends) {
       const friend = new User(fr.id);
-      await friend.removeFriend({ id: this.id, username: this.username });
+      await friend.removeFriend({
+        id: this.id,
+        username: this.public.username,
+      });
     }
     await this.dbRef.delete();
   }
@@ -816,7 +842,7 @@ export default class User implements UserType {
 
   public async getCurrentlyListening(): Promise<Song | undefined> {
     if (!this.loaded) await this.load();
-    if (this.musicPlatform !== MusicPlatform.spotify) return;
+    if (this.public.musicPlatform !== MusicPlatform.spotify) return;
     await this.updateSpotifyAuth();
     let song = await this.getRecentSpotifySong();
     if (song.timestamp) return;

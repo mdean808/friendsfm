@@ -9,9 +9,10 @@ export const getprofile = onRequest(
       const { username } = JSON.parse(req.body);
       const user = await User.getByUsername(username);
       const stats = await user.getStatistics();
-      const profile = user.profile;
+      const profile = user.public.profile;
       profile.stats = stats;
-      if (!profile.musicPlatform) profile.musicPlatform = user.musicPlatform;
+      if (!profile.musicPlatform)
+        profile.musicPlatform = user.public.musicPlatform;
       res.status(200).type('json').send({ type: 'success', message: profile });
     })
   )

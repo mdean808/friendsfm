@@ -64,8 +64,8 @@ export default class Submission implements SubmissionType {
     this.likes = likes || [];
     this.user = {
       id: user?.id || '',
-      username: user?.username || '',
-      musicPlatform: user?.musicPlatform || MusicPlatform.spotify,
+      username: user?.public.username || '',
+      musicPlatform: user?.public.musicPlatform || MusicPlatform.spotify,
     };
     this.userId = user?.id || '';
   }
@@ -79,8 +79,8 @@ export default class Submission implements SubmissionType {
     await u.load();
     this.user = {
       id: u.id,
-      username: u.username,
-      musicPlatform: u.musicPlatform,
+      username: u.public.username,
+      musicPlatform: u.public.musicPlatform,
     };
     try {
       this.currentlyListening = await u.getCurrentlyListening();
@@ -139,7 +139,7 @@ export default class Submission implements SubmissionType {
     const comment = {
       id: randomUUID(),
       content,
-      user: { id: user.id, username: user.username },
+      user: { id: user.id, username: user.public.username },
     };
     // add comment to submission in db and then locally
     await this.dbRef.update({
@@ -153,8 +153,8 @@ export default class Submission implements SubmissionType {
     const subUser = new User(this.userId);
     if (this.userId !== user.id) {
       await subUser.load();
-      notifsSentToUsernames.push(subUser.username);
-      subUser.sendNotification(`${user.username} commented`, content, {
+      notifsSentToUsernames.push(subUser.public.username);
+      subUser.sendNotification(`${user.public.username} commented`, content, {
         type: 'comment',
         id: this.id,
       });
@@ -174,8 +174,8 @@ export default class Submission implements SubmissionType {
       if (this.userId !== u.id && u.id !== user.id) {
         const u = new User(c.user.id);
         await u.load();
-        notifsSentToUsernames.push(u.username);
-        u.sendNotification(`${user.username} commented`, content, {
+        notifsSentToUsernames.push(u.public.username);
+        u.sendNotification(`${user.public.username} commented`, content, {
           type: 'comment',
           id: this.id,
         });
@@ -203,7 +203,7 @@ export default class Submission implements SubmissionType {
       if (notifsSentToUsernames.find((u) => u === username)) continue;
       User.getByUsername(username).then((u) => {
         u.sendNotification(
-          `${user.username} mentioned you in a comment`,
+          `${user.public.username} mentioned you in a comment`,
           content,
           {
             type: 'comment',
@@ -231,7 +231,7 @@ export default class Submission implements SubmissionType {
   }
 
   public async addLike(user: User) {
-    this.likes.push({ id: user.id, username: user.username });
+    this.likes.push({ id: user.id, username: user.public.username });
     await this.dbRef.update({ likes: this.likes });
   }
   public async unlike(user: User) {
