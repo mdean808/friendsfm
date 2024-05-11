@@ -3,11 +3,15 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
-  import { endSession, loadSession, session } from '$lib/session';
+  import { endSession, loadSession, authSession, session } from '$lib/session';
   import { page } from '$app/stores';
   import { insets } from '$lib/device';
   import { loading, toast, errorToast } from '$lib/util';
   import { fade, slide } from 'svelte/transition';
+  import { setupSnapshots } from '$lib/firebase';
+  import { get } from 'svelte/store';
+  import Toast from '$components/Toast.svelte';
+  import Loading from '$components/Loading.svelte';
 
   // IONIC SETUP
   import { initialize } from '@ionic/core/components';
@@ -18,11 +22,38 @@
   import { IonSpinner } from '@ionic/core/components/ion-spinner';
   import { IonApp } from '@ionic/core/components/ion-app';
   import { IonContent } from '@ionic/core/components/ion-content';
-  import Toast from '$components/Toast.svelte';
-  import LoadingIndicator from '$components/LoadingIndicator.svelte';
+  import TopNav from '$components/TopNav.svelte';
+  import BottomNav from '$components/BottomNav.svelte';
 
+  let snapshotsInit = false;
 
   onMount(async () => {
+    snapshotsInit = false;
+    // init session
+    await loadSession();
+    if ($session.loggedIn) {
+      if (!snapshotsInit) {
+        setupSnapshots();
+        snapshotsInit = true;
+      }
+      await goto('/main/home');
+    } else {
+      await goto('/intro/login');
+    }
+    // handle login state change
+    FirebaseAuthentication.addListener('authStateChange', async (state) => {
+      if (state.user) {
+        if ($session.loggedIn) return;
+        await authSession(state.user);
+        if (!snapshotsInit) {
+          setupSnapshots();
+          snapshotsInit = true;
+        }
+        await goto(`/main/home`);
+      } else {
+        await goto('/intro/login');
+      }
+    });
     // ionic init
     try {
       initialize();
@@ -38,8 +69,7 @@
       function tryDefine(tag: string, impl: any) {
         try {
           customElements.define(tag, impl);
-        } catch (error) {
-        }
+        } catch (error) {}
       }
 
       // Applies required global styles
@@ -48,37 +78,21 @@
       console.log('ionic error:', e);
       errorToast({ content: e as string });
     }
-
-    // init session
-    await loadSession();
-    if ($session.loggedIn) {
-      await goto('/home');
-    } else {
-      await goto('/intro/login');
-    }
-    // handle login state change
-    await FirebaseAuthentication.addListener('authStateChange', async (state) => {
-      if (state.user) {
-        await goto(`/home`);
-      } else {
-        await goto('/intro/login');
-        await endSession();
-      }
-    });
   });
 </script>
+
 <svelte:head>
   <title>
     friendsfm | {$page.url.pathname.split('/').pop() || 'home'}
   </title>
-  <script
+  <!--<script
     defer
     async
     src={'https://maps.googleapis.com/maps/api/js?key=' +
       import.meta.env.VITE_GOOGLE_MAPS_KEY +
       '&callback=mapready&loading=async'}
   >
-  </script>
+  </script>-->
 </svelte:head>
 
 <ion-app class="no-scroll">
@@ -94,20 +108,28 @@
 
     <!-- put the toast double the height of the bottom nav -->
     {#if $toast?.visible}
-      <div transition:slide class="absolute z-50 w-full"
-           style={`bottom: ${75 + $insets?.bottom + ($toast?.offset || 0)}px; `}>
+      <div
+        transition:slide
+        class="absolute z-50 w-full"
+        style={`bottom: ${75 + $insets?.bottom + ($toast?.offset || 0)}px; `}
+      >
         <Toast />
       </div>
     {/if}
 
-
     {#if $loading}
       <div transition:fade={{ duration: 100 }}>
-        <LoadingIndicator />
+        <Loading />
       </div>
     {/if}
 
+    {#if $page.route.id?.includes('/main/')}
+      <TopNav />
+    {/if}
     <slot />
+    {#if $page.route.id?.includes('/main/')}
+      <BottomNav />
+    {/if}
   </div>
 </ion-app>
 
@@ -124,4 +146,3 @@
   <span class="to-apple-music" />
   <span class="from-apple-music" />
 </div>
-

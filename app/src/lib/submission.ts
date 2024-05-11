@@ -2,7 +2,6 @@ import { get, writable, type Writable } from 'svelte/store';
 import { type Submission, MusicPlatform, type Song } from '$lib/types';
 import { doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { db, submissionsCollection } from '$lib/firebase';
-import { user } from '$lib/user';
 import { Geolocation, type Position } from '@capacitor/geolocation';
 import {
   type AppleMusicSong,
@@ -12,6 +11,7 @@ import AppleMusic from '$plugins/AppleMusic';
 import { Dialog } from '@capacitor/dialog';
 import { errorToast, loading, network, showToast } from './util';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { session } from './session';
 
 export const friendSubmissions = <Writable<Submission[]>>writable([]);
 
@@ -21,17 +21,17 @@ export const userSubmission = <Writable<Submission>>writable();
 
 export const activeSubmission = <Writable<Submission | null>>writable();
 
-export const getUserSubmission = async () => {
+export const getUserSubmission = async (): Promise<Submission | undefined> => {
   const currSubNumber = (await getDoc(doc(db, 'misc', 'notifications'))).data()
     ?.count;
   const q = query(
     submissionsCollection,
-    where('userId', '==', get(user).id),
+    where('userId', '==', get(session).user.id),
     where('number', '==', currSubNumber)
   );
   const snapshot = await getDocs(q);
   if (snapshot.empty) return;
-  return snapshot.docs[0];
+  return snapshot.docs[0].data() as Submission;
 };
 
 export const generateSubmission = async () => {
@@ -47,7 +47,7 @@ export const generateSubmission = async () => {
   }
 
   let recentlyPlayed = {} as { song: AppleMusicSong };
-  if (get(user).musicPlatform === MusicPlatform.appleMusic) {
+  if (get(session).user.public.musicPlatform === MusicPlatform.appleMusic) {
     // check apple music permissions.
     const perms = await AppleMusic.checkPermissions();
     if (perms.receive !== AppleMusicPermissionsResults.granted) {
@@ -79,7 +79,7 @@ export const generateSubmission = async () => {
 };
 
 export const createSubmissionsPlaylist = async () => {
-  const musicPlatform = get(user).musicPlatform;
+  const musicPlatform = get(session).user.public.musicPlatform;
   if (musicPlatform === MusicPlatform.spotify) {
     const { value } = await Dialog.confirm({
       title: 'Create Spotify® Playlist',

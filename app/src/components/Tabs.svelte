@@ -21,7 +21,7 @@
         value={tab.id}
         bind:group={$activeTab}
         class="peer hidden"
-        checked
+        checked={$activeTab === tab.id}
       />
       <label
         for={tab.id}

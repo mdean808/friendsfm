@@ -17,43 +17,44 @@ export interface Toast {
 }
 
 export interface User {
-  email: string | null;
+  id: string;
+  // secure parameters
+  messagingToken?: string;
+  email: string;
+  // private parameters
   likedSongsPlaylist?: string;
   submissionsPlaylist?: string;
-  displayName: string | null;
-  photoURL?: string;
-  uid: string;
-  username: string | undefined;
-  musicPlatform?: MusicPlatform;
   friends: Friend[];
-  friendRequests: string[];
-  submissions?: Submission[];
-  savedSongs?: SavedSong[];
-  audials?: Audial[];
-  messagingToken?: string;
-  id: string;
-  profile?: {
-    bio?: string;
-    avatarString: string;
-    stats: UserStatistics;
-    musicPlatform: MusicPlatform;
-    favorites?: {
-      album?: {
-        artwork: string;
-        name: string;
-        artist: string;
-        url: string;
-      };
-      artist?: {
-        artwork: string;
-        name: string;
-        url: string;
-      };
-      song?: {
-        artwork: string;
-        name: string;
-        artist: string;
-        url: string;
+  friendRequests: string[]; // usernames
+  //public parameters
+  // this is in the database under /{user_id}/public/info
+  public: {
+    username?: string;
+    musicPlatform?: MusicPlatform;
+    savedSongs?: SavedSong[];
+    profile?: {
+      bio?: string;
+      avatarString?: string;
+      stats: UserStatistics;
+      musicPlatform?: MusicPlatform;
+      favorites?: {
+        album?: {
+          artwork: string;
+          name: string;
+          artist: string;
+          url: string;
+        };
+        artist?: {
+          artwork: string;
+          name: string;
+          url: string;
+        };
+        song?: {
+          artwork: string;
+          name: string;
+          artist: string;
+          url: string;
+        };
       };
     };
   };
@@ -85,7 +86,7 @@ export interface Song {
   artist: string;
   length: number; // in seconds
   durationElapsed: number; // in seconds
-  timestamp?: number; // date (milliseconds) when it was played
+  timestamp: number; // date (milliseconds) when it was played
   platforms?: {
     id: MusicPlatform;
     url: string;

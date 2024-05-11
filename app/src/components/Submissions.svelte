@@ -11,13 +11,22 @@
   import { createSubmissionsPlaylist, userSubmission } from '$lib/submission';
   import { friendSubmissions } from '$lib/submission';
   import { insets } from '$lib/device';
+  import { session } from '$lib/session';
   import { goto } from '$app/navigation';
-  import { user } from '$lib/user';
 
-  export let loadingSubmission: boolean;
-  export let loadingFriendSubmissions: boolean;
-  export let sortedFriendSubmissions: SubmissionType[];
-  export let loadingNewLateSubmission: boolean;
+  let loadingSubmission: boolean = false;
+  let loadingFriendSubmissions: boolean = false;
+  let loadingNewLateSubmission: boolean = false;
+  let sortedFriendSubmissions: SubmissionType[];
+
+  const sortByDate = (a: SubmissionType, b: SubmissionType) => {
+    return new Date(b.time).getTime() - new Date(a.time).getTime();
+  };
+
+  friendSubmissions.subscribe((val) => {
+    if (val) sortedFriendSubmissions = [...val].sort(sortByDate);
+    if (val?.length > 0) loadingFriendSubmissions = false;
+  });
 
   onMount(async () => {
     const ionContent = window.document.getElementById(
@@ -40,9 +49,6 @@
     ) as IonRefresher;
     refresher?.removeEventListener('ionRefresh', handleRefresh);
   });
-  const sortByDate = (a: SubmissionType, b: SubmissionType) => {
-    return new Date(b.time).getTime() - new Date(a.time).getTime();
-  };
 
   const handleRefresh = async () => {
     const refresher = window.document.getElementById(
@@ -79,46 +85,54 @@
       <SkeletonSubmission />
       <SkeletonSubmission />
     {:else if !loadingFriendSubmissions}
-      {#each sortedFriendSubmissions.sort(sortByDate) as submission}
+      {#each sortedFriendSubmissions as submission}
         <div in:slide class="my-4">
           <LargeSubmission data={submission} />
           <!--<Submission data={submission} />-->
         </div>
       {/each}
-      {#if $friendSubmissions && [...$friendSubmissions].length === 0}
+      {#if $friendSubmissions?.length === 0}
         <p class="mx-auto text-center mt-3">nobody else has submitted yet.</p>
-        <p
+        <div
           on:keyup={() => goto('/friends')}
           on:click={() => goto('/friends')}
-          class="mx-auto text-center text-blue-500 underline"
+          role="button"
+          tabindex="0"
         >
-          add friends.
-        </p>
+          <p class="mx-auto text-center text-blue-500 underline">
+            add friends.
+          </p>
+        </div>
       {/if}
-      {#if $user.submissionsPlaylist}
-        {#if $user.musicPlatform === MusicPlatform.spotify}
+      {#if $session.user.submissionsPlaylist}
+        {#if $session.user.public.musicPlatform === MusicPlatform.spotify}
           <a
-            href={`https://open.spotify.com/playlist/${$user.submissionsPlaylist}`}
+            href={`https://open.spotify.com/playlist/${$session.user.submissionsPlaylist}`}
             class="mx-auto text-center mt-3 text-gray-300 underline"
           >
             open your submissions playlist
           </a>
-        {:else if $user.musicPlatform === MusicPlatform.appleMusic}
+        {:else if $session.user.public.musicPlatform === MusicPlatform.appleMusic}
           <a
-            href={$user.submissionsPlaylist}
+            href={$session.user.submissionsPlaylist}
             class="mx-auto text-center mt-3 text-gray-300 underline"
           >
             open your submissions playlist
           </a>
         {/if}
       {:else}
-        <p
+        <div
           on:keyup={createSubmissionsPlaylist}
           on:click={createSubmissionsPlaylist}
-          class="mx-auto text-center mt-3 text-gray-300 opacity-70 underline"
+          role="button"
+          tabindex="0"
         >
-          create your dynamic friendsfm playlist.
-        </p>
+          <p
+            class="mx-auto text-center mt-3 text-gray-300 opacity-70 underline"
+          >
+            create your dynamic friendsfm playlist.
+          </p>
+        </div>
       {/if}
     {/if}
   </div>

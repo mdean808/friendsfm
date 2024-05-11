@@ -1,27 +1,23 @@
 <script lang="ts">
-  import { goto } from '../lib/util';
-  import { getShortDate } from '../lib/dates';
-  import type { User } from '../types';
-
-  import {
-    createSongsPlaylist,
-    currPath,
-    user,
-    navDate,
-    header,
-    editingProfile,
-    setProfile,
-  } from '../store';
+  import { getShortDate } from '$lib/dates';
+  import { session } from '$lib/session';
+  import type { User } from '$lib/types';
+  import { editingProfile } from '$lib/util';
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+  import { createSongsPlaylist } from '$lib/songs';
 
   const toggleEditingProfile = () => {
     if ($editingProfile) {
       editingProfile.set(false);
-      setProfile($user.profile);
+      // todo: use firestore function to do this
+      //setProfile($session.user.public.profile);
     } else {
-      if (!$user.profile) {
-        const u = user.get();
-        u.profile = {} as User['profile'];
-        user.set(u);
+      if (!$session.user.public.profile) {
+        session.update((s) => {
+          s.user.public.profile = {} as User['public']['profile'];
+          return s;
+        });
       }
       editingProfile.set(true);
     }
@@ -30,9 +26,9 @@
 
 <div class={`z-30 w-full`}>
   <div
-    class={`w-full flex flex-row justify-between items-center text-${$user?.musicPlatform}`}
+    class={`w-full flex flex-row justify-between items-center text-${$session.user?.public?.musicPlatform}`}
   >
-    {#if $currPath === '/private_profile'}
+    {#if $page.route.id === '/main/profile'}
       <button
         class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900"
         on:click={() => goto('/settings')}
@@ -78,21 +74,25 @@
             d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
           />
         </svg>
-        {#if $user.friendRequests.length > 0}
+        {#if $session.user?.friendRequests?.length > 0}
           <div
             class="absolute inline-flex pt-0.5 items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full top-0 -right-1"
           >
-            {$user.friendRequests.length > 9
-              ? $user.friendRequests.length + '+'
-              : $user.friendRequests.length}
+            {$session.user?.friendRequests?.length > 9
+              ? $session.user?.friendRequests?.length + '+'
+              : $session.user?.friendRequests?.length}
           </div>
         {/if}
       </button>
     {/if}
     <h1 class="text-center mx-auto text-2xl text-white truncate flex-grow px-4">
-      {$header || ($navDate ? getShortDate($navDate) : 'n/a')}
+      {#if ($page.url.pathname.split('/').pop() || 'home').includes('home')}
+        {getShortDate(new Date())}
+      {:else}
+        {$page.url.pathname.split('/').pop() || 'home'}
+      {/if}
     </h1>
-    {#if $currPath === '/songs'}
+    {#if $page.route.id === '/main/songs'}
       <button
         class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900"
         on:click={createSongsPlaylist}
@@ -113,7 +113,7 @@
           />
         </svg>
       </button>
-    {:else if $currPath === '/private_profile'}
+    {:else if $page.route.id === '/main/profile'}
       <button
         class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900"
         on:click={toggleEditingProfile}

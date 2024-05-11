@@ -22,6 +22,10 @@
     }
   ],
 
+  "firestore": {
+    "rules": "./functions/firestore.rules"
+  },
+
   "functions": {
     "source": "./functions/",
     "codebase": "default",
@@ -42,7 +46,7 @@
       "port": 5001
     },
     "firestore": {
-      "port": 8081
+      "port": 5002
     },
     "ui": {
       "enabled": true

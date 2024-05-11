@@ -1,3 +1,99 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  .scroll-hide {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  .scroll-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and Opera */
+  }
+}
+
+@font-face {
+  font-family: 'League Spartan';
+  src: url('/fonts/LeagueSpartan.ttf');
+}
+
+body {
+  user-select: none;
+  margin: 0;
+  font-family: 'League Spartan', sans-serif;
+  background: theme('colors.gray.800');
+  color: theme('colors.gray.200');
+  outline: none !important;
+}
+
+*:focus {
+  outline: none !important;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+}
+
+input,
+textarea,
+button,
+label,
+select,
+a {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  --toastContainerTop: auto;
+  --toastContainerRight: auto;
+  --toastContainerLeft: 0;
+  --toastWidth: 100vw;
+  --toastBarBackground: theme('colors.white');
+  --toastBackground: theme('colors.gray.900');
+  --ion-background-color: theme('colors.gray.800') !important;
+  --ion-text-color: theme('colors.white') !important;
+  --cupertino-pane-background: theme('colors.gray.900');
+  --cupertino-pane-color: theme('colors.white');
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.firebase-emulator-warning {
+  display: none;
+}
+
+.no-scroll {
+  --offset-bottom: auto !important;
+
+  --overflow: hidden;
+
+  overflow: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+ion-content {
+  &::-webkit-scrollbar-thumb {
+    background-color: white;
+  }
+}
+
+.background-animate {
+  background-size: 200%;
+  -webkit-animation: GradientAnimation 3s ease infinite;
+  -moz-animation: GradientAnimation 3s ease infinite;
+  animation: GradientAnimation 3s ease infinite;
+}
+
+@keyframes GradientAnimation {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}

@@ -8,10 +8,10 @@
   import { activeSubmission, nearbySubmissions } from '$lib/submission';
   import { insets, location, updateCurrentLocation } from '$lib/device';
   import LoadingIndicator from '$components/LoadingIndicator.svelte';
-  import { user } from '$lib/user';
   import { songs } from '$lib/songs';
   import { sendFriendRequest } from '$lib/friends';
   import { getNearbySubmissions } from '$lib/nearby';
+  import { session } from '$lib/session';
 
   let map: google.maps.Map;
   let parentDiv: HTMLDivElement;
@@ -212,7 +212,7 @@
         username: data.user.username,
       },
     };
-    //todo: firebase function like the submission here
+    //todo: firebase function to like the submission here
     loadingHeart = false;
   };
 
@@ -241,7 +241,7 @@
     <div
       class={`px-1.5 py-0.25 transition-all duration-200 rounded-lg ${
         loadingNearby
-          ? `bg-gradient-to-r from-${$user.musicPlatform} via-blue-500 to-${$user.musicPlatform} background-animate`
+          ? `bg-gradient-to-r from-${$session.user.public.musicPlatform} via-blue-500 to-${$session.user.public.musicPlatform} background-animate`
           : 'bg-blue-500'
       }`}
     >
@@ -349,7 +349,7 @@
                 <div
                   class="flex-grow-0 text-right flex flex-row flex-nowrap justify-between gap-2"
                 >
-                  {#if !$user.friends.find((f) => f.username === sub.user.username) && sub.user.username !== $user.username}
+                  {#if !$session.user.friends.find((f) => f.username === sub.user.username) && sub.user.username !== $session.user.public.username}
                     {@const loadingFr = false}
 
                     {#if !loadingFr}

@@ -34,6 +34,7 @@ export const getFriendSubmissions = async () => {
   if (!res.value) return [];
   return JSON.parse(res.value) as Submission[];
 };
+
 export const setFriendSubmissions = async (
   friendSubmissions?: Submission[]
 ) => {

@@ -1,12 +1,20 @@
 import { writable, type Writable } from 'svelte/store';
-import type { Toast } from './types';
+import type { Toast, UserStatistics } from './types';
 import Network from './network';
+
+export const searchType = <Writable<'track' | 'album' | 'playlist' | 'artist'>>(
+  writable('track')
+);
 
 export const loading = <Writable<boolean>>writable(false);
 
 export const network = new Network();
 
 export const publicProfileUsername = <Writable<string>>writable();
+
+export const currSubNumber = <Writable<number>>writable();
+
+export const editingProfile = <Writable<boolean>>writable(false);
 
 export const activeHomeTab = <Writable<'submissions' | 'genres'>>(
   writable('submissions')

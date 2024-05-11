@@ -3,8 +3,8 @@
     convertDateToLateString,
     formatTimePlayed,
     getDaysAgo,
-  } from '../../lib/dates';
-  import type { Submission } from '../../types';
+  } from '$lib/dates';
+  import type { Submission } from '$lib/types';
 
   export let data: Submission;
   export let className: string = '';
@@ -25,7 +25,7 @@
       {convertDateToLateString(new Date(data.lateTime))}
     </span>
   {/if}
-  {#if data.song.timestamp > 0}
+  {#if data.song?.timestamp > 0}
     {#if split}
       <p class="text-gray-400 text-sm">
         played {getDaysAgo(new Date(data.song?.timestamp))}

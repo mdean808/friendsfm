@@ -1,6 +1,6 @@
 <script lang="ts">
   import { toast } from '$lib/util';
-  import { user } from '$lib/user';
+  import { session } from '$lib/session';
 </script>
 
 <button
@@ -9,7 +9,7 @@
 >
   <div
     class={`mx-auto rounded-full border bg-gray-900 px-6 py-4 border-${
-      $toast.color ? '' : $user.musicPlatform
+      $toast.color ? '' : $session.user.public.musicPlatform
     }`}
     style={$toast.color ? `border-color: ${$toast.color}` : ''}
   >

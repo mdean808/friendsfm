@@ -7,8 +7,9 @@
   import { onDestroy, onMount } from 'svelte';
   import { activeSubmission } from '$lib/submission';
   import { goto } from '$app/navigation';
-  import { getCurrentSong, user } from '$lib/user';
+  import { getCurrentSong } from '$lib/user';
   import { publicProfileUsername } from '$lib/util';
+  import { session } from '$lib/session';
 
   export let data: Submission;
 
@@ -57,7 +58,7 @@
         : `bg-${data.user.musicPlatform}`
     }`}
   >
-    <div class="flex-grow-0 text-left">
+    <div class="flex-grow-0 w-full text-left">
       <button
         on:click={(e) => {
           e.stopPropagation();
@@ -133,8 +134,8 @@
       <Heart
         className={`w-6 h-6 flex-grow-0 flex-shrink ${
           loadingHeart ? 'animate-ping text-white' : ''
-        } ${data.likes?.find((l) => l.id === $user.id) ? 'text-white' : ''} `}
-        fill={data.likes?.find((l) => l.id === $user.id)
+        } ${data.likes?.find((l) => l.id === $session.user.id) ? 'text-white' : ''} `}
+        fill={data.likes?.find((l) => l.id === $session.user.id)
           ? 'currentColor'
           : 'none'}
       />

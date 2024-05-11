@@ -21,12 +21,12 @@ service cloud.firestore {
         match /users/{userId} {
             // allow submission owners to edit their submissions
             allow read, write: if request.auth != null && request.auth.uid == userId
-            // allow all users to read public user data
-            allow read: if resource != null && allowRead(request.resource.data.keys(), ['id', 'uid', 'username', 'profile']);
         }
 
-        function allowRead(requestedFields, allowedFields) {
-            return requestedFields.hasOnly(allowedFields);
+        match /users/{userId}/public/{publicDoc} {
+            // allow all users to read public user data
+            allow read: if request.auth.uid != null
         }
+
     }
 }

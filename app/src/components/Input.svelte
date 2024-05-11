@@ -13,8 +13,8 @@
   {name}
   {placeholder}
   bind:value
-  on:focusin={() => focus = true}
-  on:focusout={() => focus = false}
+  on:focusin={() => (focus = true)}
+  on:focusout={() => (focus = false)}
   on:input={() => dispatch('input')}
   on:keyup
   type="text"

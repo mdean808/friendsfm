@@ -1,10 +1,9 @@
 import { writable, type Writable } from 'svelte/store';
-import type { MusicPlatform, Song, User } from '$lib/types';
+import type { MusicPlatform, Song } from '$lib/types';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { network } from '$lib/util';
 import type { AccessToken } from '@spotify/web-api-ts-sdk';
-
-export const user = <Writable<User>>writable();
+import { session } from './session';
 
 export const spotifyAuthCode = <Writable<string>>writable();
 
@@ -20,9 +19,9 @@ export const updateMusicPlatform = async (
   });
   if (!message) return;
 
-  user.update((u) => {
-    u.musicPlatform = newMusicPlatform;
-    return u;
+  session.update((s) => {
+    s.user.public.musicPlatform = newMusicPlatform;
+    return s;
   });
   // update state
   FirebaseAnalytics.setUserProperty({
