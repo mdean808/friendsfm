@@ -3,9 +3,10 @@
   import Genres from '$components/Genres.svelte';
   import Submissions from '$components/Submissions.svelte';
   import Tabs from '$components/Tabs.svelte';
-  import { activeHomeTab } from '$lib/util';
+  import { activeHomeTab, submissionLoaded } from '$lib/util';
   import { userSubmission } from '$lib/submission';
   import { onMount } from 'svelte';
+  import SubmissionPreview from '$components/SubmissionPreview.svelte';
 
   onMount(() => {
     activeHomeTab.set('submissions');
@@ -33,6 +34,12 @@
           </div>
         </div>
       {/if}
+    </div>
+  </div>
+{:else if $submissionLoaded}
+  <div id="home" class={`text-center w-full h-auto px-4 overflow-y-scroll`}>
+    <div class="h-full">
+      <SubmissionPreview />
     </div>
   </div>
 {:else}

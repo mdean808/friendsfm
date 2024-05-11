@@ -124,6 +124,8 @@ export default class Network {
       case 4: // 4xx - client error
         if (!get(session).loggedIn) break; // user not logged in
         switch (res.status) {
+          case 400:
+            break;
           case 401:
             errorToast({
               content: 'Authentication Error. Please sign in again.',
@@ -138,6 +140,7 @@ export default class Network {
             errorToast({
               content: 'Not found. The requested item does not exist.',
             });
+            break;
           default:
             errorToast({
               content:

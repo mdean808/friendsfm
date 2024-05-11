@@ -1,15 +1,12 @@
 <script lang="ts">
-  import type { MusicPlatform, Submission } from '../types';
   import SubmissionTime from './submission/Time.svelte';
   import { onDestroy, onMount } from 'svelte';
-  import { goto } from '../lib/util';
-  import {
-    user,
-    previewSubmission,
-    publicProfileUsername,
-    previewFriendSubmissions,
-  } from '../store';
   import MusicPlatformIcon from './icons/MusicPlatformIcon.svelte';
+  import { MusicPlatform, type Submission } from '$lib/types';
+  import { session } from '$lib/session';
+  import { goto } from '$app/navigation';
+  import { publicProfileUsername } from '$lib/util';
+  import { previewFriendSubmissions, previewSubmission } from '$lib/submission';
 
   let submission: Submission;
   let interval: NodeJS.Timeout;
@@ -45,15 +42,18 @@
   <div
     class={`flex p-2 relative rounded-t-lg ${
       submission?.currentlyListening
-        ? `bg-gradient-to-r from-${$user.musicPlatform} via-blue-500 to-${$user.musicPlatform} background-animate`
-        : `bg-${$user.musicPlatform}`
+        ? `bg-gradient-to-r from-${$session.user.public.musicPlatform} via-blue-500 to-${$session.user.public.musicPlatform} background-animate`
+        : `bg-${$session.user.public.musicPlatform}`
     }`}
   >
     <div class="flex-grow text-center">
       <p>submission preview</p>
     </div>
     <div class="absolute right-2">
-      <MusicPlatformIcon className="h-5 w-5" id={$user.musicPlatform} />
+      <MusicPlatformIcon
+        className="h-5 w-5"
+        id={$session.user.public.musicPlatform || MusicPlatform.spotify}
+      />
     </div>
   </div>
   {#if submission?.song}
@@ -114,7 +114,7 @@
       <button
         on:click={(e) => {
           e.stopPropagation();
-          goto('/public_profile');
+          goto('/modal/profile');
           publicProfileUsername.set(friend.username);
         }}
         class="flex-grow text-left"

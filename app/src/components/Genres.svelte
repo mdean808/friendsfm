@@ -8,7 +8,7 @@
   import { activeSubmission, nearbySubmissions } from '$lib/submission';
   import { insets, location, updateCurrentLocation } from '$lib/device';
   import LoadingIndicator from '$components/LoadingIndicator.svelte';
-  import { songs } from '$lib/songs';
+  import { toggleSavedSong } from '$lib/songs';
   import { sendFriendRequest } from '$lib/friends';
   import { getNearbySubmissions } from '$lib/nearby';
   import { session } from '$lib/session';
@@ -212,7 +212,7 @@
         username: data.user.username,
       },
     };
-    //todo: firebase function to like the submission here
+    await toggleSavedSong(savedSong);
     loadingHeart = false;
   };
 
@@ -389,11 +389,11 @@
                       class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
                         loadingHeart ? 'animate-ping text-white' : ''
                       } ${
-                        $songs.find((s) => s.name === sub.song.name)
+                        $session.songs.find((s) => s.name === sub.song.name)
                           ? 'text-white'
                           : ''
                       } `}
-                      fill={$songs.find((s) => s.name === sub.song.name)
+                      fill={$session.songs.find((s) => s.name === sub.song.name)
                         ? 'currentColor'
                         : 'none'}
                       stroke="currentColor"

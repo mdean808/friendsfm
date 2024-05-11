@@ -1,5 +1,5 @@
 import { get, writable, type Writable } from 'svelte/store';
-import { MusicPlatform, type Song } from '$lib/types';
+import { MusicPlatform, type SavedSong, type Song } from '$lib/types';
 import { session } from '$lib/session';
 import { Dialog } from '@capacitor/dialog';
 import { loading, network, showToast } from '$lib/util';
@@ -60,5 +60,35 @@ export const createSongsPlaylist = async () => {
     window.location.href = url;
     showToast({ content: 'Playlist successfully created!' });
     return url;
+  }
+};
+
+export const toggleSavedSong = async (savedSong: SavedSong) => {
+  session.update((sesh) => {
+    // song exists in saved songs
+    if (sesh.songs.find((song) => song.name === savedSong.name)) {
+      // make sure the ID is present
+      if (!savedSong.id)
+        savedSong.id =
+          sesh.songs.find((song) => song.name === savedSong.name)?.id ||
+          'unknown';
+      // remove the song from the list
+      sesh.songs = sesh.songs.filter((s) => s.name !== savedSong.name);
+      // save to backend
+    } else {
+      sesh.songs.push(savedSong);
+    }
+    return sesh;
+  });
+  if (get(session).songs.find((song) => song.name === savedSong.name)) {
+    const message = await network.queryFirebase('deletesong', {
+      song: savedSong,
+    });
+    if (!message) return;
+  } else {
+    const message = await network.queryFirebase('savesong', {
+      song: savedSong,
+    });
+    if (!message) return;
   }
 };

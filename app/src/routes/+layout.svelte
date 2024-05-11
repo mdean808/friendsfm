@@ -3,13 +3,12 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
-  import { endSession, loadSession, authSession, session } from '$lib/session';
+  import { loadSession, authSession, session } from '$lib/session';
   import { page } from '$app/stores';
   import { insets } from '$lib/device';
   import { loading, toast, errorToast } from '$lib/util';
   import { fade, slide } from 'svelte/transition';
   import { setupSnapshots } from '$lib/firebase';
-  import { get } from 'svelte/store';
   import Toast from '$components/Toast.svelte';
   import Loading from '$components/Loading.svelte';
 
@@ -85,14 +84,13 @@
   <title>
     friendsfm | {$page.url.pathname.split('/').pop() || 'home'}
   </title>
-  <!--<script
+  <script
     defer
     async
     src={'https://maps.googleapis.com/maps/api/js?key=' +
-      import.meta.env.VITE_GOOGLE_MAPS_KEY +
+      'AIzaSyDtWFyFjHTjbziUvD2Plob40KLYW7XyHa8' +
       '&callback=mapready&loading=async'}
-  >
-  </script>-->
+  ></script>
 </svelte:head>
 
 <ion-app class="no-scroll">

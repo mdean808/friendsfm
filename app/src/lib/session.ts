@@ -35,7 +35,6 @@ export const endSession = async () => {
   await Preferences.setLogin(false);
   await Preferences.setSongs();
   await Preferences.setFriendSubmissions();
-
   session.set({} as Session);
 };
 

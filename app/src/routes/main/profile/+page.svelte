@@ -198,6 +198,7 @@
               ? $session.user.public.profile.favorites.song.url
               : 'javascript: void(0)'}
           >
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
             <img
               alt="Song Artwork"
               class="w-20 h-20 mx-auto"
@@ -292,6 +293,7 @@
               ? $session.user.public.profile.favorites.album.url
               : 'javascript: void(0)'}
           >
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
             <img
               alt="Song Artwork"
               class="w-20 h-20 mx-auto"
@@ -386,6 +388,7 @@
               ? $session.user.public.profile.favorites.artist.url
               : 'javascript: void(0)'}
           >
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
             <img
               alt="Artist"
               class="w-20 h-20 mx-auto"

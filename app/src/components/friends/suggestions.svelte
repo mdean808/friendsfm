@@ -2,16 +2,13 @@
   import { slide } from 'svelte/transition';
   import LoadingIndicator from '../LoadingIndicator.svelte';
   import { onMount } from 'svelte';
-  import {
-    sendFriendRequest,
-    getFriendSuggestions,
-    publicProfileUsername,
-  } from '../../store';
-  import { goto, showToast } from '../../lib/util';
+  import { publicProfileUsername, showToast } from '../../lib/util';
+  import { getFriendSuggestions, sendFriendRequest } from '$lib/friends';
+  import { goto } from '$app/navigation';
 
   let suggestions: {
     username: string;
-    mutual: string;
+    mutual?: string;
     loading: boolean;
     sent: boolean;
   }[] = [];
@@ -35,7 +32,7 @@
   const addFriend = async (
     suggestion: {
       username: string;
-      mutual: string;
+      mutual?: string;
       loading: boolean;
     },
     sIndex: number
@@ -67,13 +64,9 @@
         class="w-full border-b-white border-b-2 flex justify-between py-3 px-3"
       >
         <button
-          on:keypress={() => {
-            publicProfileUsername.set(suggestion.username);
-            goto('/public_profile');
-          }}
           on:click={() => {
             publicProfileUsername.set(suggestion.username);
-            goto('/public_profile');
+            goto('/modal/profile');
           }}
           class="flex flex-row gap-2"
         >

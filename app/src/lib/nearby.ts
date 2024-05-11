@@ -1,5 +1,9 @@
 import { Preferences } from '@capacitor/preferences';
-import { updateCurrentLocation } from './device';
+import { location, updateCurrentLocation } from './device';
+import { network } from './util';
+import { get } from 'svelte/store';
+import type { StrippedSubmission } from './types';
+import { nearbySubmissions } from './submission';
 
 const loadNearby = async () => {
   await updateCurrentLocation();
@@ -25,5 +29,21 @@ export const getNearbySubmissions = async (
     northEast: { latitude: number; longitude: number };
   }
 ) => {
-  //todo: write firebase function to get nearby submissions
+  //todo: create firebase function to get nearby submissions
+  const message = await network.queryFirebase('nearbysubmissions', {
+    location: {
+      latitude: get(location)?.gp?.coords
+        ? get(location).gp.coords.latitude
+        : 0,
+      longitude: get(location)?.gp?.coords
+        ? get(location).gp.coords.longitude
+        : 0,
+    },
+    radius,
+    bounds,
+  });
+  if (!message) return;
+  const data = message as StrippedSubmission[];
+  nearbySubmissions.set(data);
+  return data;
 };

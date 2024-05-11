@@ -34,13 +34,13 @@
     ) as IonContent;
     ionContent.scrollByPoint(0, $submissionsScroll, 0);
     const scrollElement = await ionContent.getScrollElement();
-    scrollElement.addEventListener('scroll', () => {
+    scrollElement?.addEventListener('scroll', () => {
       $submissionsScroll = scrollElement.scrollTop;
     });
     const refresher = window.document.getElementById(
       'refresher'
     ) as IonRefresher;
-    refresher.addEventListener('ionRefresh', handleRefresh);
+    refresher?.addEventListener('ionRefresh', handleRefresh);
   });
 
   onDestroy(async () => {

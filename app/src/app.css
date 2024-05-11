@@ -76,10 +76,21 @@ a {
 }
 
 ion-content {
-  &::-webkit-scrollbar-thumb {
-    background-color: white;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }
+ion-content::part(scroll)::-webkit-scrollbar {
+  display: none;
+}
+/*ion-content {
+  width: calc(100% + 15px);
+  overflow-x: hidden;
+}
+ion-content::part(scroll) {
+  padding-right: 15px;
+  overflow-x: hidden;
+}*/
 
 .background-animate {
   background-size: 200%;

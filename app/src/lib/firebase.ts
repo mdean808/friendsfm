@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import {
+  QuerySnapshot,
   collection,
   connectFirestoreEmulator,
   doc,
@@ -9,6 +10,7 @@ import {
   onSnapshot,
   query,
   where,
+  type DocumentData,
   type Unsubscribe,
 } from 'firebase/firestore';
 
@@ -26,9 +28,14 @@ import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { browser } from '$app/environment';
 import { session } from './session';
 import { get } from 'svelte/store';
-import { currSubNumber } from './util';
+import { currSubNumber, submissionLoaded } from './util';
 import { friendSubmissions, userSubmission } from './submission';
-import { MusicPlatform, type Submission, type User } from './types';
+import {
+  MusicPlatform,
+  type SavedSong,
+  type Submission,
+  type User,
+} from './types';
 
 export const config = {
   apiKey: PUBLIC_FIREBASE_API_KEY,
@@ -64,8 +71,8 @@ export const submissionsCollection = collection(db, 'submissions');
 const snapshots = {} as {
   user: Unsubscribe;
   misc: Unsubscribe;
-  userSubmission: Unsubscribe;
-  friendSubmissions: Unsubscribe;
+  userSubmission?: Unsubscribe;
+  friendSubmissions?: Unsubscribe;
 };
 
 export const setupSnapshots = async () => {
@@ -78,6 +85,14 @@ export const setupSnapshots = async () => {
       const publicData = await getDoc(
         doc(db, 'users', get(session).user.id, 'public', 'info')
       );
+      let songs: QuerySnapshot<DocumentData, DocumentData> | [];
+      try {
+        songs = await getDocs(
+          collection(db, 'users', get(session).user.id, 'songs')
+        );
+      } catch {
+        songs = [];
+      }
       // set user values
       session.update((s) => {
         s.user.public.username = publicData.get('username');
@@ -89,6 +104,10 @@ export const setupSnapshots = async () => {
         s.user.messagingToken = document.get('messagingToken');
         s.user.likedSongsPlaylist = document.get('likedSongsPlaylist');
         s.user.submissionsPlaylist = document.get('submissionsPlaylist');
+        s.songs = [];
+        songs.forEach((doc) => {
+          s.songs.push(doc.data() as SavedSong);
+        });
         return s;
       });
     }
@@ -108,20 +127,10 @@ export const setupSnapshots = async () => {
   );
   // request the document once first
   const subRef = await getDocs(qUserSub);
-  userSubmission.set({
-    ...(subRef.docs[0].data() as Submission),
-    id: subRef.docs[0].id,
-    user: {
-      id: get(session).user.id,
-      username: get(session).user.public.username || '',
-      musicPlatform:
-        get(session).user.public.musicPlatform || MusicPlatform.spotify,
-    },
-  });
-  snapshots.userSubmission = onSnapshot(qUserSub, async (doc) => {
+  if (subRef.docs[0]?.exists()) {
     userSubmission.set({
-      ...(doc.docs[0].data() as Submission),
-      id: doc.docs[0].id,
+      ...(subRef.docs[0].data() as Submission),
+      id: subRef.docs[0].id,
       user: {
         id: get(session).user.id,
         username: get(session).user.public.username || '',
@@ -129,9 +138,30 @@ export const setupSnapshots = async () => {
           get(session).user.public.musicPlatform || MusicPlatform.spotify,
       },
     });
+  } else {
+    // user submission doesn't exist
+  }
+  submissionLoaded.set(true);
+  snapshots.userSubmission = onSnapshot(qUserSub, async (doc) => {
+    if (doc.docs[0]?.exists()) {
+      userSubmission.set({
+        ...(doc.docs[0].data() as Submission),
+        id: doc.docs[0].id,
+        user: {
+          id: get(session).user.id,
+          username: get(session).user.public.username || '',
+          musicPlatform:
+            get(session).user.public.musicPlatform || MusicPlatform.spotify,
+        },
+      });
+    } else {
+      // user submission doesn't exist
+    }
   });
   // snapshot friend submissions
   const friendIds = get(session).user.friends.map((f) => f.id);
+
+  if (friendIds.length === 0) return;
   const qFriendSubs = query(
     submissionsCollection,
     where('userId', 'in', friendIds),
@@ -193,6 +223,6 @@ export const setupSnapshots = async () => {
 export const unsubscribeSnapshots = () => {
   snapshots.user();
   snapshots.misc();
-  snapshots.userSubmission();
-  snapshots.friendSubmissions();
+  if (snapshots.userSubmission) snapshots.userSubmission();
+  if (snapshots.friendSubmissions) snapshots.friendSubmissions();
 };

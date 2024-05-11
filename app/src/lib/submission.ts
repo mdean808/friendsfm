@@ -1,5 +1,10 @@
 import { get, writable, type Writable } from 'svelte/store';
-import { type Submission, MusicPlatform, type Song } from '$lib/types';
+import {
+  type Submission,
+  MusicPlatform,
+  type Song,
+  type StrippedSubmission,
+} from '$lib/types';
 import { doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { db, submissionsCollection } from '$lib/firebase';
 import { Geolocation, type Position } from '@capacitor/geolocation';
@@ -15,7 +20,7 @@ import { session } from './session';
 
 export const friendSubmissions = <Writable<Submission[]>>writable([]);
 
-export const nearbySubmissions = <Writable<Submission[]>>writable([]);
+export const nearbySubmissions = <Writable<StrippedSubmission[]>>writable([]);
 
 export const userSubmission = <Writable<Submission>>writable();
 
@@ -125,4 +130,41 @@ export const createSubmissionsPlaylist = async () => {
     return url;
   }
   // return the playlist id
+};
+
+export const previewSubmission = async () => {
+  let recentlyPlayed: { song: AppleMusicSong } | undefined = undefined;
+  if (get(session).user.public.musicPlatform === MusicPlatform.appleMusic) {
+    // check apple music permissions.
+    const perms = await AppleMusic.checkPermissions();
+    if (perms.receive !== AppleMusicPermissionsResults.granted) {
+      const permsRes = await AppleMusic.requestPermissions();
+      if (permsRes.receive !== AppleMusicPermissionsResults.granted) {
+        return Dialog.alert({
+          message:
+            "We can't see what you're listening to! Please allow apple music permissions in settings.",
+          title: 'Permissions Denied.',
+        });
+      }
+    }
+    try {
+      recentlyPlayed = await AppleMusic.getRecentlyPlayed();
+    } catch (e: any) {
+      console.log(e);
+      return errorToast({ content: e.message });
+    }
+  }
+  const message = await network.queryFirebase('previewusersubmission', {
+    appleMusic: recentlyPlayed?.song as Song,
+  });
+
+  if (!message) return;
+  FirebaseAnalytics.logEvent({ name: 'preview_submission' });
+  return message;
+};
+
+export const previewFriendSubmissions = async () => {
+  const message = await network.queryFirebase('previewuserfriends');
+  if (!message) return;
+  return message;
 };
