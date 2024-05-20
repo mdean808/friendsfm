@@ -7,7 +7,7 @@
   import { Dialog } from '@capacitor/dialog';
   import { activeSubmission } from '$lib/submission';
   import { goto } from '$app/navigation';
-  import { Capacitor } from '@capacitor/core';
+  import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 
   export let data: Submission;
   let tempCap = '';
@@ -19,20 +19,16 @@
 
   const createCaption = async () => {
     try {
-      if (Capacitor.getPlatform() === 'web') {
-        const res = prompt('Enter your caption below.');
-        if (!res?.trim()) return;
-        tempCap = res;
-        ///todo: firestore function to set the caption
-      } else {
-        const res = await Dialog.prompt({
-          title: 'Create Caption',
-          message: 'Enter your caption below.',
-        });
-        if (res.cancelled || !res.value.trim()) return;
-        tempCap = res.value;
-        ///todo: firestore function to set the caption
-      }
+      const res = await Dialog.prompt({
+        title: 'Create Caption',
+        message: 'Enter your caption below.',
+      });
+      if (res.cancelled || !res.value.trim()) return;
+      tempCap = res.value;
+      await FirebaseFirestore.updateDocument({
+        reference: `submissions/${data.id}`,
+        data: { caption: tempCap },
+      });
       showToast({ content: 'successfully updated your caption.' });
     } catch (e) {
       console.log(e);

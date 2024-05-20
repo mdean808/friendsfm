@@ -9,19 +9,11 @@
   import Input from '$components/Input.svelte';
   import Skeleton from '$components/submission/Skeleton.svelte';
 
-  import {
-    MusicPlatform,
-    type SavedSong,
-    type Submission,
-    type User,
-    type UserStatistics,
-  } from '$lib/types';
+  import { MusicPlatform } from '$lib/types';
   import { goto } from '$app/navigation';
   import { formatDurationPlayed } from '$lib/dates';
+  import { getCurrentSong, getUserStatistics } from '$lib/user';
   import { onMount } from 'svelte';
-  import { submissionsCollection } from '$lib/firebase';
-  import { getDocs, query, where } from 'firebase/firestore';
-  import { getCurrentSong } from '$lib/user';
 
   const firstOfTheMonth = new Date().getDate() === 1;
 
@@ -31,45 +23,13 @@
   };
 
   onMount(async () => {
-    // load user statistics into the session
-    const stats = {} as UserStatistics;
-    stats.onTimeSubmissionCount = 0;
-    const popSongs = [] as (SavedSong & { appearances: number })[];
-    const submissionsQuery = query(
-      submissionsCollection,
-      where('userId', '==', $session.user.id)
+    // update user statistics
+    const stats = await getUserStatistics(
+      $session.user.id,
+      $session.user.public.username
     );
-    const submissionsRes = await getDocs(submissionsQuery);
-    stats.submissionCount = submissionsRes.size;
-    submissionsRes.forEach((doc) => {
-      const sub = doc.data() as Submission;
-      // percentange
-      if (!sub.late) stats.onTimeSubmissionCount++;
-      // calculate popular song
-      const songIndex = popSongs.findIndex(
-        (s) => s.name === sub.song.name && s.artist === sub.song.artist
-      );
-      if (songIndex === -1)
-        popSongs.push({
-          ...sub.song,
-          appearances: 1,
-          user: {
-            id: $session.user.id,
-            username: $session.user.public.username || 'unknown',
-          },
-        });
-      else {
-        if (!popSongs[songIndex]?.albumArtwork && sub?.song?.albumArtwork) {
-          popSongs[songIndex].albumArtwork = sub?.song?.albumArtwork;
-        }
-        popSongs[songIndex].appearances += 1;
-      }
-    });
-    stats.topSong = popSongs.sort((a, b) => b.appearances - a.appearances)[0];
     session.update((s) => {
-      if (!s.user.public.profile)
-        s.user.public.profile = {} as User['public']['profile'];
-      s.user.public.profile!.stats = stats;
+      s.user.public.profile.stats = stats;
       return s;
     });
   });
@@ -230,7 +190,7 @@
                 on:keypress={(e) => {
                   e.preventDefault();
                   searchType.set('track');
-                  goto('/search_music_platform');
+                  goto('/modal/mp-search');
                 }}
                 class="absolute bg-white text-black p-1 w-6 h-6 right-3.5 -top-2.5 rounded-full"
               >
@@ -259,11 +219,11 @@
             class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
             on:click={() => {
               searchType.set('track');
-              goto('/search_music_platform');
+              goto('/modal/mp-search');
             }}
             on:keyup={() => {
               searchType.set('track');
-              goto('/search_music_platform');
+              goto('/modal/mp-search');
             }}
           >
             <svg
@@ -320,12 +280,12 @@
                 on:click={(e) => {
                   e.preventDefault();
                   searchType.set('album');
-                  goto('/search_music_platform');
+                  goto('/modal/mp-search');
                 }}
                 on:keypress={(e) => {
                   e.preventDefault();
                   searchType.set('album');
-                  goto('/search_music_platform');
+                  goto('/modal/mp-search');
                 }}
                 class="absolute bg-white text-black p-1 w-6 h-6 right-3.5 -top-2.5 rounded-full"
               >
@@ -354,11 +314,11 @@
             class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
             on:click={() => {
               searchType.set('album');
-              goto('/search_music_platform');
+              goto('/modal/mp-search');
             }}
             on:keyup={() => {
               searchType.set('album');
-              goto('/search_music_platform');
+              goto('/modal/mp-search');
             }}
           >
             <svg
@@ -414,11 +374,11 @@
                 transition:fade={{ duration: 100 }}
                 on:click={() => {
                   searchType.set('artist');
-                  goto('/search_music_platform');
+                  goto('/modal/mp-search');
                 }}
                 on:keypress={() => {
                   searchType.set('artist');
-                  goto('/search_music_platform');
+                  goto('/modal/mp-search');
                 }}
                 class="absolute bg-white text-black p-1 w-6 h-6 right-3.5 -top-2.5 rounded-full"
               >
@@ -444,11 +404,11 @@
             class="p-5 border-2 borer-gray-600 rounded-md w-20 h-20 mx-auto hover:border-blue-600 hover:text-blue-600 transition-all duration-100"
             on:click={() => {
               searchType.set('artist');
-              goto('/search_music_platform');
+              goto('/modal/mp-search');
             }}
             on:keyup={() => {
               searchType.set('artist');
-              goto('/search_music_platform');
+              goto('/modal/mp-search');
             }}
           >
             <svg
@@ -532,7 +492,7 @@
       </div>
     {:else}
       <!-- User Top Song -->
-      {#if $session.user.public.profile?.stats.topSong}
+      {#if $session.user.public.profile?.stats?.topSong}
         <h2 class="mt-2 mb-1 font-semibold text-xl">most common song</h2>
         <div
           class="text-left bg-gray-700 rounded-md px-2 mx-4 py-2 mb-2 flex space-x-4"

@@ -3,7 +3,6 @@
   import { errorToast, loading } from '$lib/util';
   import Icon from '../../../assets/icon.png';
   import { onMount } from 'svelte';
-  import { captureException } from '@sentry/capacitor';
   import { writable } from 'svelte/store';
   import { Dialog } from '@capacitor/dialog';
   import { Capacitor } from '@capacitor/core';
@@ -43,7 +42,6 @@
             errorToast({
               content: 'Something went wrong. Please try again.',
             });
-            captureException(e);
           }
         }
       }
@@ -60,13 +58,11 @@
     try {
       const res = await FirebaseAuthentication.signInWithGoogle();
       await authSession(null, res.user);
-      //todo: do authentication logic with firestore
     } catch (e: any) {
       if (!e.message.includes('closed-by-user')) {
         loading.set(false);
         console.log('Login Error' + e);
         errorToast({ content: 'Something went wrong. Please try again.' });
-        captureException(e.message);
       }
     }
     loading.set(false);
@@ -77,13 +73,11 @@
     try {
       const res = await FirebaseAuthentication.signInWithApple();
       await authSession(null, res.user);
-      //todo: do authentication logic with firestore
     } catch (e: any) {
       if (!e.message.includes('closed-by-user')) {
         loading.set(false);
         console.log('Login Error' + e);
         errorToast({ content: 'Something went wrong. Please try again.' });
-        captureException(e.message);
       }
     }
     loading.set(false);

@@ -29,7 +29,6 @@ export const getNearbySubmissions = async (
     northEast: { latitude: number; longitude: number };
   }
 ) => {
-  //todo: create firebase function to get nearby submissions
   const message = await network.queryFirebase('nearbysubmissions', {
     location: {
       latitude: get(location)?.gp?.coords

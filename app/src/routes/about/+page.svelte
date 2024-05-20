@@ -4,6 +4,7 @@
   import TextArea from '$components/TextArea.svelte';
   import { session } from '$lib/session';
   import { showToast } from '$lib/util';
+  import { fly } from 'svelte/transition';
   let feedback: string;
 
   const sendFeedback = async () => {
@@ -21,14 +22,19 @@
   };
 </script>
 
-<div>
+<div
+  in:fly={{
+    duration: 200,
+    x: document.body.clientWidth,
+  }}
+>
   <div
     class="w-full flex border-b-white border-b-2 flex-row justify-between items-center h-[55px] px-2"
   >
     <button on:click={() => goto('/main/home')} class="flex-grow-0">
       <svg
+        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${$session.user.public.musicPlatform}`}
         fill="none"
-        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${$session.user.public.musicPlatform} `}
         stroke="currentColor"
         stroke-width="1.5"
         viewBox="0 0 24 24"
@@ -38,7 +44,7 @@
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
-          d="M15.75 19.5L8.25 12l7.5-7.5"
+          d="M6 18L18 6M6 6l12 12"
         ></path>
       </svg>
     </button>

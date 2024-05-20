@@ -2,7 +2,6 @@ import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { network } from './util';
 import { session } from './session';
 
-//todo: convert as many friend req functions to firestore as possible
 export const sendFriendRequest = async (username: string) => {
   username = username.toLowerCase();
   const message = await network.queryFirebase('requestfriend', {

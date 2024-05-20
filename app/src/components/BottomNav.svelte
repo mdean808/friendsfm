@@ -55,7 +55,7 @@
   {/if}
   <div
     class="flex backdrop-blur-xl h-full rounded-t-lg"
-    style={`padding-bottom: ${$insets.bottom}px`}
+    style={`padding-bottom: ${$insets?.bottom}px`}
   >
     <button
       on:click={() => goto('/main/songs')}

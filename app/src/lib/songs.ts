@@ -63,7 +63,8 @@ export const createSongsPlaylist = async () => {
   }
 };
 
-export const toggleSavedSong = async (savedSong: SavedSong) => {
+export const toggleSavedSong = async (savedSong?: SavedSong) => {
+  if (!savedSong) return;
   session.update((sesh) => {
     // song exists in saved songs
     if (sesh.songs.find((song) => song.name === savedSong.name)) {

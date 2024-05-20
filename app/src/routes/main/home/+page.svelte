@@ -36,7 +36,7 @@
       {/if}
     </div>
   </div>
-{:else if $submissionLoaded}
+{:else if $submissionLoaded && !userSubmission}
   <div id="home" class={`text-center w-full h-auto px-4 overflow-y-scroll`}>
     <div class="h-full">
       <SubmissionPreview />

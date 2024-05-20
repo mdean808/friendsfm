@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { user, deleteCommentFromSubmission } from '../store';
-  import type { Comment } from '../types';
+  import { session } from '$lib/session';
+  import { deleteCommentFromSubmission } from '$lib/submission';
+  import type { Comment } from '$lib/types';
   import LoadingIndicator from './LoadingIndicator.svelte';
 
   export let comment: Comment;
@@ -25,14 +26,15 @@
       )}
     </p>
   </div>
-  <p
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div
     class="text-blue-500 w-fit underline text-sm"
     on:keyup={() => replyFunc(comment.user.username)}
     on:click={() => replyFunc(comment.user.username)}
   >
     reply
-  </p>
-  {#if $user.id === comment.user.id}
+  </div>
+  {#if $session.user.id === comment.user.id}
     {#if !deleting}
       <button
         on:click={deleteComment}

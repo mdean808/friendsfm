@@ -6,9 +6,14 @@
   import SkeletonSubmission from '$components/submission/Skeleton.svelte';
   import LargeSubmission from './LargeSubmission.svelte';
   import UserSubmission from './submission/User.svelte';
-  import { MusicPlatform, type Submission as SubmissionType } from '$lib/types';
+  import { MusicPlatform, type Submission } from '$lib/types';
   import { submissionsScroll } from '$lib/util';
-  import { createSubmissionsPlaylist, userSubmission } from '$lib/submission';
+  import {
+    createSubmissionsPlaylist,
+    loadFriendSubmissions,
+    loadUserSubmission,
+    userSubmission,
+  } from '$lib/submission';
   import { friendSubmissions } from '$lib/submission';
   import { insets } from '$lib/device';
   import { session } from '$lib/session';
@@ -17,10 +22,14 @@
   let loadingSubmission: boolean = false;
   let loadingFriendSubmissions: boolean = false;
   let loadingNewLateSubmission: boolean = false;
-  let sortedFriendSubmissions: SubmissionType[];
+  let sortedFriendSubmissions: Submission[];
 
-  const sortByDate = (a: SubmissionType, b: SubmissionType) => {
-    return new Date(b.time).getTime() - new Date(a.time).getTime();
+  const sortByDate = (a: Submission, b: Submission) => {
+    try {
+      return b.time.toDate().getTime() - a.time.toDate().getTime();
+    } catch {
+      return 1;
+    }
   };
 
   friendSubmissions.subscribe((val) => {
@@ -54,7 +63,8 @@
     const refresher = window.document.getElementById(
       'refresher'
     ) as IonRefresher;
-    //todo: 1. check if user has existiong submission for this day, 2. refresh nearby, 3. refresh friends (await this)
+    loadUserSubmission();
+    await loadFriendSubmissions();
     refresher.complete();
   };
 </script>

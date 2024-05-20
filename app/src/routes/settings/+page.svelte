@@ -1,11 +1,11 @@
 <script>
   import { goto } from '$app/navigation';
   import Button from '$components/Button.svelte';
-  import { db } from '$lib/firebase';
   import { endSession, session } from '$lib/session';
   import { loading, network } from '$lib/util';
+  import { FirebaseFirestore } from '@capacitor-firebase/firestore';
   import { Dialog } from '@capacitor/dialog';
-  import { doc, updateDoc } from 'firebase/firestore';
+  import { fly } from 'svelte/transition';
 
   const deleteAccount = async () => {
     const { value } = await Dialog.confirm({
@@ -21,7 +21,12 @@
   };
 </script>
 
-<div class="">
+<div
+  in:fly={{
+    duration: 200,
+    x: -document.body.clientWidth,
+  }}
+>
   <div
     class="w-full flex border-b-white border-b-2 flex-row justify-between items-center h-[55px] px-2"
   >
@@ -41,7 +46,7 @@
     </h1>
     <button on:click={() => goto('/main/profile')} class="flex-grow-0">
       <svg
-        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${$session.user?.public.musicPlatform} `}
+        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${$session.user.public.musicPlatform}`}
         fill="none"
         stroke="currentColor"
         stroke-width="1.5"
@@ -52,8 +57,8 @@
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
-          d="M8.25 4.5l7.5 7.5-7.5 7.5"
-        />
+          d="M6 18L18 6M6 6l12 12"
+        ></path>
       </svg>
     </button>
   </div>
@@ -76,9 +81,9 @@
         });
         if (!confirm.value) return;
         loading.set(true);
-        await updateDoc(doc(db, 'users', $session.user.id), {
-          musicPlatform: '',
-          musicPlatformAuth: '',
+        await FirebaseFirestore.updateDocument({
+          reference: `users/${$session.user.id}`,
+          data: { musicPlatform: '', musicPlatformAuth: '' },
         });
         loading.set(false);
         goto('/intro/music-platform');

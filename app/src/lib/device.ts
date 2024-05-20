@@ -1,4 +1,8 @@
-import { AndroidSettings, IOSSettings, NativeSettings } from 'capacitor-native-settings';
+import {
+  AndroidSettings,
+  IOSSettings,
+  NativeSettings,
+} from 'capacitor-native-settings';
 import { SafeArea, type SafeAreaInsets } from 'capacitor-plugin-safe-area';
 import type { Location } from '$lib/types';
 import { Geolocation } from '@capacitor/geolocation';
@@ -28,7 +32,7 @@ export const updateCurrentLocation = async () => {
       l.gp = await Geolocation.getCurrentPosition();
     } catch (e) {
       if (
-        l.gp ||
+        l?.gp ||
         (await Preferences.get({ key: 'location-permissions' })).value == '0'
       )
         return;

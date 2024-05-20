@@ -6,7 +6,13 @@ export const searchType = <Writable<'track' | 'album' | 'playlist' | 'artist'>>(
   writable('track')
 );
 
+export const prevPath = <Writable<string>>writable('/main/home/');
+
+export const initParams = <Writable<URLSearchParams>>writable();
+
 export const loading = <Writable<boolean>>writable(false);
+
+export const appLoaded = <Writable<boolean>>writable(false);
 
 export const network = new Network();
 
@@ -102,3 +108,11 @@ export function intToRGB(i: number) {
   }
   return hex;
 }
+
+export const chunkArray = (arr: string[], size: number) => {
+  const result = [];
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size));
+  }
+  return result;
+};

@@ -10,6 +10,7 @@
   import { getCurrentSong } from '$lib/user';
   import { publicProfileUsername } from '$lib/util';
   import { session } from '$lib/session';
+  import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 
   export let data: Submission;
 
@@ -34,11 +35,29 @@
     clearInterval(interval);
   });
 
-  const toggleHeart = async (e: MouseEvent | KeyboardEvent) => {
+  const toggleLike = async (e: MouseEvent | KeyboardEvent) => {
     e.stopPropagation();
     if (loadingHeart) return;
     loadingHeart = true;
-    //todo: firestore call to toggle song like status
+    const shouldLike = !data.likes.find((l) => l.id === $session.user.id);
+    if (shouldLike) {
+      await FirebaseFirestore.updateDocument({
+        reference: `submissions/${data.id}`,
+        data: {
+          likes: [
+            ...data.likes,
+            { id: $session.user.id, username: $session.user.public.username },
+          ],
+        },
+      });
+    } else {
+      await FirebaseFirestore.updateDocument({
+        reference: `submissions/${data.id}`,
+        data: {
+          likes: data.likes.filter((l) => l.id !== $session.user.id),
+        },
+      });
+    }
     loadingHeart = false;
   };
 </script>
@@ -63,7 +82,7 @@
         on:click={(e) => {
           e.stopPropagation();
           publicProfileUsername.set(data.user.username);
-          goto('/public_profile');
+          goto('/modal/profile');
         }}
         class="text-left w-full flex gap-2 mb-1"
       >
@@ -125,8 +144,8 @@
     }`}
   >
     <div
-      on:click={toggleHeart}
-      on:keypress={toggleHeart}
+      on:click={toggleLike}
+      on:keypress={toggleLike}
       role="button"
       tabindex="0"
       class="text-white py-1 flex gap-2 place-content-center text-center w-full truncate border-r border-white"

@@ -8,6 +8,7 @@
   import { getNearbySubmissions } from '$lib/nearby';
   import { goto } from '$app/navigation';
   import { session } from '$lib/session';
+  import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 
   export let data: Submission;
   export let className: string = '';
@@ -16,11 +17,29 @@
 
   let loadingHeart = false;
 
-  const toggleHeart = async (e: MouseEvent | KeyboardEvent) => {
+  const toggleLike = async (e: MouseEvent | KeyboardEvent) => {
     e.stopPropagation();
     if (loadingHeart) return;
     loadingHeart = true;
-    //todo: firestore call to toggle song like status
+    const shouldLike = !data.likes.find((l) => l.id === $session.user.id);
+    if (shouldLike) {
+      await FirebaseFirestore.updateDocument({
+        reference: `submissions/${data.id}`,
+        data: {
+          likes: [
+            ...data.likes,
+            { id: $session.user.id, username: $session.user.public.username },
+          ],
+        },
+      });
+    } else {
+      await FirebaseFirestore.updateDocument({
+        reference: `submissions/${data.id}`,
+        data: {
+          likes: data.likes.filter((l) => l.id !== $session.user.id),
+        },
+      });
+    }
     loadingHeart = false;
   };
 </script>
@@ -74,8 +93,8 @@
           {data.likes.length > 9 ? 9 + '+' : data.likes.length}
         </div>
         <Heart
-          on:click={toggleHeart}
-          on:keypress={toggleHeart}
+          on:click={toggleLike}
+          on:keypress={toggleLike}
           className={`w-6 h-6 flex-grow-0 flex-shrink ${
             loadingHeart ? 'animate-ping text-white' : ''
           } ${

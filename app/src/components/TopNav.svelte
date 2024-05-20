@@ -6,13 +6,17 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { createSongsPlaylist } from '$lib/songs';
+  import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 
-  const toggleEditingProfile = () => {
+  const toggleEditingProfile = async () => {
     if ($editingProfile) {
       editingProfile.set(false);
-      // todo: use firestore function to do this
-      //setProfile($session.user.public.profile);
+      await FirebaseFirestore.updateDocument({
+        reference: `users/${$session.user.id}/public/info`,
+        data: { profile: $session.user.public.profile },
+      });
     } else {
+      // make sure to create a dummy profile just in case when we start editing
       if (!$session.user.public.profile) {
         session.update((s) => {
           s.user.public.profile = {} as User['public']['profile'];

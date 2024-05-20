@@ -4,9 +4,9 @@ import {
   MusicPlatform,
   type Song,
   type StrippedSubmission,
+  type Comment,
+  type User,
 } from '$lib/types';
-import { doc, getDoc, getDocs, query, where } from 'firebase/firestore';
-import { db, submissionsCollection } from '$lib/firebase';
 import { Geolocation, type Position } from '@capacitor/geolocation';
 import {
   type AppleMusicSong,
@@ -14,9 +14,22 @@ import {
 } from '$plugins/AppleMusic';
 import AppleMusic from '$plugins/AppleMusic';
 import { Dialog } from '@capacitor/dialog';
-import { errorToast, loading, network, showToast } from './util';
+import {
+  chunkArray,
+  currSubNumber,
+  errorToast,
+  loading,
+  network,
+  showToast,
+} from './util';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { session } from './session';
+import {
+  FirebaseFirestore,
+  type DocumentData,
+  type DocumentSnapshot,
+  type QueryCompositeFilterConstraint,
+} from '@capacitor-firebase/firestore';
 
 export const friendSubmissions = <Writable<Submission[]>>writable([]);
 
@@ -25,19 +38,6 @@ export const nearbySubmissions = <Writable<StrippedSubmission[]>>writable([]);
 export const userSubmission = <Writable<Submission>>writable();
 
 export const activeSubmission = <Writable<Submission | null>>writable();
-
-export const getUserSubmission = async (): Promise<Submission | undefined> => {
-  const currSubNumber = (await getDoc(doc(db, 'misc', 'notifications'))).data()
-    ?.count;
-  const q = query(
-    submissionsCollection,
-    where('userId', '==', get(session).user.id),
-    where('number', '==', currSubNumber)
-  );
-  const snapshot = await getDocs(q);
-  if (snapshot.empty) return;
-  return snapshot.docs[0].data() as Submission;
-};
 
 export const generateSubmission = async () => {
   // set location
@@ -164,7 +164,179 @@ export const previewSubmission = async () => {
 };
 
 export const previewFriendSubmissions = async () => {
-  const message = await network.queryFirebase('previewuserfriends');
-  if (!message) return;
-  return message;
+  const friendSubs = await loadFriendSubmissions();
+  const friends = friendSubs?.map((f) => {
+    return {
+      id: f.id,
+      username: f.user?.username,
+      musicPlatform: f.user?.musicPlatform,
+    };
+  });
+  return friends;
+};
+
+export const createCommentForSubmission = async (content: string) => {
+  const sub = get(activeSubmission);
+  const user = get(session).user;
+  if (!sub) return;
+  const comment = {
+    id: Math.random().toString(),
+    user: {
+      id: user.id,
+      username: user.public.username,
+    },
+    content: content,
+  };
+  await FirebaseFirestore.updateDocument({
+    reference: `submissions/${sub.id}`,
+    data: {
+      comments: [...sub.comments, comment],
+    } as Submission,
+  });
+};
+
+export const deleteCommentFromSubmission = async (comment: Comment) => {
+  const sub = get(activeSubmission);
+  if (!sub) return;
+  await FirebaseFirestore.updateDocument({
+    reference: `submissions/${sub.id}`,
+    data: {
+      comments: sub.comments.filter((c) => c.id !== comment.id),
+    } as Submission,
+  });
+};
+
+export const loadUserSubmission = async () => {
+  const userFilter: QueryCompositeFilterConstraint = {
+    type: 'and',
+    queryConstraints: [
+      {
+        type: 'where',
+        fieldPath: 'userId',
+        opStr: '==',
+        value: get(session).user.id,
+      },
+      {
+        type: 'where',
+        fieldPath: 'number',
+        opStr: '==',
+        value: get(currSubNumber),
+      },
+    ],
+  };
+  // snapshot user submission status
+  const colRes = await FirebaseFirestore.getCollection({
+    reference: 'submissions',
+    compositeFilter: userFilter,
+  });
+  const sub = colRes.snapshots[0];
+  if (sub?.data) {
+    userSubmission.set({
+      ...(sub.data as Submission),
+      id: sub.id,
+      user: {
+        id: get(session).user.id,
+        username: get(session).user.public.username || '',
+        musicPlatform:
+          get(session).user.public.musicPlatform || MusicPlatform.spotify,
+      },
+    });
+  } else {
+    // user submission doesn't exist
+  }
+};
+
+export const loadFriendSubmissions = async () => {
+  // friend submissions
+  const friendIds = get(session).user.friends.map((f) => f.id);
+
+  if (friendIds.length === 0) return;
+
+  const friendIdChunks = chunkArray(friendIds, 30);
+
+  const submissions: Submission[] = [];
+
+  const updateSubmissions = async (docs: DocumentSnapshot<DocumentData>[]) => {
+    docs.forEach(async (d) => {
+      const userRes = await FirebaseFirestore.getDocument({
+        reference: `users/${d.data?.userId}/public/info`,
+      });
+      const publicUser = userRes.snapshot.data as User['public'];
+      const fSub = {
+        ...d.data,
+        id: d.id,
+        user: {
+          id: d.data?.userId,
+          username: publicUser.username,
+          musicPlatform: publicUser.musicPlatform,
+        },
+      } as Submission;
+
+      submissions.push(fSub);
+
+      friendSubmissions.update((fs) => {
+        // remove existing submission instance
+        fs = fs.filter((s) => s.id !== fSub.id);
+        // add updated submission instance
+        fs = [...fs, fSub];
+        // complete update
+        return fs;
+      });
+    });
+  };
+
+  friendIdChunks.forEach(async (chunk) => {
+    const friendSubsFilter: QueryCompositeFilterConstraint = {
+      type: 'and',
+      queryConstraints: [
+        {
+          type: 'where',
+          fieldPath: 'userId',
+          opStr: 'in',
+          value: chunk,
+        },
+        {
+          type: 'where',
+          fieldPath: 'number',
+          opStr: '==',
+          value: get(currSubNumber),
+        },
+      ],
+    };
+
+    // Load friend submissions
+    const docs = await FirebaseFirestore.getCollection({
+      reference: 'submissions',
+      compositeFilter: friendSubsFilter,
+    });
+    await updateSubmissions(docs.snapshots);
+  });
+  return submissions;
+};
+
+export const getSubmission: (id: string) => Promise<Submission | null> = async (
+  id: string
+) => {
+  if (!id) return null;
+  // snapshot user submission status
+  const sub = await FirebaseFirestore.getDocument({
+    reference: `submissions/${id}`,
+  });
+  if (sub.snapshot.data) {
+    const userRes = await FirebaseFirestore.getDocument({
+      reference: `users/${sub.snapshot.data?.userId}/public/info`,
+    });
+    const publicUser = userRes.snapshot.data as User['public'];
+    return {
+      ...(sub.snapshot.data as Submission),
+      id: sub.snapshot.id,
+      user: {
+        id: sub.snapshot.data.userId,
+        username: publicUser.username,
+        musicPlatform: publicUser.musicPlatform,
+      },
+    } as Submission;
+  } else {
+    return null;
+  }
 };

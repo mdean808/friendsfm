@@ -2,7 +2,7 @@
   import Input from '$components/Input.svelte';
   import Button from '$components/Button.svelte';
   import LoadingIndicator from '$components/LoadingIndicator.svelte';
-  import { slide } from 'svelte/transition';
+  import { fly, slide } from 'svelte/transition';
   import Tabs from '$components/Tabs.svelte';
   import All from '$components/friends/all.svelte';
   import Suggestions from '$components/friends/suggestions.svelte';
@@ -76,7 +76,13 @@
   };
 </script>
 
-<div class="h-full">
+<div
+  in:fly={{
+    duration: 200,
+    x: -document.body.clientWidth,
+  }}
+  class="h-full"
+>
   <div class="w-full flex flex-row justify-between items-center h-[55px] px-2">
     <div class="flex-grow-0 text-transparent">
       <svg
@@ -94,7 +100,7 @@
     </h1>
     <button on:click={() => goto('/main/home')} class="flex-grow-0">
       <svg
-        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${$session.user.public.musicPlatform} `}
+        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${$session.user.public.musicPlatform}`}
         fill="none"
         stroke="currentColor"
         stroke-width="1.5"
@@ -105,13 +111,13 @@
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
-          d="M8.25 4.5l7.5 7.5-7.5 7.5"
-        />
+          d="M6 18L18 6M6 6l12 12"
+        ></path>
       </svg>
     </button>
   </div>
   <Tabs
-    activeTab={writable('suggestions')}
+    activeTab={writable('all')}
     tabs={[
       { name: 'your friends', component: All, id: 'all' },
       { name: 'suggestions', id: 'suggestions', component: Suggestions },

@@ -15,11 +15,10 @@
     id: string;
     username: string;
     musicPlatform: MusicPlatform;
-    currentlyListening: boolean;
   }[] = [];
 
   onMount(async () => {
-    previewFriendSubmissions().then((res) => (friends = res.friends));
+    previewFriendSubmissions().then((fr) => (friends = fr || []));
     const resSub = await previewSubmission();
     if (!resSub) return;
     submission = resSub.submission;
@@ -104,13 +103,7 @@
 
 <div class="my-2 border-t-2 border-white relative pt-2 pb-48">
   {#each friends as friend}
-    <div
-      class={`flex p-2 rounded-t-lg ${
-        friend?.currentlyListening
-          ? `bg-gradient-to-r from-${friend?.musicPlatform} via-blue-500 to-${friend?.musicPlatform} background-animate`
-          : `bg-gray-500`
-      }`}
-    >
+    <div class={`flex p-2 rounded-t-lg bg-gray-500`}>
       <button
         on:click={(e) => {
           e.stopPropagation();

@@ -5,7 +5,7 @@ import {
   type NetworkResponse,
 } from '$lib/types';
 import { spotifyAuthCode, updateMusicPlatform } from './user';
-import ky, { HTTPError } from 'ky';
+import ky from 'ky';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { errorToast, loading } from '$lib/util';
 import { Dialog } from '@capacitor/dialog';
@@ -15,6 +15,7 @@ import { endSession, session } from './session';
 import { get } from 'svelte/store';
 import { goto } from '$app/navigation';
 import { Capacitor } from '@capacitor/core';
+import { dev } from '$app/environment';
 
 export default class Network {
   requests: NetworkRequest[] = [];
@@ -71,6 +72,7 @@ export default class Network {
     });
     // make request
     let res = {} as Response;
+    console.log(url);
     try {
       res = await ky.post(url, {
         headers: {
@@ -79,8 +81,12 @@ export default class Network {
         },
         body: JSON.stringify(body),
       });
-    } catch (e) {
-      res = (e as HTTPError).response;
+    } catch (e: any) {
+      if (e.message.includes('No user is signed in.')) {
+        await endSession();
+        return goto('/intro/login');
+      }
+      res = e.response;
     }
 
     // update request object with response
@@ -130,6 +136,7 @@ export default class Network {
             errorToast({
               content: 'Authentication Error. Please sign in again.',
             });
+            goto('/intro/login');
             break;
           case 403:
             errorToast({
@@ -212,7 +219,9 @@ export default class Network {
         if (Capacitor.getPlatform() === 'web') {
           SpotifyApi.performUserAuthorization(
             import.meta.env.VITE_SPOTIFY_CLIENT_ID,
-            import.meta.env.VITE_SPOTIFY_REDIRECT_URL_WEB,
+            dev
+              ? 'http://localhost:8080?auth=spotify'
+              : import.meta.env.VITE_SPOTIFY_REDIRECT_URL_WEB,
             [
               'user-read-recently-played',
               'user-read-currently-playing',
@@ -243,7 +252,9 @@ export default class Network {
             import.meta.env.VITE_SPOTIFY_CLIENT_ID
           }&response_type=code&redirect_uri=${
             Capacitor.getPlatform() === 'web'
-              ? import.meta.env.VITE_SPOTIFY_REDIRECT_URL_WEB
+              ? dev
+                ? 'http://localhost:8080?auth=spotify'
+                : import.meta.env.VITE_SPOTIFY_REDIRECT_URL_WEB
               : import.meta.env.VITE_SPOTIFY_REDIRECT_URL
           }&scope=user-read-currently-playing%20user-read-recently-played%20playlist-modify-private%20playlist-modify-public`;
           window.location.href = spotifyUrl;

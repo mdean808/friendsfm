@@ -1,16 +1,20 @@
 <script lang="ts">
   import '../app.css';
   import { onMount } from 'svelte';
-  import { goto } from '$app/navigation';
-  import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
-  import { loadSession, authSession, session } from '$lib/session';
-  import { page } from '$app/stores';
+  import { navigating, page } from '$app/stores';
   import { insets } from '$lib/device';
-  import { loading, toast, errorToast } from '$lib/util';
+  import {
+    loading,
+    toast,
+    errorToast,
+    appLoaded,
+    publicProfileUsername,
+  } from '$lib/util';
   import { fade, slide } from 'svelte/transition';
-  import { setupSnapshots } from '$lib/firebase';
   import Toast from '$components/Toast.svelte';
   import Loading from '$components/Loading.svelte';
+  import Icon from '$assets/icon.png';
+  import LoadingIndicator from '$components/LoadingIndicator.svelte';
 
   // IONIC SETUP
   import { initialize } from '@ionic/core/components';
@@ -23,36 +27,34 @@
   import { IonContent } from '@ionic/core/components/ion-content';
   import TopNav from '$components/TopNav.svelte';
   import BottomNav from '$components/BottomNav.svelte';
+  import { SplashScreen } from '@capacitor/splash-screen';
+  import { goto } from '$app/navigation';
+  import { activeSubmission } from '$lib/submission';
 
-  let snapshotsInit = false;
+  //export let data: LayoutData;
+
+  $: if ($navigating)
+    (() => {
+      if ($navigating) {
+        console.log(`navigated to: ${$navigating.to?.route.id}`);
+        // handle dynamic route updates
+        if ($navigating.to?.route.id === '/modal/profile') {
+          $page.url.searchParams.set('user', $publicProfileUsername);
+          goto(
+            `${$navigating.to?.route.id}?${$page.url.searchParams.toString()}`
+          );
+        }
+        if ($navigating.to?.route.id === '/modal/submission') {
+          if (!$activeSubmission) return;
+          $page.url.searchParams.set('id', $activeSubmission.id);
+          goto(
+            `${$navigating.to?.route.id}?${$page.url.searchParams.toString()}`
+          );
+        }
+      }
+    })();
 
   onMount(async () => {
-    snapshotsInit = false;
-    // init session
-    await loadSession();
-    if ($session.loggedIn) {
-      if (!snapshotsInit) {
-        setupSnapshots();
-        snapshotsInit = true;
-      }
-      await goto('/main/home');
-    } else {
-      await goto('/intro/login');
-    }
-    // handle login state change
-    FirebaseAuthentication.addListener('authStateChange', async (state) => {
-      if (state.user) {
-        if ($session.loggedIn) return;
-        await authSession(state.user);
-        if (!snapshotsInit) {
-          setupSnapshots();
-          snapshotsInit = true;
-        }
-        await goto(`/main/home`);
-      } else {
-        await goto('/intro/login');
-      }
-    });
     // ionic init
     try {
       initialize();
@@ -77,6 +79,7 @@
       console.log('ionic error:', e);
       errorToast({ content: e as string });
     }
+    await SplashScreen.hide();
   });
 </script>
 
@@ -120,13 +123,29 @@
         <Loading />
       </div>
     {/if}
-
-    {#if $page.route.id?.includes('/main/')}
-      <TopNav />
+    {#if !$appLoaded}
+      <div transition:fade={{ duration: 100 }}>
+        <div class="z-40 fixed top-0 left-0 bg-gray-800 w-full h-full flex">
+          <div class="self-center mx-auto items-center justify-center">
+            <img
+              src={Icon}
+              alt="FriendsFM Logo"
+              class="mx-auto mt-16 w-56 h-56"
+            />
+            <LoadingIndicator className="w-16 h-16 mx-auto" />
+          </div>
+        </div>
+      </div>
     {/if}
-    <slot />
-    {#if $page.route.id?.includes('/main/')}
-      <BottomNav />
+
+    {#if $appLoaded}
+      {#if $page.route.id?.includes('/main/')}
+        <TopNav />
+      {/if}
+      <slot />
+      {#if $page.route.id?.includes('/main/')}
+        <BottomNav />
+      {/if}
     {/if}
   </div>
 </ion-app>

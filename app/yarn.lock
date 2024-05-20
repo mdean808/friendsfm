@@ -25,6 +25,11 @@
   resolved "https://registry.yarnpkg.com/@capacitor-firebase/authentication/-/authentication-6.0.0.tgz#a8374f5d79eca9275b7c6cbb9ba4beb3dee3d49d"
   integrity sha512-5JU92PoiCo/KHVpArQbCEgdyxMRJtmwECemUgweVsOAwVrhoWC6Z6AeDU91f3wjOYsHRD7sicPwWsvN5Vi4AHg==
 
+"@capacitor-firebase/firestore@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@capacitor-firebase/firestore/-/firestore-6.0.0.tgz#2513a302c4b0e78d9abcdc5d99788878af25c64d"
+  integrity sha512-UOT405Yw1WbvnUigF8dXy809Thsb4thQPvOGrv0fsL5WgbpORWNxw9hXaiauaXwwcjGEdXXhDEN6Z0Lq1g0PNQ==
+
 "@capacitor-firebase/messaging@^6.0.0":
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/@capacitor-firebase/messaging/-/messaging-6.0.0.tgz#288866fa7bd1079895f0140646d654983de3e61f"
