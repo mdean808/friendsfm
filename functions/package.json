@@ -2,12 +2,9 @@
   "name": "functions",
   "scripts": {
     "build": "tsc && tsc-alias",
-    "watch": "tsc --watch",
-    "serve": "yarn build && firebase emulators:start --import=./data --export-on-exit=./data",
-    "shell": "yarn build && firebase functions:shell",
-    "start": "yarn shell",
+    "watch": "tsc -w & tsc-alias -w",
+    "serve": "yarn watch | firebase emulators:start --import=./data --export-on-exit=./data",
     "deploy": "COMMIT=$(git rev-parse HEAD) firebase deploy --only functions",
-    "logs": "firebase functions:log",
     "sentry:release": "sentry-cli releases new $(git rev-parse HEAD)",
     "sentry:inject": "sentry-cli sourcemaps inject ./bin",
     "sentry:upload": "sentry-cli sourcemaps upload --release $(git rev-parse HEAD) ./bin",
@@ -22,7 +19,7 @@
     "@sentry/node": "^7.59.3",
     "@sentry/profiling-node": "^1.1.2",
     "firebase-admin": "^11.10.1",
-    "firebase-functions": "^4.9.0",
+    "firebase-functions": "^5.0.1",
     "jsonwebtoken": "^9.0.2",
     "openai": "^3.2.1",
     "tslib": "^2.6.0"

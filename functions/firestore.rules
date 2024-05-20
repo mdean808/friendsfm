@@ -9,7 +9,7 @@ service cloud.firestore {
             allow get: if request.auth.uid != null;
         }
 
-        match /submissions/{submissionId} {
+        match /submissions/{submissionDoc} {
             // allow logged in users to view submissions
             allow read: if request.auth.uid != null;
             // allow submission owners to edit their submissions
@@ -18,13 +18,26 @@ service cloud.firestore {
             allow write: if request.auth != null && resource != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['comments', 'likes'])
         }
 
+        // allow users to modify their database entry
         match /users/{userId} {
-            // allow submission owners to edit their submissions
+            allow read, write: if request.auth != null && request.auth.uid == userId
+        }
+        // allow users to update their public data
+        match /{document=**}/users/{userId}/public/{publicDoc} {
             allow read, write: if request.auth != null && request.auth.uid == userId
         }
 
+        // allow users to edit their songs
+        match /users/{userId}/songs/{songDoc} {
+            allow read, write: if request.auth != null && request.auth.uid == userId
+        }
+
+        // allow all users to read public user data
+        // two matches are required for grouping queries
+        match /{document=**}/public/{publicDoc} {
+            allow read: if request.auth.uid != null
+        }
         match /users/{userId}/public/{publicDoc} {
-            // allow all users to read public user data
             allow read: if request.auth.uid != null
         }
 

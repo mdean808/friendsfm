@@ -154,6 +154,7 @@ export interface SpotifyTrack {
   artists: [
     {
       name: string;
+      genres: string[];
     }
   ];
   album: {

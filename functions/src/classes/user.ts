@@ -259,7 +259,7 @@ export default class User implements UserType {
     return songs;
   }
 
-  public async getRecentSpotifySong(): Promise<Song> {
+  public async getRecentSpotifySong(noGenre?: boolean): Promise<Song> {
     if (!this.exists) throw Error('User not loaded.');
     if (!this.musicPlatformAccessCode)
       throw Error('No access code provided. Cannot get most recent song.');
@@ -277,10 +277,14 @@ export default class User implements UserType {
       albumArtwork: currentSong.item.album.images[0]?.url,
       timestamp: currentSong.timestamp || 0,
       genre:
-        (await getTrackGenre(
-          currentSong.item.name,
-          currentSong.item.artists[0]?.name
-        )) || 'unkown',
+        currentSong.item.artists[0]?.genres[0] ||
+        (noGenre
+          ? 'Unknown'
+          : await getTrackGenre(
+              currentSong.item.name,
+              currentSong.item.artists[0]?.name
+            )) ||
+        'unkown',
     } as Song;
   }
 
@@ -843,10 +847,16 @@ export default class User implements UserType {
   public async getCurrentlyListening(): Promise<Song | undefined> {
     if (!this.loaded) await this.load();
     if (this.public.musicPlatform !== MusicPlatform.spotify) return;
-    await this.updateSpotifyAuth();
-    let song = await this.getRecentSpotifySong();
-    if (song.timestamp) return;
-    return song;
+    try {
+      await this.updateSpotifyAuth();
+      let song = await this.getRecentSpotifySong(true);
+      if (song.timestamp) return;
+      return song;
+    } catch (e: any) {
+      if (!e.message.includes('Spotify now playing error'))
+        console.log('user.getCurrentlyListening:', e);
+    }
+    return;
   }
 
   //STATIC METHODS

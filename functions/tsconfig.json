@@ -14,13 +14,9 @@
     "baseUrl": "./src",
     "rootDir": "./src/",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
-    },
+      "@/*": ["./*"]
+    }
   },
   "compileOnSave": true,
-  "include": [
-    "./src"
-  ]
+  "include": ["./src"]
 }
