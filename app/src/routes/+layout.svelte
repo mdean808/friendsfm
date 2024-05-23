@@ -36,15 +36,14 @@
   $: if ($navigating)
     (() => {
       if ($navigating) {
-        console.log(`navigated to: ${$navigating.to?.route.id}`);
         // handle dynamic route updates
-        if ($navigating.to?.route.id === '/modal/profile') {
+        if ($navigating.to?.route?.id === '/modal/profile') {
           $page.url.searchParams.set('user', $publicProfileUsername);
           goto(
             `${$navigating.to?.route.id}?${$page.url.searchParams.toString()}`
           );
         }
-        if ($navigating.to?.route.id === '/modal/submission') {
+        if ($navigating.to?.route?.id === '/modal/submission') {
           if (!$activeSubmission) return;
           $page.url.searchParams.set('id', $activeSubmission.id);
           goto(

@@ -9,10 +9,32 @@ import type {
 } from '$lib/types';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { network } from '$lib/util';
-import { session } from './session';
+import { session } from '$lib/session';
 import { FirebaseFirestore } from '@capacitor-firebase/firestore';
+import { FirebaseMessaging } from '@capacitor-firebase/messaging';
+import { Capacitor } from '@capacitor/core';
 
 export const spotifyAuthCode = <Writable<string>>writable();
+
+export const refreshMessagingToken = async (token?: string) => {
+  if (Capacitor.getPlatform() !== 'web' && !token) {
+    await FirebaseMessaging.checkPermissions().catch(
+      async () => await FirebaseMessaging.requestPermissions()
+    );
+    const token = (await FirebaseMessaging.getToken())?.token;
+    await FirebaseFirestore.updateDocument({
+      reference: `users/${get(session).user.id}`,
+      data: { messagingToken: token },
+    });
+    return token;
+  } else if (token) {
+    await FirebaseFirestore.updateDocument({
+      reference: `users/${get(session).user.id}`,
+      data: { messagingToken: token },
+    });
+    return token;
+  }
+};
 
 export const updateMusicPlatform = async (
   newMusicPlatform: MusicPlatform,

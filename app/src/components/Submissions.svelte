@@ -83,7 +83,7 @@
   <span class="border-white border-t-2 block w-full" />
   <div
     class="mb-3 mt-1 overflow-y-scroll"
-    style={`padding-bottom: calc(80px + ${$insets.bottom}px)`}
+    style={`padding-bottom: calc(80px + ${$insets.bottom + $insets.top}px)`}
   >
     {#if loadingNewLateSubmission}
       <div class="my-2">

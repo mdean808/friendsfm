@@ -486,3 +486,11 @@ export interface NetworkRequest {
   attempts?: number;
   [key: string]: any;
 }
+
+export enum NotificationType {
+  FriendRequestCreated = 'request-create',
+  FriendRequestAccepted = 'request-accept',
+  Daily = 'daily',
+  Comment = 'comment',
+  LateSubmission = 'late-submission',
+}

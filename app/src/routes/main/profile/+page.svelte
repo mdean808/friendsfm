@@ -9,7 +9,7 @@
   import Input from '$components/Input.svelte';
   import Skeleton from '$components/submission/Skeleton.svelte';
 
-  import { MusicPlatform } from '$lib/types';
+  import { MusicPlatform, type User } from '$lib/types';
   import { goto } from '$app/navigation';
   import { formatDurationPlayed } from '$lib/dates';
   import { getCurrentSong, getUserStatistics } from '$lib/user';
@@ -18,7 +18,7 @@
   const firstOfTheMonth = new Date().getDate() === 1;
 
   const currentlyListening = async () => {
-    const song = await getCurrentSong($session.user.id);
+    const song = await getCurrentSong();
     return song;
   };
 
@@ -29,6 +29,8 @@
       $session.user.public.username
     );
     session.update((s) => {
+      if (!s.user.public.profile)
+        s.user.public.profile = {} as User['public']['profile'];
       s.user.public.profile.stats = stats;
       return s;
     });

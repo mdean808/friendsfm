@@ -4,16 +4,25 @@ import { insets } from '$lib/device';
 import { setupSnapshots } from '$lib/firebase';
 import { authSession, endSession, loadSession, session } from '$lib/session';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
+import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { SafeArea } from 'capacitor-plugin-safe-area';
 import { get } from 'svelte/store';
 import type { LayoutLoad } from './$types';
-import { appLoaded, initParams, publicProfileUsername } from '$lib/util';
+import {
+  appLoaded,
+  initParams,
+  notificationState,
+  publicProfileUsername,
+} from '$lib/util';
 import { page } from '$app/stores';
 import { activeSubmission, getSubmission } from '$lib/submission';
-import { Dialog } from '@capacitor/dialog';
 import { Capacitor } from '@capacitor/core';
 import { App, type URLOpenListenerEvent } from '@capacitor/app';
-import { spotifyAuthCode, updateMusicPlatform } from '$lib/user';
+import {
+  refreshMessagingToken,
+  spotifyAuthCode,
+  updateMusicPlatform,
+} from '$lib/user';
 import { MusicPlatform } from '$lib/types';
 
 export const ssr = false;
@@ -27,8 +36,24 @@ export const load: LayoutLoad = ({ url }) => {
 
 let snapshotsInit = false;
 const setupDevice = async () => {
-  if (Capacitor.getPlatform() === 'ios')
-    await Dialog.alert({ message: 'message' });
+  // setup notifications
+  if (Capacitor.isPluginAvailable('FirebaseMessaging')) {
+    // listen for a new token
+    FirebaseMessaging.addListener('tokenReceived', async ({ token }) => {
+      if (!get(session)?.user?.id) return;
+      await refreshMessagingToken(token);
+    });
+    // listen for a new notification
+    await FirebaseMessaging.addListener(
+      'notificationActionPerformed',
+      (action) => {
+        notificationState.set(action);
+      }
+    );
+    // remove notification bubble on app launch
+    if (Capacitor.getPlatform() !== 'web')
+      FirebaseMessaging.removeAllDeliveredNotifications();
+  }
   // device specific layout logic
   const is = await SafeArea.getSafeAreaInsets();
   insets.set(is.insets);
@@ -130,7 +155,7 @@ const setupSessionsAndAuth = async () => {
   }
 };
 
-const setupNavigationHandlers = async () => {
+const setupNavigationLogic = async () => {
   // handle dynamic pages
   if (get(page).route.id?.includes('modal/profile')) {
     const username = get(page).url.searchParams.get('user') || '';
@@ -151,7 +176,7 @@ if (browser) {
   (async () => {
     await setupDevice();
     await setupSessionsAndAuth();
-    await setupNavigationHandlers();
+    await setupNavigationLogic();
     appLoaded.set(true);
   })();
 }

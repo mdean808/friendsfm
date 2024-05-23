@@ -31,6 +31,7 @@ import {
   type QueryCompositeFilterConstraint,
 } from '@capacitor-firebase/firestore';
 import { Timestamp } from 'firebase/firestore';
+import { Capacitor } from '@capacitor/core';
 
 export const friendSubmissions = <Writable<Submission[]>>writable([]);
 
@@ -43,13 +44,15 @@ export const activeSubmission = <Writable<Submission | null>>writable();
 export const generateSubmission = async () => {
   // set location
   let location: Position = {} as Position;
-  try {
-    await Geolocation.checkPermissions().catch(
-      async () => await Geolocation.requestPermissions()
-    );
-    location = await Geolocation.getCurrentPosition();
-  } catch (e) {
-    console.log('Location permissions rejected.');
+  if (Capacitor.getPlatform() !== 'web') {
+    try {
+      await Geolocation.checkPermissions().catch(
+        async () => await Geolocation.requestPermissions()
+      );
+      location = await Geolocation.getCurrentPosition();
+    } catch (e) {
+      console.log('Location permissions rejected.');
+    }
   }
 
   let recentlyPlayed = {} as { song: AppleMusicSong };
@@ -74,8 +77,8 @@ export const generateSubmission = async () => {
     }
   }
   const message = await network.queryFirebase('createnewusersubmission', {
-    latitude: location ? location.coords.latitude : undefined,
-    longitude: location ? location.coords.longitude : undefined,
+    latitude: location ? location.coords?.latitude : undefined,
+    longitude: location ? location.coords?.longitude : undefined,
     appleMusic: recentlyPlayed?.song as Song,
   });
 

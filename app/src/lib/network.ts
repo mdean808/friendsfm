@@ -196,7 +196,7 @@ export default class Network {
       json.error?.includes('Firebase ID token has been revoked') ||
       json.error === 'client_auth_error'
     ) {
-      endSession();
+      await endSession();
       goto('/intro/login');
     }
     // handle spotify errors

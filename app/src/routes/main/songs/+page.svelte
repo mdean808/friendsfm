@@ -33,6 +33,7 @@
 
 <div
   style={`height: calc(100vh - ${64 + $insets.bottom + $insets.top}px); padding-bottom: calc(70px + ${$insets.bottom}px)`}
+  class="overflow-y-scroll"
 >
   <div>
     <div class="mx-4 py-1 text-center border-b-2 border-gray-400"></div>

@@ -1,6 +1,7 @@
 import { writable, type Writable } from 'svelte/store';
 import type { Toast } from './types';
 import Network from './network';
+import type { NotificationActionPerformedEvent } from '@capacitor-firebase/messaging';
 
 export const searchType = <Writable<'track' | 'album' | 'playlist' | 'artist'>>(
   writable('track')
@@ -13,6 +14,10 @@ export const initParams = <Writable<URLSearchParams>>writable();
 export const loading = <Writable<boolean>>writable(false);
 
 export const appLoaded = <Writable<boolean>>writable(false);
+
+export const notificationState = <
+  Writable<NotificationActionPerformedEvent | null>
+>writable();
 
 export const network = new Network();
 

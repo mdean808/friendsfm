@@ -1,4 +1,9 @@
-import type { SavedSong, Submission, User } from './types';
+import {
+  NotificationType,
+  type SavedSong,
+  type Submission,
+  type User,
+} from './types';
 import { get, writable, type Writable } from 'svelte/store';
 import Preferences from './preferences';
 import {
@@ -8,8 +13,13 @@ import {
 } from '@capacitor-firebase/authentication';
 import { unsubscribeSnapshots } from './firebase';
 import { FirebaseFirestore } from '@capacitor-firebase/firestore';
-import { getUserStatistics } from './user';
+import { getUserStatistics, refreshMessagingToken } from './user';
 import { goto } from '$app/navigation';
+import { page } from '$app/stores';
+import { browser } from '$app/environment';
+import { notificationState } from './util';
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { activeSubmission, getSubmission } from './submission';
 
 export type Session = {
   user: User;
@@ -21,6 +31,90 @@ export type Session = {
 
 export const session = <Writable<Session>>writable({} as Session);
 
+if (browser) {
+  session.subscribe(async (sesh) => {
+    // handle routing overrides based on session state
+    const currRoute = get(page).route?.id;
+    switch (currRoute) {
+      case '/intro/login':
+        if (sesh.loaded && sesh.loggedIn) {
+          if (sesh.user.public.username)
+            if (sesh.user.public.musicPlatform) goto('/main/home');
+            else goto('/intro/music-platform');
+          else goto('/intro/username');
+        }
+        break;
+      case '/intro/username':
+        if (sesh.loaded && sesh.loggedIn) {
+          if (sesh.user.public.username)
+            if (sesh.user.public.musicPlatform) goto('/main/home');
+            else goto('/intro/music-platform');
+          else break;
+        }
+        break;
+      case '/intro/music-platform':
+        if (sesh.loaded && sesh.loggedIn) {
+          if (sesh.user.public.username)
+            if (sesh.user.public.musicPlatform) goto('/main/home');
+            else break;
+          else goto('/intro/username');
+        }
+        break;
+      case '/':
+        if (sesh.loaded && sesh.loggedIn) {
+          if (sesh.user.public.username)
+            if (sesh.user.public.musicPlatform) goto('/main/home');
+            else goto('/intro/music-platform');
+          else goto('/intro/username');
+        } else goto('/intro/login');
+        break;
+      default:
+        break;
+    }
+    const notification = get(notificationState)?.notification;
+    if (notification && sesh.loaded && sesh.loggedIn) {
+      const data = notification.data as {
+        [key: string]: any;
+        type: NotificationType;
+      };
+      FirebaseAnalytics.logEvent({
+        name: 'notification_open',
+        params: {
+          title: notification.title,
+          body: notification.body,
+          subtitle: notification.subtitle,
+          id: data.id,
+          type: data.type,
+        },
+      });
+      // handle notification actions and subsequente routing
+      switch (data.type) {
+        case NotificationType.Daily:
+          goto('/main/home');
+          break;
+        case NotificationType.LateSubmission:
+          goto('/main/home');
+          break;
+        case NotificationType.Comment:
+          const sub = await getSubmission(data.id);
+          activeSubmission.set(sub);
+          if (sub) goto('/modal/submission');
+          break;
+        case NotificationType.FriendRequestCreated:
+          goto('/modal/friends');
+          break;
+        case NotificationType.FriendRequestAccepted:
+          goto('/modal/friends');
+          break;
+        default:
+          break;
+      }
+      // reset the notification state
+      notificationState.set(null);
+    }
+  });
+}
+
 export const loadSession = async () => {
   const sesh = {
     user: await Preferences.getUser(),
@@ -31,7 +125,9 @@ export const loadSession = async () => {
   };
   // handle old saved user information from preferences
   sesh.user.public = {} as User['public'];
+  // update the messaging token
   session.set(sesh);
+  if (sesh.user?.id) await refreshMessagingToken();
 };
 
 export const saveSession = async () => {
@@ -135,5 +231,8 @@ export const authSession = async (
   session.update((s) => {
     return { ...s, loggedIn: true, user: u, loaded: true };
   });
+
+  // manually update the messaging token
+  await refreshMessagingToken();
   saveSession();
 };
