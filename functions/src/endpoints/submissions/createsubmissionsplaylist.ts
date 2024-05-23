@@ -1,4 +1,3 @@
-import { createSpotifyPlaylist } from '@/lib/spotify';
 import { Song } from '@/types';
 import { onRequest } from 'firebase-functions/v2/https';
 import { authMiddleware, sentryWrapper } from '../middleware';
@@ -15,8 +14,7 @@ export const createsubmissionsplaylist = onRequest(
         songs.push(sub.song);
       }
       await user.updateSpotifyAuth();
-      const playlistUrl = await createSpotifyPlaylist(
-        user.musicPlatformAuth,
+      const playlistUrl = await user.spotify.createPlaylist(
         songs,
         'friendsfm - submissions',
         "rotating playlist of your friend's friendsfm submissions",

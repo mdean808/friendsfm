@@ -14,7 +14,7 @@ export interface User {
   //public parameters
   // this is in the database under /{user_id}/public/info
   public: {
-    username: string;
+    username?: string;
     musicPlatform?: MusicPlatform;
     savedSongs?: SavedSong[];
     profile: {
@@ -186,45 +186,6 @@ export interface SpotifyRecentlyPlayedRes {
       played_at: Date;
     }
   ];
-}
-
-export interface SpotifySearchRes {
-  tracks?: {
-    href: string;
-    limit: number;
-    next: string;
-    offset: number;
-    previous: string;
-    total: number;
-    items: SpotifyTrack[];
-  };
-  artists?: {
-    href: string;
-    limit: number;
-    next: string;
-    offset: number;
-    previous: string;
-    total: number;
-    items: SpotifyArtist[];
-  };
-  albums?: {
-    href: string;
-    limit: number;
-    next: string;
-    offset: number;
-    previous: string;
-    total: number;
-    items: SpotifyAlbum[];
-  };
-  playlists?: {
-    href: string;
-    limit: number;
-    next: string;
-    offset: number;
-    previous: string;
-    total: number;
-    items: SpotifyPlaylist[];
-  };
 }
 
 export interface SpotifyPlaylist {

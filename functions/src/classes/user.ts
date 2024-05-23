@@ -4,23 +4,15 @@ import {
   getFirestore,
 } from 'firebase-admin/firestore';
 import { Message } from 'firebase-admin/messaging';
-import { SPOTIFY_AUTH } from '../lib/spotify';
 import { getTrackGenre } from '../lib/gpt';
 import { newNotification } from '../lib/notifications';
-import {
-  addSongsToSpotifyPlaylist,
-  getCurrentSpotifySong,
-  refreshSpotifyAccessCode,
-  removeSongsFromSpotifyPlaylist,
-  getSpotifySong,
-} from '../lib/spotify';
+import { getSpotifySong } from '../lib/spotify';
 import {
   Friend,
   MusicPlatform,
   MusicPlatformAuth,
   SavedSong,
   Song,
-  SpotifyAuthRes,
   Submission as SubmissionType,
   UserStatistics,
   User as UserType,
@@ -29,6 +21,7 @@ import Submission from './submission';
 import { CustomError } from './error';
 import { searchAppleMusic } from '@/lib/music-kit';
 import { sendExceptionToSentry } from '@/lib/sentry';
+import { SpotifyUserApi } from './SpotifyUserApi';
 
 const db = getFirestore();
 
@@ -48,10 +41,13 @@ export default class User implements UserType {
   // User
   musicPlatformAccessCode?: string;
   loaded = false;
+  // api
+  spotify: SpotifyUserApi;
 
   constructor(id: string) {
     if (!id) throw Error('No user id passed to constructor');
     this.id = id;
+    this.spotify = new SpotifyUserApi();
   }
 
   public get json() {
@@ -85,6 +81,7 @@ export default class User implements UserType {
           this[key] = res.get(key) || this[key];
         }
       }
+      this.spotify.musicPlatformAuth = this.musicPlatformAuth;
       this.loaded = true;
     } else {
       this.loaded = false;
@@ -117,8 +114,8 @@ export default class User implements UserType {
   }
 
   public async setUsername(username: string) {
-    const usersRef = db.collection('users');
-    if ((await usersRef.where('username', '==', username).get()).docs[0]) {
+    const u = db.collectionGroup('public').where('username', '==', username);
+    if ((await u.get()).docs[0]) {
       throw new CustomError('Username taken. Please try another.');
     } else {
       const userFriends = this.friends as {
@@ -139,6 +136,7 @@ export default class User implements UserType {
         f.dbRef.update({ friends: friendFriends });
       }
       await this.dbRef.update({ username });
+      await this.dbRef.collection('public').doc('info').update({ username });
     }
   }
 
@@ -146,54 +144,39 @@ export default class User implements UserType {
     musicPlatform: MusicPlatform,
     authCode: string
   ) {
+    console.log(musicPlatform, authCode);
     if (musicPlatform === MusicPlatform.spotify) {
-      const body = new URLSearchParams();
-      body.append('grant_type', 'authorization_code');
-      body.append('code', authCode);
-      body.append('redirect_uri', process.env.SPOTIFY_REDIRECT_URL || '');
+      this.public.musicPlatform = musicPlatform;
+      this.musicPlatformAuth = await this.spotify.authenticate(authCode);
 
-      const res = await fetch('https://accounts.spotify.com/api/token', {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: 'Basic ' + SPOTIFY_AUTH,
-        },
-        method: 'post',
-        body,
+      await this.dbRef.update({
+        musicPlatform,
+        musicPlatformAuth: this.musicPlatformAuth,
       });
-      if (res.status !== 200) {
-      } else {
-        const spotifyAuthRes: SpotifyAuthRes = await res.json();
-        const musicPlatformAuth = {
-          expires_at: new Date(Date.now() + spotifyAuthRes.expires_in * 1000),
-          access_token: spotifyAuthRes.access_token,
-          refresh_token: spotifyAuthRes.refresh_token,
-        };
-        this.public.musicPlatform = musicPlatform;
-        this.musicPlatformAuth = musicPlatformAuth;
-        await this.dbRef.update({
-          musicPlatform,
-          musicPlatformAuth,
-        });
-      }
+      await this.dbRef.collection('public').doc('info').update({
+        musicPlatform,
+      });
     } else {
       // apple music
       this.public.musicPlatform = musicPlatform;
       await this.dbRef.update({
         musicPlatform,
       });
+      await this.dbRef.collection('public').doc('info').update({
+        musicPlatform,
+      });
     }
   }
 
-  public async updateSpotifyAuth(): Promise<string> {
+  public async updateSpotifyAuth() {
     if (!this.exists) throw Error('User not loaded.');
     if (!this.musicPlatformAuth)
       throw Error('No music platform authenticated.');
-    const accessCode = await refreshSpotifyAccessCode(
-      this.musicPlatformAuth,
-      this.dbRef
-    );
-    this.musicPlatformAccessCode = accessCode;
-    return accessCode;
+
+    this.spotify.musicPlatformAuth = this.musicPlatformAuth;
+    this.musicPlatformAuth = await this.spotify.refreshToken();
+    this.dbRef.update({ musicPlatformAuth: this.musicPlatformAuth });
+    this.musicPlatformAccessCode = this.musicPlatformAuth.access_token;
   }
 
   public async saveSong(song: SavedSong): Promise<SavedSong> {
@@ -214,11 +197,7 @@ export default class User implements UserType {
       if (this.public.musicPlatform === MusicPlatform.spotify) {
         await this.updateSpotifyAuth();
         // this doesn't need to be synchronous
-        addSongsToSpotifyPlaylist(
-          [song],
-          this.likedSongsPlaylist,
-          this.musicPlatformAuth
-        );
+        await this.spotify.addSongsToPlaylist([song], this.likedSongsPlaylist);
       }
     }
 
@@ -236,10 +215,9 @@ export default class User implements UserType {
       if (this.public.musicPlatform === MusicPlatform.spotify) {
         await this.updateSpotifyAuth();
         // this doesn't need to synchronous
-        removeSongsFromSpotifyPlaylist(
+        this.spotify.removeSongsFromSpotifyPlaylist(
           [song],
-          this.likedSongsPlaylist,
-          this.musicPlatformAuth
+          this.likedSongsPlaylist
         );
       }
     }
@@ -263,28 +241,25 @@ export default class User implements UserType {
     if (!this.exists) throw Error('User not loaded.');
     if (!this.musicPlatformAccessCode)
       throw Error('No access code provided. Cannot get most recent song.');
-    const currentSong = await getCurrentSpotifySong(
-      this.musicPlatformAccessCode
-    );
+    await this.updateSpotifyAuth();
+    const currentTrack = await this.spotify.getCurrentlyPlaying();
     return {
       id: '',
-      name: currentSong.item.name,
+      name: currentTrack.item.name,
       platforms: [],
-      artist: currentSong.item.artists[0]?.name,
-      url: currentSong.item.external_urls.spotify,
-      length: currentSong.item.duration_ms / 1000,
-      durationElapsed: currentSong.progress_ms / 1000,
-      albumArtwork: currentSong.item.album.images[0]?.url,
-      timestamp: currentSong.timestamp || 0,
+      artist: currentTrack.item.artists[0]?.name,
+      url: currentTrack.item.external_urls.spotify,
+      length: currentTrack.item.duration_ms / 1000,
+      durationElapsed: currentTrack.progress_ms / 1000,
+      albumArtwork: currentTrack.item.album.images[0]?.url,
+      timestamp: currentTrack.timestamp || 0,
       genre:
-        currentSong.item.artists[0]?.genres[0] ||
         (noGenre
           ? 'Unknown'
           : await getTrackGenre(
-              currentSong.item.name,
-              currentSong.item.artists[0]?.name
-            )) ||
-        'unkown',
+              currentTrack.item.name,
+              currentTrack.item.artists[0]?.name || ''
+            )) || 'Unknown',
     } as Song;
   }
 
@@ -590,10 +565,10 @@ export default class User implements UserType {
           for (const sub of friendSubmissions) {
             songs.push(sub.song);
           }
-          await addSongsToSpotifyPlaylist(
+          await this.updateSpotifyAuth();
+          await this.spotify.addSongsToPlaylist(
             songs,
-            this.submissionsPlaylist,
-            this.musicPlatformAuth
+            this.submissionsPlaylist
           );
         }
         // Add submission song to their friend's playlists
@@ -606,12 +581,11 @@ export default class User implements UserType {
           if (!fid) continue;
           const friend = new User(fid);
           await friend.load();
-          await friend.updateSpotifyAuth();
           if (song) {
-            await addSongsToSpotifyPlaylist(
+            if (!friend.spotify) await friend.updateSpotifyAuth();
+            await friend.spotify.addSongsToPlaylist(
               [song],
-              friend.submissionsPlaylist,
-              friend.musicPlatformAuth
+              friend.submissionsPlaylist
             );
           }
         }
@@ -654,8 +628,13 @@ export default class User implements UserType {
   public async acceptRequest(requester: string) {
     if (!requester) throw new CustomError('No requester provided');
     const usersRef = db.collection('users');
-    const friendQuery = usersRef.where('username', '==', requester);
-    const friend = (await friendQuery.get()).docs[0]?.data() as UserType;
+    const pubRef = db
+      .collectionGroup('public')
+      .where('username', '==', requester);
+    const pubRes = await pubRef.get();
+    const friendQuery = pubRes.docs[0].ref.parent.parent;
+    const friend = (await friendQuery?.get())?.data() as UserType;
+    friend.public = pubRes.docs[0].data() as UserType['public'];
     // if we have such a friend and there is an actual request from them to the user
     if (
       !friend ||
@@ -664,7 +643,10 @@ export default class User implements UserType {
       throw new CustomError('Friend request does not exist.');
     // update user friends
     const userFriends = this.friends;
-    this.friends.push({ username: friend.public.username, id: friend.id });
+    this.friends.push({
+      username: friend.public.username || friend.id,
+      id: friend.id,
+    });
     // doesn't need to be synchronous
     this.dbRef.update({ friends: userFriends });
     // remove from friend request array
@@ -677,7 +659,10 @@ export default class User implements UserType {
 
     // update friend friends
     const friendFriends = friend.friends;
-    friendFriends.push({ username: this.public.username, id: this.id });
+    friendFriends.push({
+      username: this.public.username || this.id,
+      id: this.id,
+    });
     const friendRef = usersRef.doc(friend.id);
     // doesn't need to be synchronous
     friendRef.update({ friends: friendFriends });
@@ -709,9 +694,13 @@ export default class User implements UserType {
 
   public async rejectRequest(requester: string) {
     if (!requester) throw new CustomError('No requester provided');
-    const usersRef = db.collection('users');
-    const friendQuery = usersRef.where('username', '==', requester);
-    const friend = (await friendQuery.get()).docs[0]?.data() as UserType;
+    const pubRef = db
+      .collectionGroup('public')
+      .where('username', '==', requester);
+    const pubRes = await pubRef.get();
+    const friendQuery = pubRes.docs[0].ref.parent.parent;
+    const friend = (await friendQuery?.get())?.data() as UserType;
+    friend.public = pubRes.docs[0].data() as UserType['public'];
     // if we have such a friend and there is an actual request from them to the user
     if (
       !friend ||
@@ -731,8 +720,14 @@ export default class User implements UserType {
   public async sendRequest(username: string) {
     if (!username) throw new CustomError('No username provided');
     const usersRef = db.collection('users');
-    const friendQuery = usersRef.where('username', '==', username);
-    const friend = (await friendQuery.get()).docs[0]?.data() as User;
+    const pubRef = db
+      .collectionGroup('public')
+      .where('username', '==', username);
+    const pubRes = await pubRef.get();
+    const friendQuery = pubRes.docs[0].ref.parent.parent;
+    const friend = (await friendQuery?.get())?.data() as UserType;
+    friend.public = pubRes.docs[0].data() as UserType['public'];
+
     if (!friend) throw new CustomError('No user with provided username.');
     const friendRef = usersRef.doc(friend.id);
     if (friend.friendRequests.find((r) => r === this.public.username)) return;
@@ -809,7 +804,6 @@ export default class User implements UserType {
         // make sure not to add this username to the list if this user is already friends with them
         //      or if the username is this user's username
         //      or if the username is already in the suggestions list
-        //todo:
         //      or if the user already has a friend request out for the username
         //      or if the user decided to ignore the username's suggestion
         if (
@@ -823,7 +817,6 @@ export default class User implements UserType {
           });
         }
       }
-      //todo: get suggestions from nearby submissions
     }
     return suggestions;
   }
@@ -834,7 +827,7 @@ export default class User implements UserType {
       const friend = new User(fr.id);
       await friend.removeFriend({
         id: this.id,
-        username: this.public.username,
+        username: this.public.username || this.id,
       });
     }
     await this.dbRef.delete();
@@ -881,11 +874,15 @@ export default class User implements UserType {
   }
 
   static async getByUsername(username: string) {
-    const ref = db.collection('users').where('username', '==', username);
-    const res = await ref.get();
-    if (!res.docs[0])
+    const pubRef = db
+      .collectionGroup('public')
+      .where('username', '==', username);
+    const pubRes = await pubRef.get();
+    const userRef = pubRes.docs[0].ref.parent.parent;
+    const res = await userRef?.get();
+    if (!res?.exists)
       throw new CustomError(`No user with username ${username} found.`);
-    const u = new User(res.docs[0].id);
+    const u = new User(res.id);
     await u.load();
     return u;
   }

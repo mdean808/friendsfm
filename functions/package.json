@@ -18,6 +18,7 @@
     "@google-cloud/tasks": "^3.1.2",
     "@sentry/node": "^7.59.3",
     "@sentry/profiling-node": "^1.1.2",
+    "@spotify/web-api-ts-sdk": "^1.2.0",
     "firebase-admin": "^11.10.1",
     "firebase-functions": "^5.0.1",
     "jsonwebtoken": "^9.0.2",
