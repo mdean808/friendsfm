@@ -79,7 +79,7 @@ export default class Submission implements SubmissionType {
     await u.load();
     this.user = {
       id: u.id,
-      username: u.public.username,
+      username: u.public.username || u.id,
       musicPlatform: u.public.musicPlatform,
     };
     try {
@@ -139,7 +139,7 @@ export default class Submission implements SubmissionType {
     const comment = {
       id: randomUUID(),
       content,
-      user: { id: user.id, username: user.public.username },
+      user: { id: user.id, username: user.public.username || user.id },
     };
     // add comment to submission in db and then locally
     await this.dbRef.update({
@@ -153,7 +153,7 @@ export default class Submission implements SubmissionType {
     const subUser = new User(this.userId);
     if (this.userId !== user.id) {
       await subUser.load();
-      notifsSentToUsernames.push(subUser.public.username);
+      notifsSentToUsernames.push(subUser.public.username || subUser.id);
       subUser.sendNotification(`${user.public.username} commented`, content, {
         type: 'comment',
         id: this.id,
@@ -174,7 +174,7 @@ export default class Submission implements SubmissionType {
       if (this.userId !== u.id && u.id !== user.id) {
         const u = new User(c.user.id);
         await u.load();
-        notifsSentToUsernames.push(u.public.username);
+        notifsSentToUsernames.push(u.public.username || subUser.id);
         u.sendNotification(`${user.public.username} commented`, content, {
           type: 'comment',
           id: this.id,
@@ -231,7 +231,7 @@ export default class Submission implements SubmissionType {
   }
 
   public async addLike(user: User) {
-    this.likes.push({ id: user.id, username: user.public.username });
+    this.likes.push({ id: user.id, username: user.public.username || user.id });
     await this.dbRef.update({ likes: this.likes });
   }
   public async unlike(user: User) {

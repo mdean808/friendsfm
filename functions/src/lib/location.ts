@@ -52,7 +52,7 @@ export const getNearbySubmissions = async (
       await user.load();
       result.user = {
         id: user.id,
-        username: user.public.username,
+        username: user.public.username || user.id,
         musicPlatform: user.public.musicPlatform,
       };
       return result;
