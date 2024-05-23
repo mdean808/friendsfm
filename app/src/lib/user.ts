@@ -9,7 +9,6 @@ import type {
 } from '$lib/types';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { network } from '$lib/util';
-import type { AccessToken } from '@spotify/web-api-ts-sdk';
 import { session } from './session';
 import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 
@@ -17,13 +16,11 @@ export const spotifyAuthCode = <Writable<string>>writable();
 
 export const updateMusicPlatform = async (
   newMusicPlatform: MusicPlatform,
-  authCode?: string,
-  musicPlatformAuth?: AccessToken
+  authCode?: string
 ) => {
   const message = await network.queryFirebase('setmusicplatform', {
     musicPlatform: newMusicPlatform,
     platformAuthCode: authCode,
-    musicPlatformAuth,
   });
   if (!message) return;
 
@@ -40,16 +37,16 @@ export const updateMusicPlatform = async (
   return true;
 };
 
-export const getCurrentSong = async (
-  id?: string,
-  username?: string
-): Promise<Song | undefined> => {
-  const message = await network.queryFirebase('getusercurrentlylistening', {
+export const getCurrentSong = async () //id?: string,
+//username?: string
+: Promise<Song | undefined> => {
+  /*const message = await network.queryFirebase('getusercurrentlylistening', {
     id,
     username,
   });
   if (!message) return;
-  return message;
+  return message;*/
+  return;
 };
 
 export const updateUsername = async (newUsername: string) => {
@@ -146,4 +143,11 @@ export const getUserStatistics = async (id: string, username?: string) => {
   });
   stats.topSong = popularSongs.sort((a, b) => b.appearances - a.appearances)[0];
   return stats;
+};
+
+export const setProfile = async (profile: User['public']['profile']) => {
+  await FirebaseFirestore.updateDocument({
+    reference: `users/${get(session).user.id}/public/info`,
+    data: { profile },
+  });
 };

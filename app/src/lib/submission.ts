@@ -30,12 +30,13 @@ import {
   type DocumentSnapshot,
   type QueryCompositeFilterConstraint,
 } from '@capacitor-firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 
 export const friendSubmissions = <Writable<Submission[]>>writable([]);
 
 export const nearbySubmissions = <Writable<StrippedSubmission[]>>writable([]);
 
-export const userSubmission = <Writable<Submission>>writable();
+export const userSubmission = <Writable<Submission | null>>writable();
 
 export const activeSubmission = <Writable<Submission | null>>writable();
 
@@ -79,6 +80,9 @@ export const generateSubmission = async () => {
   });
 
   if (!message) return;
+  const sub = message.user;
+  sub.lateTime = Timestamp.fromDate(new Date(sub.lateTime as string));
+  sub.time = Timestamp.fromDate(new Date(sub.time as string));
   userSubmission.set(message.user as Submission);
   FirebaseAnalytics.logEvent({ name: 'generate_submission' });
 };
@@ -132,7 +136,14 @@ export const createSubmissionsPlaylist = async () => {
   // return the playlist id
 };
 
-export const previewSubmission = async () => {
+export const previewSubmission = async (): Promise<{
+  submission: Submission;
+  friends: {
+    id: string;
+    username: string;
+    musicPlatform: MusicPlatform;
+  }[];
+} | void> => {
   let recentlyPlayed: { song: AppleMusicSong } | undefined = undefined;
   if (get(session).user.public.musicPlatform === MusicPlatform.appleMusic) {
     // check apple music permissions.
@@ -159,7 +170,12 @@ export const previewSubmission = async () => {
   });
 
   if (!message) return;
+  const sub = message.submission;
+  sub.lateTime = Timestamp.fromDate(new Date(sub.lateTime as string));
+  sub.time = Timestamp.fromDate(new Date(sub.time as string));
   FirebaseAnalytics.logEvent({ name: 'preview_submission' });
+  message.submission = sub;
+
   return message;
 };
 
@@ -242,7 +258,7 @@ export const loadUserSubmission = async () => {
       },
     });
   } else {
-    // user submission doesn't exist
+    userSubmission.set(null);
   }
 };
 

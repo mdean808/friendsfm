@@ -6,11 +6,7 @@
   import { updateUsername } from '$lib/user';
   import { loading, showToast } from '$lib/util';
 
-  import { onMount } from 'svelte';
-
   let username: string;
-
-  onMount(() => {});
 
   const setUsername = async () => {
     if (!username) return;
@@ -20,7 +16,7 @@
     loading.set(true);
     if (await updateUsername(username)) {
       if (!$session.user.public.musicPlatform) goto('/intro/music-platform');
-      else goto('/');
+      else goto('/main/home');
     }
     loading.set(false);
   };
@@ -29,7 +25,7 @@
 <main class="text-center mx-auto w-full">
   <div class="mx-auto py-6 px-4 w-full">
     <h1 class="text-4xl">
-      {#if $session.user.public.username && $session.user.public.username !== $session.user.id}
+      {#if $session.user.public?.username && $session.user.public?.username !== $session.user.id}
         change username
       {:else}
         username
@@ -51,7 +47,7 @@
     </div>
     <button
       on:click={() =>
-        !$session.user.public.musicPlatform
+        !$session.user.public?.musicPlatform
           ? goto('/intro/login')
           : goto('/main/home')}
       class="mx-auto text-blue-500 underline text-center mt-10">go back</button

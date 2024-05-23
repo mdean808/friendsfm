@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import Button from '$components/Button.svelte';
   import { endSession, session } from '$lib/session';
-  import { loading, network } from '$lib/util';
+  import { loading, network, showToast } from '$lib/util';
   import { FirebaseFirestore } from '@capacitor-firebase/firestore';
   import { Dialog } from '@capacitor/dialog';
   import { fly } from 'svelte/transition';
@@ -15,9 +15,10 @@
     if (!value) return;
     loading.set(true);
     await network.queryFirebase('deleteuser');
+    await goto('/intro/login');
     await endSession();
-    goto('/intro/login');
     loading.set(false);
+    showToast({ content: 'successfully deleted your account.' });
   };
 </script>
 
@@ -67,7 +68,7 @@
       type="primary"
       title="reset"
       on:click={async () => {
-        goto('/username');
+        goto('/intro/username');
       }}>change username</Button
     >
     <Button
@@ -93,8 +94,9 @@
       type="breaking"
       title="reset"
       on:click={async () => {
-        goto('/intro/login');
+        await goto('/intro/login');
         await endSession();
+        showToast({ content: 'successfully logged out.' });
       }}>log out</Button
     >
     <div class="pt-24">

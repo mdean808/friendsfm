@@ -7,6 +7,7 @@
   import { userSubmission } from '$lib/submission';
   import { onMount } from 'svelte';
   import SubmissionPreview from '$components/SubmissionPreview.svelte';
+  import { insets } from '$lib/device';
 
   onMount(() => {
     activeHomeTab.set('submissions');
@@ -36,8 +37,12 @@
       {/if}
     </div>
   </div>
-{:else if $submissionLoaded && !userSubmission}
-  <div id="home" class={`text-center w-full h-auto px-4 overflow-y-scroll`}>
+{:else if $submissionLoaded && !$userSubmission}
+  <div
+    id="home"
+    style={`height: calc(100vh - ${64 + $insets.bottom + $insets.top}px)`}
+    class={`text-center w-full px-4 overflow-y-scroll`}
+  >
     <div class="h-full">
       <SubmissionPreview />
     </div>

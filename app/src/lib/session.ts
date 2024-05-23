@@ -110,12 +110,26 @@ export const authSession = async (
       email: u.email,
       public: publicData,
     };
+    await goto('/main/home/');
   } else {
+    const tempU = { ...u } as any;
+    delete tempU.public;
     await FirebaseFirestore.setDocument({
       reference: `users/${u.id}`,
-      data: u,
+      data: tempU,
     });
-    goto('/intro/username');
+    await FirebaseFirestore.setDocument({
+      reference: `users/${u.id}/public/info`,
+      data: {
+        profile: {
+          stats: {
+            submissionCount: 0,
+            onTimeSubmissionCount: 0,
+          },
+        },
+      } as User['public'],
+    });
+    await goto('/intro/username');
   }
 
   session.update((s) => {

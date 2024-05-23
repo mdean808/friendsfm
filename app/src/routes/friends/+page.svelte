@@ -27,7 +27,7 @@
     loading = true;
     if (await sendFriendRequest(newUsername.trim())) {
       newUsername = '';
-      showToast({ content: 'Successfully sent friend request' });
+      showToast({ content: 'successfully sent friend request.' });
     }
     loading = false;
   };
@@ -43,7 +43,7 @@
     if (loaders[i]) return;
     loaders[i] = true;
     if (await acceptFriendRequest(requester))
-      showToast({ content: 'Successfully accepted friend request' });
+      showToast({ content: 'successfully accepted friend request.' });
     // add fr back
     else
       session.update((s) => {
@@ -65,7 +65,7 @@
     if (loaders[i]) return;
     loaders[i] = true;
     if (await rejectFriendRequest(requester))
-      showToast({ content: 'Successfully accepted friend request' });
+      showToast({ content: 'successfully accepted friend request.' });
     // add fr back
     else
       session.update((s) => {

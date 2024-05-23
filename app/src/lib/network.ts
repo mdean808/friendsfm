@@ -1,21 +1,18 @@
 import {
-  MusicPlatform,
   ResponseType,
   type NetworkRequest,
   type NetworkResponse,
 } from '$lib/types';
-import { spotifyAuthCode, updateMusicPlatform } from './user';
+import { spotifyAuthCode } from './user';
 import ky from 'ky';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
-import { errorToast, loading } from '$lib/util';
+import { errorToast } from '$lib/util';
 import { Dialog } from '@capacitor/dialog';
-import { SpotifyApi } from '@spotify/web-api-ts-sdk';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { endSession, session } from './session';
 import { get } from 'svelte/store';
 import { goto } from '$app/navigation';
-import { Capacitor } from '@capacitor/core';
-import { dev } from '$app/environment';
+import { authenticateWithSpotify } from './spotify';
 
 export default class Network {
   requests: NetworkRequest[] = [];
@@ -72,7 +69,6 @@ export default class Network {
     });
     // make request
     let res = {} as Response;
-    console.log(url);
     try {
       res = await ky.post(url, {
         headers: {
@@ -131,6 +127,7 @@ export default class Network {
         if (!get(session).loggedIn) break; // user not logged in
         switch (res.status) {
           case 400:
+            errorToast({ content: json.message });
             break;
           case 401:
             errorToast({
@@ -215,50 +212,12 @@ export default class Network {
       });
       if (value) {
         this.spotifySet = false;
-
-        if (Capacitor.getPlatform() === 'web') {
-          SpotifyApi.performUserAuthorization(
-            import.meta.env.VITE_SPOTIFY_CLIENT_ID,
-            dev
-              ? 'http://localhost:8080?auth=spotify'
-              : import.meta.env.VITE_SPOTIFY_REDIRECT_URL_WEB,
-            [
-              'user-read-recently-played',
-              'user-read-currently-playing',
-              'playlist-modify-public',
-              'playlist-modify-private',
-            ],
-            // @ts-ignore
-            async (token) => {
-              if (
-                await updateMusicPlatform(
-                  MusicPlatform.spotify,
-                  token.access_token,
-                  token
-                )
-              )
-                goto('/');
-              loading.set(false);
-            }
-          );
-        } else {
-          spotifyAuthCode.subscribe(async (value: string) => {
-            if (!this.spotifySet) {
-              await updateMusicPlatform(MusicPlatform.spotify, value);
-              this.spotifySet = true;
-            }
-          });
-          const spotifyUrl = `https://accounts.spotify.com/authorize?client_id=${
-            import.meta.env.VITE_SPOTIFY_CLIENT_ID
-          }&response_type=code&redirect_uri=${
-            Capacitor.getPlatform() === 'web'
-              ? dev
-                ? 'http://localhost:8080?auth=spotify'
-                : import.meta.env.VITE_SPOTIFY_REDIRECT_URL_WEB
-              : import.meta.env.VITE_SPOTIFY_REDIRECT_URL
-          }&scope=user-read-currently-playing%20user-read-recently-played%20playlist-modify-private%20playlist-modify-public`;
-          window.location.href = spotifyUrl;
-        }
+        await authenticateWithSpotify();
+        spotifyAuthCode.subscribe(() => {
+          if (!this.spotifySet) {
+            this.spotifySet = true;
+          }
+        });
       }
     }
   }

@@ -19,13 +19,15 @@
 
   onMount(async () => {
     previewFriendSubmissions().then((fr) => (friends = fr || []));
-    const resSub = await previewSubmission();
-    if (!resSub) return;
-    submission = resSub.submission;
+    const res = await previewSubmission();
+    if (!res) return;
+    submission = res.submission;
+    friends = res.friends;
     loading = false;
     // update the preview every 15 seconds
     interval = setInterval(async () => {
       const res = await previewSubmission();
+      if (!res) return;
       submission = res.submission;
       friends = res.friends;
     }, 10000);
@@ -103,41 +105,45 @@
 
 <div class="my-2 border-t-2 border-white relative pt-2 pb-48">
   {#each friends as friend}
-    <div class={`flex p-2 rounded-t-lg bg-gray-500`}>
-      <button
-        on:click={(e) => {
-          e.stopPropagation();
-          goto('/modal/profile');
-          publicProfileUsername.set(friend.username);
-        }}
-        class="flex-grow text-left"
-      >
-        <img
-          class="w-5 h-5 inline rounded-full"
-          src={`https://icotar.com/avatar/${
-            friend?.username || 'undefined'
-          }.svg`}
-          alt="avatar"
+    <div>
+      <div class={`flex p-2 rounded-t-lg bg-gray-500`}>
+        <button
+          on:click={(e) => {
+            e.stopPropagation();
+            goto('/modal/profile');
+            publicProfileUsername.set(friend.username);
+          }}
+          class="flex-grow text-left"
+        >
+          <img
+            class="w-5 h-5 inline rounded-full"
+            src={`https://icotar.com/avatar/${
+              friend?.username || 'undefined'
+            }.svg`}
+            alt="avatar"
+          />
+          {friend ? friend?.username : 'Unknown'}
+        </button>
+      </div>
+      <div class="relative p-2 bg-gray-700 text-left mb-2 rounded-b-lg">
+        <div
+          class="absolute backdrop-blur-md w-full h-full rounded-b-lg left-0 top-0"
         />
-        {friend ? friend?.username : 'Unknown'}
-      </button>
-    </div>
-    <div class="relative p-2 bg-gray-700 text-left mb-2 rounded-b-lg">
-      <div
-        class="absolute backdrop-blur-md w-full h-full rounded-b-lg left-0 top-0"
-      />
-      <p class="mb-1 text-sm text-gray-400">played yesterday at 12:30</p>
-      <div class="flex gap-2">
-        <img
-          class="w-12 h-12 inline rounded-lg"
-          src={`https://icotar.com/avatar/album-${
-            friend?.username || 'undefined'
-          }.svg`}
-          alt="avatar"
-        />
-        <div class="w-48 flex justify-center align-middle flex-col">
-          <p class={`h-4 mb-1 text-${friend?.musicPlatform}`}>Cool Song Name</p>
-          <p class="h-4">Cool Artist Name</p>
+        <p class="mb-1 text-sm text-gray-400">played yesterday at 12:30</p>
+        <div class="flex gap-2">
+          <img
+            class="w-12 h-12 inline rounded-lg"
+            src={`https://icotar.com/avatar/album-${
+              friend?.username || 'undefined'
+            }.svg`}
+            alt="avatar"
+          />
+          <div class="w-48 flex justify-center align-middle flex-col">
+            <p class={`h-4 mb-1 text-${friend?.musicPlatform}`}>
+              Cool Song Name
+            </p>
+            <p class="h-4">Cool Artist Name</p>
+          </div>
         </div>
       </div>
     </div>

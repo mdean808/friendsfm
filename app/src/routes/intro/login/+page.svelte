@@ -36,6 +36,7 @@
               }
             );
             await authSession(null, res.user);
+            loading.set(false);
           } catch (e) {
             loading.set(false);
             console.log('Login Error' + e);

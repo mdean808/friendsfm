@@ -53,7 +53,6 @@
     "@googlemaps/markerclusterer": "^2.5.3",
     "@ionic/core": "^8.0.0",
     "@sentry/capacitor": "^0.17.0",
-    "@spotify/web-api-ts-sdk": "^1.2.0",
     "capacitor-native-settings": "^6.0.0",
     "capacitor-plugin-safe-area": "^3.0.1",
     "firebase": "^10.11.0",

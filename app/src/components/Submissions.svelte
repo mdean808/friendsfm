@@ -76,14 +76,14 @@
   <div class="mb-3 pt-3 px-4 mx-auto overflow-hidden">
     {#if loadingSubmission}
       <SkeletonSubmission type="user" />
-    {:else if $userSubmission.song}
+    {:else if $userSubmission?.song}
       <UserSubmission data={$userSubmission} />
     {/if}
   </div>
   <span class="border-white border-t-2 block w-full" />
   <div
     class="mb-3 mt-1 overflow-y-scroll"
-    style={`padding-bottom: calc(120px + ${$insets.bottom}px)`}
+    style={`padding-bottom: calc(80px + ${$insets.bottom}px)`}
   >
     {#if loadingNewLateSubmission}
       <div class="my-2">

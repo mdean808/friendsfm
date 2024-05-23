@@ -10,7 +10,7 @@
   import AppleMusic, {
     AppleMusicPermissionsResults,
   } from '$plugins/AppleMusic';
-  import { authSpotify } from '$lib/spotify';
+  import { authenticateWithSpotify } from '$lib/spotify';
 
   let platform: MusicPlatform;
 
@@ -23,7 +23,7 @@
       return;
     loading.set(true);
     if (platform == MusicPlatform.spotify) {
-      authSpotify(platform);
+      authenticateWithSpotify();
     } else if (platform === MusicPlatform.appleMusic) {
       // return toast.push('Apple Music support in development!');
       switch ((await AppleMusic.checkPermissions()).receive) {
