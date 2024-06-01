@@ -38,11 +38,13 @@ export const refreshMessagingToken = async (token?: string) => {
 
 export const updateMusicPlatform = async (
   newMusicPlatform: MusicPlatform,
-  authCode?: string
+  authCode?: string,
+  redirectUrl?: string
 ) => {
   const message = await network.queryFirebase('setmusicplatform', {
     musicPlatform: newMusicPlatform,
     platformAuthCode: authCode,
+    redirectUrl,
   });
   if (!message) return;
 
@@ -59,16 +61,17 @@ export const updateMusicPlatform = async (
   return true;
 };
 
-export const getCurrentSong = async () //id?: string,
-//username?: string
-: Promise<Song | undefined> => {
-  /*const message = await network.queryFirebase('getusercurrentlylistening', {
+export const getCurrentSong = async (
+  id?: string,
+  username?: string
+): Promise<Song | undefined> => {
+  return;
+  const message = await network.queryFirebase('getusercurrentlylistening', {
     id,
     username,
   });
   if (!message) return;
-  return message;*/
-  return;
+  return message;
 };
 
 export const updateUsername = async (newUsername: string) => {

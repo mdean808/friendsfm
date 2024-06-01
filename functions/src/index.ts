@@ -24,3 +24,4 @@ if (process.env.FUNCTIONS_EMULATOR !== 'true') {
 }
 
 export * from './endpoints';
+export * from './events';

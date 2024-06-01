@@ -50,17 +50,24 @@ export class SpotifyUserApi {
     this.expires_at = auth.expires_at;
   }
 
-  public async authenticate(code: string): Promise<MusicPlatformAuth> {
-    console.log('authenticating...');
+  public async authenticate(
+    code: string,
+    redirect_uri: string
+  ): Promise<MusicPlatformAuth> {
     const body = new URLSearchParams();
     body.append('grant_type', 'authorization_code');
     body.append('code', code);
-    body.append(
-      'redirect_uri',
-      process.env.NODE_ENV === 'development'
-        ? 'http://localhost:8080?auth=spotify'
-        : process.env.SPOTIFY_REDIRECT_URL || ''
-    );
+    if (
+      !process.env.SPOTIFY_REDIRECT_URLS?.split(',').find(
+        (r) => redirect_uri === r
+      )
+    )
+      throw new CustomError('Invalid Spotify redirect url.');
+    body.append('redirect_uri', redirect_uri);
+
+    console.log('authorization body:');
+    console.log(body.get('code'));
+    console.log(body.get('redirect_uri'));
 
     const res = await fetch('https://accounts.spotify.com/api/token', {
       headers: {
@@ -71,11 +78,12 @@ export class SpotifyUserApi {
       body,
     });
     if (res.status !== 200) {
-      console.log('Spotify code authentication error', await res.text());
-      throw new CustomError('Spotify code authentication error.');
+      console.log('Spotify authentication error:', await res.text());
+      console.log(res.status);
+      throw new CustomError('Spotify authentication error.');
     } else {
       const json = await res.json();
-      console.log('authenticated', json);
+      console.log('authenticated!');
 
       this.access_token = json.access_token;
       this.refresh_token = json.refresh_token;
@@ -98,7 +106,7 @@ export class SpotifyUserApi {
         body,
       });
       if (res.status !== 200) {
-        console.log('Spotify Token Refresh Error', await res.text());
+        console.log('Spotify token refresh error', await res.text());
         throw new CustomError('Spotify token refresh error.');
       } else {
         const json = await res.json();

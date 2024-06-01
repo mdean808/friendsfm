@@ -17,9 +17,14 @@ import { getUserStatistics, refreshMessagingToken } from './user';
 import { goto } from '$app/navigation';
 import { page } from '$app/stores';
 import { browser } from '$app/environment';
-import { notificationState } from './util';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
-import { activeSubmission, getSubmission } from './submission';
+import {
+  activeSubmission,
+  friendSubmissions,
+  getSubmission,
+} from './submission';
+import type { NotificationActionPerformedEvent } from '@capacitor-firebase/messaging';
+import { songs } from './songs';
 
 export type Session = {
   user: User;
@@ -28,6 +33,10 @@ export type Session = {
   friendSubmissions: Submission[];
   loaded: boolean;
 };
+
+export const notificationState = <
+  Writable<NotificationActionPerformedEvent | null>
+>writable();
 
 export const session = <Writable<Session>>writable({} as Session);
 
@@ -145,6 +154,8 @@ export const endSession = async () => {
   await Preferences.setLogin();
   await Preferences.setSongs();
   await Preferences.setFriendSubmissions();
+  friendSubmissions.set([]);
+  songs.set([]);
   session.set({} as Session);
 };
 

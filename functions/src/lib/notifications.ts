@@ -49,7 +49,9 @@ export const newNotification = async (message: Message) => {
     return;
   try {
     await messaging.send(message);
-  } catch (e) {
+  } catch (e: any) {
+    // don't log when the notification entity isn't found
+    if (e.message.includes('Requested entity was not found.')) return;
     functions.logger.info('Error sending notification:', e);
     functions.logger.info('Notification context: ', message);
   }

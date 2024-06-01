@@ -30,6 +30,10 @@
   import { SplashScreen } from '@capacitor/splash-screen';
   import { goto } from '$app/navigation';
   import { activeSubmission } from '$lib/submission';
+  import { spotifyAuthCode } from '$lib/user';
+  import { session } from '$lib/session';
+  import { get } from 'svelte/store';
+  import { App, type URLOpenListenerEvent } from '@capacitor/app';
 
   //export let data: LayoutData;
 
@@ -54,6 +58,28 @@
     })();
 
   onMount(async () => {
+    App.addListener('appStateChange', async (_event) => {
+      // use this to setup background tasks
+    });
+
+    App.addListener('appUrlOpen', async (event: URLOpenListenerEvent) => {
+      const url = new URL(event.url);
+      if (url.pathname.includes('spotify')) {
+        const spotifyAccessCode = url.searchParams.get('code');
+        spotifyAuthCode.set(spotifyAccessCode || '');
+      }
+      if (url.pathname.includes('user')) {
+        if (
+          !get(session).loggedIn ||
+          !get(session).user.public.username ||
+          !get(session).user.public.username
+        )
+          return;
+        const username = url.pathname.split('/')[2];
+        publicProfileUsername.set(username);
+        goto('/modal/profile');
+      }
+    });
     // ionic init
     try {
       initialize();

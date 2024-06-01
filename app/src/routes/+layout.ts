@@ -2,27 +2,23 @@ import { browser, dev } from '$app/environment';
 import { goto } from '$app/navigation';
 import { insets } from '$lib/device';
 import { setupSnapshots } from '$lib/firebase';
-import { authSession, endSession, loadSession, session } from '$lib/session';
+import {
+  authSession,
+  endSession,
+  loadSession,
+  session,
+  notificationState,
+} from '$lib/session';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { SafeArea } from 'capacitor-plugin-safe-area';
 import { get } from 'svelte/store';
 import type { LayoutLoad } from './$types';
-import {
-  appLoaded,
-  initParams,
-  notificationState,
-  publicProfileUsername,
-} from '$lib/util';
+import { appLoaded, initParams, publicProfileUsername } from '$lib/util';
 import { page } from '$app/stores';
 import { activeSubmission, getSubmission } from '$lib/submission';
 import { Capacitor } from '@capacitor/core';
-import { App, type URLOpenListenerEvent } from '@capacitor/app';
-import {
-  refreshMessagingToken,
-  spotifyAuthCode,
-  updateMusicPlatform,
-} from '$lib/user';
+import { refreshMessagingToken, updateMusicPlatform } from '$lib/user';
 import { MusicPlatform } from '$lib/types';
 
 export const ssr = false;
@@ -63,24 +59,6 @@ const setupQueriesAndDeeplinks = () => {
   // setup for deep links and query parameters
   if (window.location.search)
     initParams.set(new URLSearchParams(window.location.search));
-  App.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
-    const url = new URL(event.url);
-    if (url.pathname.includes('spotify')) {
-      const spotifyAccessCode = url.searchParams.get('code');
-      spotifyAuthCode.set(spotifyAccessCode || '');
-    }
-    if (url.pathname.includes('user')) {
-      if (
-        !get(session).loggedIn ||
-        !get(session).user.public.username ||
-        !get(session).user.public.username
-      )
-        return;
-      const username = url.pathname.split('/')[2];
-      publicProfileUsername.set(username);
-      goto('/modal/public');
-    }
-  });
 };
 
 const setupSessionsAndAuth = async () => {
@@ -112,10 +90,16 @@ const setupSessionsAndAuth = async () => {
     // check for music platform authentication on web only after authenticating
     const platform = get(initParams)?.get('auth');
     if (platform === MusicPlatform.spotify) {
+      let redirectUrl =
+        Capacitor.getPlatform() === 'web'
+          ? `${import.meta.env.VITE_SPOTIFY_REDIRECT_URL}?auth=spotify`
+          : import.meta.env.VITE_SPOTIFY_REDIRECT_URL;
+      if (dev) redirectUrl = window.location.origin + '?auth=spotify';
       if (
         await updateMusicPlatform(
           MusicPlatform.spotify,
-          get(initParams).get('code') || ''
+          get(initParams).get('code') || '',
+          redirectUrl
         )
       )
         goto('/main/home');
@@ -141,10 +125,16 @@ const setupSessionsAndAuth = async () => {
     // check for music platform authentication on web only after authenticating
     const platform = get(initParams)?.get('auth');
     if (platform === MusicPlatform.spotify) {
+      let redirectUrl =
+        Capacitor.getPlatform() === 'web'
+          ? `${import.meta.env.VITE_SPOTIFY_REDIRECT_URL}?auth=spotify`
+          : import.meta.env.VITE_SPOTIFY_REDIRECT_URL;
+      if (dev) redirectUrl = window.location.origin + '?auth=spotify';
       if (
         await updateMusicPlatform(
           MusicPlatform.spotify,
-          get(initParams).get('code') || ''
+          get(initParams).get('code') || '',
+          redirectUrl
         )
       )
         goto('/main/home');

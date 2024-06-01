@@ -142,12 +142,16 @@ export default class User implements UserType {
 
   public async setMusicPlatform(
     musicPlatform: MusicPlatform,
-    authCode: string
+    authCode: string,
+    redirectUrl: string
   ) {
-    console.log(musicPlatform, authCode);
     if (musicPlatform === MusicPlatform.spotify) {
       this.public.musicPlatform = musicPlatform;
-      this.musicPlatformAuth = await this.spotify.authenticate(authCode);
+      console.log('redirect url:', redirectUrl);
+      this.musicPlatformAuth = await this.spotify.authenticate(
+        authCode,
+        redirectUrl
+      );
 
       await this.dbRef.update({
         musicPlatform,

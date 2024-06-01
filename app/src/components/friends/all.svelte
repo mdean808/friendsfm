@@ -29,7 +29,10 @@
       swipePosCurrent.y = touch.screenY;
     }
     const changeInY = swipePosCurrent.y - swipePosStart.y;
-    if (document.getElementById('friends').scrollTop <= 0 && changeInY > 100)
+    if (
+      (document?.getElementById('friends')?.scrollTop || 1) <= 0 &&
+      changeInY > 100
+    )
       shouldRefreshOnSwipeEnd = true;
     else shouldRefreshOnSwipeEnd = false;
   };
