@@ -20,7 +20,7 @@
   import { goto } from '$app/navigation';
 
   let loadingSubmission: boolean = false;
-  let loadingFriendSubmissions: boolean = false;
+  let loadingFriendSubmissions: boolean = true;
   let loadingNewLateSubmission: boolean = false;
   let sortedFriendSubmissions: Submission[];
 
@@ -90,7 +90,6 @@
         <SkeletonSubmission />
       </div>
     {/if}
-    <!-- TODO: show this when initial friend submissions are loaded -->
     {#if loadingFriendSubmissions}
       <SkeletonSubmission />
       <SkeletonSubmission />
