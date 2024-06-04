@@ -26,7 +26,7 @@
 
   const sortByDate = (a: Submission, b: Submission) => {
     try {
-      return b.time.toDate().getTime() - a.time.toDate().getTime();
+      return b.time.getTime() - a.time.getTime();
     } catch {
       return 1;
     }

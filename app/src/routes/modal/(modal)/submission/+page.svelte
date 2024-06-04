@@ -90,7 +90,7 @@
       <div transition:slide>
         {#if !$activeSubmission.late}
           <span class="text-sm text-center block text-gray-400"
-            >{$activeSubmission.time?.toDate().toLocaleString('en-US', {
+            >{$activeSubmission.time?.toLocaleString('en-US', {
               hour: 'numeric',
               minute: 'numeric',
               hour12: true,
@@ -98,7 +98,7 @@
           </span>
         {:else}
           <span class="text-sm text-center block text-red-500">
-            {convertDateToLateString($activeSubmission.lateTime?.toDate())}
+            {convertDateToLateString($activeSubmission.lateTime)}
           </span>
         {/if}
         {#if $activeSubmission.song.timestamp > 0}

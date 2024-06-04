@@ -5,8 +5,12 @@
   import { MusicPlatform, type Submission } from '$lib/types';
   import { session } from '$lib/session';
   import { goto } from '$app/navigation';
-  import { publicProfileUsername } from '$lib/util';
-  import { previewFriendSubmissions, previewSubmission } from '$lib/submission';
+  import { chunkArray, currSubNumber, publicProfileUsername } from '$lib/util';
+  import { previewSubmission } from '$lib/submission';
+  import {
+    FirebaseFirestore,
+    type QueryCompositeFilterConstraint,
+  } from '@capacitor-firebase/firestore';
 
   let submission: Submission;
   let interval: NodeJS.Timeout;
@@ -14,24 +18,65 @@
   let friends: {
     id: string;
     username: string;
-    musicPlatform: MusicPlatform;
   }[] = [];
 
   onMount(async () => {
-    previewFriendSubmissions().then((fr) => (friends = fr || []));
+    getFriends();
     const res = await previewSubmission();
     if (!res) return;
     submission = res.submission;
-    friends = res.friends;
     loading = false;
     // update the preview every 15 seconds
     interval = setInterval(async () => {
+      getFriends();
       const res = await previewSubmission();
       if (!res) return;
       submission = res.submission;
-      friends = res.friends;
-    }, 10000);
+    }, 15000);
   });
+
+  const getFriends = async () => {
+    const userFriends = $session.user.friends;
+    const friendIds = userFriends.map((f) => f.id);
+    if (friendIds.length === 0) return;
+    const friendIdChunks = chunkArray(friendIds, 30);
+    const friendPromises = friendIdChunks.map(async (chunk) => {
+      const friendSubsFilter: QueryCompositeFilterConstraint = {
+        type: 'and',
+        queryConstraints: [
+          {
+            type: 'where',
+            fieldPath: 'userId',
+            opStr: 'in',
+            value: chunk,
+          },
+          {
+            type: 'where',
+            fieldPath: 'number',
+            opStr: '==',
+            value: $currSubNumber,
+          },
+        ],
+      };
+
+      const docs = await FirebaseFirestore.getCollection({
+        reference: 'submissions',
+        compositeFilter: friendSubsFilter,
+      });
+
+      return docs.snapshots.map((snapshot) => {
+        return {
+          id: snapshot.data?.userId as string,
+          username:
+            userFriends.find((f) => f.id === snapshot.data?.userId)?.username ||
+            '',
+        };
+      });
+    });
+
+    const friendResults = await Promise.all(friendPromises);
+    friends = friendResults.flat();
+  };
 
   onDestroy(() => {
     clearInterval(interval);
@@ -139,9 +184,7 @@
             alt="avatar"
           />
           <div class="w-48 flex justify-center align-middle flex-col">
-            <p class={`h-4 mb-1 text-${friend?.musicPlatform}`}>
-              Cool Song Name
-            </p>
+            <p class="h-4 mb-1 text-blue-500">Cool Song Name</p>
             <p class="h-4">Cool Artist Name</p>
           </div>
         </div>

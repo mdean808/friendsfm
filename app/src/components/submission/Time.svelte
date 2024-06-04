@@ -14,7 +14,7 @@
 <div class={className}>
   {#if !data.late}
     <span class="text-sm text-gray-400"
-      >{data.time?.toDate().toLocaleString('en-US', {
+      >{data.time?.toLocaleString('en-US', {
         hour: 'numeric',
         minute: 'numeric',
         hour12: true,
@@ -22,7 +22,7 @@
     </span>
   {:else}
     <span class="text-sm text-red-500">
-      {convertDateToLateString(data.lateTime?.toDate())}
+      {convertDateToLateString(data.lateTime)}
     </span>
   {/if}
   {#if data.song?.timestamp > 0}

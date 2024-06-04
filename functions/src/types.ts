@@ -94,7 +94,7 @@ export interface Submission {
   number: number;
   late: boolean;
   song: Song; // song id
-  time: Date | Timestamp;
+  time: Date | number;
   audial: Audial;
   user?: {
     username: string;
@@ -103,7 +103,7 @@ export interface Submission {
   };
   comments: Comment[];
   location: Location;
-  lateTime: Date | Timestamp;
+  lateTime: Date | number;
   userId: string;
   currentlyListening?: Song;
   caption?: string;

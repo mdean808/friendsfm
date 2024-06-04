@@ -30,7 +30,6 @@ import {
   type DocumentSnapshot,
   type QueryCompositeFilterConstraint,
 } from '@capacitor-firebase/firestore';
-import { Timestamp } from 'firebase/firestore';
 import { Capacitor } from '@capacitor/core';
 
 export const friendSubmissions = <Writable<Submission[]>>writable([]);
@@ -84,8 +83,8 @@ export const generateSubmission = async () => {
 
   if (!message) return;
   const sub = message.user;
-  sub.lateTime = Timestamp.fromDate(new Date(sub.lateTime as string));
-  sub.time = Timestamp.fromDate(new Date(sub.time as string));
+  sub.lateTime = new Date(sub.lateTime);
+  sub.time = new Date(sub.time);
   userSubmission.set(message.user as Submission);
   FirebaseAnalytics.logEvent({ name: 'generate_submission' });
 };
@@ -174,24 +173,15 @@ export const previewSubmission = async (): Promise<{
 
   if (!message) return;
   const sub = message.submission;
-  sub.lateTime = Timestamp.fromDate(new Date(sub.lateTime as string));
-  sub.time = Timestamp.fromDate(new Date(sub.time as string));
+  // turn times into timestamps for frontent type safety
+  sub.lateTime = new Date(sub.lateTime);
+  sub.time = new Date(sub.time);
   FirebaseAnalytics.logEvent({ name: 'preview_submission' });
   message.submission = sub;
 
-  return message;
-};
+  message.friends = [];
 
-export const previewFriendSubmissions = async () => {
-  const friendSubs = await loadFriendSubmissions();
-  const friends = friendSubs?.map((f) => {
-    return {
-      id: f.id,
-      username: f.user?.username,
-      musicPlatform: f.user?.musicPlatform,
-    };
-  });
-  return friends;
+  return message;
 };
 
 export const createCommentForSubmission = async (content: string) => {
@@ -253,6 +243,8 @@ export const loadUserSubmission = async () => {
     userSubmission.set({
       ...(sub.data as Submission),
       id: sub.id,
+      time: new Date(sub.data.time),
+      lateTime: new Date(sub.data.lateTime),
       user: {
         id: get(session).user.id,
         username: get(session).user.public.username || '',
@@ -284,6 +276,8 @@ export const loadFriendSubmissions = async () => {
       const fSub = {
         ...d.data,
         id: d.id,
+        time: new Date(d.data?.time),
+        lateTime: new Date(d.data?.lateTime),
         user: {
           id: d.data?.userId,
           username: publicUser.username,
@@ -349,6 +343,8 @@ export const getSubmission: (id: string) => Promise<Submission | null> = async (
     return {
       ...(sub.snapshot.data as Submission),
       id: sub.snapshot.id,
+      time: new Date(sub.snapshot.data?.time),
+      lateTime: new Date(sub.snapshot.data?.lateTime),
       user: {
         id: sub.snapshot.data.userId,
         username: publicUser.username,

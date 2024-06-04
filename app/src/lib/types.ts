@@ -1,5 +1,4 @@
 import type { Position } from '@capacitor/geolocation';
-import type { Timestamp } from 'firebase/firestore';
 
 export enum UserState {
   unregistered = 'unregistered',
@@ -123,8 +122,8 @@ export interface Submission {
     latitude: number;
   };
   song: Song;
-  time: Timestamp;
-  lateTime: Timestamp;
+  time: Date;
+  lateTime: Date;
   comments: Comment[];
   audial: Audial;
   currentlyListening?: Song;

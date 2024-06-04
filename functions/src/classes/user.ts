@@ -39,7 +39,6 @@ export default class User implements UserType {
   // this is in the database under /{user_id}/public/info
   public: UserType['public'] = {} as UserType['public'];
   // User
-  musicPlatformAccessCode?: string;
   loaded = false;
   // api
   spotify: SpotifyUserApi;
@@ -147,7 +146,6 @@ export default class User implements UserType {
   ) {
     if (musicPlatform === MusicPlatform.spotify) {
       this.public.musicPlatform = musicPlatform;
-      console.log('redirect url:', redirectUrl);
       this.musicPlatformAuth = await this.spotify.authenticate(
         authCode,
         redirectUrl
@@ -180,7 +178,6 @@ export default class User implements UserType {
     this.spotify.musicPlatformAuth = this.musicPlatformAuth;
     this.musicPlatformAuth = await this.spotify.refreshToken();
     this.dbRef.update({ musicPlatformAuth: this.musicPlatformAuth });
-    this.musicPlatformAccessCode = this.musicPlatformAuth.access_token;
   }
 
   public async saveSong(song: SavedSong): Promise<SavedSong> {
@@ -243,7 +240,7 @@ export default class User implements UserType {
 
   public async getRecentSpotifySong(noGenre?: boolean): Promise<Song> {
     if (!this.exists) throw Error('User not loaded.');
-    if (!this.musicPlatformAccessCode)
+    if (!this.musicPlatformAuth.access_token)
       throw Error('No access code provided. Cannot get most recent song.');
     await this.updateSpotifyAuth();
     const currentTrack = await this.spotify.getCurrentlyPlaying();
@@ -306,7 +303,6 @@ export default class User implements UserType {
       try {
         const friendSub = await friend.getSubmission(number);
         if (!friendSub) continue;
-        friendSub.formatDatesForFrontend();
         friendSubmissions.push(friendSub);
       } catch (e) {
         if (!(e as Error).message.includes('No Current Submission')) {
@@ -357,7 +353,6 @@ export default class User implements UserType {
     // make sure we have the latest access tokens for the user's music oauth before we get their song
     let song = {} as Song;
     if (this.public.musicPlatform === MusicPlatform.spotify) {
-      await this.updateSpotifyAuth();
       song = await this.getRecentSpotifySong();
       song.platforms.push({
         id: MusicPlatform.spotify,
@@ -470,7 +465,6 @@ export default class User implements UserType {
     // make sure we have the latest access tokens for the user's music oauth before we get their song
     let song = {} as Song;
     if (this.public.musicPlatform === MusicPlatform.spotify) {
-      await this.updateSpotifyAuth();
       song = await this.getRecentSpotifySong();
       song.platforms.push({
         id: MusicPlatform.spotify,
@@ -534,9 +528,9 @@ export default class User implements UserType {
     // create and store the submission
     const newSubmission: SubmissionType = {
       id: '',
-      time,
+      time: time.getTime(),
       late,
-      lateTime,
+      lateTime: lateTime.getTime(),
       number: notificationsSnapshot.get('count'),
       audial: { number: -1, score: '' },
       song,
@@ -845,7 +839,6 @@ export default class User implements UserType {
     if (!this.loaded) await this.load();
     if (this.public.musicPlatform !== MusicPlatform.spotify) return;
     try {
-      await this.updateSpotifyAuth();
       let song = await this.getRecentSpotifySong(true);
       if (song.timestamp) return;
       return song;

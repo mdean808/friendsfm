@@ -202,6 +202,8 @@ export const setupSnapshots = async () => {
     userSubmission.set({
       ...(sub.data as Submission),
       id: sub.id,
+      time: new Date(sub.data.time),
+      lateTime: new Date(sub.data.lateTime),
       user: {
         id: get(session).user.id,
         username: get(session).user.public.username || '',
@@ -225,6 +227,8 @@ export const setupSnapshots = async () => {
           userSubmission.set({
             ...(event.snapshots[0].data as Submission),
             id: event.snapshots[0].id,
+            time: new Date(event.snapshots[0].data?.time),
+            lateTime: new Date(event.snapshots[0].data?.lateTime),
             user: {
               id: get(session).user.id,
               username: get(session).user.public.username || '',
@@ -257,6 +261,8 @@ export const setupSnapshots = async () => {
       const fSub = {
         ...d.data,
         id: d.id,
+        time: new Date(d.data?.time),
+        lateTime: new Date(d.data?.lateTime),
         user: {
           id: d.data?.userId,
           username: publicUser.username,
@@ -302,7 +308,7 @@ export const setupSnapshots = async () => {
       reference: 'submissions',
       compositeFilter: friendSubsFilter,
     });
-    await updateSubmissions(docs.snapshots); // /* ChatGPT CODE */
+    await updateSubmissions(docs.snapshots);
 
     // Snapshot friend submissions
     snapshots.friendSubmissions.push(

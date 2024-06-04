@@ -84,8 +84,13 @@
         loading.set(true);
         await FirebaseFirestore.updateDocument({
           reference: `users/${$session.user.id}`,
-          data: { musicPlatform: '', musicPlatformAuth: '' },
+          data: { musicPlatform: null, musicPlatformAuth: null },
         });
+        await FirebaseFirestore.updateDocument({
+          reference: `users/${$session.user.id}/public/info`,
+          data: { musicPlatform: null },
+        });
+        $session.user.public.musicPlatform = undefined;
         loading.set(false);
         goto('/intro/music-platform');
       }}>unlink music provider</Button

@@ -65,10 +65,6 @@ export class SpotifyUserApi {
       throw new CustomError('Invalid Spotify redirect url.');
     body.append('redirect_uri', redirect_uri);
 
-    console.log('authorization body:');
-    console.log(body.get('code'));
-    console.log(body.get('redirect_uri'));
-
     const res = await fetch('https://accounts.spotify.com/api/token', {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -79,24 +75,29 @@ export class SpotifyUserApi {
     });
     if (res.status !== 200) {
       console.log('Spotify authentication error:', await res.text());
-      console.log(res.status);
       throw new CustomError('Spotify authentication error.');
     } else {
       const json = await res.json();
-      console.log('authenticated!');
 
       this.access_token = json.access_token;
       this.refresh_token = json.refresh_token;
       this.expires_at = new Date(Date.now() + json.expires_in * 1000);
-      return this.musicPlatformAuth;
+      return {
+        access_token: this.access_token,
+        refresh_token: this.refresh_token,
+        expires_at: this.expires_at,
+      };
     }
   }
 
   public async refreshToken(): Promise<MusicPlatformAuth> {
+    if (!this.refresh_token)
+      throw new CustomError('Spotify token refresh error.');
     if (new Date(this.expires_at || 0) < new Date()) {
-      const body = new URLSearchParams();
-      body.append('grant_type', 'refresh_token');
-      body.append('refresh_token', this.refresh_token);
+      const body = new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: this.refresh_token,
+      });
       const res = await fetch('https://accounts.spotify.com/api/token', {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -111,12 +112,20 @@ export class SpotifyUserApi {
       } else {
         const json = await res.json();
         this.access_token = json.access_token;
-        this.refresh_token = json.refresh_token;
         this.expires_at = new Date(Date.now() + json.expires_in * 1000);
-        return this.musicPlatformAuth;
+        // spotify doesn't pass a new refresh token so we don't update it
+        return {
+          access_token: this.access_token,
+          refresh_token: this.refresh_token,
+          expires_at: this.expires_at,
+        };
       }
     } else {
-      return this.musicPlatformAuth;
+      return {
+        access_token: this.access_token,
+        refresh_token: this.refresh_token,
+        expires_at: this.expires_at,
+      };
     }
   }
 

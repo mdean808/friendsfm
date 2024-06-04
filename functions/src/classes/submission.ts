@@ -90,25 +90,11 @@ export default class Submission implements SubmissionType {
     return this;
   }
 
-  public formatDatesForFrontend() {
-    if ((this.time as Timestamp).toDate)
-      this.time = (this.time as Timestamp).toDate();
-    if ((this.lateTime as Timestamp).toDate)
-      this.lateTime = (this.lateTime as Timestamp).toDate();
-  }
-  public formatDatesForFirebase() {
-    if (!(this.time as Timestamp).toDate)
-      this.time = Timestamp.fromDate(this.time as Date);
-    if (!(this.lateTime as Timestamp).toDate)
-      this.lateTime = Timestamp.fromDate(this.lateTime as Date);
-  }
-
   public get dbRef(): DocumentReference {
     return db.collection('submissions').doc(this.id);
   }
 
   public get json(): SubmissionType {
-    this.formatDatesForFrontend();
     return {
       id: this.id,
       number: this.number,
@@ -262,15 +248,15 @@ export default class Submission implements SubmissionType {
     notificationsSnapshot: DocumentSnapshot
   ): {
     late: boolean;
-    time: Timestamp;
-    lateTime: Timestamp;
+    time: Date;
+    lateTime: Date;
   } {
     const notificationTimestamp = notificationsSnapshot.get(
       'time'
     ) as Timestamp;
     const notificationTime = notificationTimestamp.toDate();
     let late = false;
-    let lateTime: Date | Timestamp = new Date();
+    let lateTime = new Date();
     if (notificationTime > new Date()) {
       // the current date is before the current notification time, so we use the previous time.
       const prevTime = (
@@ -293,8 +279,6 @@ export default class Submission implements SubmissionType {
     }
 
     // create and store the submission
-    let time = Timestamp.fromDate(new Date());
-    lateTime = Timestamp.fromDate(lateTime);
-    return { late, time, lateTime };
+    return { late, time: new Date(), lateTime };
   }
 }
