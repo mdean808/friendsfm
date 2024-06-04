@@ -31,11 +31,11 @@ export const getNearbySubmissions = async (
 ) => {
   const message = await network.queryFirebase('nearbysubmissions', {
     location: {
-      latitude: get(location)?.gp?.coords
-        ? get(location).gp.coords.latitude
+      latitude: get(location)?.coords
+        ? get(location).coords.latitude
         : 0,
-      longitude: get(location)?.gp?.coords
-        ? get(location).gp.coords.longitude
+      longitude: get(location)?.coords
+        ? get(location).coords.longitude
         : 0,
     },
     radius,

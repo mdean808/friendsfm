@@ -4,8 +4,7 @@ import {
   NativeSettings,
 } from 'capacitor-native-settings';
 import { SafeArea, type SafeAreaInsets } from 'capacitor-plugin-safe-area';
-import type { Location } from '$lib/types';
-import { Geolocation } from '@capacitor/geolocation';
+import { Geolocation, type Position } from '@capacitor/geolocation';
 import { Dialog } from '@capacitor/dialog';
 import { Preferences } from '@capacitor/preferences';
 import { get, writable, type Writable } from 'svelte/store';
@@ -19,7 +18,7 @@ export const getInsets = async () => {
   return insetsRes.insets;
 };
 
-export const location = <Writable<Location>>writable();
+export const location = <Writable<Position>>writable();
 export const updateCurrentLocation = async () => {
   if (Capacitor.getPlatform() !== 'web') {
     try {
@@ -27,12 +26,13 @@ export const updateCurrentLocation = async () => {
     } catch {
       await Geolocation.requestPermissions();
     }
-    const l = get(location);
+    let l = get(location);
+    console.log('location:', l)
     try {
-      l.gp = await Geolocation.getCurrentPosition();
+      l = await Geolocation.getCurrentPosition();
     } catch (e) {
       if (
-        l?.gp ||
+        l ||
         (await Preferences.get({ key: 'location-permissions' })).value == '0'
       )
         return;
@@ -57,12 +57,10 @@ export const updateCurrentLocation = async () => {
     location.set(l);
   } else {
     location.set({
-      gp: {
-        coords: {
-          latitude: 0,
-          longitude: 0,
-        },
+      coords: {
+        latitude: 0,
+        longitude: 0,
       },
-    } as Location);
+    } as Position);
   }
 };

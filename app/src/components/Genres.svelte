@@ -35,10 +35,10 @@
 
   // lsiten for location changes
   location.subscribe((val) => {
-    if (val?.gp?.coords && map && !$activeSubmission) {
+    if (val?.coords && map && !$activeSubmission) {
       const startingCenter = {
-        lng: $location?.gp?.coords?.longitude || 0,
-        lat: $location?.gp?.coords?.latitude || 0,
+        lng: $location?.coords?.longitude || 0,
+        lat: $location?.coords?.latitude || 0,
       };
       map.setCenter(startingCenter);
       createMarkers();
@@ -68,12 +68,12 @@
         lng: $activeSubmission.location?.longitude,
       };
     } else if (
-      $location?.gp?.coords?.latitude &&
-      $location?.gp?.coords?.longitude
+      $location?.coords?.latitude &&
+      $location?.coords?.longitude
     ) {
       startingCenter = {
-        lng: $location?.gp?.coords?.longitude,
-        lat: $location?.gp?.coords?.latitude,
+        lng: $location?.coords?.longitude,
+        lat: $location?.coords?.latitude,
       };
     } else {
       startingCenter = { lng: 0, lat: 0 };
@@ -128,8 +128,8 @@
       // then check for difference of .25 lng and lat
       if (!bounds) {
         map.setCenter({
-          lat: $location?.gp?.coords?.latitude || 51.4934,
-          lng: $location?.gp?.coords?.longitude || 0.0098,
+          lat: $location?.coords?.latitude || 51.4934,
+          lng: $location?.coords?.longitude || 0.0098,
         });
         bounds = map.getBounds();
       }

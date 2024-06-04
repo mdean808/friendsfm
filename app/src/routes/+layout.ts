@@ -44,7 +44,6 @@ const setupDevice = async () => {
     await FirebaseMessaging.addListener(
       'notificationActionPerformed',
       async (action) => {
-        console.log('notificationactionpreformed', action);
         // make sure the app is fully loaded before running the handler
         if (!get(appLoaded)) {
           await new Promise<void>((resolve) => {

@@ -59,10 +59,6 @@
     })();
 
   onMount(async () => {
-    App.addListener('resume', async () => {
-      console.log('app resume' );
-    });
-
     App.addListener('appUrlOpen', async (event: URLOpenListenerEvent) => {
       const url = new URL(event.url);
       if (url.pathname.includes('spotify')) {

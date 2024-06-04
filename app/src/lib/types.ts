@@ -71,10 +71,6 @@ export interface Friend {
   id: string;
 }
 
-export interface Location {
-  gp: Position;
-}
-
 export enum MusicPlatform {
   spotify = 'spotify',
   appleMusic = 'apple-music',
