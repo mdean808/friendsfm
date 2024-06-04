@@ -11,6 +11,7 @@ import {
   type AuthStateChange,
   type SignInResult,
 } from '@capacitor-firebase/authentication';
+import { App } from '@capacitor/app'
 import { unsubscribeSnapshots } from './firebase';
 import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 import { getUserStatistics, refreshMessagingToken } from './user';
@@ -25,6 +26,7 @@ import {
 } from './submission';
 import type { NotificationActionPerformedEvent } from '@capacitor-firebase/messaging';
 import { songs } from './songs';
+import { appLoaded } from './util';
 
 export type Session = {
   user: User;
@@ -33,10 +35,6 @@ export type Session = {
   friendSubmissions: Submission[];
   loaded: boolean;
 };
-
-export const notificationState = <
-  Writable<NotificationActionPerformedEvent | null>
->writable();
 
 export const session = <Writable<Session>>writable({} as Session);
 
@@ -79,47 +77,6 @@ if (browser) {
         break;
       default:
         break;
-    }
-    const notification = get(notificationState)?.notification;
-    if (notification && sesh.loaded && sesh.loggedIn) {
-      const data = notification.data as {
-        [key: string]: any;
-        type: NotificationType;
-      };
-      FirebaseAnalytics.logEvent({
-        name: 'notification_open',
-        params: {
-          title: notification.title,
-          body: notification.body,
-          subtitle: notification.subtitle,
-          id: data.id,
-          type: data.type,
-        },
-      });
-      // handle notification actions and subsequente routing
-      switch (data.type) {
-        case NotificationType.Daily:
-          goto('/main/home');
-          break;
-        case NotificationType.LateSubmission:
-          goto('/main/home');
-          break;
-        case NotificationType.Comment:
-          const sub = await getSubmission(data.id);
-          activeSubmission.set(sub);
-          if (sub) goto('/modal/submission');
-          break;
-        case NotificationType.FriendRequestCreated:
-          goto('/modal/friends');
-          break;
-        case NotificationType.FriendRequestAccepted:
-          goto('/modal/friends');
-          break;
-        default:
-          break;
-      }
-      // reset the notification state
-      notificationState.set(null);
     }
   });
 }

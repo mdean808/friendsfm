@@ -90,6 +90,7 @@
         <SkeletonSubmission />
       </div>
     {/if}
+    <!-- TODO: show this when initial friend submissions are loaded -->
     {#if loadingFriendSubmissions}
       <SkeletonSubmission />
       <SkeletonSubmission />

@@ -22,8 +22,8 @@ const getNewComment = (
 export const notifyoncomment = firestore.onDocumentUpdated(
   'submissions/{subId}',
   async (ctx) => {
-    const oldSub = ctx.data?.before.data() as Submission;
-    const newSub = ctx.data?.after.data() as Submission;
+    const oldSub = { ...ctx.data?.before.data(), id: ctx.data?.before.id } as Submission;
+    const newSub = { ...ctx.data?.after.data(), id: ctx.data?.after.id } as Submission;
     if (newSub.comments.length > oldSub.comments.length) {
       const comment = getNewComment(newSub.comments, oldSub.comments);
       if (!comment) return;

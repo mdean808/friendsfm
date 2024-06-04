@@ -11,7 +11,8 @@
     "lint": "prettier --check .",
     "format": "prettier --write .",
     "dev:cap": "vite dev --host",
-    "build:cap": "vite build && npx cap sync"
+    "build:cap": "vite build && npx cap sync",
+    "build:release": "vite build && npx cap sync"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^3.0.0",

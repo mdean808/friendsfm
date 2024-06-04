@@ -34,6 +34,7 @@
   import { session } from '$lib/session';
   import { get } from 'svelte/store';
   import { App, type URLOpenListenerEvent } from '@capacitor/app';
+  import { Dialog } from '@capacitor/dialog';
 
   //export let data: LayoutData;
 
@@ -58,8 +59,8 @@
     })();
 
   onMount(async () => {
-    App.addListener('appStateChange', async (_event) => {
-      // use this to setup background tasks
+    App.addListener('resume', async () => {
+      console.log('app resume' );
     });
 
     App.addListener('appUrlOpen', async (event: URLOpenListenerEvent) => {

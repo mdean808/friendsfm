@@ -7,9 +7,9 @@ import {
   endSession,
   loadSession,
   session,
-  notificationState,
 } from '$lib/session';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { SafeArea } from 'capacitor-plugin-safe-area';
 import { get } from 'svelte/store';
@@ -18,8 +18,9 @@ import { appLoaded, initParams, publicProfileUsername } from '$lib/util';
 import { page } from '$app/stores';
 import { activeSubmission, getSubmission } from '$lib/submission';
 import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 import { refreshMessagingToken, updateMusicPlatform } from '$lib/user';
-import { MusicPlatform } from '$lib/types';
+import { MusicPlatform, NotificationType } from '$lib/types';
 
 export const ssr = false;
 export const prerender = true;
@@ -42,8 +43,56 @@ const setupDevice = async () => {
     // listen for a new notification
     await FirebaseMessaging.addListener(
       'notificationActionPerformed',
-      (action) => {
-        notificationState.set(action);
+      async (action) => {
+        console.log('notificationactionpreformed', action);
+        // make sure the app is fully loaded before running the handler
+        if (!get(appLoaded)) {
+          await new Promise<void>((resolve) => {
+            App.addListener('resume', async () => {
+              resolve();
+            });
+          })
+        }
+        const sesh = get(session)
+        const notification = action?.notification
+        if (notification && sesh.loaded && sesh.loggedIn) {
+          const data = notification.data as {
+            [key: string]: any;
+            type: NotificationType;
+          };
+          FirebaseAnalytics.logEvent({
+            name: 'notification_open',
+            params: {
+              title: notification.title,
+              body: notification.body,
+              subtitle: notification.subtitle,
+              id: data.id,
+              type: data.type,
+            },
+          });
+          // handle notification actions and subsequente routing
+          switch (data.type) {
+            case NotificationType.Daily:
+              goto('/main/home');
+              break;
+            case NotificationType.LateSubmission:
+              goto('/main/home');
+              break;
+            case NotificationType.Comment:
+              const sub = await getSubmission(data.id);
+              activeSubmission.set(sub);
+              if (sub) goto('/modal/submission');
+              break;
+            case NotificationType.FriendRequestCreated:
+              goto('/modal/friends');
+              break;
+            case NotificationType.FriendRequestAccepted:
+              goto('/modal/friends');
+              break;
+            default:
+              break;
+          }
+        }
       }
     );
     // remove notification bubble on app launch
