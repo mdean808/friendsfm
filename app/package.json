@@ -1,18 +1,17 @@
 {
   "name": "friends-fm",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.3.1",
   "scripts": {
     "dev": "vite dev",
+    "dev:cap": "vite dev --host",
     "build": "vite build",
+    "build:cap": "vite build && npx cap sync",
     "build:release": "RELEASE=true vite build",
+    "release": "yarn build:release && npx cap sync",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "lint": "prettier --check .",
-    "format": "prettier --write .",
-    "dev:cap": "vite dev --host",
-    "build:cap": "vite build && npx cap sync"
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^3.0.0",
