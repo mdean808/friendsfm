@@ -1280,7 +1280,7 @@ PODS:
   - RecaptchaInterop (100.0.0)
   - Sentry/HybridSDK (8.21.0):
     - SentryPrivate (= 8.21.0)
-  - SentryCapacitor (0.17.0):
+  - SentryCapacitor (0.18.0):
     - Capacitor
     - Sentry/HybridSDK (= 8.21.0)
   - SentryPrivate (8.21.0)
@@ -1451,7 +1451,7 @@ SPEC CHECKSUMS:
   PromisesSwift: 9d77319bbe72ebf6d872900551f7eeba9bce2851
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   Sentry: ebc12276bd17613a114ab359074096b6b3725203
-  SentryCapacitor: eab7128c7c9558bfca219d1d11dd7aed74b1a01f
+  SentryCapacitor: 170d8b96ba195cead4dc60eaf5c42aacf97ff1d3
   SentryPrivate: d651efb234cf385ec9a1cdd3eff94b5e78a0e0fe
 
 PODFILE CHECKSUM: f7c21b676a62a145cfa173d9e613085c8cac0231

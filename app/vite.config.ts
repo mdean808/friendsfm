@@ -8,17 +8,21 @@ import child_process from 'child_process';
 const file = fileURLToPath(new URL('package.json', import.meta.url));
 const json = readFileSync(file, 'utf8');
 const pkg = JSON.parse(json);
-const commit = child_process.execSync('git rev-parse --short HEAD').toString();
+const commit = child_process
+  .execSync('git rev-parse --short HEAD')
+  .toString()
+  .trim();
 
 export default defineConfig({
   plugins: [
     sentrySvelteKit({
       sourceMapsUploadOptions: {
+        dist: '1',
         telemetry: false,
         org: 'friendsfm',
         project: 'friendsfm-app',
         authToken: process.env.SENTRY_AUTH_TOKEN,
-        release: commit,
+        release: 'git-' + commit,
       },
       autoUploadSourceMaps: !!process.env.RELEASE,
     }),

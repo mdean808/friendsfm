@@ -9,7 +9,7 @@ Sentry.init(
 
     // Set your dist version, such as "1"
     dist: '1',
-    release: COMMIT,
+    release: 'git-' + COMMIT,
     environment: !dev && RELEASE ? 'production' : 'development',
     integrations: [
       // Registers and configures the Tracing integration,

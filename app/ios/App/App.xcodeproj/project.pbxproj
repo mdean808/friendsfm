@@ -266,7 +266,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which sentry-cli >/dev/null; then\nexport SENTRY_ORG=friendsfm\nexport SENTRY_PROJECT=friendsfm-app\nexport SENTRY_AUTH_TOKEN=1731f887e2894141bca1ab8e3c6f1ca028502a3a1f584e86b3b13120c2d6b028\nERROR=$(sentry-cli debug-files upload --include-sources \"$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\nif [ ! $? -eq 0 ]; then\necho \"warning: sentry-cli - $ERROR\"\nfi\nelse\necho \"warning: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nfi\n";
+			shellScript = "if which sentry-cli >/dev/null; then\nexport SENTRY_ORG=friendsfm\nexport SENTRY_PROJECT=friendsfm-app\nexport SENTRY_AUTH_TOKEN=1731f887e2894141bca1ab8e3c6f1ca028502a3a1f584e86b3b13120c2d6b028\nERROR=$(sentry-cli debug-files upload --include-sources \"$DWARF_DSYM_FOLDER_PATH\" --force-foreground 2>&1 >/dev/null)\nif [ ! $? -eq 0 ]; then\necho \"error: sentry-cli - $ERROR\"\nfi\nelse\necho \"error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
