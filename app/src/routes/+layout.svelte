@@ -34,7 +34,6 @@
   import { session } from '$lib/session';
   import { get } from 'svelte/store';
   import { App, type URLOpenListenerEvent } from '@capacitor/app';
-  import { Dialog } from '@capacitor/dialog';
 
   //export let data: LayoutData;
 

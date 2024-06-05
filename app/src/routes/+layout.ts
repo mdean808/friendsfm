@@ -2,12 +2,7 @@ import { browser, dev } from '$app/environment';
 import { goto } from '$app/navigation';
 import { insets } from '$lib/device';
 import { setupSnapshots } from '$lib/firebase';
-import {
-  authSession,
-  endSession,
-  loadSession,
-  session,
-} from '$lib/session';
+import { authSession, endSession, loadSession, session } from '$lib/session';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { FirebaseMessaging } from '@capacitor-firebase/messaging';
@@ -50,10 +45,10 @@ const setupDevice = async () => {
             App.addListener('resume', async () => {
               resolve();
             });
-          })
+          });
         }
-        const sesh = get(session)
-        const notification = action?.notification
+        const sesh = get(session);
+        const notification = action?.notification;
         if (notification && sesh.loaded && sesh.loggedIn) {
           const data = notification.data as {
             [key: string]: any;

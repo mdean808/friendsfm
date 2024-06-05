@@ -21,3 +21,6 @@ vite.config.ts.timestamp-*
 certificates
 # Capacitor
 capacitor.config.json.timestamp-*
+
+# Sentry Config File
+.sentryclirc
