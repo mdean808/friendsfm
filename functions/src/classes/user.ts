@@ -380,6 +380,7 @@ export default class User implements UserType {
       }
     }
     if (this.public.musicPlatform === MusicPlatform.appleMusic) {
+      console.log('previewSubmission:', appleMusicSong);
       song = {
         ...appleMusicSong,
         platforms: [],
@@ -496,6 +497,7 @@ export default class User implements UserType {
       }
     }
     if (this.public.musicPlatform === MusicPlatform.appleMusic) {
+      console.log('generateSubmission:', appleMusicSong);
       song = {
         ...appleMusicSong,
         platforms: [],

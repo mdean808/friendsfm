@@ -150,8 +150,10 @@ export const previewSubmission = async (): Promise<{
   if (get(session).user.public.musicPlatform === MusicPlatform.appleMusic) {
     // check apple music permissions.
     const perms = await AppleMusic.checkPermissions();
+    console.log('perms', perms);
     if (perms.receive !== AppleMusicPermissionsResults.granted) {
       const permsRes = await AppleMusic.requestPermissions();
+      console.log('permsres: ', permsRes);
       if (permsRes.receive !== AppleMusicPermissionsResults.granted) {
         return Dialog.alert({
           message:
@@ -162,6 +164,7 @@ export const previewSubmission = async (): Promise<{
     }
     try {
       recentlyPlayed = await AppleMusic.getRecentlyPlayed();
+      console.log('recentplayed', recentlyPlayed);
     } catch (e: any) {
       console.log(e);
       return errorToast({ content: e.message });

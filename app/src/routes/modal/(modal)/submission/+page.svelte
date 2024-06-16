@@ -26,6 +26,7 @@
   } from '$lib/dates';
   import { MusicPlatform } from '$lib/types';
   import { session } from '$lib/session';
+  import { Capacitor } from '@capacitor/core';
 
   let commentValue: string;
   let commentSubmitting = false;
@@ -85,8 +86,8 @@
       </svg>
     </button>
   </div>
-  <div class="bg-gray-700 py-2 px-4 pb-[50px] w-full">
-    {#if !focused}
+  <div class="bg-gray-700 py-2 px-4 w-full">
+    {#if !focused || Capacitor.getPlatform() == 'web'}
       <div transition:slide>
         {#if !$activeSubmission.late}
           <span class="text-sm text-center block text-gray-400"
@@ -237,12 +238,8 @@
     <div
       transition:slide
       style={`height: calc(100vh - ${
-        $insets.bottom * 2 +
-        (focused
-          ? ($keyboardHeight ? $keyboardHeight : 20) + 145
-          : $keyboardHeight
-            ? 495
-            : 475)
+        ($insets.bottom ? $insets.bottom + 50 : 0) +
+        (focused ? $keyboardHeight + 441 : 441)
       }px)`}
       class="overflow-y-scroll text-white pb-1 pt-2 block"
     >

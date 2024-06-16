@@ -16,10 +16,12 @@
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
 		AC199A5B2BC7C6C6003663FD /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AC199A5A2BC7C6C6003663FD /* PrivacyInfo.xcprivacy */; };
+		AC254E932C1D6637006CB20D /* AppleMusic.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC254E922C1D6637006CB20D /* AppleMusic.swift */; };
+		AC254E952C1D6655006CB20D /* AppleMusicPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC254E942C1D6655006CB20D /* AppleMusicPlugin.swift */; };
+		AC254E972C1D6666006CB20D /* AppleMusicPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = AC254E962C1D6666006CB20D /* AppleMusicPlugin.m */; };
+		AC254E992C1E641D006CB20D /* MyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC254E982C1E641D006CB20D /* MyViewController.swift */; };
 		AC42C85729BFE16100902F1B /* OSLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = AC42C85629BFE16100902F1B /* OSLogger.m */; };
 		AC42C85929BFE17500902F1B /* OSLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C85829BFE17500902F1B /* OSLogger.swift */; };
-		AC42C85B29CF66C400902F1B /* AppleMusic.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C85A29CF66C400902F1B /* AppleMusic.swift */; };
-		AC42C85F29CF6ACB00902F1B /* AppleMusic.m in Sources */ = {isa = PBXBuildFile; fileRef = AC42C85E29CF6ACB00902F1B /* AppleMusic.m */; };
 		ACA0E7C52990EB3400B47C81 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = ACA0E7C42990EB3400B47C81 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
@@ -35,11 +37,13 @@
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
 		AC199A5A2BC7C6C6003663FD /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		AC254E922C1D6637006CB20D /* AppleMusic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusic.swift; sourceTree = "<group>"; };
+		AC254E942C1D6655006CB20D /* AppleMusicPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicPlugin.swift; sourceTree = "<group>"; };
+		AC254E962C1D6666006CB20D /* AppleMusicPlugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleMusicPlugin.m; sourceTree = "<group>"; };
+		AC254E982C1E641D006CB20D /* MyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyViewController.swift; sourceTree = "<group>"; };
 		AC42C85529BFE16000902F1B /* FriendsFM-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FriendsFM-Bridging-Header.h"; sourceTree = "<group>"; };
 		AC42C85629BFE16100902F1B /* OSLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OSLogger.m; sourceTree = "<group>"; };
 		AC42C85829BFE17500902F1B /* OSLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSLogger.swift; sourceTree = "<group>"; };
-		AC42C85A29CF66C400902F1B /* AppleMusic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusic.swift; sourceTree = "<group>"; };
-		AC42C85E29CF6ACB00902F1B /* AppleMusic.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleMusic.m; sourceTree = "<group>"; };
 		ACA0E7C42990EB3400B47C81 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		ACA0E7C72990ECC100B47C81 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 		AF51FD2D460BCFE21FA515B2 /* Pods-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.release.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.release.xcconfig"; sourceTree = "<group>"; };
@@ -89,6 +93,7 @@
 		504EC3061FED79650016851F /* App */ = {
 			isa = PBXGroup;
 			children = (
+				AC254E912C1D659D006CB20D /* Plugins */,
 				AC199A5A2BC7C6C6003663FD /* PrivacyInfo.xcprivacy */,
 				ACA0E7C72990ECC100B47C81 /* App.entitlements */,
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
@@ -102,9 +107,8 @@
 				50B271D01FEDC1A000F3C39B /* public */,
 				AC42C85629BFE16100902F1B /* OSLogger.m */,
 				AC42C85529BFE16000902F1B /* FriendsFM-Bridging-Header.h */,
-				AC42C85E29CF6ACB00902F1B /* AppleMusic.m */,
 				AC42C85829BFE17500902F1B /* OSLogger.swift */,
-				AC42C85A29CF66C400902F1B /* AppleMusic.swift */,
+				AC254E982C1E641D006CB20D /* MyViewController.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -118,6 +122,16 @@
 				EC8053EE096359D92D45450A /* Pods-FriendsFM.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		AC254E912C1D659D006CB20D /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+				AC254E922C1D6637006CB20D /* AppleMusic.swift */,
+				AC254E942C1D6655006CB20D /* AppleMusicPlugin.swift */,
+				AC254E962C1D6666006CB20D /* AppleMusicPlugin.m */,
+			);
+			path = Plugins;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -275,11 +289,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AC254E932C1D6637006CB20D /* AppleMusic.swift in Sources */,
 				AC42C85729BFE16100902F1B /* OSLogger.m in Sources */,
-				AC42C85F29CF6ACB00902F1B /* AppleMusic.m in Sources */,
 				AC42C85929BFE17500902F1B /* OSLogger.swift in Sources */,
-				AC42C85B29CF66C400902F1B /* AppleMusic.swift in Sources */,
+				AC254E992C1E641D006CB20D /* MyViewController.swift in Sources */,
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
+				AC254E952C1D6655006CB20D /* AppleMusicPlugin.swift in Sources */,
+				AC254E972C1D6666006CB20D /* AppleMusicPlugin.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

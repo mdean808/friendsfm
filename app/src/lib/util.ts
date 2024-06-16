@@ -12,6 +12,8 @@ export const initParams = <Writable<URLSearchParams>>writable();
 
 export const loading = <Writable<boolean>>writable(false);
 
+export const loadingFriendSubmissions = <Writable<boolean>>writable(true);
+
 export const appLoaded = <Writable<boolean>>writable(false);
 
 export const network = new Network();

@@ -1,9 +1,11 @@
 //
-//  AppleMusic.m
+//  AppleMusicPlugin.m
 //  FriendsFM
 //
-//  Created by Morgan Dean on 3/25/23.
+//  Created by Morgan Dean on 6/14/24.
 //
+
+#import <Foundation/Foundation.h>
 #import <Capacitor/Capacitor.h>
 
 CAP_PLUGIN(AppleMusicPlugin, "AppleMusic",

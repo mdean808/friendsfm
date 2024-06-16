@@ -78,7 +78,7 @@
     <h1 class="py-2 font-semibold text-xl">{$session.user.public.username}</h1>
     <hr class="w-28 border-gray-400 border-[1.5px] rounded-full mx-auto" />
     <div class="py-1 flex max-h-20 h-14 w-full">
-      {#if $editingProfile && $session.user.public.profile?.bio}
+      {#if $editingProfile}
         <Input
           name="bio"
           maxlength="47"

@@ -7,7 +7,7 @@
   import LargeSubmission from './LargeSubmission.svelte';
   import UserSubmission from './submission/User.svelte';
   import { MusicPlatform, type Submission } from '$lib/types';
-  import { submissionsScroll } from '$lib/util';
+  import { loadingFriendSubmissions, submissionsScroll } from '$lib/util';
   import {
     createSubmissionsPlaylist,
     loadFriendSubmissions,
@@ -20,7 +20,6 @@
   import { goto } from '$app/navigation';
 
   let loadingSubmission: boolean = false;
-  let loadingFriendSubmissions: boolean = true;
   let loadingNewLateSubmission: boolean = false;
   let sortedFriendSubmissions: Submission[];
 
@@ -34,7 +33,7 @@
 
   friendSubmissions.subscribe((val) => {
     if (val) sortedFriendSubmissions = [...val].sort(sortByDate);
-    if (val?.length > 0) loadingFriendSubmissions = false;
+    if (val?.length > 0) loadingFriendSubmissions.set(false);
   });
 
   onMount(async () => {
@@ -90,11 +89,11 @@
         <SkeletonSubmission />
       </div>
     {/if}
-    {#if loadingFriendSubmissions}
+    {#if $loadingFriendSubmissions}
       <SkeletonSubmission />
       <SkeletonSubmission />
       <SkeletonSubmission />
-    {:else if !loadingFriendSubmissions}
+    {:else if !$loadingFriendSubmissions}
       {#each sortedFriendSubmissions as submission}
         <div in:slide class="my-4">
           <LargeSubmission data={submission} />

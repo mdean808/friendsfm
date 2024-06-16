@@ -122,9 +122,9 @@
   <!-- padding handles device-specific insets -->
   <div
     style={`padding-top: ${$insets?.top}px; padding-bottom: ${
-      $insets?.bottom / 2
+      $page.route.id?.includes('submission') ? 0 : $insets?.bottom / 2
     }px`}
-    class="relative h-screen max-h-screen"
+    class={`relative h-screen max-h-screen ${$page.route.id?.includes('submission') ? '' : ''}`}
   >
     <!-- START absolute positioning -->
 

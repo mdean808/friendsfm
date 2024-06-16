@@ -4,7 +4,7 @@
       "site": "friendsfm-app",
       "public": "app/dist",
       "ignore": [],
-      "predeploy": "yarn app:build",
+      "predeploy": "yarn app:release",
       "rewrites": [
         {
           "source": "**",

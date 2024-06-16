@@ -20,7 +20,12 @@ import {
 import { browser } from '$app/environment';
 import { session } from './session';
 import { get } from 'svelte/store';
-import { chunkArray, currSubNumber, submissionLoaded } from './util';
+import {
+  chunkArray,
+  currSubNumber,
+  loadingFriendSubmissions,
+  submissionLoaded,
+} from './util';
 import {
   activeSubmission,
   friendSubmissions,
@@ -309,6 +314,7 @@ export const setupSnapshots = async () => {
       compositeFilter: friendSubsFilter,
     });
     await updateSubmissions(docs.snapshots);
+    loadingFriendSubmissions.set(false);
 
     // Snapshot friend submissions
     snapshots.friendSubmissions.push(
