@@ -13,8 +13,5 @@
     "web:build": "cd web && yarn build",
     "functions:dev": "cd functions && yarn serve",
     "functions:build": "cd functions && yarn build && yarn run sentry:prepare"
-  },
-  "dependencies": {
-    "@capgo/nativegeocoder": "^1.0.21"
   }
 }

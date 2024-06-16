@@ -2,15 +2,10 @@
   "hosting": [
     {
       "site": "friendsfm-app",
-      "public": "app/dist",
-      "ignore": [],
+      "source": "app",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "predeploy": "yarn app:release",
-      "rewrites": [
-        {
-          "source": "**",
-          "destination": "/index.html"
-        }
-      ]
+      "frameworksBackend": { "region": "us-west1" }
     },
     {
       "site": "friendsfm",
