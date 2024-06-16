@@ -30,10 +30,13 @@ const config: CapacitorConfig = {
       resizeOnFullScreen: true,
     },
   },
-  /*server: {
+  server: {
+    androidScheme: 'http',
+    /*
     url: 'http://localhost:8080/',
     cleartext: true,
-  },*/
+  */
+  },
 };
 
 export default config;

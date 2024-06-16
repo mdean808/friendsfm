@@ -13,6 +13,7 @@
   const swipePosCurrent = { x: 0, y: 0 };
   let shouldRefreshOnSwipeEnd = false;
   let loadingFriends = false;
+  //todo: make accepting requests slicker
 
   const swipeStart = (e: TouchEvent) => {
     const touch = e.targetTouches[0];
