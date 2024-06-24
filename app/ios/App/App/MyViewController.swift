@@ -15,6 +15,10 @@ class MyViewController: CAPBridgeViewController {
         // Do any additional setup after loading the view.
     }
     
+    override open func webView(with frame: CGRect, configuration: WKWebViewConfiguration) -> WKWebView {
+        return CustomWKWebView(frame: frame, configuration: configuration)
+    }
+    
     override open func capacitorDidLoad() {
         bridge?.registerPluginInstance(AppleMusicPlugin())
     }

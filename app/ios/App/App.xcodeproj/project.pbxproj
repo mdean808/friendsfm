@@ -20,6 +20,7 @@
 		AC254E952C1D6655006CB20D /* AppleMusicPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC254E942C1D6655006CB20D /* AppleMusicPlugin.swift */; };
 		AC254E972C1D6666006CB20D /* AppleMusicPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = AC254E962C1D6666006CB20D /* AppleMusicPlugin.m */; };
 		AC254E992C1E641D006CB20D /* MyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC254E982C1E641D006CB20D /* MyViewController.swift */; };
+		AC254E9B2C28F919006CB20D /* CustomWKWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC254E9A2C28F919006CB20D /* CustomWKWebView.swift */; };
 		AC42C85729BFE16100902F1B /* OSLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = AC42C85629BFE16100902F1B /* OSLogger.m */; };
 		AC42C85929BFE17500902F1B /* OSLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C85829BFE17500902F1B /* OSLogger.swift */; };
 		ACA0E7C52990EB3400B47C81 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = ACA0E7C42990EB3400B47C81 /* GoogleService-Info.plist */; };
@@ -41,6 +42,7 @@
 		AC254E942C1D6655006CB20D /* AppleMusicPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicPlugin.swift; sourceTree = "<group>"; };
 		AC254E962C1D6666006CB20D /* AppleMusicPlugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleMusicPlugin.m; sourceTree = "<group>"; };
 		AC254E982C1E641D006CB20D /* MyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyViewController.swift; sourceTree = "<group>"; };
+		AC254E9A2C28F919006CB20D /* CustomWKWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomWKWebView.swift; sourceTree = "<group>"; };
 		AC42C85529BFE16000902F1B /* FriendsFM-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FriendsFM-Bridging-Header.h"; sourceTree = "<group>"; };
 		AC42C85629BFE16100902F1B /* OSLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OSLogger.m; sourceTree = "<group>"; };
 		AC42C85829BFE17500902F1B /* OSLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSLogger.swift; sourceTree = "<group>"; };
@@ -109,6 +111,7 @@
 				AC42C85529BFE16000902F1B /* FriendsFM-Bridging-Header.h */,
 				AC42C85829BFE17500902F1B /* OSLogger.swift */,
 				AC254E982C1E641D006CB20D /* MyViewController.swift */,
+				AC254E9A2C28F919006CB20D /* CustomWKWebView.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -295,6 +298,7 @@
 				AC254E992C1E641D006CB20D /* MyViewController.swift in Sources */,
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 				AC254E952C1D6655006CB20D /* AppleMusicPlugin.swift in Sources */,
+				AC254E9B2C28F919006CB20D /* CustomWKWebView.swift in Sources */,
 				AC254E972C1D6666006CB20D /* AppleMusicPlugin.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -444,7 +448,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.3.2;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.mogdan.friendsfm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -471,7 +475,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.mogdan.friendsfm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
