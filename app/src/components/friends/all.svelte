@@ -74,7 +74,10 @@
       {/if}
     </div>
   {/if}
-  <div class="bg-gray-800 max-h-[50vh] h-auto overflow-scroll">
+  <div
+    style={`max-height: calc(100vh - 211px)`}
+    class="bg-gray-800 h-auto overflow-scroll"
+  >
     {#each $session.user.friends as friend}
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div

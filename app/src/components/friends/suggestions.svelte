@@ -52,7 +52,10 @@
   };
 </script>
 
-<div class="bg-gray-800 max-h-[50vh] h-auto overflow-scroll">
+<div
+  style={`max-height: calc(100vh - 211px)`}
+  class="bg-gray-800 h-auto overflow-scroll"
+>
   {#if loading}
     <div transition:slide class="w-full flex justify-between py-4 px-3">
       <LoadingIndicator className="w-8 mx-auto" />

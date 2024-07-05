@@ -724,6 +724,8 @@ export default class User implements UserType {
       .collectionGroup('public')
       .where('username', '==', username);
     const pubRes = await pubRef.get();
+    if (!pubRes.docs[0])
+      throw new CustomError('No user with provided username.');
     const friendQuery = pubRes.docs[0].ref.parent.parent;
     const friend = (await friendQuery?.get())?.data() as UserType;
     friend.public = pubRes.docs[0].data() as UserType['public'];
