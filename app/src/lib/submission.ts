@@ -31,6 +31,7 @@ import {
   type QueryCompositeFilterConstraint,
 } from '@capacitor-firebase/firestore';
 import { Capacitor } from '@capacitor/core';
+import { friendSubmissionsFilter, userSubmissionFilter } from './filters';
 
 export const friendSubmissions = <Writable<Submission[]>>writable([]);
 
@@ -219,27 +220,10 @@ export const deleteCommentFromSubmission = async (comment: Comment) => {
 };
 
 export const loadUserSubmission = async () => {
-  const userFilter: QueryCompositeFilterConstraint = {
-    type: 'and',
-    queryConstraints: [
-      {
-        type: 'where',
-        fieldPath: 'userId',
-        opStr: '==',
-        value: get(session).user.id,
-      },
-      {
-        type: 'where',
-        fieldPath: 'number',
-        opStr: '==',
-        value: get(currSubNumber),
-      },
-    ],
-  };
   // snapshot user submission status
   const colRes = await FirebaseFirestore.getCollection({
     reference: 'submissions',
-    compositeFilter: userFilter,
+    compositeFilter: userSubmissionFilter,
   });
   const sub = colRes.snapshots[0];
   if (sub?.data) {
@@ -302,28 +286,10 @@ export const loadFriendSubmissions = async () => {
   };
 
   friendIdChunks.forEach(async (chunk) => {
-    const friendSubsFilter: QueryCompositeFilterConstraint = {
-      type: 'and',
-      queryConstraints: [
-        {
-          type: 'where',
-          fieldPath: 'userId',
-          opStr: 'in',
-          value: chunk,
-        },
-        {
-          type: 'where',
-          fieldPath: 'number',
-          opStr: '==',
-          value: get(currSubNumber),
-        },
-      ],
-    };
-
     // Load friend submissions
     const docs = await FirebaseFirestore.getCollection({
       reference: 'submissions',
-      compositeFilter: friendSubsFilter,
+      compositeFilter: friendSubmissionsFilter(chunk),
     });
     await updateSubmissions(docs.snapshots);
   });

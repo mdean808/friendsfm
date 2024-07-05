@@ -11,7 +11,12 @@ import { get } from 'svelte/store';
 import type { LayoutLoad } from './$types';
 import { appLoaded, initParams, publicProfileUsername } from '$lib/util';
 import { page } from '$app/stores';
-import { activeSubmission, getSubmission } from '$lib/submission';
+import {
+  activeSubmission,
+  friendSubmissions,
+  getSubmission,
+  userSubmission,
+} from '$lib/submission';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { refreshMessagingToken, updateMusicPlatform } from '$lib/user';
@@ -49,6 +54,7 @@ const setupDevice = async () => {
         }
         const sesh = get(session);
         const notification = action?.notification;
+        alert(JSON.stringify(notification, null, '\t'));
         if (notification && sesh.loaded && sesh.loggedIn) {
           const data = notification.data as {
             [key: string]: any;
@@ -67,6 +73,8 @@ const setupDevice = async () => {
           // handle notification actions and subsequente routing
           switch (data.type) {
             case NotificationType.Daily:
+              userSubmission.set(null);
+              friendSubmissions.set([]);
               goto('/main/home');
               break;
             case NotificationType.LateSubmission:

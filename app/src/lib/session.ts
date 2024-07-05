@@ -1,9 +1,4 @@
-import {
-  NotificationType,
-  type SavedSong,
-  type Submission,
-  type User,
-} from './types';
+import { type SavedSong, type Submission, type User } from './types';
 import { get, writable, type Writable } from 'svelte/store';
 import Preferences from './preferences';
 import {
@@ -11,22 +6,14 @@ import {
   type AuthStateChange,
   type SignInResult,
 } from '@capacitor-firebase/authentication';
-import { App } from '@capacitor/app'
 import { unsubscribeSnapshots } from './firebase';
 import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 import { getUserStatistics, refreshMessagingToken } from './user';
 import { goto } from '$app/navigation';
 import { page } from '$app/stores';
 import { browser } from '$app/environment';
-import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
-import {
-  activeSubmission,
-  friendSubmissions,
-  getSubmission,
-} from './submission';
-import type { NotificationActionPerformedEvent } from '@capacitor-firebase/messaging';
+import { friendSubmissions } from './submission';
 import { songs } from './songs';
-import { appLoaded } from './util';
 
 export type Session = {
   user: User;

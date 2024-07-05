@@ -29,6 +29,7 @@ import {
 import {
   activeSubmission,
   friendSubmissions,
+  loadUserSubmission,
   userSubmission,
 } from './submission';
 import {
@@ -39,6 +40,7 @@ import {
 } from './types';
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
 import { migratePublicInfo } from './user';
+import { friendSubmissionsFilter, userSubmissionFilter } from './filters';
 
 export const config = {
   apiKey: PUBLIC_FIREBASE_API_KEY,
@@ -175,56 +177,23 @@ export const setupSnapshots = async () => {
           'Snapshot reference `misc/notifications` error:',
           err
         );
-      currSubNumber.set(event?.snapshot.data?.count);
+      const num = event?.snapshot.data?.count;
+      if (num > get(currSubNumber)) {
+        currSubNumber.set(event?.snapshot.data?.count);
+        friendSubmissions.set([]);
+        userSubmission.set(null);
+      }
     }
   );
 
   // load user submission
-  const userFilter: QueryCompositeFilterConstraint = {
-    type: 'and',
-    queryConstraints: [
-      {
-        type: 'where',
-        fieldPath: 'userId',
-        opStr: '==',
-        value: get(session).user.id,
-      },
-      {
-        type: 'where',
-        fieldPath: 'number',
-        opStr: '==',
-        value: get(currSubNumber),
-      },
-    ],
-  };
-  // snapshot user submission status
-  const colRes = await FirebaseFirestore.getCollection({
-    reference: 'submissions',
-    compositeFilter: userFilter,
-  });
-  const sub = colRes.snapshots[0];
-  if (sub?.data) {
-    userSubmission.set({
-      ...(sub.data as Submission),
-      id: sub.id,
-      time: new Date(sub.data.time),
-      lateTime: new Date(sub.data.lateTime),
-      user: {
-        id: get(session).user.id,
-        username: get(session).user.public.username || '',
-        musicPlatform:
-          get(session).user.public.musicPlatform || MusicPlatform.spotify,
-      },
-    });
-  } else {
-    // user submission doesn't exist
-  }
+  await loadUserSubmission();
   submissionLoaded.set(true);
   // snapshot user sub
 
   snapshots.userSubmission =
     await FirebaseFirestore.addCollectionSnapshotListener(
-      { reference: 'submissions', compositeFilter: userFilter },
+      { reference: 'submissions', compositeFilter: userSubmissionFilter },
       async (event, err) => {
         if (err)
           return console.log('Snapshot reference `submissions` error:', err);
@@ -246,6 +215,7 @@ export const setupSnapshots = async () => {
             activeSubmission.set(get(userSubmission));
         } else {
           // user submission doesn't exist
+          userSubmission.set(null);
         }
       }
     );
@@ -290,28 +260,10 @@ export const setupSnapshots = async () => {
   };
 
   friendIdChunks.forEach(async (chunk) => {
-    const friendSubsFilter: QueryCompositeFilterConstraint = {
-      type: 'and',
-      queryConstraints: [
-        {
-          type: 'where',
-          fieldPath: 'userId',
-          opStr: 'in',
-          value: chunk,
-        },
-        {
-          type: 'where',
-          fieldPath: 'number',
-          opStr: '==',
-          value: get(currSubNumber),
-        },
-      ],
-    };
-
     // Load friend submissions
     const docs = await FirebaseFirestore.getCollection({
       reference: 'submissions',
-      compositeFilter: friendSubsFilter,
+      compositeFilter: friendSubmissionsFilter(chunk),
     });
     await updateSubmissions(docs.snapshots);
     loadingFriendSubmissions.set(false);
@@ -319,7 +271,10 @@ export const setupSnapshots = async () => {
     // Snapshot friend submissions
     snapshots.friendSubmissions.push(
       await FirebaseFirestore.addCollectionSnapshotListener(
-        { reference: 'submissions', compositeFilter: friendSubsFilter },
+        {
+          reference: 'submissions',
+          compositeFilter: friendSubmissionsFilter(chunk),
+        },
         async (event, err) => {
           if (err)
             return console.log('Snapshot reference `submissions` error:', err);
