@@ -14,21 +14,13 @@ import {
 } from '$plugins/AppleMusic';
 import AppleMusic from '$plugins/AppleMusic';
 import { Dialog } from '@capacitor/dialog';
-import {
-  chunkArray,
-  currSubNumber,
-  errorToast,
-  loading,
-  network,
-  showToast,
-} from './util';
+import { chunkArray, errorToast, loading, network, showToast } from './util';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { session } from './session';
 import {
   FirebaseFirestore,
   type DocumentData,
   type DocumentSnapshot,
-  type QueryCompositeFilterConstraint,
 } from '@capacitor-firebase/firestore';
 import { Capacitor } from '@capacitor/core';
 import { friendSubmissionsFilter, userSubmissionFilter } from './filters';
@@ -223,7 +215,7 @@ export const loadUserSubmission = async () => {
   // snapshot user submission status
   const colRes = await FirebaseFirestore.getCollection({
     reference: 'submissions',
-    compositeFilter: userSubmissionFilter,
+    compositeFilter: userSubmissionFilter(),
   });
   const sub = colRes.snapshots[0];
   if (sub?.data) {

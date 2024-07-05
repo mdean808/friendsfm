@@ -193,7 +193,7 @@ export const setupSnapshots = async () => {
 
   snapshots.userSubmission =
     await FirebaseFirestore.addCollectionSnapshotListener(
-      { reference: 'submissions', compositeFilter: userSubmissionFilter },
+      { reference: 'submissions', compositeFilter: userSubmissionFilter() },
       async (event, err) => {
         if (err)
           return console.log('Snapshot reference `submissions` error:', err);

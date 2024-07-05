@@ -239,7 +239,8 @@
       transition:slide
       style={`height: calc(100vh - ${
         ($insets.bottom ? $insets.bottom + 50 : 0) +
-        (focused ? $keyboardHeight + 441 : 441)
+        (focused ? $keyboardHeight + 441 : 441) +
+        ($activeSubmission.caption ? 35 : 0)
       }px)`}
       class="overflow-y-scroll text-white pb-1 pt-2 block"
     >
