@@ -54,7 +54,7 @@ const setupDevice = async () => {
         }
         const sesh = get(session);
         const notification = action?.notification;
-        alert(JSON.stringify(notification, null, '\t'));
+        console.log(JSON.stringify(notification, null, '\t'));
         if (notification && sesh.loaded && sesh.loggedIn) {
           const data = notification.data as {
             [key: string]: any;

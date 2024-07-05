@@ -41,6 +41,7 @@
         lat: $location?.coords?.latitude || 0,
       };
       map.setCenter(startingCenter);
+      map.setZoom(12);
       createMarkers();
     }
   });
@@ -54,23 +55,21 @@
         genres.push({ name: genre, active: true });
     }
 
-    updateCurrentLocation();
     const mapRef = document.getElementById('google-map')!;
     const { Map } = (await google.maps.importLibrary(
       'maps'
     )) as google.maps.MapsLibrary;
 
     // center on the genre that was tapped
+    await updateCurrentLocation();
     let startingCenter = {} as { lat: number; lng: number };
     if ($activeSubmission?.location) {
       startingCenter = {
         lat: $activeSubmission.location?.latitude,
         lng: $activeSubmission.location?.longitude,
       };
-    } else if (
-      $location?.coords?.latitude &&
-      $location?.coords?.longitude
-    ) {
+    } else if ($location?.coords?.latitude && $location?.coords?.longitude) {
+      // if coords aren't 0, 0
       startingCenter = {
         lng: $location?.coords?.longitude,
         lat: $location?.coords?.latitude,
@@ -124,7 +123,6 @@
       // compare previous bounds to current bounds
       // make sure they are different enough to justify an update
       // first check for zoom change
-      if (prevZoom === map.getZoom()) shouldGetSubmissions = false;
       // then check for difference of .25 lng and lat
       if (!bounds) {
         map.setCenter({

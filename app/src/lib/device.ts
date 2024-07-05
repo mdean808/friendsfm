@@ -27,15 +27,22 @@ export const updateCurrentLocation = async () => {
       await Geolocation.requestPermissions();
     }
     let l = get(location);
-    console.log('location:', l)
     try {
       l = await Geolocation.getCurrentPosition();
     } catch (e) {
+      // we don't want to save location
       if (
         l ||
         (await Preferences.get({ key: 'location-permissions' })).value == '0'
-      )
+      ) {
+        location.set({
+          coords: {
+            latitude: 0,
+            longitude: 0,
+          },
+        } as Position);
         return;
+      }
       const { value } = await Dialog.confirm({
         title: 'Location Permissions',
         message:
