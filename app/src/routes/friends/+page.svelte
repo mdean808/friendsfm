@@ -83,7 +83,9 @@
   }}
   class="h-full"
 >
-  <div class="w-full flex flex-row justify-between items-center h-[55px] px-2">
+  <div
+    class="w-full flex flex-row justify-between items-center h-[55px] px-2 border-b-2 border-white"
+  >
     <div class="flex-grow-0 text-transparent">
       <svg
         class="w-8 h-8"
@@ -116,14 +118,11 @@
       </svg>
     </button>
   </div>
-  <Tabs
-    activeTab={writable('all')}
-    tabs={[
-      { name: 'your friends', component: All, id: 'all' },
-      { name: 'suggestions', id: 'suggestions', component: Suggestions },
-    ]}
-  />
-  <div class="px-2 py-2 flex bg-gray-800 border-b-2 border-white">
+
+  <h2 class="mx-auto text-gray-300 text-center pt-1 px-2 text-lg">
+    add a friend
+  </h2>
+  <div class="px-2 pb-2 flex bg-gray-800">
     <div
       class="inline-block py-1 px-1 border-2 border-r-0 rounded-sm rounded-r-none border-gray-600 text-gray-400 w-2/12 text-center"
     >
@@ -182,6 +181,19 @@
       {/if}
     </div>
   </div>
+  <h2
+    class="mx-auto text-gray-300 text-center px-2 text-lg border-b-2 border-white"
+  >
+    find friends
+  </h2>
+  <Tabs
+    rounded={false}
+    activeTab={writable('all')}
+    tabs={[
+      { name: 'your friends', component: All, id: 'all' },
+      { name: 'suggestions', id: 'suggestions', component: Suggestions },
+    ]}
+  />
   {#if $session.user.friendRequests.length > 0}
     <div class="bg-gray-900 border-white">
       <p
@@ -189,7 +201,7 @@
       >
         friend requests
       </p>
-      <div class="bg-gray-800 max-h-[150px] h-auto overflow-scroll">
+      <div class="bg-gray-800 h-auto overflow-scroll">
         {#each $session.user.friendRequests as username, i}
           <div
             transition:slide
