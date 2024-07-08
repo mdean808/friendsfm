@@ -47,6 +47,7 @@
       } as User['public']['profile'];
     }
     profile = publicInfo.profile;
+    if (!profile.musicPlatform) profile.musicPlatform === publicInfo.musicPlatform
     // load the stats!
     const stats = await getUserStatistics(
       snapshots[0].path.split('/')[1], // 'id' is 'info', so we must use 'path' to retrieve the userId
@@ -208,7 +209,9 @@
               src={profile.favorites.song.artwork}
             />
           </a>
-          <p class="mt-1 text-sm">{profile.favorites.song.name}</p>
+          <p class={`mt-1 text-sm text-${profile.musicPlatform}`}>
+            {profile.favorites.song.name}
+          </p>
           <p class="mt-1 text-sm text-gray-400">
             {profile.favorites.song.artist}
           </p>
@@ -349,7 +352,7 @@
         {$publicProfileUsername} is listening to
       </h2>
       <div
-        class={`p-1 rounded-md mx-4 mb-2 bg-gradient-to-r from-${profile?.musicPlatform} via-blue-500 to-${profile?.musicPlatform}   background-animate`}
+        class={`p-1 rounded-md mx-4 mb-2 bg-gradient-to-r from-${profile?.musicPlatform} via-blue-500 to-${profile?.musicPlatform} background-animate`}
       >
         <div
           class="text-left bg-gray-700 relative rounded-md px-2 py-2 flex space-x-4"

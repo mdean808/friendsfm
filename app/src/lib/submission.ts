@@ -80,6 +80,7 @@ export const generateSubmission = async () => {
   sub.lateTime = new Date(sub.lateTime);
   sub.time = new Date(sub.time);
   userSubmission.set(message.user as Submission);
+  loadFriendSubmissions()
   FirebaseAnalytics.logEvent({ name: 'generate_submission' });
 };
 
