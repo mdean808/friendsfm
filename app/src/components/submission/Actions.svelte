@@ -32,7 +32,7 @@
           ],
         },
       });
-    } else {
+    } else {// remove the like
       await FirebaseFirestore.updateDocument({
         reference: `submissions/${data.id}`,
         data: {

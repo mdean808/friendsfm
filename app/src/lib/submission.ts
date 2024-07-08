@@ -24,6 +24,7 @@ import {
 } from '@capacitor-firebase/firestore';
 import { Capacitor } from '@capacitor/core';
 import { friendSubmissionsFilter, userSubmissionFilter } from './filters';
+import { saveSong, unsaveSong } from './songs';
 
 export const friendSubmissions = <Writable<Submission[]>>writable([]);
 
@@ -316,3 +317,32 @@ export const getSubmission: (id: string) => Promise<Submission | null> = async (
     return null;
   }
 };
+
+export const toggleLike = async (submission: Submission) => {
+  const sesh = get(session)
+  // user hasn't liked the submission yet 
+  if (!submission.likes.find((l) => l.id === sesh.user.id)) {
+    // add the like
+    await FirebaseFirestore.updateDocument({
+      reference: `submissions/${submission.id}`,
+      data: {
+        likes: [
+          ...submission.likes,
+          { id: sesh.user.id, username: sesh.user.public.username },
+        ],
+      },
+    });
+    // save the song
+    await saveSong({ ...submission.song, user: submission.user })
+  } else {
+    // remove the like
+    await FirebaseFirestore.updateDocument({
+      reference: `submissions/${submission.id}`,
+      data: {
+        likes: submission.likes.filter((l) => l.id !== sesh.user.id),
+      },
+    });
+    // unsave the song
+    await unsaveSong({ ...submission.song, user: submission.user })
+  }
+}

@@ -4,7 +4,7 @@
   import { session } from '$lib/session';
   import type { SavedSong } from '$lib/types';
   import { insets } from '$lib/device';
-  import { toggleSavedSong } from '$lib/songs';
+  import { saveSong, toggleSong, unsaveSong } from '$lib/songs';
   import { formatDurationPlayed } from '$lib/dates';
   import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 
@@ -29,6 +29,7 @@
       loadingSongs = false;
     }
   });
+
 </script>
 
 <div
@@ -110,8 +111,8 @@
           >
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <svg
-              on:click={() => toggleSavedSong(song)}
-              on:keypress={() => toggleSavedSong(song)}
+              on:click={() => toggleSong(song)}
+              on:keypress={() => toggleSong(song)}
               class="w-6 h-6 ml-auto self-start text-pink-500"
               fill="currentColor"
               stroke="currentColor"

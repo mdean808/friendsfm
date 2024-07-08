@@ -63,33 +63,47 @@ export const createSongsPlaylist = async () => {
   }
 };
 
-export const toggleSavedSong = async (savedSong?: SavedSong) => {
-  if (!savedSong) return;
+export const saveSong = async (song: SavedSong) => {
   session.update((sesh) => {
-    // song exists in saved songs
-    if (sesh.songs.find((song) => song.name === savedSong.name)) {
-      // make sure the ID is present
-      if (!savedSong.id)
-        savedSong.id =
-          sesh.songs.find((song) => song.name === savedSong.name)?.id ||
-          'unknown';
-      // remove the song from the list
-      sesh.songs = sesh.songs.filter((s) => s.name !== savedSong.name);
-      // save to backend
-    } else {
-      sesh.songs.push(savedSong);
-    }
-    return sesh;
+    // song exists in saved songs - return
+    if (sesh.songs.find((song) => song.name === song.name)) return sesh
+    // add the song 
+    sesh.songs.push(song);
+    return sesh
   });
-  if (get(session).songs.find((song) => song.name === savedSong.name)) {
-    const message = await network.queryFirebase('deletesong', {
-      song: savedSong,
-    });
-    if (!message) return;
-  } else {
-    const message = await network.queryFirebase('savesong', {
-      song: savedSong,
-    });
-    if (!message) return;
-  }
-};
+  // save to backend
+  await network.queryFirebase('savesong', {
+    song: song,
+  });
+}
+
+export const unsaveSong = async (song: SavedSong) => {
+  session.update((sesh) => {
+    // song doesn't exist in saved songs - return
+    if (!sesh.songs.find((song) => song.name === song.name)) return sesh
+    // remove the song 
+    // make sure the ID is present
+    if (!song.id)
+      song.id =
+        sesh.songs.find((song) => song.name === song.name)?.id ||
+        'unknown';
+    // remove the song from the list
+    sesh.songs = sesh.songs.filter((s) => s.name !== song.name);
+    return sesh
+  });
+  // save to backend
+  await network.queryFirebase('deletesong', {
+    song: song,
+  });
+}
+
+  export const toggleSong = async (savedSong?: SavedSong) => {
+    if (!savedSong) return;
+    if ($session.songs.find((song) => song.name === savedSong.name)) {
+      // song exists
+      await unsaveSong(savedSong);
+    } else {
+      // song doesn't exist
+      await saveSong(savedSong);
+    }
+  };

@@ -65,7 +65,6 @@ export const getCurrentSong = async (
   id?: string,
   username?: string
 ): Promise<Song | undefined> => {
-  return;
   const message = await network.queryFirebase('getusercurrentlylistening', {
     id,
     username,

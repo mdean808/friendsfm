@@ -11,7 +11,7 @@
   import { sendFriendRequest } from '$lib/friends';
   import { session } from '$lib/session';
   import { formatDurationPlayed } from '$lib/dates';
-  import { toggleSavedSong } from '$lib/songs';
+  import { toggleSong } from '$lib/songs';
   import { FirebaseFirestore } from '@capacitor-firebase/firestore';
   import { Clipboard } from '@capacitor/clipboard';
   import { Capacitor } from '@capacitor/core';
@@ -430,8 +430,8 @@
           <div class="flex-grow-0 flex-shrink">
             <svg
               role="presentation"
-              on:click={() => toggleSavedSong(profile.stats.topSong)}
-              on:keypress={() => toggleSavedSong(profile.stats.topSong)}
+              on:click={() => toggleSong(profile.stats.topSong)}
+              on:keypress={() => toggleSong(profile.stats.topSong)}
               class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
                 $session.songs.find(
                   (s) => s.name === profile?.stats.topSong?.name

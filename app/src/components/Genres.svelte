@@ -8,7 +8,7 @@
   import { activeSubmission, nearbySubmissions } from '$lib/submission';
   import { insets, location, updateCurrentLocation } from '$lib/device';
   import LoadingIndicator from '$components/LoadingIndicator.svelte';
-  import { toggleSavedSong } from '$lib/songs';
+  import { toggleSong } from '$lib/songs';
   import { sendFriendRequest } from '$lib/friends';
   import { getNearbySubmissions } from '$lib/nearby';
   import { session } from '$lib/session';
@@ -210,7 +210,7 @@
         username: data.user.username,
       },
     };
-    await toggleSavedSong(savedSong);
+    await toggleSong(savedSong);
     loadingHeart = false;
   };
 

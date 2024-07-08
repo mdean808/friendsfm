@@ -2,9 +2,10 @@
   import { slide } from 'svelte/transition';
   import LoadingIndicator from '../LoadingIndicator.svelte';
   import { onMount } from 'svelte';
-  import { publicProfileUsername, showToast } from '../../lib/util';
-  import { getFriendSuggestions, sendFriendRequest } from '$lib/friends';
+  import { publicProfileUsername, showToast } from '$lib/util';
+  import { insets } from '$lib/device';
   import { goto } from '$app/navigation';
+  import { getFriendSuggestions, sendFriendRequest } from '$lib/friends';
 
   let suggestions: {
     username: string;
@@ -53,7 +54,7 @@
 </script>
 
 <div
-  style={`max-height: calc(100vh - 211px)`}
+  style={`max-height: calc(100vh - ${211 + $insets.bottom}px)`}
   class="bg-gray-800 h-auto overflow-scroll"
 >
   {#if loading}
