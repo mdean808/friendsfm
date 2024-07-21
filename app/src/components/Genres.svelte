@@ -198,9 +198,11 @@
   };
 
   const toggleSongHelper = async (
+    e: MouseEvent | KeyboardEvent,
     data: StrippedSubmission,
     loadingHeart: boolean
   ) => {
+    e.stopPropagation();
     if (loadingHeart) return;
     loadingHeart = true;
     const savedSong: SavedSong = {
@@ -380,8 +382,8 @@
                   {/if}
                   <div class="h-full">
                     <svg
-                      on:click={() => toggleSongHelper(sub, loadingHeart)}
-                      on:keypress={() => toggleSongHelper(sub, loadingHeart)}
+                      on:click={(e) => toggleSongHelper(e, sub, loadingHeart)}
+                      on:keypress={(e) => toggleSongHelper(e, sub, loadingHeart)}
                       role="button"
                       tabindex="0"
                       class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${

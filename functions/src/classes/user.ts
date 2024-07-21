@@ -185,13 +185,13 @@ export default class User implements UserType {
     const songsRef = this.dbRef.collection('songs');
 
     const songExists = this.savedSongs.find((s: SavedSong) => s.id === song.id);
-    if (songExists) {
-      return songExists;
+    let songData = song;
+    if (!songExists) {
+      const songRef = await songsRef.add(song);
+      const songRes = await songRef.get();
+      songData = { ...songRes.data(), id: songRes.id } as SavedSong;
     }
 
-    const songRef = await songsRef.add(song);
-    const songRes = await songRef.get();
-    const songData = { ...songRes.data(), id: songRes.id } as SavedSong;
 
     // add the new song to the playlist
     if (this.likedSongsPlaylist) {
@@ -258,9 +258,9 @@ export default class User implements UserType {
         (noGenre
           ? 'Unknown'
           : await getTrackGenre(
-              currentTrack.item.name,
-              currentTrack.item.artists[0]?.name || ''
-            )) || 'Unknown',
+            currentTrack.item.name,
+            currentTrack.item.artists[0]?.name || ''
+          )) || 'Unknown',
     } as Song;
   }
 

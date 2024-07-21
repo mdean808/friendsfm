@@ -47,7 +47,8 @@
       } as User['public']['profile'];
     }
     profile = publicInfo.profile;
-    if (!profile.musicPlatform) profile.musicPlatform === publicInfo.musicPlatform
+    if (!profile.musicPlatform)
+      profile.musicPlatform = publicInfo.musicPlatform;
     // load the stats!
     const stats = await getUserStatistics(
       snapshots[0].path.split('/')[1], // 'id' is 'info', so we must use 'path' to retrieve the userId

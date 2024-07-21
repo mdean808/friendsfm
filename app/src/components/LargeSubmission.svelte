@@ -5,7 +5,7 @@
   import Comment from '$components/icons/Comment.svelte';
   import Heart from '$components/icons/Heart.svelte';
   import { onDestroy, onMount } from 'svelte';
-  import { activeSubmission } from '$lib/submission';
+  import { activeSubmission, toggleLike } from '$lib/submission';
   import { goto } from '$app/navigation';
   import { getCurrentSong } from '$lib/user';
   import { publicProfileUsername } from '$lib/util';
@@ -35,29 +35,11 @@
     clearInterval(interval);
   });
 
-  const toggleLike = async (e: MouseEvent | KeyboardEvent) => {
+  const toggleLikeHandler = async (e: MouseEvent | KeyboardEvent) => {
     e.stopPropagation();
     if (loadingHeart) return;
     loadingHeart = true;
-    const shouldLike = !data.likes.find((l) => l.id === $session.user.id);
-    if (shouldLike) {
-      await FirebaseFirestore.updateDocument({
-        reference: `submissions/${data.id}`,
-        data: {
-          likes: [
-            ...data.likes,
-            { id: $session.user.id, username: $session.user.public.username },
-          ],
-        },
-      });
-    } else {
-      await FirebaseFirestore.updateDocument({
-        reference: `submissions/${data.id}`,
-        data: {
-          likes: data.likes.filter((l) => l.id !== $session.user.id),
-        },
-      });
-    }
+    await toggleLike(data);
     loadingHeart = false;
   };
 </script>
@@ -144,8 +126,8 @@
     }`}
   >
     <div
-      on:click={toggleLike}
-      on:keypress={toggleLike}
+      on:click={toggleLikeHandler}
+      on:keypress={toggleLikeHandler}
       role="button"
       tabindex="0"
       class="text-white py-1 flex gap-2 place-content-center text-center w-full truncate border-r border-white"

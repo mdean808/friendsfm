@@ -4,11 +4,10 @@
   import Heart from '$components/icons/Heart.svelte';
   import Comment from '$components/icons/Comment.svelte';
   import MusicPlatformIcon from '$components/icons/MusicPlatformIcon.svelte';
-  import { activeSubmission } from '$lib/submission';
+  import { activeSubmission, toggleLike } from '$lib/submission';
   import { getNearbySubmissions } from '$lib/nearby';
   import { goto } from '$app/navigation';
   import { session } from '$lib/session';
-  import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 
   export let data: Submission;
   export let className: string = '';
@@ -17,29 +16,11 @@
 
   let loadingHeart = false;
 
-  const toggleLike = async (e: MouseEvent | KeyboardEvent) => {
+  const toggleLikeHandler = async (e: MouseEvent | KeyboardEvent) => {
     e.stopPropagation();
     if (loadingHeart) return;
     loadingHeart = true;
-    const shouldLike = !data.likes.find((l) => l.id === $session.user.id);
-    if (shouldLike) {
-      await FirebaseFirestore.updateDocument({
-        reference: `submissions/${data.id}`,
-        data: {
-          likes: [
-            ...data.likes,
-            { id: $session.user.id, username: $session.user.public.username },
-          ],
-        },
-      });
-    } else {// remove the like
-      await FirebaseFirestore.updateDocument({
-        reference: `submissions/${data.id}`,
-        data: {
-          likes: data.likes.filter((l) => l.id !== $session.user.id),
-        },
-      });
-    }
+    await toggleLike(data);
     loadingHeart = false;
   };
 </script>
@@ -93,8 +74,8 @@
           {data.likes.length > 9 ? 9 + '+' : data.likes.length}
         </div>
         <Heart
-          on:click={toggleLike}
-          on:keypress={toggleLike}
+          on:click={toggleLikeHandler}
+          on:keypress={toggleLikeHandler}
           className={`w-6 h-6 flex-grow-0 flex-shrink ${
             loadingHeart ? 'animate-ping text-white' : ''
           } ${
