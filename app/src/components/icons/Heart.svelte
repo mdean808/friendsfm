@@ -2,6 +2,7 @@
   export let className: string = '';
 </script>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <svg
   on:click
   on:keypress

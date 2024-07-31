@@ -2,16 +2,14 @@
   import { slide } from 'svelte/transition';
   import LoadingIndicator from '../LoadingIndicator.svelte';
   import { onMount } from 'svelte';
-  import {
-    sendFriendRequest,
-    getFriendSuggestions,
-    publicProfileUsername,
-  } from '../../store';
-  import { goto, showToast } from '../../lib/util';
+  import { publicProfileUsername, showToast } from '$lib/util';
+  import { insets } from '$lib/device';
+  import { goto } from '$app/navigation';
+  import { getFriendSuggestions, sendFriendRequest } from '$lib/friends';
 
   let suggestions: {
     username: string;
-    mutual: string;
+    mutual?: string;
     loading: boolean;
     sent: boolean;
   }[] = [];
@@ -35,7 +33,7 @@
   const addFriend = async (
     suggestion: {
       username: string;
-      mutual: string;
+      mutual?: string;
       loading: boolean;
     },
     sIndex: number
@@ -55,7 +53,10 @@
   };
 </script>
 
-<div class="bg-gray-800 max-h-[50vh] h-auto overflow-scroll">
+<div
+  style={`max-height: calc(100vh - ${211 + $insets.bottom}px)`}
+  class="bg-gray-800 h-auto overflow-scroll"
+>
   {#if loading}
     <div transition:slide class="w-full flex justify-between py-4 px-3">
       <LoadingIndicator className="w-8 mx-auto" />
@@ -67,13 +68,9 @@
         class="w-full border-b-white border-b-2 flex justify-between py-3 px-3"
       >
         <button
-          on:keypress={() => {
-            publicProfileUsername.set(suggestion.username);
-            goto('/public_profile');
-          }}
           on:click={() => {
             publicProfileUsername.set(suggestion.username);
-            goto('/public_profile');
+            goto('/modal/profile');
           }}
           class="flex flex-row gap-2"
         >

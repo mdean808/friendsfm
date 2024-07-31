@@ -64,8 +64,8 @@ export default class Submission implements SubmissionType {
     this.likes = likes || [];
     this.user = {
       id: user?.id || '',
-      username: user?.username || '',
-      musicPlatform: user?.musicPlatform || MusicPlatform.spotify,
+      username: user?.public.username || '',
+      musicPlatform: user?.public.musicPlatform || MusicPlatform.spotify,
     };
     this.userId = user?.id || '';
   }
@@ -79,8 +79,8 @@ export default class Submission implements SubmissionType {
     await u.load();
     this.user = {
       id: u.id,
-      username: u.username,
-      musicPlatform: u.musicPlatform,
+      username: u.public.username || u.id,
+      musicPlatform: u.public.musicPlatform,
     };
     try {
       this.currentlyListening = await u.getCurrentlyListening();
@@ -90,25 +90,11 @@ export default class Submission implements SubmissionType {
     return this;
   }
 
-  public formatDatesForFrontend() {
-    if ((this.time as Timestamp).toDate)
-      this.time = (this.time as Timestamp).toDate();
-    if ((this.lateTime as Timestamp).toDate)
-      this.lateTime = (this.lateTime as Timestamp).toDate();
-  }
-  public formatDatesForFirebase() {
-    if (!(this.time as Timestamp).toDate)
-      this.time = Timestamp.fromDate(this.time as Date);
-    if (!(this.lateTime as Timestamp).toDate)
-      this.lateTime = Timestamp.fromDate(this.lateTime as Date);
-  }
-
   public get dbRef(): DocumentReference {
     return db.collection('submissions').doc(this.id);
   }
 
   public get json(): SubmissionType {
-    this.formatDatesForFrontend();
     return {
       id: this.id,
       number: this.number,
@@ -116,8 +102,8 @@ export default class Submission implements SubmissionType {
       audial: this.audial,
       location: this.location,
       late: this.late,
-      time: this.time,
-      lateTime: this.lateTime,
+      time: new Date(this.time),
+      lateTime: new Date(this.lateTime),
       comments: this.comments,
       user: this.user,
       userId: this.user?.id || '',
@@ -139,7 +125,7 @@ export default class Submission implements SubmissionType {
     const comment = {
       id: randomUUID(),
       content,
-      user: { id: user.id, username: user.username },
+      user: { id: user.id, username: user.public.username || user.id },
     };
     // add comment to submission in db and then locally
     await this.dbRef.update({
@@ -153,8 +139,8 @@ export default class Submission implements SubmissionType {
     const subUser = new User(this.userId);
     if (this.userId !== user.id) {
       await subUser.load();
-      notifsSentToUsernames.push(subUser.username);
-      subUser.sendNotification(`${user.username} commented`, content, {
+      notifsSentToUsernames.push(subUser.public.username || subUser.id);
+      subUser.sendNotification(`${user.public.username} commented`, content, {
         type: 'comment',
         id: this.id,
       });
@@ -174,8 +160,8 @@ export default class Submission implements SubmissionType {
       if (this.userId !== u.id && u.id !== user.id) {
         const u = new User(c.user.id);
         await u.load();
-        notifsSentToUsernames.push(u.username);
-        u.sendNotification(`${user.username} commented`, content, {
+        notifsSentToUsernames.push(u.public.username || subUser.id);
+        u.sendNotification(`${user.public.username} commented`, content, {
           type: 'comment',
           id: this.id,
         });
@@ -203,7 +189,7 @@ export default class Submission implements SubmissionType {
       if (notifsSentToUsernames.find((u) => u === username)) continue;
       User.getByUsername(username).then((u) => {
         u.sendNotification(
-          `${user.username} mentioned you in a comment`,
+          `${user.public.username} mentioned you in a comment`,
           content,
           {
             type: 'comment',
@@ -231,7 +217,7 @@ export default class Submission implements SubmissionType {
   }
 
   public async addLike(user: User) {
-    this.likes.push({ id: user.id, username: user.username });
+    this.likes.push({ id: user.id, username: user.public.username || user.id });
     await this.dbRef.update({ likes: this.likes });
   }
   public async unlike(user: User) {
@@ -262,15 +248,15 @@ export default class Submission implements SubmissionType {
     notificationsSnapshot: DocumentSnapshot
   ): {
     late: boolean;
-    time: Timestamp;
-    lateTime: Timestamp;
+    time: Date;
+    lateTime: Date;
   } {
     const notificationTimestamp = notificationsSnapshot.get(
       'time'
     ) as Timestamp;
     const notificationTime = notificationTimestamp.toDate();
     let late = false;
-    let lateTime: Date | Timestamp = new Date();
+    let lateTime = new Date();
     if (notificationTime > new Date()) {
       // the current date is before the current notification time, so we use the previous time.
       const prevTime = (
@@ -293,8 +279,6 @@ export default class Submission implements SubmissionType {
     }
 
     // create and store the submission
-    let time = Timestamp.fromDate(new Date());
-    lateTime = Timestamp.fromDate(lateTime);
-    return { late, time, lateTime };
+    return { late, time: new Date(), lateTime };
   }
 }

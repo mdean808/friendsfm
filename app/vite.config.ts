@@ -1,31 +1,43 @@
-import { defineConfig, loadEnv } from 'vite';
-import { svelte } from '@sveltejs/vite-plugin-svelte';
-import { sentryVitePlugin } from '@sentry/vite-plugin';
+import { sentrySvelteKit } from '@sentry/sveltekit';
+import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import child_process from 'child_process';
 
-// https://vitejs.dev/config/
-export default ({ mode }) => {
-  process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
-  return defineConfig({
-    build: {
-      sourcemap: true, // Source map generation must be turned on
-    },
-    plugins: [
-      svelte(),
-      process.env.RELEASE === 'true'
-        ? sentryVitePlugin({
-            authToken: process.env.VITE_SENTRY_AUTH_TOKEN,
-            org: 'friendsfm',
-            project: 'friendsfm-app',
-            release: {
-              name: process.env.npm_package_version,
-              cleanArtifacts: true,
-            },
-          })
-        : {},
-    ],
-    server: {
-      port: 8080,
-      host: '0.0.0.0',
-    },
-  });
-};
+const file = fileURLToPath(new URL('package.json', import.meta.url));
+const json = readFileSync(file, 'utf8');
+const pkg = JSON.parse(json);
+const commit = child_process
+  .execSync('git rev-parse --short HEAD')
+  .toString()
+  .trim();
+
+export default defineConfig({
+  plugins: [
+    sentrySvelteKit({
+      sourceMapsUploadOptions: {
+        dist: '1',
+        telemetry: false,
+        org: 'friendsfm',
+        project: 'friendsfm-app',
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        release: 'git-' + commit,
+      },
+      autoUploadSourceMaps: !!process.env.RELEASE,
+    }),
+    sveltekit(),
+  ],
+  define: {
+    VERSION: JSON.stringify(pkg.version),
+    RELEASE: JSON.stringify(process.env.RELEASE),
+    COMMIT: JSON.stringify(commit),
+  },
+  server: {
+    port: 8080,
+    host: '0.0.0.0',
+  },
+  preview: {
+    port: 8080,
+  },
+});

@@ -1,12 +1,13 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  import { publicProfileUsername, refreshUser, user } from '../../store';
   import { slide } from 'svelte/transition';
-  import { goto } from '../../lib/util';
   import LoadingIndicator from '../LoadingIndicator.svelte';
   import { Share } from '@capacitor/share';
   import { Keyboard, KeyboardResize } from '@capacitor/keyboard';
   import { Capacitor } from '@capacitor/core';
+  import { session } from '$lib/session';
+  import { publicProfileUsername } from '$lib/util';
+  import { goto } from '$app/navigation';
 
   const swipePosStart = { x: 0, y: 0 };
   const swipePosCurrent = { x: 0, y: 0 };
@@ -28,7 +29,10 @@
       swipePosCurrent.y = touch.screenY;
     }
     const changeInY = swipePosCurrent.y - swipePosStart.y;
-    if (document.getElementById('friends')?.scrollTop <= 0 && changeInY > 100)
+    if (
+      (document?.getElementById('friends')?.scrollTop || 1) <= 0 &&
+      changeInY > 100
+    )
       shouldRefreshOnSwipeEnd = true;
     else shouldRefreshOnSwipeEnd = false;
   };
@@ -36,7 +40,6 @@
   const swipeEnd = async () => {
     if (shouldRefreshOnSwipeEnd && !loadingFriends) {
       loadingFriends = true;
-      await refreshUser();
       loadingFriends = false;
       shouldRefreshOnSwipeEnd = false;
     }
@@ -71,16 +74,20 @@
       {/if}
     </div>
   {/if}
-  <div class="bg-gray-800 max-h-[50vh] h-auto overflow-scroll">
-    {#each $user.friends as friend}
+  <div
+    style={`max-height: calc(100vh - 211px)`}
+    class="bg-gray-800 h-auto overflow-scroll"
+  >
+    {#each $session.user.friends as friend}
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
         on:keypress={() => {
           publicProfileUsername.set(friend.username);
-          goto('/public_profile');
+          goto('/modal/profile');
         }}
         on:click={() => {
           publicProfileUsername.set(friend.username);
-          goto('/public_profile');
+          goto('/modal/profile');
         }}
         transition:slide
         class="w-full border-b-white border-b-2 flex justify-between py-4 px-3"

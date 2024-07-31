@@ -1,49 +1,37 @@
 <script lang="ts">
-  import { goto, showToast } from '../../lib/util';
-  import type { Submission } from '../../types';
-  import {
-    activeSubmission,
-    platform,
-    setSubmissionCaption,
-    loading,
-  } from '../../store';
+  import { showToast } from '$lib/util';
+  import type { Submission } from '$lib/types';
   import SubmissionSong from './Song.svelte';
   import SubmissionTime from './Time.svelte';
   import SubmissionActions from './Actions.svelte';
   import { Dialog } from '@capacitor/dialog';
+  import { activeSubmission } from '$lib/submission';
+  import { goto } from '$app/navigation';
+  import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 
   export let data: Submission;
   let tempCap = '';
 
   const showFullSubmission = () => {
     activeSubmission.set(data);
-    goto('/?submission');
+    goto('/modal/submission');
   };
 
   const createCaption = async () => {
     try {
-      if ($platform === 'web') {
-        const res = prompt('Enter your caption below.');
-        if (!res.trim()) return;
-        tempCap = res;
-        data.caption = await setSubmissionCaption(res.trim());
-      } else {
-        const res = await Dialog.prompt({
-          title: 'Create Caption',
-          message: 'Enter your caption below.',
-        });
-        if (res.cancelled || !res.value.trim()) return;
-        tempCap = res.value;
-        data = {
-          ...data,
-          caption: await setSubmissionCaption(res.value.trim()),
-        };
-      }
+      const res = await Dialog.prompt({
+        title: 'Create Caption',
+        message: 'Enter your caption below.',
+      });
+      if (res.cancelled || !res.value.trim()) return;
+      tempCap = res.value;
+      await FirebaseFirestore.updateDocument({
+        reference: `submissions/${data.id}`,
+        data: { caption: tempCap },
+      });
       showToast({ content: 'successfully updated your caption.' });
     } catch (e) {
       console.log(e);
-    } finally {
-      loading.set(false);
     }
   };
 </script>
@@ -52,6 +40,8 @@
   <div
     on:keypress={showFullSubmission}
     on:click={showFullSubmission}
+    role="button"
+    tabindex="0"
     class={`border-white rounded-t-lg bg-gray-700 `}
   >
     <div class="relative">

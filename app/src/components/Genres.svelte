@@ -1,30 +1,24 @@
 <script lang="ts">
   import { MarkerClusterer } from '@googlemaps/markerclusterer';
-  import { hashCode, intToRGB, showToast } from '../lib/util';
-  import type { SavedSong, StrippedSubmission } from '../types';
-  import {
-    toggleSong,
-    nearbySubmissions,
-    songs,
-    location,
-    updateCurrentLocation,
-    insets,
-    getNearbySubmissions,
-    sendFriendRequest,
-    user,
-    activeSubmission,
-  } from '../store';
-  import MusicPlatformIcon from '../components/icons/MusicPlatformIcon.svelte';
+  import { hashCode, intToRGB, showToast } from '$lib/util';
+  import type { SavedSong, StrippedSubmission } from '$lib/types';
+  import MusicPlatformIcon from '$components/icons/MusicPlatformIcon.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { slide } from 'svelte/transition';
-  import LoadingIndicator from './LoadingIndicator.svelte';
+  import { activeSubmission, nearbySubmissions } from '$lib/submission';
+  import { insets, location, updateCurrentLocation } from '$lib/device';
+  import LoadingIndicator from '$components/LoadingIndicator.svelte';
+  import { toggleSong } from '$lib/songs';
+  import { sendFriendRequest } from '$lib/friends';
+  import { getNearbySubmissions } from '$lib/nearby';
+  import { session } from '$lib/session';
 
   let map: google.maps.Map;
   let parentDiv: HTMLDivElement;
   let markers: google.maps.marker.AdvancedMarkerElement[] = [];
 
   let prevZoom = 12;
-  let prevBounds = null;
+  let prevBounds: google.maps.LatLngBounds;
 
   let genres: { name: string; active: boolean }[] = [];
 
@@ -40,13 +34,14 @@
   });
 
   // lsiten for location changes
-  location.listen((val) => {
-    if (val?.gp?.coords && map && !$activeSubmission) {
+  location.subscribe((val) => {
+    if (val?.coords && map && !$activeSubmission) {
       const startingCenter = {
-        lng: $location?.gp?.coords?.longitude || 0,
-        lat: $location?.gp?.coords?.latitude || 0,
+        lng: $location?.coords?.longitude || 0,
+        lat: $location?.coords?.latitude || 0,
       };
       map.setCenter(startingCenter);
+      map.setZoom(12);
       createMarkers();
     }
   });
@@ -60,26 +55,24 @@
         genres.push({ name: genre, active: true });
     }
 
-    updateCurrentLocation();
-    const mapRef = document.getElementById('google-map');
+    const mapRef = document.getElementById('google-map')!;
     const { Map } = (await google.maps.importLibrary(
       'maps'
     )) as google.maps.MapsLibrary;
 
     // center on the genre that was tapped
+    await updateCurrentLocation();
     let startingCenter = {} as { lat: number; lng: number };
     if ($activeSubmission?.location) {
       startingCenter = {
         lat: $activeSubmission.location?.latitude,
         lng: $activeSubmission.location?.longitude,
       };
-    } else if (
-      $location?.gp?.coords?.latitude &&
-      $location?.gp?.coords?.longitude
-    ) {
+    } else if ($location?.coords?.latitude && $location?.coords?.longitude) {
+      // if coords aren't 0, 0
       startingCenter = {
-        lng: $location?.gp?.coords?.longitude,
-        lat: $location?.gp?.coords?.latitude,
+        lng: $location?.coords?.longitude,
+        lat: $location?.coords?.latitude,
       };
     } else {
       startingCenter = { lng: 0, lat: 0 };
@@ -130,41 +123,41 @@
       // compare previous bounds to current bounds
       // make sure they are different enough to justify an update
       // first check for zoom change
-      if (prevZoom === map.getZoom()) shouldGetSubmissions = false;
       // then check for difference of .25 lng and lat
       if (!bounds) {
         map.setCenter({
-          lat: $location?.gp?.coords?.latitude || 51.4934,
-          lng: $location?.gp?.coords?.longitude || 0.0098,
+          lat: $location?.coords?.latitude || 51.4934,
+          lng: $location?.coords?.longitude || 0.0098,
         });
         bounds = map.getBounds();
       }
       if (
-        Math.abs(bounds.getCenter().lat() - prevBounds?.getCenter().lat()) >
+        bounds &&
+        (Math.abs(bounds.getCenter().lat() - prevBounds?.getCenter().lat()) >
           0.25 ||
-        Math.abs(bounds.getCenter().lng() - prevBounds?.getCenter().lng()) >
-          0.25 ||
-        $nearbySubmissions.length == 0
+          Math.abs(bounds.getCenter().lng() - prevBounds?.getCenter().lng()) >
+            0.25 ||
+          $nearbySubmissions.length == 0)
       )
         shouldGetSubmissions = true;
       if (shouldGetSubmissions) {
         // update nearbySubmissions for this location
         loadingNearby = true;
-        getNearbySubmissions(null, {
+        getNearbySubmissions(undefined, {
           southWest: {
-            latitude: bounds.getSouthWest().lat(),
-            longitude: bounds.getSouthWest().lng(),
+            latitude: bounds?.getSouthWest().lat() || 0,
+            longitude: bounds?.getSouthWest().lng() || 0,
           },
           northEast: {
-            latitude: bounds.getNorthEast().lat(),
-            longitude: bounds.getNorthEast().lng(),
+            latitude: bounds?.getNorthEast().lat() || 0,
+            longitude: bounds?.getNorthEast().lng() || 0,
           },
         }).then(() => {
           loadingNearby = false;
           createMarkers();
         });
-        prevZoom = map.getZoom();
-        prevBounds = map.getBounds();
+        prevZoom = map.getZoom()!;
+        prevBounds = map.getBounds()!;
       } else loadingNearby = false;
     }, 1000); // Adjust debounce time as needed
   }
@@ -175,10 +168,10 @@
     )) as google.maps.MarkerLibrary;
     const missingSubs = [...$nearbySubmissions].filter((s) => {
       const hasLat = !!markers.find(
-        (m) => m.position.lat === s.location?.latitude
+        (m) => m.position?.lat === s.location?.latitude
       );
       const hasLng = !!markers.find(
-        (m) => m.position.lng === s.location?.longitude
+        (m) => m.position?.lng === s.location?.longitude
       );
       if (hasLat && hasLng) return false;
       else return true;
@@ -205,9 +198,11 @@
   };
 
   const toggleSongHelper = async (
+    e: MouseEvent | KeyboardEvent,
     data: StrippedSubmission,
     loadingHeart: boolean
   ) => {
+    e.stopPropagation();
     if (loadingHeart) return;
     loadingHeart = true;
     const savedSong: SavedSong = {
@@ -246,7 +241,7 @@
     <div
       class={`px-1.5 py-0.25 transition-all duration-200 rounded-lg ${
         loadingNearby
-          ? `bg-gradient-to-r from-${$user.musicPlatform} via-blue-500 to-${$user.musicPlatform} background-animate`
+          ? `bg-gradient-to-r from-${$session.user.public.musicPlatform} via-blue-500 to-${$session.user.public.musicPlatform} background-animate`
           : 'bg-blue-500'
       }`}
     >
@@ -275,6 +270,8 @@
       <div
         on:click={() => (genre.active = !genre.active)}
         on:keypress={() => (genre.active = !genre.active)}
+        role="button"
+        tabindex="0"
         style={`border-color: ${intToRGB(hashCode(genre.name, 23))}`}
         class={`p-1 border-b-2 mb-2 flex w-full border-white`}
       >
@@ -333,6 +330,8 @@
                   gotoCoords(sub.location?.latitude, sub.location?.longitude);
                   parentDiv.scrollIntoView();
                 }}
+                role="button"
+                tabindex="0"
                 style={`background: ${intToRGB(hashCode(sub.song.genre, 23))}`}
                 class={`flex p-2 rounded-t-lg bg-${sub.user.musicPlatform}`}
               >
@@ -350,7 +349,7 @@
                 <div
                   class="flex-grow-0 text-right flex flex-row flex-nowrap justify-between gap-2"
                 >
-                  {#if !$user.friends.find((f) => f.username === sub.user.username) && sub.user.username !== $user.username}
+                  {#if !$session.user.friends.find((f) => f.username === sub.user.username) && sub.user.username !== $session.user.public.username}
                     {@const loadingFr = false}
 
                     {#if !loadingFr}
@@ -383,16 +382,18 @@
                   {/if}
                   <div class="h-full">
                     <svg
-                      on:click={() => toggleSongHelper(sub, loadingHeart)}
-                      on:keypress={() => toggleSongHelper(sub, loadingHeart)}
+                      on:click={(e) => toggleSongHelper(e, sub, loadingHeart)}
+                      on:keypress={(e) => toggleSongHelper(e, sub, loadingHeart)}
+                      role="button"
+                      tabindex="0"
                       class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${
                         loadingHeart ? 'animate-ping text-white' : ''
                       } ${
-                        $songs.find((s) => s.name === sub.song.name)
+                        $session.songs.find((s) => s.name === sub.song.name)
                           ? 'text-white'
                           : ''
                       } `}
-                      fill={$songs.find((s) => s.name === sub.song.name)
+                      fill={$session.songs.find((s) => s.name === sub.song.name)
                         ? 'currentColor'
                         : 'none'}
                       stroke="currentColor"

@@ -1,17 +1,20 @@
 <script lang="ts">
-  import type { WritableAtom } from 'nanostores';
+  import type { Writable } from 'svelte/store';
 
   export let loading = false;
+  export let rounded = true;
   export let tabs: {
     name: string;
     id: string;
     component: ConstructorOfATypedSvelteComponent;
     props?: object;
   }[] = [];
-  export let activeTab: WritableAtom<string>;
+  export let activeTab: Writable<string>;
 </script>
 
-<div class="grid grid-cols-2 bg-gray-900 rounded-t-lg border-b-2 border-white">
+<div
+  class={`grid grid-cols-2 bg-gray-900 ${rounded ? 'rounded-t-lg' : ''} border-b-2 border-white`}
+>
   {#each tabs as tab, i}
     <div>
       <input
@@ -21,13 +24,13 @@
         value={tab.id}
         bind:group={$activeTab}
         class="peer hidden"
-        checked
+        checked={$activeTab === tab.id}
       />
       <label
         for={tab.id}
         class={`w-full flex cursor-pointer select-none p-2 text-center focus:outline-none outline-none peer-checked:bg-blue-500 peer-checked:text-white
-                ${i === 0 && 'rounded-tl-lg'}
-                ${i === tabs.length - 1 && 'rounded-tr-lg'}
+                ${i === 0 && (rounded ? 'rounded-tl-lg' : '')}
+                ${i === tabs.length - 1 && (rounded ? 'rounded-tr-lg' : '')}
                 ${loading && 'animate-pulse'}
               `}
       >

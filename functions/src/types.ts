@@ -1,44 +1,45 @@
 import { Timestamp } from 'firebase-admin/firestore';
 
 export interface User {
+  id: string;
+  // secure parameters
+  messagingToken?: string;
   email: string;
+  musicPlatformAuth: MusicPlatformAuth;
+  // private parameters
   likedSongsPlaylist?: string;
   submissionsPlaylist?: string;
-  musicPlatformAuth: MusicPlatformAuth;
-  displayName?: string;
-  photoURL?: string;
-  username: string;
-  musicPlatform?: MusicPlatform;
   friends: Friend[];
   friendRequests: string[]; // usernames
-  submissions?: string[]; // submission ids
-  savedSongs?: SavedSong[]; // song ids
-  audials?: string[]; // audial ids
-  messagingToken?: string;
-  id: string;
-  authToken: string;
-  profile: {
-    bio?: string;
-    avatarString?: string;
-    stats: UserStatistics;
+  //public parameters
+  // this is in the database under /{user_id}/public/info
+  public: {
+    username?: string;
     musicPlatform?: MusicPlatform;
-    favorites?: {
-      album?: {
-        artwork: string;
-        name: string;
-        artist: string;
-        url: string;
-      };
-      artist?: {
-        artwork: string;
-        name: string;
-        url: string;
-      };
-      song?: {
-        artwork: string;
-        name: string;
-        artist: string;
-        url: string;
+    savedSongs?: SavedSong[];
+    profile: {
+      bio?: string;
+      avatarString?: string;
+      stats: UserStatistics;
+      musicPlatform?: MusicPlatform;
+      favorites?: {
+        album?: {
+          artwork: string;
+          name: string;
+          artist: string;
+          url: string;
+        };
+        artist?: {
+          artwork: string;
+          name: string;
+          url: string;
+        };
+        song?: {
+          artwork: string;
+          name: string;
+          artist: string;
+          url: string;
+        };
       };
     };
   };
@@ -93,7 +94,7 @@ export interface Submission {
   number: number;
   late: boolean;
   song: Song; // song id
-  time: Date | Timestamp;
+  time: Date | number;
   audial: Audial;
   user?: {
     username: string;
@@ -102,7 +103,7 @@ export interface Submission {
   };
   comments: Comment[];
   location: Location;
-  lateTime: Date | Timestamp;
+  lateTime: Date | number;
   userId: string;
   currentlyListening?: Song;
   caption?: string;
@@ -153,6 +154,7 @@ export interface SpotifyTrack {
   artists: [
     {
       name: string;
+      genres: string[];
     }
   ];
   album: {
@@ -184,45 +186,6 @@ export interface SpotifyRecentlyPlayedRes {
       played_at: Date;
     }
   ];
-}
-
-export interface SpotifySearchRes {
-  tracks?: {
-    href: string;
-    limit: number;
-    next: string;
-    offset: number;
-    previous: string;
-    total: number;
-    items: SpotifyTrack[];
-  };
-  artists?: {
-    href: string;
-    limit: number;
-    next: string;
-    offset: number;
-    previous: string;
-    total: number;
-    items: SpotifyArtist[];
-  };
-  albums?: {
-    href: string;
-    limit: number;
-    next: string;
-    offset: number;
-    previous: string;
-    total: number;
-    items: SpotifyAlbum[];
-  };
-  playlists?: {
-    href: string;
-    limit: number;
-    next: string;
-    offset: number;
-    previous: string;
-    total: number;
-    items: SpotifyPlaylist[];
-  };
 }
 
 export interface SpotifyPlaylist {

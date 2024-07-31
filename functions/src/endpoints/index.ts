@@ -37,3 +37,4 @@ export * from './submissions/setsubmissioncaption';
 export * from './submissions/likesubmission';
 export * from './submissions/unlikesubmission';
 export * from './submissions/previewuserfriends';
+export * from './util';

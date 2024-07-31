@@ -7,7 +7,7 @@
     "web:deploy": "firebase deploy --only hosting:friendsfm",
     "functions:deploy": "firebase deploy --only functions",
     "app:dev": "cd app && yarn dev",
-    "app:build": "cd app && yarn build:release",
+    "app:build": "cd app && yarn build",
     "app:release": "cd app && yarn release",
     "web:dev": "cd web && yarn dev",
     "web:build": "cd web && yarn build",

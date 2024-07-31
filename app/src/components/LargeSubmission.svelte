@@ -1,35 +1,33 @@
 <script lang="ts">
-  import { goto } from '../lib/util';
-  import type { Song, Submission } from '../types';
-  import {
-    activeSubmission,
-    getUserCurrentlyListening,
-    publicProfileUsername,
-    toggleLike,
-    user,
-  } from '../store';
+  import type { Song, Submission } from '$lib/types';
   import SubmissionTime from './submission/Time.svelte';
   import SubmissionActions from './submission/Actions.svelte';
-  import Comment from './icons/Comment.svelte';
-  import Heart from './icons/Heart.svelte';
+  import Comment from '$components/icons/Comment.svelte';
+  import Heart from '$components/icons/Heart.svelte';
   import { onDestroy, onMount } from 'svelte';
+  import { activeSubmission, toggleLike } from '$lib/submission';
+  import { goto } from '$app/navigation';
+  import { getCurrentSong } from '$lib/user';
+  import { publicProfileUsername } from '$lib/util';
+  import { session } from '$lib/session';
+  import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 
   export let data: Submission;
 
-  let currentlyListening: Song;
+  let currentlyListening: Song | undefined;
   let interval: NodeJS.Timeout;
   let loadingHeart = false;
 
   const showFullSubmission = () => {
     activeSubmission.set(data);
-    goto('/?submission');
+    goto('/modal/submission');
   };
 
   onMount(async () => {
-    currentlyListening = await getUserCurrentlyListening(data.user.id);
+    currentlyListening = await getCurrentSong(data.user.id);
     // get current listening every 15 seconds
     interval = setInterval(async () => {
-      currentlyListening = await getUserCurrentlyListening(data.user.id);
+      currentlyListening = await getCurrentSong(data.user.id);
     }, 15000);
   });
 
@@ -37,11 +35,11 @@
     clearInterval(interval);
   });
 
-  const toggleHeart = async (e: MouseEvent | KeyboardEvent) => {
+  const toggleLikeHandler = async (e: MouseEvent | KeyboardEvent) => {
     e.stopPropagation();
     if (loadingHeart) return;
     loadingHeart = true;
-    data.likes = await toggleLike(data.id);
+    await toggleLike(data);
     loadingHeart = false;
   };
 </script>
@@ -49,6 +47,8 @@
 <div
   on:keypress={showFullSubmission}
   on:click={showFullSubmission}
+  role="button"
+  tabindex="0"
   class={`rounded-lg shadow-2xl bg-gray-700`}
 >
   <!-- HEADER -->
@@ -59,12 +59,12 @@
         : `bg-${data.user.musicPlatform}`
     }`}
   >
-    <div class="flex-grow-0 text-left">
+    <div class="flex-grow-0 w-full text-left">
       <button
         on:click={(e) => {
           e.stopPropagation();
-          goto('/public_profile');
           publicProfileUsername.set(data.user.username);
+          goto('/modal/profile');
         }}
         class="text-left w-full flex gap-2 mb-1"
       >
@@ -126,15 +126,17 @@
     }`}
   >
     <div
-      on:click={toggleHeart}
-      on:keypress={toggleHeart}
+      on:click={toggleLikeHandler}
+      on:keypress={toggleLikeHandler}
+      role="button"
+      tabindex="0"
       class="text-white py-1 flex gap-2 place-content-center text-center w-full truncate border-r border-white"
     >
       <Heart
         className={`w-6 h-6 flex-grow-0 flex-shrink ${
           loadingHeart ? 'animate-ping text-white' : ''
-        } ${data.likes?.find((l) => l.id === $user.id) ? 'text-white' : ''} `}
-        fill={data.likes?.find((l) => l.id === $user.id)
+        } ${data.likes?.find((l) => l.id === $session.user.id) ? 'text-white' : ''} `}
+        fill={data.likes?.find((l) => l.id === $session.user.id)
           ? 'currentColor'
           : 'none'}
       />

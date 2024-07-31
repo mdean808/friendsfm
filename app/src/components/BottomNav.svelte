@@ -1,19 +1,14 @@
 <script lang="ts">
   import { Preferences } from '@capacitor/preferences';
-  import { goto } from '../lib/util';
-  import {
-    currPath,
-    generateSubmission,
-    getFriendSubmissions,
-    getNearbySubmissions,
-    loadingSubmission,
-    insets,
-    loading,
-    updateCurrentLocation,
-    user,
-    userSubmission,
-  } from '../store';
   import Button from './Button.svelte';
+  import { loading } from '$lib/util';
+  import { generateSubmission, userSubmission } from '$lib/submission';
+  import { getFriendSubmissions } from '$lib/preferences';
+  import { insets, updateCurrentLocation } from '$lib/device';
+  import { getNearbySubmissions } from '$lib/nearby';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import { session } from '$lib/session';
   let elem: HTMLDivElement;
 
   const createSubmission = async () => {
@@ -26,7 +21,7 @@
       if (
         (await Preferences.get({ key: 'location-permissions' })).value === '0'
       )
-        getNearbySubmissions(null, {
+        getNearbySubmissions(undefined, {
           southWest: {
             latitude: 80,
             longitude: 180,
@@ -43,7 +38,7 @@
 </script>
 
 <div class={`w-full absolute left-0 bottom-0`} bind:this={elem}>
-  {#if !$userSubmission?.song && !$loadingSubmission}
+  {#if !$userSubmission?.song}
     <div class="px-4 w-full mb-2">
       <div
         class="border-white rounded-lg bg-gray-800 bg-opacity-70 backdrop-blur-md py-3 px-3 border-2"
@@ -60,23 +55,23 @@
   {/if}
   <div
     class="flex backdrop-blur-xl h-full rounded-t-lg"
-    style={`padding-bottom: ${$insets.bottom}px`}
+    style={`padding-bottom: ${$insets?.bottom}px`}
   >
     <button
-      on:click={() => goto('/songs')}
+      on:click={() => goto('/main/songs')}
       class="w-1/3 flex justify-center py-2"
     >
       <div
         class={`mx-auto rounded-full border bg-gray-900 px-6 pt-1 ${
-          $currPath === '/songs'
-            ? `border-${$user.musicPlatform} `
+          $page.route.id === '/main/songs'
+            ? `border-${$session.user?.public?.musicPlatform} `
             : 'currentColor border-transparent'
         }`}
       >
         <svg
           class={`w-6 h-6 mx-auto ${
-            $currPath === '/songs'
-              ? `text-${$user.musicPlatform}`
+            $page.route.id === '/main/songs'
+              ? `text-${$session.user?.public?.musicPlatform}`
               : 'currentColor'
           }`}
           fill={'currentColor'}
@@ -89,17 +84,22 @@
         <span class="text-white">songs</span>
       </div>
     </button>
-    <button on:click={() => goto('/')} class="w-1/3 flex justify-center py-2">
+    <button
+      on:click={() => goto('/main/home')}
+      class="w-1/3 flex justify-center py-2"
+    >
       <div
         class={`mx-auto rounded-full border bg-gray-900 px-6 pt-1 ${
-          $currPath === '/'
-            ? `border-${$user.musicPlatform} `
+          $page.route.id === '/main/home'
+            ? `border-${$session.user?.public?.musicPlatform} `
             : 'currentColor border-transparent'
         }`}
       >
         <svg
           class={`w-6 h-6 mx-auto ${
-            $currPath === '/' ? `text-${$user.musicPlatform}` : 'currentColor'
+            $page.route.id === '/main/home'
+              ? `text-${$session.user?.public?.musicPlatform}`
+              : 'currentColor'
           }`}
           fill="currentColor"
           viewBox="0 0 20 20"
@@ -112,20 +112,20 @@
       </div>
     </button>
     <button
-      on:click={() => goto('/private_profile')}
+      on:click={() => goto('/main/profile')}
       class="w-1/3 flex justify-center py-2"
     >
       <div
         class={`mx-auto rounded-full border bg-gray-900 px-6 pt-1 ${
-          $currPath === '/private_profile'
-            ? `border-${$user.musicPlatform} `
+          $page.route.id === '/main/profile'
+            ? `border-${$session.user?.public?.musicPlatform}`
             : 'currentColor border-transparent'
         }`}
       >
         <svg
           class={`w-6 h-6 mx-auto ${
-            $currPath === '/private_profile'
-              ? `text-${$user.musicPlatform}`
+            $page.route.id === '/main/profile'
+              ? `text-${$session.user?.public?.musicPlatform}`
               : 'currentColor'
           }`}
           fill="none"

@@ -50,7 +50,7 @@ export const getDaysAgo = (date: Date) => {
 };
 
 export const convertDateToLateString = (date: Date) => {
-  if (isNaN(date.getTime())) return 'infinitely late';
+  if (!date || isNaN(date.getTime())) return 'infinitely late';
   const rootDate = new Date(0);
   const days = daysBetweenDates(rootDate, date);
   const hours = Math.floor(

@@ -1,17 +1,13 @@
 <script lang="ts">
-  import { goto, hashCode, intToRGB } from '../../lib/util';
-  import {
-    activeGenre,
-    activeHomeTab,
-    activeSubmission,
-    getNearbySubmissions,
-    toggleLike,
-    user as userStore,
-  } from '../../store';
-  import type { Submission } from '../../types';
-  import Heart from '../icons/Heart.svelte';
-  import Comment from '../icons/Comment.svelte';
-  import MusicPlatformIcon from '../icons/MusicPlatformIcon.svelte';
+  import { activeHomeTab, hashCode, intToRGB } from '$lib/util';
+  import type { Submission } from '$lib/types';
+  import Heart from '$components/icons/Heart.svelte';
+  import Comment from '$components/icons/Comment.svelte';
+  import MusicPlatformIcon from '$components/icons/MusicPlatformIcon.svelte';
+  import { activeSubmission, toggleLike } from '$lib/submission';
+  import { getNearbySubmissions } from '$lib/nearby';
+  import { goto } from '$app/navigation';
+  import { session } from '$lib/session';
 
   export let data: Submission;
   export let className: string = '';
@@ -20,11 +16,11 @@
 
   let loadingHeart = false;
 
-  const toggleHeart = async (e: MouseEvent | KeyboardEvent) => {
+  const toggleLikeHandler = async (e: MouseEvent | KeyboardEvent) => {
     e.stopPropagation();
     if (loadingHeart) return;
     loadingHeart = true;
-    data.likes = await toggleLike(data.id);
+    await toggleLike(data);
     loadingHeart = false;
   };
 </script>
@@ -34,10 +30,9 @@
     <span
       on:keyup={(e) => {
         e.stopPropagation();
-        activeGenre.set(data.song.genre);
         activeSubmission.set(data);
         activeHomeTab.set('genres');
-        getNearbySubmissions(null, {
+        getNearbySubmissions(undefined, {
           southWest: {
             latitude: data.location.latitude - 5,
             longitude: data.location.longitude - 5,
@@ -47,15 +42,26 @@
             longitude: data.location.longitude + 5,
           },
         });
-        goto('/');
+        goto('/main/home');
       }}
       on:click={(e) => {
         e.stopPropagation();
-        activeGenre.set(data.song.genre);
         activeSubmission.set(data);
         activeHomeTab.set('genres');
-        goto('/');
+        getNearbySubmissions(undefined, {
+          southWest: {
+            latitude: data.location.latitude - 5,
+            longitude: data.location.longitude - 5,
+          },
+          northEast: {
+            latitude: data.location.latitude + 5,
+            longitude: data.location.longitude + 5,
+          },
+        });
+        goto('/main/home');
       }}
+      role="button"
+      tabindex="0"
       class="px-1.5 py-1 h-7 border-white whitespace-nowrap border text-sm text-center text-white text-md rounded-xl"
       style={`background: ${intToRGB(hashCode(data.song.genre, 23))}`}
       >{data.song.genre}</span
@@ -68,14 +74,16 @@
           {data.likes.length > 9 ? 9 + '+' : data.likes.length}
         </div>
         <Heart
-          on:click={toggleHeart}
-          on:keypress={toggleHeart}
+          on:click={toggleLikeHandler}
+          on:keypress={toggleLikeHandler}
           className={`w-6 h-6 flex-grow-0 flex-shrink ${
             loadingHeart ? 'animate-ping text-white' : ''
           } ${
-            data?.likes?.find((l) => l.id === $userStore.id) ? 'text-white' : ''
+            data?.likes?.find((l) => l.id === $session.user.id)
+              ? 'text-white'
+              : ''
           } `}
-          fill={data?.likes?.find((l) => l.id === $userStore.id)
+          fill={data?.likes?.find((l) => l.id === $session.user.id)
             ? 'currentColor'
             : 'none'}
         />

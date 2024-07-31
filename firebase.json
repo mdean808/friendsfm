@@ -2,15 +2,10 @@
   "hosting": [
     {
       "site": "friendsfm-app",
-      "public": "app/dist",
-      "ignore": [],
-      "predeploy": "yarn app:build",
-      "rewrites": [
-        {
-          "source": "**",
-          "destination": "/index.html"
-        }
-      ]
+      "source": "app",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "predeploy": "yarn app:release",
+      "frameworksBackend": { "region": "us-west1" }
     },
     {
       "site": "friendsfm",
@@ -21,6 +16,10 @@
       }
     }
   ],
+
+  "firestore": {
+    "rules": "./functions/firestore.rules"
+  },
 
   "functions": {
     "source": "./functions/",
@@ -42,7 +41,10 @@
       "port": 5001
     },
     "firestore": {
-      "port": 8081
+      "port": 5002
+    },
+    "hosting": {
+      "port": 5003
     },
     "ui": {
       "enabled": true

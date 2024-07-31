@@ -1,15 +1,16 @@
 <script lang="ts">
-  import type { MusicPlatform, Submission } from '../types';
   import SubmissionTime from './submission/Time.svelte';
   import { onDestroy, onMount } from 'svelte';
-  import { goto } from '../lib/util';
-  import {
-    user,
-    previewSubmission,
-    publicProfileUsername,
-    previewFriendSubmissions,
-  } from '../store';
   import MusicPlatformIcon from './icons/MusicPlatformIcon.svelte';
+  import { MusicPlatform, type Submission } from '$lib/types';
+  import { session } from '$lib/session';
+  import { goto } from '$app/navigation';
+  import { chunkArray, currSubNumber, publicProfileUsername } from '$lib/util';
+  import { previewSubmission } from '$lib/submission';
+  import {
+    FirebaseFirestore,
+    type QueryCompositeFilterConstraint,
+  } from '@capacitor-firebase/firestore';
 
   let submission: Submission;
   let interval: NodeJS.Timeout;
@@ -17,23 +18,65 @@
   let friends: {
     id: string;
     username: string;
-    musicPlatform: MusicPlatform;
-    currentlyListening: boolean;
   }[] = [];
 
   onMount(async () => {
-    previewFriendSubmissions().then((res) => (friends = res.friends));
-    const resSub = await previewSubmission();
-    if (!resSub) return;
-    submission = resSub.submission;
+    getFriends();
+    const res = await previewSubmission();
+    if (!res) return;
+    submission = res.submission;
     loading = false;
     // update the preview every 15 seconds
     interval = setInterval(async () => {
+      getFriends();
       const res = await previewSubmission();
+      if (!res) return;
       submission = res.submission;
-      friends = res.friends;
-    }, 10000);
+    }, 15000);
   });
+
+  const getFriends = async () => {
+    const userFriends = $session.user.friends;
+    const friendIds = userFriends.map((f) => f.id);
+    if (friendIds.length === 0) return;
+    const friendIdChunks = chunkArray(friendIds, 30);
+    const friendPromises = friendIdChunks.map(async (chunk) => {
+      const friendSubsFilter: QueryCompositeFilterConstraint = {
+        type: 'and',
+        queryConstraints: [
+          {
+            type: 'where',
+            fieldPath: 'userId',
+            opStr: 'in',
+            value: chunk,
+          },
+          {
+            type: 'where',
+            fieldPath: 'number',
+            opStr: '==',
+            value: $currSubNumber,
+          },
+        ],
+      };
+
+      const docs = await FirebaseFirestore.getCollection({
+        reference: 'submissions',
+        compositeFilter: friendSubsFilter,
+      });
+
+      return docs.snapshots.map((snapshot) => {
+        return {
+          id: snapshot.data?.userId as string,
+          username:
+            userFriends.find((f) => f.id === snapshot.data?.userId)?.username ||
+            '',
+        };
+      });
+    });
+
+    const friendResults = await Promise.all(friendPromises);
+    friends = friendResults.flat();
+  };
 
   onDestroy(() => {
     clearInterval(interval);
@@ -45,15 +88,18 @@
   <div
     class={`flex p-2 relative rounded-t-lg ${
       submission?.currentlyListening
-        ? `bg-gradient-to-r from-${$user.musicPlatform} via-blue-500 to-${$user.musicPlatform} background-animate`
-        : `bg-${$user.musicPlatform}`
+        ? `bg-gradient-to-r from-${$session.user.public.musicPlatform} via-blue-500 to-${$session.user.public.musicPlatform} background-animate`
+        : `bg-${$session.user.public.musicPlatform}`
     }`}
   >
     <div class="flex-grow text-center">
       <p>submission preview</p>
     </div>
     <div class="absolute right-2">
-      <MusicPlatformIcon className="h-5 w-5" id={$user.musicPlatform} />
+      <MusicPlatformIcon
+        className="h-5 w-5"
+        id={$session.user.public.musicPlatform || MusicPlatform.spotify}
+      />
     </div>
   </div>
   {#if submission?.song}
@@ -104,47 +150,43 @@
 
 <div class="my-2 border-t-2 border-white relative pt-2 pb-48">
   {#each friends as friend}
-    <div
-      class={`flex p-2 rounded-t-lg ${
-        friend?.currentlyListening
-          ? `bg-gradient-to-r from-${friend?.musicPlatform} via-blue-500 to-${friend?.musicPlatform} background-animate`
-          : `bg-gray-500`
-      }`}
-    >
-      <button
-        on:click={(e) => {
-          e.stopPropagation();
-          goto('/public_profile');
-          publicProfileUsername.set(friend.username);
-        }}
-        class="flex-grow text-left"
-      >
-        <img
-          class="w-5 h-5 inline rounded-full"
-          src={`https://icotar.com/avatar/${
-            friend?.username || 'undefined'
-          }.svg`}
-          alt="avatar"
+    <div>
+      <div class={`flex p-2 rounded-t-lg bg-gray-500`}>
+        <button
+          on:click={(e) => {
+            e.stopPropagation();
+            goto('/modal/profile');
+            publicProfileUsername.set(friend.username);
+          }}
+          class="flex-grow text-left"
+        >
+          <img
+            class="w-5 h-5 inline rounded-full"
+            src={`https://icotar.com/avatar/${
+              friend?.username || 'undefined'
+            }.svg`}
+            alt="avatar"
+          />
+          {friend ? friend?.username : 'Unknown'}
+        </button>
+      </div>
+      <div class="relative p-2 bg-gray-700 text-left mb-2 rounded-b-lg">
+        <div
+          class="absolute backdrop-blur-md w-full h-full rounded-b-lg left-0 top-0"
         />
-        {friend ? friend?.username : 'Unknown'}
-      </button>
-    </div>
-    <div class="relative p-2 bg-gray-700 text-left mb-2 rounded-b-lg">
-      <div
-        class="absolute backdrop-blur-md w-full h-full rounded-b-lg left-0 top-0"
-      />
-      <p class="mb-1 text-sm text-gray-400">played yesterday at 12:30</p>
-      <div class="flex gap-2">
-        <img
-          class="w-12 h-12 inline rounded-lg"
-          src={`https://icotar.com/avatar/album-${
-            friend?.username || 'undefined'
-          }.svg`}
-          alt="avatar"
-        />
-        <div class="w-48 flex justify-center align-middle flex-col">
-          <p class={`h-4 mb-1 text-${friend?.musicPlatform}`}>Cool Song Name</p>
-          <p class="h-4">Cool Artist Name</p>
+        <p class="mb-1 text-sm text-gray-400">played yesterday at 12:30</p>
+        <div class="flex gap-2">
+          <img
+            class="w-12 h-12 inline rounded-lg"
+            src={`https://icotar.com/avatar/album-${
+              friend?.username || 'undefined'
+            }.svg`}
+            alt="avatar"
+          />
+          <div class="w-48 flex justify-center align-middle flex-col">
+            <p class="h-4 mb-1 text-blue-500">Cool Song Name</p>
+            <p class="h-4">Cool Artist Name</p>
+          </div>
         </div>
       </div>
     </div>

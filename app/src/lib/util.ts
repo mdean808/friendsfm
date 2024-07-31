@@ -1,37 +1,52 @@
-import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
-import { FirebaseMessaging } from '@capacitor-firebase/messaging';
-import { currPath, platform, prevPath, toast } from '../store';
-import * as Sentry from '@sentry/capacitor';
+import { writable, type Writable } from 'svelte/store';
+import type { Toast } from './types';
+import Network from './network';
 
-export const goto = (url: string) => {
-  prevPath.set(currPath.get());
-  currPath.set(url);
-  //  history.pushState(null, null, url);
-  FirebaseAnalytics.setCurrentScreen({
-    screenName: url,
-    screenClassOverride: url,
-  });
-};
+export const searchType = <Writable<'track' | 'album' | 'playlist' | 'artist'>>(
+  writable('track')
+);
 
-export const registerForNotifications = async () => {
-  if (platform.get() === 'web') return;
-  try {
-    await FirebaseMessaging.checkPermissions().catch(
-      async () => await FirebaseMessaging.requestPermissions()
-    );
-    // subscribe device to 'all' topic
-    await FirebaseMessaging.subscribeToTopic({ topic: 'all' });
-    const token = await FirebaseMessaging.getToken();
-    return token.token;
-  } catch (e) {
-    Sentry.withScope((scope) => {
-      scope.setContext('client-notifications', {
-        message: 'Error registering user for notifications.',
-      });
-    });
-    Sentry.captureException(e);
-    console.log(`Error registering for notifications: ${e}`);
-  }
+export const prevPath = <Writable<string>>writable('/main/home/');
+
+export const initParams = <Writable<URLSearchParams>>writable();
+
+export const loading = <Writable<boolean>>writable(false);
+
+export const loadingFriendSubmissions = <Writable<boolean>>writable(true);
+
+export const appLoaded = <Writable<boolean>>writable(false);
+
+export const network = new Network();
+
+export const publicProfileUsername = <Writable<string>>writable();
+
+export const currSubNumber = <Writable<number>>writable();
+
+export const editingProfile = <Writable<boolean>>writable(false);
+
+export const submissionLoaded = <Writable<boolean>>writable(false);
+
+export const activeHomeTab = <Writable<'submissions' | 'genres'>>(
+  writable('submissions')
+);
+
+export const submissionsScroll = <Writable<number>>writable();
+
+export const toast = <Writable<Toast>>writable();
+export const showToast = (options: {
+  content: string;
+  color?: string;
+  duration?: number;
+  offset?: number;
+  onClick?: () => void;
+}) => {
+  options.onClick =
+    options.onClick || (() => toast.set({ visible: false, ...options }));
+  toast.set({ visible: true, ...options });
+  setTimeout(
+    () => toast.set({ visible: false, ...options }),
+    options.duration || 5000
+  );
 };
 
 export function errorToast(options: {
@@ -41,7 +56,7 @@ export function errorToast(options: {
   onClick?: () => void;
 }) {
   console.log('error toast: ' + options.content);
-  showToast({ color: '#ad2626', ...options });
+  showToast({ color: '#ad2627', ...options });
 }
 
 export const wait = (ms: number): Promise<void> => {
@@ -76,7 +91,7 @@ export function getContrastRatio(
 export function intToRGB(i: number) {
   let c = (i & 0x00ffffff).toString(16).toUpperCase();
   let hex = '#' + '00000'.substring(0, 6 - c?.length) + c;
-  let rgb = hex.match(/.{2}/g).map((v) => parseInt(v, 16)) as [
+  let rgb = hex.match(/.{2}/g)?.map((v) => parseInt(v, 16)) as [
     number,
     number,
     number,
@@ -86,7 +101,7 @@ export function intToRGB(i: number) {
     i++;
     c = (i & 0x00ffffff).toString(16).toUpperCase();
     hex = '#' + '00000'.substring(0, 6 - c?.length) + c;
-    rgb = hex.match(/.{2}/g).map((v) => parseInt(v, 16)) as [
+    rgb = hex.match(/.{2}/g)?.map((v) => parseInt(v, 16)) as [
       number,
       number,
       number,
@@ -96,18 +111,10 @@ export function intToRGB(i: number) {
   return hex;
 }
 
-export const showToast = (options: {
-  content: string;
-  color?: string;
-  duration?: number;
-  offset?: number;
-  onClick?: () => void;
-}) => {
-  options.onClick =
-    options.onClick || (() => toast.set({ visible: false, ...options }));
-  toast.set({ visible: true, ...options });
-  setTimeout(
-    () => toast.set({ visible: false, ...options }),
-    options.duration || 5000
-  );
+export const chunkArray = (arr: string[], size: number) => {
+  const result = [];
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size));
+  }
+  return result;
 };
