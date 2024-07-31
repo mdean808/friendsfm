@@ -32,6 +32,7 @@
   let commentSubmitting = false;
   let input: HTMLInputElement;
   let focused = false;
+  let captionHeight: number;
 
   const submitComment = async () => {
     if (!commentValue) return;
@@ -61,7 +62,7 @@
     <button
       on:click={() => {
         goto('/modal/profile');
-        publicProfileUsername.set($activeSubmission?.user.id);
+        publicProfileUsername.set($activeSubmission.user.id);
       }}
     >
       <h1 class="text-center pt-2 mx-auto text-2xl text-white flex-grow">
@@ -229,7 +230,10 @@
       </div>
     {/if}
     {#if $activeSubmission.caption}
-      <div class="flex py-1 border-white border-b-2">
+      <div
+        bind:clientHeight={captionHeight}
+        class="flex py-1 border-white border-b-2"
+      >
         <p class="text-center w-full italic">
           {$activeSubmission?.caption}
         </p>
@@ -240,7 +244,7 @@
       style={`height: calc(100vh - ${
         ($insets.bottom ? $insets.bottom + 50 : 0) +
         (focused ? $keyboardHeight + 441 : 441) +
-        ($activeSubmission.caption ? 35 : 0)
+        ($activeSubmission.caption ? captionHeight : 0)
       }px)`}
       class="overflow-y-scroll text-white pb-1 pt-2 block"
     >

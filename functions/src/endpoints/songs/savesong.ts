@@ -7,7 +7,6 @@ export const savesong = onRequest(
   authMiddleware(
     sentryWrapper('save-song', async (req, res, user) => {
       const { song }: { song: SavedSong; subId: string } = JSON.parse(req.body);
-      console.log(song)
       const likedSong = await user.saveSong(song);
       res
         .status(200)
