@@ -65,7 +65,7 @@
     if (loaders[i]) return;
     loaders[i] = true;
     if (await rejectFriendRequest(requester))
-      showToast({ content: 'successfully accepted friend request.' });
+      showToast({ content: 'successfully rejected friend request.' });
     // add fr back
     else
       session.update((s) => {

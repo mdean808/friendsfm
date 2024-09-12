@@ -13,7 +13,7 @@
 </script>
 
 <div
-  class={`grid grid-cols-2 bg-gray-900 ${rounded ? 'rounded-t-lg' : ''} border-b-2 border-white`}
+  class={`grid grid-cols-2 bg-gray-900 ${rounded ? 'rounded-lg' : ''} `}
 >
   {#each tabs as tab, i}
     <div>
@@ -29,8 +29,8 @@
       <label
         for={tab.id}
         class={`w-full flex cursor-pointer select-none p-2 text-center focus:outline-none outline-none peer-checked:bg-blue-500 peer-checked:text-white
-                ${i === 0 && (rounded ? 'rounded-tl-lg' : '')}
-                ${i === tabs.length - 1 && (rounded ? 'rounded-tr-lg' : '')}
+                ${i === 0 && (rounded ? 'rounded-l-lg' : '')}
+                ${i === tabs.length - 1 && (rounded ? 'rounded-r-lg' : '')}
                 ${loading && 'animate-pulse'}
               `}
       >

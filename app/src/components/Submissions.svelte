@@ -7,7 +7,7 @@
   import LargeSubmission from './LargeSubmission.svelte';
   import UserSubmission from './submission/User.svelte';
   import { MusicPlatform, type Submission } from '$lib/types';
-  import { loadingFriendSubmissions, submissionsScroll } from '$lib/util';
+  import {loadingFriendSubmissions, sortByDate, submissionsScroll} from '$lib/util';
   import {
     createSubmissionsPlaylist,
     loadFriendSubmissions,
@@ -23,13 +23,6 @@
   let loadingNewLateSubmission: boolean = false;
   let sortedFriendSubmissions: Submission[];
 
-  const sortByDate = (a: Submission, b: Submission) => {
-    try {
-      return b.time.getTime() - a.time.getTime();
-    } catch {
-      return 1;
-    }
-  };
 
   friendSubmissions.subscribe((val) => {
     if (val) sortedFriendSubmissions = [...val].sort(sortByDate);
@@ -72,7 +65,7 @@
   <ion-refresher id="refresher" slot="fixed">
     <ion-refresher-content />
   </ion-refresher>
-  <div class="mb-3 pt-3 px-4 mx-auto overflow-hidden">
+  <div class="mb-3 pt-3 px-2 mx-auto overflow-hidden">
     {#if loadingSubmission}
       <SkeletonSubmission type="user" />
     {:else if $userSubmission?.song}

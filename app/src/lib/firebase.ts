@@ -188,7 +188,6 @@ export const setupSnapshots = async () => {
 
   // load user submission
   await loadUserSubmission();
-  submissionLoaded.set(true);
   // snapshot user sub
 
   snapshots.userSubmission =

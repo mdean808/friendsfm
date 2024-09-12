@@ -14,7 +14,7 @@ import {
 } from '$plugins/AppleMusic';
 import AppleMusic from '$plugins/AppleMusic';
 import { Dialog } from '@capacitor/dialog';
-import { chunkArray, errorToast, loading, network, showToast } from './util';
+import { chunkArray, errorToast, loading, network, showToast, submissionLoaded } from './util';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { session } from './session';
 import {
@@ -213,11 +213,11 @@ export const deleteCommentFromSubmission = async (comment: Comment) => {
   });
 };
 
-export const loadUserSubmission = async () => {
+export const loadUserSubmission = async (number?: number) => {
   // snapshot user submission status
   const colRes = await FirebaseFirestore.getCollection({
     reference: 'submissions',
-    compositeFilter: userSubmissionFilter(),
+    compositeFilter: userSubmissionFilter(number),
   });
   const sub = colRes.snapshots[0];
   if (sub?.data) {
@@ -236,9 +236,10 @@ export const loadUserSubmission = async () => {
   } else {
     userSubmission.set(null);
   }
+  submissionLoaded.set(true);
 };
 
-export const loadFriendSubmissions = async () => {
+export const loadFriendSubmissions = async (number?: number) => {
   // friend submissions
   const friendIds = get(session).user.friends.map((f) => f.id);
 
@@ -283,7 +284,7 @@ export const loadFriendSubmissions = async () => {
     // Load friend submissions
     const docs = await FirebaseFirestore.getCollection({
       reference: 'submissions',
-      compositeFilter: friendSubmissionsFilter(chunk),
+      compositeFilter: friendSubmissionsFilter(chunk, number),
     });
     await updateSubmissions(docs.snapshots);
   });
@@ -321,7 +322,7 @@ export const getSubmission: (id: string) => Promise<Submission | null> = async (
 
 export const toggleLike = async (submission: Submission) => {
   const sesh = get(session)
-  // user hasn't liked the submission yet 
+  // user hasn't liked the submission yet
   if (!submission.likes.find((l) => l.id === sesh.user.id)) {
     // add the like
     await FirebaseFirestore.updateDocument({

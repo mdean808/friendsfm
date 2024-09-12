@@ -1,5 +1,5 @@
 import { writable, type Writable } from 'svelte/store';
-import type { Toast } from './types';
+import type {Submission, Toast} from './types';
 import Network from './network';
 
 export const searchType = <Writable<'track' | 'album' | 'playlist' | 'artist'>>(
@@ -117,4 +117,11 @@ export const chunkArray = (arr: string[], size: number) => {
     result.push(arr.slice(i, i + size));
   }
   return result;
+};
+export const sortByDate = (a: Submission, b: Submission) => {
+  try {
+    return b.time.getTime() - a.time.getTime();
+  } catch {
+    return 1;
+  }
 };

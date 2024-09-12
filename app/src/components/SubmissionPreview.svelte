@@ -6,7 +6,10 @@
   import { session } from '$lib/session';
   import { goto } from '$app/navigation';
   import { chunkArray, currSubNumber, publicProfileUsername } from '$lib/util';
-  import { previewSubmission } from '$lib/submission';
+  import {
+    loadUserSubmission,
+    previewSubmission,
+  } from '$lib/submission';
   import {
     FirebaseFirestore,
     type QueryCompositeFilterConstraint,
@@ -21,6 +24,8 @@
   }[] = [];
 
   onMount(async () => {
+    // load user submission just in case
+    loadUserSubmission();
     getFriends();
     const res = await previewSubmission();
     if (!res) return;

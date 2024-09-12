@@ -3,7 +3,7 @@ import { session } from './session';
 import { get } from 'svelte/store';
 import { currSubNumber } from './util';
 
-export const userSubmissionFilter = () => {
+export const userSubmissionFilter = (number?: number) => {
   return {
     type: 'and',
     queryConstraints: [
@@ -17,13 +17,13 @@ export const userSubmissionFilter = () => {
         type: 'where',
         fieldPath: 'number',
         opStr: '==',
-        value: get(currSubNumber),
+        value: number || get(currSubNumber),
       },
     ],
   } as QueryCompositeFilterConstraint;
 };
 
-export const friendSubmissionsFilter = (chunk: string[]) => {
+export const friendSubmissionsFilter = (chunk: string[], number?: number) => {
   return {
     type: 'and',
     queryConstraints: [
@@ -37,7 +37,7 @@ export const friendSubmissionsFilter = (chunk: string[]) => {
         type: 'where',
         fieldPath: 'number',
         opStr: '==',
-        value: get(currSubNumber),
+        value: number || get(currSubNumber),
       },
     ],
   } as QueryCompositeFilterConstraint;
