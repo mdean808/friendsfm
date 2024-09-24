@@ -18,8 +18,7 @@
   const firstOfTheMonth = new Date().getDate() === 1;
 
   const currentlyListening = async () => {
-    const song = await getCurrentSong($session.user.id);
-    return song;
+    return await getCurrentSong($session.user.id);
   };
 
   onMount(async () => {

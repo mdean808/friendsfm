@@ -3,7 +3,7 @@
   import {insets} from '$lib/device';
   import {currSubNumber, loadingFriendSubmissions, sortByDate} from "$lib/util";
   import {loadFriendSubmissions, loadUserSubmission, friendSubmissions, userSubmission} from "$lib/submission";
-  import {slide} from "svelte/transition";
+  import {slide, fly} from "svelte/transition";
   import {getShortDate} from "$lib/dates";
 
   import SkeletonSubmission from "$components/submission/Skeleton.svelte";
@@ -14,9 +14,11 @@
 
   const currFriendSubmissions = get(friendSubmissions)
   const currUserSubmission = get(userSubmission)
+  let direction: 'left' | 'right' = 'left'
   let loadingHistory = false;
   let currentDay = $currSubNumber - 1;
   let sortedFriendSubmissions: Submission[];
+  let activeDaySubmission: Submission | null = null;
   $: currentDate = new Date(new Date().setDate(new Date().getDate() - ($currSubNumber - currentDay)))
 
   friendSubmissions.subscribe((val) => {
@@ -28,6 +30,7 @@
     if (loadingHistory) return;
     loadingHistory = true;
     await loadUserSubmission(currentDay)
+    friendSubmissions.set([])
     await loadFriendSubmissions(currentDay)
     loadingHistory = false;
   });
@@ -38,16 +41,24 @@
   })
 
   const getPreviousDay = async () => {
+    loadingHistory = true;
+    direction = 'left'
     currentDay--
-    await loadUserSubmission(currentDay)
+    activeDaySubmission = await loadUserSubmission(currentDay)
+    friendSubmissions.set([])
     await loadFriendSubmissions(currentDay)
+    loadingHistory = false;
   }
 
   const getNextDay = async () => {
     if (currentDay + 1 === $currSubNumber) return;
+    direction = 'right'
+    loadingHistory = true;
     currentDay++;
-    await loadUserSubmission(currentDay)
+    activeDaySubmission = await loadUserSubmission(currentDay)
+    friendSubmissions.set([])
     await loadFriendSubmissions(currentDay)
+    loadingHistory = false;
   }
 
 </script>
@@ -92,20 +103,27 @@
         <SkeletonSubmission/>
         <SkeletonSubmission/>
       </div>
-    {:else if !$userSubmission}
-      <p class="text-center w-full">you did not submit on this day</p>
+    {:else if !activeDaySubmission}
+      <p out:fly={{x: direction === 'left' ? 200 : -200, duration: 200}}
+         in:fly={{x: direction === 'left' ? -200 : 200, duration: 200}}
+         class="text-center w-full">you did not
+        submit on this day</p>
     {:else}
-      <div class="my-2 px-2 pb-2 border-b-2 border-gray-400">
-        <UserSubmission data={$userSubmission}/>
-      </div>
-      {#each sortedFriendSubmissions as submission}
-        <div in:slide class="my-4">
-          <LargeSubmission data={submission}/>
+      <div out:fly={{x: direction === 'left' ? 200 : -200, duration: 200}}
+           in:fly={{x: direction === 'left' ? -200 : 200, duration: 200}}>
+
+        <div class="my-2 px-2 pb-2 border-b-2 border-gray-400">
+          <UserSubmission data={activeDaySubmission}/>
         </div>
-      {/each}
-      {#if $friendSubmissions?.length === 0}
-        <p class="mx-auto text-center mt-3">nobody submitted on this day</p>
-      {/if}
+        {#each sortedFriendSubmissions as submission}
+          <div in:slide class="my-4">
+            <LargeSubmission data={submission}/>
+          </div>
+        {/each}
+        {#if $friendSubmissions?.length === 0}
+          <p class="mx-auto text-center mt-3">nobody submitted on this day</p>
+        {/if}
+      </div>
     {/if}
   </div>
 </div>
