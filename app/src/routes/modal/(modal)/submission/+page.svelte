@@ -16,7 +16,7 @@
   import {
     activeHomeTab,
     hashCode,
-    intToRGB,
+    intToRGB, prevPath,
     publicProfileUsername,
   } from '$lib/util';
   import {
@@ -44,7 +44,8 @@
   };
 
   const close = () => {
-    goto('/main/home');
+    console.log($prevPath)
+    goto($prevPath);
     activeSubmission.set(null);
   };
 

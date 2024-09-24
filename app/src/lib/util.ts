@@ -1,5 +1,5 @@
-import { writable, type Writable } from 'svelte/store';
-import type {Submission, Toast} from './types';
+import { get, writable, type Writable } from 'svelte/store';
+import type { Submission, Toast } from './types';
 import Network from './network';
 
 export const searchType = <Writable<'track' | 'album' | 'playlist' | 'artist'>>(
@@ -21,6 +21,8 @@ export const network = new Network();
 export const publicProfileUsername = <Writable<string>>writable();
 
 export const currSubNumber = <Writable<number>>writable();
+
+export const historyCurrentDay = <Writable<number>>writable(get(currSubNumber) - 1);
 
 export const editingProfile = <Writable<boolean>>writable(false);
 
@@ -45,7 +47,7 @@ export const showToast = (options: {
   toast.set({ visible: true, ...options });
   setTimeout(
     () => toast.set({ visible: false, ...options }),
-    options.duration || 5000
+    options.duration || 5000,
   );
 };
 
@@ -81,7 +83,7 @@ export function getRelativeLuminance(rgb: [number, number, number]) {
 
 export function getContrastRatio(
   rgb1: [number, number, number],
-  rgb2: [number, number, number]
+  rgb2: [number, number, number],
 ) {
   let l1 = getRelativeLuminance(rgb1);
   let l2 = getRelativeLuminance(rgb2);

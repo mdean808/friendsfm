@@ -8,7 +8,7 @@
     toast,
     errorToast,
     appLoaded,
-    publicProfileUsername,
+    publicProfileUsername, prevPath,
   } from '$lib/util';
   import { fade, slide } from 'svelte/transition';
   import Toast from '$components/Toast.svelte';
@@ -40,6 +40,8 @@
   $: if ($navigating)
     (() => {
       if ($navigating) {
+        // set previous route
+        prevPath.set($navigating.from?.route.id)
         // handle dynamic route updates
         if ($navigating.to?.route?.id === '/modal/profile') {
           $page.url.searchParams.set('user', $publicProfileUsername);

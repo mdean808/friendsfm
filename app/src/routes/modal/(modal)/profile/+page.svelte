@@ -1,20 +1,20 @@
 <script lang="ts">
-  import {Share} from '@capacitor/share';
+  import { Share } from '@capacitor/share';
   import SpotifyLogo from '$assets/spotify_logo_green.png';
   import AppleMusicLogo from '$assets/apple_music_logo_white.svg';
-  import {onMount} from 'svelte';
+  import { onMount } from 'svelte';
   import Skeleton from '$components/submission/Skeleton.svelte';
-  import {MusicPlatform, type User} from '$lib/types';
-  import {loading, publicProfileUsername, showToast} from '$lib/util';
-  import {goto} from '$app/navigation';
-  import {getCurrentSong, getUserStatistics} from '$lib/user';
-  import {sendFriendRequest} from '$lib/friends';
-  import {session} from '$lib/session';
-  import {formatDurationPlayed} from '$lib/dates';
-  import {toggleSong} from '$lib/songs';
-  import {FirebaseFirestore} from '@capacitor-firebase/firestore';
-  import {Clipboard} from '@capacitor/clipboard';
-  import {Capacitor} from '@capacitor/core';
+  import { MusicPlatform, type User } from '$lib/types';
+  import { loading, prevPath, publicProfileUsername, showToast } from '$lib/util';
+  import { goto } from '$app/navigation';
+  import { getCurrentSong, getUserStatistics } from '$lib/user';
+  import { sendFriendRequest } from '$lib/friends';
+  import { session } from '$lib/session';
+  import { formatDurationPlayed } from '$lib/dates';
+  import { toggleSong } from '$lib/songs';
+  import { FirebaseFirestore } from '@capacitor-firebase/firestore';
+  import { Clipboard } from '@capacitor/clipboard';
+  import { Capacitor } from '@capacitor/core';
 
   let profile: User['public']['profile'];
   const firstOfTheMonth = new Date().getDate() === 1;
@@ -37,7 +37,7 @@
     });
     const publicInfo = snapshots[0].data as User['public'];
     if (!publicInfo) {
-      goto('/main/home');
+      goto($prevPath);
       return;
     }
 
@@ -59,8 +59,7 @@
   });
 
   const currentlyListening = async () => {
-    const song = await getCurrentSong(undefined, $publicProfileUsername);
-    return song;
+    return await getCurrentSong(undefined, $publicProfileUsername);
   };
 
   let currentListeningPromise = currentlyListening();
@@ -122,7 +121,7 @@
   </button>
 {/if}
 <button
-    on:click={() => goto('/main/home')}
+    on:click={() => goto($prevPath)}
     class="absolute right-3 top-3 text-transparent"
 >
   <svg
