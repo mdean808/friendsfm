@@ -2,18 +2,20 @@
   import { onDestroy, onMount } from 'svelte';
   import { insets } from '$lib/device';
   import { currSubNumber, historyCurrentDay, loadingFriendSubmissions, sortByDate } from '$lib/util';
-  import { loadFriendSubmissions, loadUserSubmission, friendSubmissions, userSubmission } from '$lib/submission';
+  import { loadFriendSubmissions, friendSubmissions } from '$lib/submission';
   import { slide, fly } from 'svelte/transition';
   import { getShortDate } from '$lib/dates';
 
   import SkeletonSubmission from '$components/submission/Skeleton.svelte';
   import LargeSubmission from '$components/LargeSubmission.svelte';
-  import type { Submission } from '$lib/types';
+  import { MusicPlatform, type Submission } from '$lib/types';
   import UserSubmission from '$components/submission/User.svelte';
-  import { get, writable, type Writable } from 'svelte/store';
+  import { get } from 'svelte/store';
+  import { userSubmissionFilter } from '$lib/filters';
+  import { FirebaseFirestore } from '@capacitor-firebase/firestore';
+  import { session } from '$lib/session';
 
-  const currFriendSubmissions = get(friendSubmissions);
-  const currUserSubmission = get(userSubmission);
+  const currFriendSubmissions = $friendSubmissions;
   let direction: 'left' | 'right' = 'left';
   let loadingHistory = false;
   let sortedFriendSubmissions: Submission[];
@@ -36,14 +38,13 @@
     if (loadingHistory) return;
     if (!$historyCurrentDay) historyCurrentDay.set(get(currSubNumber) - 1);
     loadingHistory = true;
-    activeDaySubmission = await loadUserSubmission($historyCurrentDay);
+    activeDaySubmission = await getSubmission();
     friendSubmissions.set([]);
     await loadFriendSubmissions($historyCurrentDay);
     loadingHistory = false;
   });
 
   onDestroy(async () => {
-    userSubmission.set(currUserSubmission);
     friendSubmissions.set(currFriendSubmissions);
   });
 
@@ -51,7 +52,7 @@
     loadingHistory = true;
     direction = 'left';
     historyCurrentDay.update((day) => day -= 1);
-    activeDaySubmission = await loadUserSubmission($historyCurrentDay);
+    activeDaySubmission = await getSubmission();
     friendSubmissions.set([]);
     await loadFriendSubmissions($historyCurrentDay);
     loadingHistory = false;
@@ -62,10 +63,35 @@
     direction = 'right';
     loadingHistory = true;
     historyCurrentDay.update((day) => day += 1);
-    activeDaySubmission = await loadUserSubmission($historyCurrentDay);
+    activeDaySubmission = await getSubmission();
     friendSubmissions.set([]);
     await loadFriendSubmissions($historyCurrentDay);
     loadingHistory = false;
+  };
+
+  const getSubmission = async () => {
+    const colRes = await FirebaseFirestore.getCollection({
+      reference: 'submissions',
+      compositeFilter: userSubmissionFilter($historyCurrentDay),
+    });
+    const sub = colRes.snapshots[0];
+    let result: Submission | null = null;
+    if (sub?.data) {
+      result = {
+        ...(sub.data as Submission),
+        id: sub.id,
+        time: new Date(sub.data.time),
+        lateTime: new Date(sub.data.lateTime),
+        user: {
+          id: ($session).user.id,
+          username: $session.user.public.username || '',
+          musicPlatform:
+            $session.user.public.musicPlatform || MusicPlatform.spotify,
+        },
+      };
+    }
+    console.log(result?.number);
+    return result;
   };
 
 </script>
@@ -101,36 +127,38 @@
         </svg>
       </button>
     </div>
-    {#if loadingHistory}
-      <div class="my-2 border-b-2 border-gray-400">
-        <SkeletonSubmission type="user" />
-      </div>
-      <div class="my-2">
-        <SkeletonSubmission />
-        <SkeletonSubmission />
-        <SkeletonSubmission />
-      </div>
-    {:else if !activeDaySubmission}
-      <p out:fly={{x: direction === 'left' ? 200 : -200, duration: 200}}
-         in:fly={{x: direction === 'left' ? -200 : 200, duration: 200}}
-         class="text-center w-full">you did not
-        submit on this day</p>
-    {:else}
-      <div out:fly={{x: direction === 'left' ? 200 : -200, duration: 200}}
-           in:fly={{x: direction === 'left' ? -200 : 200, duration: 200}}>
-
-        <div class="my-2 px-2 pb-2 border-b-2 border-gray-400">
-          <UserSubmission data={activeDaySubmission} />
+    {#key activeDaySubmission}
+      {#if loadingHistory}
+        <div class="my-2 border-b-2 border-gray-400">
+          <SkeletonSubmission type="user" />
         </div>
-        {#each sortedFriendSubmissions as submission}
-          <div in:slide class="my-4">
-            <LargeSubmission data={submission} />
+        <div class="my-2">
+          <SkeletonSubmission />
+          <SkeletonSubmission />
+          <SkeletonSubmission />
+        </div>
+      {:else if !activeDaySubmission}
+        <p out:fly={{x: direction === 'left' ? 200 : -200, duration: 200}}
+           in:fly={{x: direction === 'left' ? -200 : 200, duration: 200}}
+           class="text-center w-full mt-3">you did not
+          submit on this day</p>
+      {:else}
+        <div out:fly={{x: direction === 'left' ? 200 : -200, duration: 200}}
+             in:fly={{x: direction === 'left' ? -200 : 200, duration: 200}}>
+
+          <div class="my-2 px-2 pb-2 border-b-2 border-gray-400">
+            <UserSubmission data={activeDaySubmission} />
           </div>
-        {/each}
-        {#if $friendSubmissions?.length === 0}
-          <p class="mx-auto text-center mt-3">nobody submitted on this day</p>
-        {/if}
-      </div>
-    {/if}
+          {#each sortedFriendSubmissions as submission}
+            <div in:slide class="my-4">
+              <LargeSubmission data={submission} />
+            </div>
+          {/each}
+          {#if $friendSubmissions?.length === 0}
+            <p class="mx-auto text-center mt-3">nobody submitted on this day</p>
+          {/if}
+        </div>
+      {/if}
+    {/key}
   </div>
 </div>

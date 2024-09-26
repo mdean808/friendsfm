@@ -15,7 +15,6 @@ import {
   FirebaseFirestore,
   type DocumentData,
   type DocumentSnapshot,
-  type QueryCompositeFilterConstraint,
 } from '@capacitor-firebase/firestore';
 import { browser } from '$app/environment';
 import { session } from './session';
@@ -24,7 +23,6 @@ import {
   chunkArray,
   currSubNumber,
   loadingFriendSubmissions,
-  submissionLoaded,
 } from './util';
 import {
   activeSubmission,
@@ -61,13 +59,14 @@ let emulatorsEmulated = false;
 if (browser) {
   if (import.meta.env.DEV && !emulatorsEmulated) {
     try {
-      FirebaseAuthentication.useEmulator({
+      await FirebaseAuthentication.useEmulator({
         host: 'http://127.0.0.1',
         port: 9099,
       });
       connectFirestoreEmulator(db, '127.0.0.1', 5002);
       emulatorsEmulated = true;
-    } catch {}
+    } catch {
+    }
   }
 }
 
@@ -128,7 +127,7 @@ export const setupSnapshots = async () => {
       if (err)
         return console.log(
           `Snapshot reference 'users/${get(session).user.id}' error:`,
-          err
+          err,
         );
       const doc = { ...event?.snapshot.data, id: event?.snapshot.id } as User;
       const res = await FirebaseFirestore.getDocument({
@@ -161,7 +160,7 @@ export const setupSnapshots = async () => {
         });
         return s;
       });
-    }
+    },
   );
 
   // snapshot current submission number after getting it
@@ -175,7 +174,7 @@ export const setupSnapshots = async () => {
       if (err)
         return console.log(
           'Snapshot reference `misc/notifications` error:',
-          err
+          err,
         );
       const num = event?.snapshot.data?.count;
       if (num > get(currSubNumber)) {
@@ -183,7 +182,7 @@ export const setupSnapshots = async () => {
         friendSubmissions.set([]);
         userSubmission.set(null);
       }
-    }
+    },
   );
 
   // load user submission
@@ -216,7 +215,7 @@ export const setupSnapshots = async () => {
           // user submission doesn't exist
           userSubmission.set(null);
         }
-      }
+      },
     );
 
   // friend submissions
@@ -279,8 +278,8 @@ export const setupSnapshots = async () => {
             return console.log('Snapshot reference `submissions` error:', err);
           if (!event) return;
           await updateSubmissions(event?.snapshots);
-        }
-      )
+        },
+      ),
     );
   });
 };

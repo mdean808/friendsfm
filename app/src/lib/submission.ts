@@ -235,7 +235,7 @@ export const loadUserSubmission = async (number?: number) => {
       },
     }
   }
-  userSubmission.set(null);
+  userSubmission.set(result);
   submissionLoaded.set(true);
   return result;
 };
