@@ -1,12 +1,5 @@
 import { get, writable, type Writable } from 'svelte/store';
-import type {
-  MusicPlatform,
-  SavedSong,
-  Song,
-  Submission,
-  User,
-  UserStatistics,
-} from '$lib/types';
+import type { MusicPlatform, SavedSong, Song, Submission, User, UserStatistics } from '$lib/types';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { network } from '$lib/util';
 import { session } from '$lib/session';
@@ -15,6 +8,20 @@ import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { Capacitor } from '@capacitor/core';
 
 export const spotifyAuthCode = <Writable<string>>writable();
+
+export const loadUser = async (uid: string): Promise<User> => {
+  // load user
+  let res = await FirebaseFirestore.getDocument({
+    reference: `users/${uid}`,
+  });
+  const user = { ...res.snapshot.data, id: res.snapshot.id } as User;
+  // load public data
+  res = await FirebaseFirestore.getDocument({
+    reference: `users/${get(session).user.id}/public/info`,
+  });
+  user.public = res.snapshot.data as User['public'];
+  return user;
+}
 
 export const refreshMessagingToken = async (token?: string) => {
   if (Capacitor.getPlatform() !== 'web' && !token) {

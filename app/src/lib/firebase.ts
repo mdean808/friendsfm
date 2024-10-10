@@ -27,7 +27,7 @@ import {
 import {
   activeSubmission,
   friendSubmissions,
-  loadUserSubmission,
+  loadUserSubmission, updateSubmissions,
   userSubmission,
 } from './submission';
 import {
@@ -37,8 +37,10 @@ import {
   type User,
 } from './types';
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
-import { migratePublicInfo } from './user';
+import { loadUser, migratePublicInfo } from './user';
 import { friendSubmissionsFilter, userSubmissionFilter } from './filters';
+
+// INIT FIREBASE
 
 export const config = {
   apiKey: PUBLIC_FIREBASE_API_KEY,
@@ -59,7 +61,8 @@ let emulatorsEmulated = false;
 if (browser) {
   if (import.meta.env.DEV && !emulatorsEmulated) {
     try {
-      await FirebaseAuthentication.useEmulator({
+      // noinspection JSIgnoredPromiseFromCall
+      FirebaseAuthentication.useEmulator({
         host: 'http://127.0.0.1',
         port: 9099,
       });
@@ -70,6 +73,8 @@ if (browser) {
   }
 }
 
+// INIT SNAPSHOTS
+
 const snapshots = { friendSubmissions: [] } as {
   user?: string;
   misc?: string;
@@ -79,17 +84,9 @@ const snapshots = { friendSubmissions: [] } as {
 
 export const setupSnapshots = async () => {
   if (!get(session).loggedIn) return;
-  // load user
-  let res = await FirebaseFirestore.getDocument({
-    reference: `users/${get(session).user.id}`,
-  });
-  const user = { ...res.snapshot.data, id: res.snapshot.id } as User;
-  res = await FirebaseFirestore.getDocument({
-    reference: `users/${get(session).user.id}/public/info`,
-  });
-  const publicData = res.snapshot.data as User['public'];
+  const user = await loadUser(get(session).user.id)
 
-  if (!publicData) {
+  if (!user.public) {
     await migratePublicInfo();
   }
 
@@ -104,12 +101,12 @@ export const setupSnapshots = async () => {
   }
   // set user values
   session.update((s) => {
-    s.user.public.username = publicData?.username;
-    s.user.public.musicPlatform = publicData?.musicPlatform;
+    s.user.public.username = user.public?.username;
+    s.user.public.musicPlatform = user.public?.musicPlatform;
     s.user.friends = user.friends;
     s.user.friendRequests = user.friendRequests;
-    s.user.public.profile = publicData?.profile;
-    s.user.public.savedSongs = publicData?.savedSongs;
+    s.user.public.profile = user.public?.profile;
+    s.user.public.savedSongs = user.public?.savedSongs;
     s.user.messagingToken = user.messagingToken;
     s.user.likedSongsPlaylist = user.likedSongsPlaylist;
     s.user.submissionsPlaylist = user.submissionsPlaylist;
@@ -119,8 +116,8 @@ export const setupSnapshots = async () => {
     });
     return s;
   });
-  // snapshot user
 
+  // snapshot on user
   snapshots.user = await FirebaseFirestore.addDocumentSnapshotListener(
     { reference: `users/${get(session).user.id}` },
     async (event, err) => {
@@ -163,11 +160,12 @@ export const setupSnapshots = async () => {
     },
   );
 
-  // snapshot current submission number after getting it
+  // get current submission number
   const miscSnapshot = await FirebaseFirestore.getDocument({
     reference: 'misc/notifications',
   });
   currSubNumber.set(miscSnapshot.snapshot.data?.count);
+  // snapshot current submission number
   snapshots.misc = await FirebaseFirestore.addDocumentSnapshotListener(
     { reference: 'misc/notifications' },
     async (event, err) => {
@@ -187,8 +185,8 @@ export const setupSnapshots = async () => {
 
   // load user submission
   await loadUserSubmission();
-  // snapshot user sub
 
+  // snapshot user sub
   snapshots.userSubmission =
     await FirebaseFirestore.addCollectionSnapshotListener(
       { reference: 'submissions', compositeFilter: userSubmissionFilter() },
@@ -225,39 +223,7 @@ export const setupSnapshots = async () => {
 
   const friendIdChunks = chunkArray(friendIds, 30);
 
-  const updateSubmissions = async (docs: DocumentSnapshot<DocumentData>[]) => {
-    docs.forEach(async (d) => {
-      const res = await FirebaseFirestore.getDocument({
-        reference: `users/${d.data?.userId}/public/info`,
-      });
-      const publicUser = res.snapshot.data as User['public'];
-      const fSub = {
-        ...d.data,
-        id: d.id,
-        time: new Date(d.data?.time),
-        lateTime: new Date(d.data?.lateTime),
-        user: {
-          id: d.data?.userId,
-          username: publicUser.username,
-          musicPlatform: publicUser.musicPlatform,
-        },
-      } as Submission;
-
-      friendSubmissions.update((fs) => {
-        // remove existing submission instance
-        fs = fs.filter((s) => s.id !== fSub.id);
-        // add updated submission instance
-        fs = [...fs, fSub];
-        // complete update
-        return fs;
-      });
-
-      // update activeSubmission if needed
-      if (get(activeSubmission)?.id === fSub.id) activeSubmission.set(fSub);
-    });
-  };
-
-  friendIdChunks.forEach(async (chunk) => {
+  for (const chunk of friendIdChunks) {
     // Load friend submissions
     const docs = await FirebaseFirestore.getCollection({
       reference: 'submissions',
@@ -275,24 +241,28 @@ export const setupSnapshots = async () => {
         },
         async (event, err) => {
           if (err)
-            return console.log('Snapshot reference `submissions` error:', err);
+            return console.log('Snapshot reference `friendSubmissions` error:', err);
           if (!event) return;
-          await updateSubmissions(event?.snapshots);
+          const subs = await updateSubmissions(event?.snapshots);
+          // update active submission if we need to
+          subs.forEach((sub) => {
+            if (get(activeSubmission)?.id === sub.id) activeSubmission.set(sub);
+          })
         },
       ),
     );
-  });
+  }
 };
 
-export const unsubscribeSnapshots = () => {
+export const unsubscribeSnapshots = async () => {
   if (snapshots.user)
-    FirebaseFirestore.removeSnapshotListener({ callbackId: snapshots.user });
+    await FirebaseFirestore.removeSnapshotListener({ callbackId: snapshots.user });
   if (snapshots.misc)
-    FirebaseFirestore.removeSnapshotListener({ callbackId: snapshots.misc });
+    await FirebaseFirestore.removeSnapshotListener({ callbackId: snapshots.misc });
   if (snapshots.userSubmission)
-    FirebaseFirestore.removeSnapshotListener({
+    await FirebaseFirestore.removeSnapshotListener({
       callbackId: snapshots.userSubmission,
     });
   for (const snapId in snapshots.friendSubmissions)
-    FirebaseFirestore.removeSnapshotListener({ callbackId: snapId });
+    await FirebaseFirestore.removeSnapshotListener({ callbackId: snapId });
 };

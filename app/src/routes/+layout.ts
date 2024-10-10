@@ -32,11 +32,31 @@ export const load: LayoutLoad = ({ url }) => {
 };
 
 let snapshotsInit = false;
+
+const musicPlatformInit = async () => {
+  const platform = get(initParams)?.get('auth');
+  if (platform === MusicPlatform.spotify) {
+    let redirectUrl =
+      Capacitor.getPlatform() === 'web'
+        ? `${import.meta.env.VITE_SPOTIFY_REDIRECT_URL}?auth=spotify`
+        : import.meta.env.VITE_SPOTIFY_REDIRECT_URL;
+    if (dev) redirectUrl = window.location.origin + '?auth=spotify';
+    if (
+      await updateMusicPlatform(
+        MusicPlatform.spotify,
+        get(initParams).get('code') || '',
+        redirectUrl,
+      )
+    )
+      await goto('/main/home');
+  }
+}
+
 const setupDevice = async () => {
   // setup notifications
   if (Capacitor.isPluginAvailable('FirebaseMessaging')) {
     // listen for a new token
-    FirebaseMessaging.addListener('tokenReceived', async ({ token }) => {
+    await FirebaseMessaging.addListener('tokenReceived', async ({ token }) => {
       if (!get(session)?.user?.id) return;
       await refreshMessagingToken(token);
     });
@@ -60,6 +80,7 @@ const setupDevice = async () => {
             [key: string]: any;
             type: NotificationType;
           };
+          // noinspection ES6MissingAwait
           FirebaseAnalytics.logEvent({
             name: 'notification_open',
             params: {
@@ -75,31 +96,31 @@ const setupDevice = async () => {
             case NotificationType.Daily:
               userSubmission.set(null);
               friendSubmissions.set([]);
-              goto('/main/home');
+              await goto('/main/home');
               break;
             case NotificationType.LateSubmission:
-              goto('/main/home');
+              await goto('/main/home');
               break;
             case NotificationType.Comment:
               const sub = await getSubmission(data.id);
               activeSubmission.set(sub);
-              if (sub) goto('/modal/submission');
+              if (sub) await goto('/modal/submission');
               break;
             case NotificationType.FriendRequestCreated:
-              goto('/modal/friends');
+              await goto('/modal/friends');
               break;
             case NotificationType.FriendRequestAccepted:
-              goto('/modal/friends');
+              await goto('/modal/friends');
               break;
             default:
               break;
           }
         }
-      }
+      },
     );
     // remove notification bubble on app launch
     if (Capacitor.getPlatform() !== 'web')
-      FirebaseMessaging.removeAllDeliveredNotifications();
+      await FirebaseMessaging.removeAllDeliveredNotifications();
   }
   // device specific layout logic
   const is = await SafeArea.getSafeAreaInsets();
@@ -115,7 +136,7 @@ const setupQueriesAndDeeplinks = () => {
 const setupSessionsAndAuth = async () => {
   // user auth logic
   session.update((s) => ({ ...s, loaded: false }));
-  FirebaseAuthentication.addListener('authStateChange', async (state) => {
+  await FirebaseAuthentication.addListener('authStateChange', async (state) => {
     if (state.user) {
       if (get(session).loggedIn) return;
       await authSession(state.user);
@@ -124,37 +145,22 @@ const setupSessionsAndAuth = async () => {
           if (e.message.includes('Missing or insufficient permissions')) {
             await FirebaseAuthentication.signOut();
             await endSession();
-            goto('/intro/login');
+            await goto('/intro/login');
           } else {
             console.log(
               'load (listener): snapshot setup error',
               e,
-              get(session)
+              get(session),
             );
           }
         });
         snapshotsInit = true;
       }
     } else {
-      goto('/intro/login');
+      await goto('/intro/login');
     }
     // check for music platform authentication on web only after authenticating
-    const platform = get(initParams)?.get('auth');
-    if (platform === MusicPlatform.spotify) {
-      let redirectUrl =
-        Capacitor.getPlatform() === 'web'
-          ? `${import.meta.env.VITE_SPOTIFY_REDIRECT_URL}?auth=spotify`
-          : import.meta.env.VITE_SPOTIFY_REDIRECT_URL;
-      if (dev) redirectUrl = window.location.origin + '?auth=spotify';
-      if (
-        await updateMusicPlatform(
-          MusicPlatform.spotify,
-          get(initParams).get('code') || '',
-          redirectUrl
-        )
-      )
-        goto('/main/home');
-    }
+    await musicPlatformInit()
     appLoaded.set(true);
   });
   // init session
@@ -166,7 +172,7 @@ const setupSessionsAndAuth = async () => {
         if (e.message.includes('Missing or insufficient permissions') || dev) {
           await FirebaseAuthentication.signOut();
           await endSession();
-          goto('/intro/login');
+          await goto('/intro/login');
         } else {
           console.log('load: snapshot setup error', e, get(session));
         }
@@ -174,38 +180,31 @@ const setupSessionsAndAuth = async () => {
       snapshotsInit = true;
     }
     // check for music platform authentication on web only after authenticating
-    const platform = get(initParams)?.get('auth');
-    if (platform === MusicPlatform.spotify) {
-      let redirectUrl =
-        Capacitor.getPlatform() === 'web'
-          ? `${import.meta.env.VITE_SPOTIFY_REDIRECT_URL}?auth=spotify`
-          : import.meta.env.VITE_SPOTIFY_REDIRECT_URL;
-      if (dev) redirectUrl = window.location.origin + '?auth=spotify';
-      if (
-        await updateMusicPlatform(
-          MusicPlatform.spotify,
-          get(initParams).get('code') || '',
-          redirectUrl
-        )
-      )
-        goto('/main/home');
-    }
+    await musicPlatformInit()
     appLoaded.set(true);
   } else {
-    goto('/intro/login');
+    await goto('/intro/login');
   }
+  // handle app load from background -- reload snapshots
+  await App.addListener('appStateChange', async (state) => {
+    if (state.isActive)
+      // only setup the snapshots if we've already init them
+      if (snapshotsInit) {
+        await setupSnapshots();
+      }
+  });
 };
 
 const setupNavigationLogic = async () => {
   // handle dynamic pages
   if (get(page).route.id?.includes('modal/profile')) {
     const username = get(page).url.searchParams.get('user') || '';
-    if (!username) goto('/main/home');
+    if (!username) await goto('/main/home');
     publicProfileUsername.set(username);
   }
   if (get(page).route.id?.includes('modal/submission')) {
     const subId = get(page).url.searchParams.get('id') || '';
-    if (!subId) goto('/main/home');
+    if (!subId) await goto('/main/home');
     const submission = await getSubmission(subId);
     activeSubmission.set(submission);
   }

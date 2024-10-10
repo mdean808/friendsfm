@@ -50,11 +50,10 @@
     if (!profile.musicPlatform)
       profile.musicPlatform = publicInfo.musicPlatform;
     // load the stats!
-    const stats = await getUserStatistics(
+    profile.stats = await getUserStatistics(
       snapshots[0].path.split('/')[1], // 'id' is 'info', so we must use 'path' to retrieve the userId
       $publicProfileUsername
     );
-    profile.stats = stats;
     loadingProfile = false;
   });
 

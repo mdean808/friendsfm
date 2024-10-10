@@ -15,9 +15,12 @@
   import { insets, keyboardHeight } from '$lib/device';
   import {
     activeHomeTab,
+    currSubNumber,
     hashCode,
-    intToRGB, prevPath,
+    intToRGB,
+    prevPath,
     publicProfileUsername,
+    historyCurrentDay,
   } from '$lib/util';
   import {
     convertDateToLateString,
@@ -44,7 +47,7 @@
   };
 
   const close = () => {
-    console.log($prevPath)
+    console.log($prevPath);
     goto($prevPath);
     activeSubmission.set(null);
   };
@@ -66,9 +69,9 @@
         publicProfileUsername.set($activeSubmission.user.id);
       }}
     >
-      <h1 class="text-center pt-2 mx-auto text-2xl text-white flex-grow">
+      <span class="text-center pt-2 mx-auto text-2xl text-white flex-grow">
         {$activeSubmission?.user.username}
-      </h1>
+      </span>
     </button>
     <button on:click={close} class="flex-grow-0 text-transparent">
       <svg
@@ -89,15 +92,15 @@
     </button>
   </div>
   <div class="bg-gray-700 py-2 px-4 w-full">
-    {#if !focused || Capacitor.getPlatform() == 'web'}
+    {#if !focused || Capacitor.getPlatform() === 'web'}
       <div transition:slide>
         {#if !$activeSubmission.late}
           <span class="text-sm text-center block text-gray-400"
-            >{$activeSubmission.time?.toLocaleString('en-US', {
-              hour: 'numeric',
-              minute: 'numeric',
-              hour12: true,
-            })}
+          >{$activeSubmission.time?.toLocaleString('en-US', {
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true,
+          })}
           </span>
         {:else}
           <span class="text-sm text-center block text-red-500">
@@ -258,40 +261,44 @@
         </div>
       {/each}
     </div>
-    <div
-      transition:slide
-      class={`w-full flex rounded-md pl-1 pr-2 border py-1 border-${$session.user.public.musicPlatform} shadow-md bg-gray-900 text-white`}
-    >
-      <div class="py-1 w-10/12 rounded-none">
-        <input
-          bind:value={commentValue}
-          bind:this={input}
-          on:focusin={() => (focused = true)}
-          on:focusout={() => (focused = false)}
-          on:keyup={(e) => e.key === 'Enter' && submitComment()}
-          class="bg-gray-900 w-full placeholder:text-gray-400 rounded-md p-1 outline-none"
-          placeholder="tap to start a comment"
-        />
-      </div>
-      {#if !commentSubmitting}
-        <button
-          on:click={submitComment}
-          class="ml-auto self-center rounded-full py-1 pl-1.5 pr-1 h-9 w-9 bg-blue-600 text-white"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 256 256"
-            ><path
-              d="M232,127.89a16,16,0,0,1-8.18,14L55.91,237.9A16.14,16.14,0,0,1,48,240a16,16,0,0,1-15.05-21.34L60.3,138.71A4,4,0,0,1,64.09,136H136a8,8,0,0,0,8-8.53,8.19,8.19,0,0,0-8.26-7.47H64.16a4,4,0,0,1-3.79-2.7l-27.44-80A16,16,0,0,1,55.85,18.07l168,95.89A16,16,0,0,1,232,127.89Z"
-            ></path></svg
+    {#if !$prevPath.includes('history')}
+      <div
+        transition:slide
+        class={`w-full flex rounded-md pl-1 pr-2 border py-1 border-${$session.user.public.musicPlatform} shadow-md bg-gray-900 text-white`}
+      >
+        <div class="py-1 w-10/12 rounded-none">
+          <input
+            bind:value={commentValue}
+            bind:this={input}
+            on:focusin={() => (focused = true)}
+            on:focusout={() => (focused = false)}
+            on:keyup={(e) => e.key === 'Enter' && submitComment()}
+            class="bg-gray-900 w-full placeholder:text-gray-400 rounded-md p-1 outline-none"
+            placeholder="tap to start a comment"
+          />
+        </div>
+        {#if !commentSubmitting}
+          <button
+            on:click={submitComment}
+            class="ml-auto self-center rounded-full py-1 pl-1.5 pr-1 h-9 w-9 bg-blue-600 text-white"
           >
-        </button>
-      {:else}
-        <LoadingIndicator
-          className="ml-auto self-center rounded-full py-1 pl-1.5 pr-1 h-9 w-9 bg-blue-600 text-white"
-        />
-      {/if}
-    </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 256 256"
+            >
+              <path
+                d="M232,127.89a16,16,0,0,1-8.18,14L55.91,237.9A16.14,16.14,0,0,1,48,240a16,16,0,0,1-15.05-21.34L60.3,138.71A4,4,0,0,1,64.09,136H136a8,8,0,0,0,8-8.53,8.19,8.19,0,0,0-8.26-7.47H64.16a4,4,0,0,1-3.79-2.7l-27.44-80A16,16,0,0,1,55.85,18.07l168,95.89A16,16,0,0,1,232,127.89Z"
+              ></path>
+            </svg
+            >
+          </button>
+        {:else}
+          <LoadingIndicator
+            className="ml-auto self-center rounded-full py-1 pl-1.5 pr-1 h-9 w-9 bg-blue-600 text-white"
+          />
+        {/if}
+      </div>
+    {/if}
   </div>
 {/if}

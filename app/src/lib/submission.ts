@@ -1,30 +1,22 @@
-import {get, writable, type Writable} from 'svelte/store';
+import { get, writable, type Writable } from 'svelte/store';
 import {
-  type Submission,
+  type Comment,
   MusicPlatform,
   type Song,
   type StrippedSubmission,
-  type Comment,
+  type Submission,
   type User,
 } from '$lib/types';
-import {Geolocation, type Position} from '@capacitor/geolocation';
-import {
-  type AppleMusicSong,
-  AppleMusicPermissionsResults,
-} from '$plugins/AppleMusic';
-import AppleMusic from '$plugins/AppleMusic';
-import {Dialog} from '@capacitor/dialog';
-import {chunkArray, errorToast, loading, network, showToast, submissionLoaded} from './util';
-import {FirebaseAnalytics} from '@capacitor-firebase/analytics';
-import {session} from './session';
-import {
-  FirebaseFirestore,
-  type DocumentData,
-  type DocumentSnapshot,
-} from '@capacitor-firebase/firestore';
-import {Capacitor} from '@capacitor/core';
-import {friendSubmissionsFilter, userSubmissionFilter} from './filters';
-import {saveSong, unsaveSong} from './songs';
+import { Geolocation, type Position } from '@capacitor/geolocation';
+import AppleMusic, { AppleMusicPermissionsResults, type AppleMusicSong } from '$plugins/AppleMusic';
+import { Dialog } from '@capacitor/dialog';
+import { chunkArray, errorToast, loading, network, showToast, submissionLoaded } from './util';
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { session } from './session';
+import { type DocumentData, type DocumentSnapshot, FirebaseFirestore } from '@capacitor-firebase/firestore';
+import { Capacitor } from '@capacitor/core';
+import { friendSubmissionsFilter, userSubmissionFilter } from './filters';
+import { saveSong, unsaveSong } from './songs';
 
 export const friendSubmissions = <Writable<Submission[]>>writable([]);
 
@@ -40,7 +32,7 @@ export const generateSubmission = async () => {
   if (Capacitor.getPlatform() !== 'web') {
     try {
       await Geolocation.checkPermissions().catch(
-        async () => await Geolocation.requestPermissions()
+        async () => await Geolocation.requestPermissions(),
       );
       location = await Geolocation.getCurrentPosition();
     } catch (e) {
@@ -57,7 +49,7 @@ export const generateSubmission = async () => {
       if (permsRes.receive !== AppleMusicPermissionsResults.granted) {
         return Dialog.alert({
           message:
-            "We can't see what you're listening to! Please allow apple music permissions in settings.",
+            'We can\'t see what you\'re listening to! Please allow apple music permissions in settings.',
           title: 'Permissions Denied.',
         });
       }
@@ -66,7 +58,7 @@ export const generateSubmission = async () => {
       recentlyPlayed = await AppleMusic.getRecentlyPlayed();
     } catch (e: any) {
       console.log(e);
-      return errorToast({content: e.message});
+      return errorToast({ content: e.message });
     }
   }
   const message = await network.queryFirebase('createnewusersubmission', {
@@ -80,14 +72,14 @@ export const generateSubmission = async () => {
   sub.lateTime = new Date(sub.lateTime);
   sub.time = new Date(sub.time);
   userSubmission.set(message.user as Submission);
-  loadFriendSubmissions()
-  FirebaseAnalytics.logEvent({name: 'generate_submission'});
+  loadFriendSubmissions();
+  FirebaseAnalytics.logEvent({ name: 'generate_submission' });
 };
 
 export const createSubmissionsPlaylist = async () => {
   const musicPlatform = get(session).user.public.musicPlatform;
   if (musicPlatform === MusicPlatform.spotify) {
-    const {value} = await Dialog.confirm({
+    const { value } = await Dialog.confirm({
       title: 'Create Spotify® Playlist',
       message:
         'This will create a new Spotify® playlist of the songs on your friends submissions each day. Proceed?',
@@ -98,22 +90,22 @@ export const createSubmissionsPlaylist = async () => {
     loading.set(false);
     if (!message) {
       //api response failed
-      showToast({content: 'Playlist creation failed. Please try again.'});
+      showToast({ content: 'Playlist creation failed. Please try again.' });
       return;
     }
     // goto the playlist!
     window.location.href = 'https://open.spotify.com/playlist/' + message;
-    showToast({content: 'playlist successfully created!'});
+    showToast({ content: 'playlist successfully created!' });
     return message;
   } else if (musicPlatform === MusicPlatform.appleMusic) {
-    const {value} = await Dialog.confirm({
+    const { value } = await Dialog.confirm({
       title: 'Create Apple Music Playlist',
       message:
         'This will create a new Apple Music playlist of the songs on your friends submissions each day. Proceed?',
     });
     if (!value) return;
     loading.set(true);
-    const {url} = await AppleMusic.createPlaylist({
+    const { url } = await AppleMusic.createPlaylist({
       name: 'friendsfm - submissions',
     });
     const message = await network.queryFirebase('setsubmissionsplaylist', {
@@ -122,12 +114,12 @@ export const createSubmissionsPlaylist = async () => {
     loading.set(false);
     if (!message) {
       //api response failed
-      showToast({content: 'playlist creation failed. please try again.'});
+      showToast({ content: 'playlist creation failed. please try again.' });
       return;
     }
     // goto playlist
     window.location.href = url;
-    showToast({content: 'playlist successfully created!'});
+    showToast({ content: 'playlist successfully created!' });
     return url;
   }
   // return the playlist id
@@ -152,7 +144,7 @@ export const previewSubmission = async (): Promise<{
       if (permsRes.receive !== AppleMusicPermissionsResults.granted) {
         return Dialog.alert({
           message:
-            "We can't see what you're listening to! Please allow apple music permissions in settings.",
+            'We can\'t see what you\'re listening to! Please allow apple music permissions in settings.',
           title: 'Permissions Denied.',
         });
       }
@@ -162,7 +154,7 @@ export const previewSubmission = async (): Promise<{
       console.log('recentplayed', recentlyPlayed);
     } catch (e: any) {
       console.log(e);
-      return errorToast({content: e.message});
+      return errorToast({ content: e.message });
     }
   }
   const message = await network.queryFirebase('previewusersubmission', {
@@ -174,7 +166,7 @@ export const previewSubmission = async (): Promise<{
   // turn times into timestamps for frontent type safety
   sub.lateTime = new Date(sub.lateTime);
   sub.time = new Date(sub.time);
-  FirebaseAnalytics.logEvent({name: 'preview_submission'});
+  FirebaseAnalytics.logEvent({ name: 'preview_submission' });
   message.submission = sub;
 
   message.friends = [];
@@ -233,11 +225,44 @@ export const loadUserSubmission = async (number?: number) => {
         musicPlatform:
           get(session).user.public.musicPlatform || MusicPlatform.spotify,
       },
-    }
+    };
   }
   userSubmission.set(result);
   submissionLoaded.set(true);
   return result;
+};
+
+// function for appending to submissions
+export const updateSubmissions = async (docs: DocumentSnapshot<DocumentData>[]) => {
+  const submissions: Submission[] = [];
+  for (const d of docs) {
+    const publicUserRes = await FirebaseFirestore.getDocument({
+      reference: `users/${d.data?.userId}/public/info`,
+    });
+    const publicUser = publicUserRes.snapshot.data as User['public'];
+    const fSub = {
+      ...d.data,
+      id: d.id,
+      time: new Date(d.data?.time),
+      lateTime: new Date(d.data?.lateTime),
+      user: {
+        id: d.data?.userId,
+        username: publicUser.username,
+        musicPlatform: publicUser.musicPlatform,
+      },
+    } as Submission;
+
+    friendSubmissions.update((fs) => {
+      // remove existing submission instance
+      fs = fs.filter((s) => s.id !== fSub.id);
+      // add updated submission instance
+      fs = [...fs, fSub];
+      // complete update
+      return fs;
+    });
+    submissions.push(fSub);
+  }
+  return submissions;
 };
 
 export const loadFriendSubmissions = async (number?: number) => {
@@ -249,53 +274,23 @@ export const loadFriendSubmissions = async (number?: number) => {
   // chunk request by friend, since firestore only supports queries with <= 30
   const friendIdChunks = chunkArray(friendIds, 30);
 
-  const submissions: Submission[] = [];
+  let submissions: Submission[] = [];
 
-  // function for appending to submissions
-  const updateSubmissions = async (docs: DocumentSnapshot<DocumentData>[]) => {
-    docs.forEach(async (d) => {
-      const userRes = await FirebaseFirestore.getDocument({
-        reference: `users/${d.data?.userId}/public/info`,
-      });
-      const publicUser = userRes.snapshot.data as User['public'];
-      const fSub = {
-        ...d.data,
-        id: d.id,
-        time: new Date(d.data?.time),
-        lateTime: new Date(d.data?.lateTime),
-        user: {
-          id: d.data?.userId,
-          username: publicUser.username,
-          musicPlatform: publicUser.musicPlatform,
-        },
-      } as Submission;
 
-      submissions.push(fSub);
-
-      friendSubmissions.update((fs) => {
-        // remove existing submission instance
-        fs = fs.filter((s) => s.id !== fSub.id);
-        // add updated submission instance
-        fs = [...fs, fSub];
-        // complete update
-        return fs;
-      });
-    });
-  };
-
-  friendIdChunks.forEach(async (chunk) => {
+  for (const chunk of friendIdChunks) {
     // Load friend submissions
     const docs = await FirebaseFirestore.getCollection({
       reference: 'submissions',
       compositeFilter: friendSubmissionsFilter(chunk, number),
     });
-    await updateSubmissions(docs.snapshots);
-  });
+    submissions = await updateSubmissions(docs.snapshots);
+  }
   return submissions;
 };
 
+
 export const getSubmission: (id: string) => Promise<Submission | null> = async (
-  id: string
+  id: string,
 ) => {
   if (!id) return null;
   // snapshot user submission status
@@ -324,7 +319,7 @@ export const getSubmission: (id: string) => Promise<Submission | null> = async (
 };
 
 export const toggleLike = async (submission: Submission) => {
-  const sesh = get(session)
+  const sesh = get(session);
   // user hasn't liked the submission yet
   if (!submission.likes.find((l) => l.id === sesh.user.id)) {
     // add the like
@@ -333,12 +328,12 @@ export const toggleLike = async (submission: Submission) => {
       data: {
         likes: [
           ...submission.likes,
-          {id: sesh.user.id, username: sesh.user.public.username},
+          { id: sesh.user.id, username: sesh.user.public.username },
         ],
       },
     });
     // save the song
-    await saveSong({...submission.song, user: submission.user})
+    await saveSong({ ...submission.song, user: submission.user });
   } else {
     // remove the like
     await FirebaseFirestore.updateDocument({
@@ -348,6 +343,6 @@ export const toggleLike = async (submission: Submission) => {
       },
     });
     // unsave the song
-    await unsaveSong({...submission.song, user: submission.user})
+    await unsaveSong({ ...submission.song, user: submission.user });
   }
-}
+};

@@ -14,6 +14,7 @@
     FirebaseFirestore,
     type QueryCompositeFilterConstraint,
   } from '@capacitor-firebase/firestore';
+  import { friendSubmissionsFilter } from '$lib/filters';
 
   let submission: Submission;
   let interval: NodeJS.Timeout;
@@ -44,29 +45,13 @@
     const userFriends = $session.user.friends;
     const friendIds = userFriends.map((f) => f.id);
     if (friendIds.length === 0) return;
+    // chunk because of firestore limitations
     const friendIdChunks = chunkArray(friendIds, 30);
     const friendPromises = friendIdChunks.map(async (chunk) => {
-      const friendSubsFilter: QueryCompositeFilterConstraint = {
-        type: 'and',
-        queryConstraints: [
-          {
-            type: 'where',
-            fieldPath: 'userId',
-            opStr: 'in',
-            value: chunk,
-          },
-          {
-            type: 'where',
-            fieldPath: 'number',
-            opStr: '==',
-            value: $currSubNumber,
-          },
-        ],
-      };
 
       const docs = await FirebaseFirestore.getCollection({
         reference: 'submissions',
-        compositeFilter: friendSubsFilter,
+        compositeFilter: friendSubmissionsFilter(chunk),
       });
 
       return docs.snapshots.map((snapshot) => {
