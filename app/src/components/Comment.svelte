@@ -1,7 +1,7 @@
 <script lang="ts">
   import { session } from '$lib/session';
   import { deleteCommentFromSubmission } from '$lib/submission';
-  import type { Comment } from '$lib/types';
+  import type { Comment } from '$lib/types/friendsfm';
   import LoadingIndicator from './LoadingIndicator.svelte';
 
   export let comment: Comment;

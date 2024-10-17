@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Song, Submission } from '$lib/types';
+  import type { Song, Submission } from '$lib/types/friendsfm';
   import SubmissionTime from './submission/Time.svelte';
   import SubmissionActions from './submission/Actions.svelte';
   import Comment from '$components/icons/Comment.svelte';
@@ -10,7 +10,6 @@
   import { getCurrentSong } from '$lib/user';
   import { publicProfileUsername } from '$lib/util';
   import { session } from '$lib/session';
-  import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 
   export let data: Submission;
 

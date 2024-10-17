@@ -2,7 +2,7 @@ import {
   ResponseType,
   type NetworkRequest,
   type NetworkResponse,
-} from '$lib/types';
+} from '$lib/types/friendsfm';
 import { spotifyAuthCode } from './user';
 import ky from 'ky';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';

@@ -2,17 +2,16 @@
   import SubmissionTime from './submission/Time.svelte';
   import { onDestroy, onMount } from 'svelte';
   import MusicPlatformIcon from './icons/MusicPlatformIcon.svelte';
-  import { MusicPlatform, type Submission } from '$lib/types';
+  import { MusicPlatform, type Submission } from '$lib/types/friendsfm';
   import { session } from '$lib/session';
   import { goto } from '$app/navigation';
-  import { chunkArray, currSubNumber, publicProfileUsername } from '$lib/util';
+  import { chunkArray, publicProfileUsername } from '$lib/util';
   import {
     loadUserSubmission,
     previewSubmission,
   } from '$lib/submission';
   import {
     FirebaseFirestore,
-    type QueryCompositeFilterConstraint,
   } from '@capacitor-firebase/firestore';
   import { friendSubmissionsFilter } from '$lib/filters';
 

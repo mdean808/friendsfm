@@ -89,13 +89,34 @@ export interface SavedSong extends Song {
   };
 }
 
+export interface AudialSong {
+  name: string;
+  artist: string;
+  id: string;
+  preview?: string;
+}
+
+export interface AudialGuess {
+  song: AudialSong;
+  correct: boolean;
+  artistCorrect: boolean;
+}
+
+export interface AudialAttempt {
+  guesses: AudialGuess[];
+  date: Date;
+  correct: boolean;
+  attempts: number;
+  type?: string;
+}
+
 export interface Submission {
   id: string;
   number: number;
   late: boolean;
   song: Song; // song id
   time: Date | number;
-  audial: Audial;
+  audial: AudialAttempt;
   user?: {
     username: string;
     musicPlatform?: MusicPlatform;
@@ -124,7 +145,7 @@ export interface Location {
   latitude: number;
 }
 
-export interface Audial {
+export interface AudialAttempt {
   number: number;
   score: string;
 }

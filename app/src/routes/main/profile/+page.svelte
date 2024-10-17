@@ -9,7 +9,7 @@
   import Input from '$components/Input.svelte';
   import Skeleton from '$components/submission/Skeleton.svelte';
 
-  import { MusicPlatform, type User } from '$lib/types';
+  import { MusicPlatform, type User } from '$lib/types/friendsfm';
   import { goto } from '$app/navigation';
   import { formatDurationPlayed } from '$lib/dates';
   import { getCurrentSong, getUserStatistics } from '$lib/user';

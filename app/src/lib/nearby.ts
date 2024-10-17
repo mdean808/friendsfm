@@ -1,7 +1,7 @@
 import { location } from './device';
 import { network } from './util';
 import { get } from 'svelte/store';
-import type { StrippedSubmission } from './types';
+import type { StrippedSubmission } from './types/friendsfm';
 import { nearbySubmissions } from './submission';
 
 export const getNearbySubmissions = async (

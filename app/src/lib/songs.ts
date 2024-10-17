@@ -1,5 +1,5 @@
 import { get, writable, type Writable } from 'svelte/store';
-import { MusicPlatform, type SavedSong, type Song } from '$lib/types';
+import { MusicPlatform, type SavedSong, type Song } from '$lib/types/friendsfm';
 import { session } from '$lib/session';
 import { Dialog } from '@capacitor/dialog';
 import { loading, network, showToast } from '$lib/util';
@@ -97,13 +97,13 @@ export const unsaveSong = async (song: SavedSong) => {
   });
 }
 
-  export const toggleSong = async (savedSong?: SavedSong) => {
-    if (!savedSong) return;
-    if ($session.songs.find((song) => song.name === savedSong.name)) {
-      // song exists
-      await unsaveSong(savedSong);
-    } else {
-      // song doesn't exist
-      await saveSong(savedSong);
-    }
-  };
+export const toggleSong = async (savedSong?: SavedSong) => {
+  if (!savedSong) return;
+  if ($session.songs.find((song) => song.name === savedSong.name)) {
+    // song exists
+    await unsaveSong(savedSong);
+  } else {
+    // song doesn't exist
+    await saveSong(savedSong);
+  }
+};

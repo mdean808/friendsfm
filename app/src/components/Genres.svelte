@@ -1,7 +1,7 @@
 <script lang="ts">
   import { MarkerClusterer } from '@googlemaps/markerclusterer';
   import { hashCode, intToRGB, showToast } from '$lib/util';
-  import type { SavedSong, StrippedSubmission } from '$lib/types';
+  import type { SavedSong, StrippedSubmission } from '$lib/types/friendsfm';
   import MusicPlatformIcon from '$components/icons/MusicPlatformIcon.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { slide } from 'svelte/transition';

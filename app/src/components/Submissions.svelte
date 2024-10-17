@@ -6,7 +6,7 @@
   import SkeletonSubmission from '$components/submission/Skeleton.svelte';
   import LargeSubmission from './LargeSubmission.svelte';
   import UserSubmission from './submission/User.svelte';
-  import { MusicPlatform, type Submission } from '$lib/types';
+  import { MusicPlatform, type Submission } from '$lib/types/friendsfm';
   import {loadingFriendSubmissions, sortByDate, submissionsScroll} from '$lib/util';
   import {
     createSubmissionsPlaylist,
@@ -88,7 +88,7 @@
       <SkeletonSubmission />
     {:else if !$loadingFriendSubmissions}
       {#each sortedFriendSubmissions as submission}
-        <div in:slide class="my-4">
+        <div class="my-4">
           <LargeSubmission data={submission} />
           <!--<Submission data={submission} />-->
         </div>

@@ -1,5 +1,5 @@
 import { get, writable, type Writable } from 'svelte/store';
-import type { MusicPlatform, SavedSong, Song, Submission, User, UserStatistics } from '$lib/types';
+import type { MusicPlatform, SavedSong, Song, Submission, User, UserStatistics } from '$lib/types/friendsfm';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { network } from '$lib/util';
 import { session } from '$lib/session';

@@ -19,15 +19,12 @@ import {
 import { browser } from '$app/environment';
 import { session } from './session';
 import { get } from 'svelte/store';
-import {
-  chunkArray,
-  currSubNumber,
-  loadingFriendSubmissions,
-} from './util';
+import { chunkArray, currSubNumber, loadingFriendSubmissions } from './util';
 import {
   activeSubmission,
   friendSubmissions,
-  loadUserSubmission, updateSubmissions,
+  loadUserSubmission,
+  updateSubmissions,
   userSubmission,
 } from './submission';
 import {
@@ -35,7 +32,7 @@ import {
   type SavedSong,
   type Submission,
   type User,
-} from './types';
+} from './types/friendsfm';
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
 import { loadUser, migratePublicInfo } from './user';
 import { friendSubmissionsFilter, userSubmissionFilter } from './filters';
@@ -68,8 +65,7 @@ if (browser) {
       });
       connectFirestoreEmulator(db, '127.0.0.1', 5002);
       emulatorsEmulated = true;
-    } catch {
-    }
+    } catch { }
   }
 }
 
@@ -84,7 +80,7 @@ const snapshots = { friendSubmissions: [] } as {
 
 export const setupSnapshots = async () => {
   if (!get(session).loggedIn) return;
-  const user = await loadUser(get(session).user.id)
+  const user = await loadUser(get(session).user.id);
 
   if (!user.public) {
     await migratePublicInfo();
@@ -124,7 +120,7 @@ export const setupSnapshots = async () => {
       if (err)
         return console.log(
           `Snapshot reference 'users/${get(session).user.id}' error:`,
-          err,
+          err
         );
       const doc = { ...event?.snapshot.data, id: event?.snapshot.id } as User;
       const res = await FirebaseFirestore.getDocument({
@@ -157,7 +153,7 @@ export const setupSnapshots = async () => {
         });
         return s;
       });
-    },
+    }
   );
 
   // get current submission number
@@ -172,7 +168,7 @@ export const setupSnapshots = async () => {
       if (err)
         return console.log(
           'Snapshot reference `misc/notifications` error:',
-          err,
+          err
         );
       const num = event?.snapshot.data?.count;
       if (num > get(currSubNumber)) {
@@ -180,7 +176,7 @@ export const setupSnapshots = async () => {
         friendSubmissions.set([]);
         userSubmission.set(null);
       }
-    },
+    }
   );
 
   // load user submission
@@ -213,7 +209,7 @@ export const setupSnapshots = async () => {
           // user submission doesn't exist
           userSubmission.set(null);
         }
-      },
+      }
     );
 
   // friend submissions
@@ -229,6 +225,8 @@ export const setupSnapshots = async () => {
       reference: 'submissions',
       compositeFilter: friendSubmissionsFilter(chunk),
     });
+    // reset friend submissions before new ones
+    friendSubmissions.set([]);
     await updateSubmissions(docs.snapshots);
     loadingFriendSubmissions.set(false);
 
@@ -241,24 +239,31 @@ export const setupSnapshots = async () => {
         },
         async (event, err) => {
           if (err)
-            return console.log('Snapshot reference `friendSubmissions` error:', err);
+            return console.log(
+              'Snapshot reference `friendSubmissions` error:',
+              err
+            );
           if (!event) return;
           const subs = await updateSubmissions(event?.snapshots);
           // update active submission if we need to
           subs.forEach((sub) => {
             if (get(activeSubmission)?.id === sub.id) activeSubmission.set(sub);
-          })
-        },
-      ),
+          });
+        }
+      )
     );
   }
 };
 
 export const unsubscribeSnapshots = async () => {
   if (snapshots.user)
-    await FirebaseFirestore.removeSnapshotListener({ callbackId: snapshots.user });
+    await FirebaseFirestore.removeSnapshotListener({
+      callbackId: snapshots.user,
+    });
   if (snapshots.misc)
-    await FirebaseFirestore.removeSnapshotListener({ callbackId: snapshots.misc });
+    await FirebaseFirestore.removeSnapshotListener({
+      callbackId: snapshots.misc,
+    });
   if (snapshots.userSubmission)
     await FirebaseFirestore.removeSnapshotListener({
       callbackId: snapshots.userSubmission,

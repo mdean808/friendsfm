@@ -15,19 +15,17 @@
   import { insets, keyboardHeight } from '$lib/device';
   import {
     activeHomeTab,
-    currSubNumber,
     hashCode,
     intToRGB,
     prevPath,
     publicProfileUsername,
-    historyCurrentDay,
   } from '$lib/util';
   import {
     convertDateToLateString,
     formatTimePlayed,
     getDaysAgo,
   } from '$lib/dates';
-  import { MusicPlatform } from '$lib/types';
+  import { MusicPlatform } from '$lib/types/friendsfm';
   import { session } from '$lib/session';
   import { Capacitor } from '@capacitor/core';
 
@@ -40,14 +38,12 @@
   const submitComment = async () => {
     if (!commentValue) return;
     commentSubmitting = true;
-    const tempVal = commentValue;
+    await createCommentForSubmission(commentValue);
     commentValue = '';
-    await createCommentForSubmission(tempVal);
     commentSubmitting = false;
   };
 
   const close = () => {
-    console.log($prevPath);
     goto($prevPath);
     activeSubmission.set(null);
   };

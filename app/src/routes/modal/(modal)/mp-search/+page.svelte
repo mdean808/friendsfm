@@ -11,7 +11,7 @@
     type SpotifyTrack,
     type User,
     type MusicKitSearchResponse,
-  } from '$lib/types';
+  } from '$lib/types/friendsfm';
   import { network, loading, searchType } from '$lib/util';
   import LoadingIndicator from '$components/LoadingIndicator.svelte';
   import { setProfile } from '$lib/user';

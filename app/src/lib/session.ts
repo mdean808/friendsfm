@@ -1,4 +1,4 @@
-import { type SavedSong, type Submission, type User } from './types';
+import { type SavedSong, type Submission, type User } from './types/friendsfm';
 import { get, writable, type Writable } from 'svelte/store';
 import Preferences from './preferences';
 import {

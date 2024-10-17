@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from '$components/Button.svelte';
   import MusicPlatformIcon from '$components/icons/MusicPlatformIcon.svelte';
-  import { MusicPlatform } from '$lib/types';
+  import { MusicPlatform } from '$lib/types/friendsfm';
   import { endSession } from '$lib/session';
   import { goto } from '$app/navigation';
   import { Capacitor } from '@capacitor/core';

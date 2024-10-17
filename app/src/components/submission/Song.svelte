@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Submission } from '$lib/types';
+  import type { Submission } from '$lib/types/friendsfm';
   import MusicPlatformIcon from '$components/icons/MusicPlatformIcon.svelte';
   import { session } from '$lib/session';
 

@@ -4,7 +4,7 @@
     formatTimePlayed,
     getDaysAgo,
   } from '$lib/dates';
-  import type { Submission } from '$lib/types';
+  import type { Submission } from '$lib/types/friendsfm';
 
   export let data: Submission;
   export let className: string = '';

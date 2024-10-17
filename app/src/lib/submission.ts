@@ -6,7 +6,7 @@ import {
   type StrippedSubmission,
   type Submission,
   type User,
-} from '$lib/types';
+} from '$lib/types/friendsfm';
 import { Geolocation, type Position } from '@capacitor/geolocation';
 import AppleMusic, { AppleMusicPermissionsResults, type AppleMusicSong } from '$plugins/AppleMusic';
 import { Dialog } from '@capacitor/dialog';
@@ -192,6 +192,7 @@ export const createCommentForSubmission = async (content: string) => {
       comments: [...sub.comments, comment],
     } as Submission,
   });
+  return comment as Comment;
 };
 
 export const deleteCommentFromSubmission = async (comment: Comment) => {

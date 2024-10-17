@@ -4,7 +4,7 @@
   import AppleMusicLogo from '$assets/apple_music_logo_white.svg';
   import { onMount } from 'svelte';
   import Skeleton from '$components/submission/Skeleton.svelte';
-  import { MusicPlatform, type User } from '$lib/types';
+  import { MusicPlatform, type User } from '$lib/types/friendsfm';
   import { loading, prevPath, publicProfileUsername, showToast } from '$lib/util';
   import { goto } from '$app/navigation';
   import { getCurrentSong, getUserStatistics } from '$lib/user';

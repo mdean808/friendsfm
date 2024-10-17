@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getShortDate } from '$lib/dates';
   import { session } from '$lib/session';
-  import type { User } from '$lib/types';
+  import type { User } from '$lib/types/friendsfm';
   import { editingProfile } from '$lib/util';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
@@ -96,26 +96,38 @@
         {$page.url.pathname.split('/').pop() || 'home'}
       {/if}
     </h1>
-    {#if $page.route.id === '/main/songs'}
+    {#if $page.route.id === '/main/audial'}
       <button
         class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900"
-        on:click={createSongsPlaylist}
+        on:click={() => goto('/modal/history')}
       >
         <svg
-          fill="none"
-          class="w-6 h-6"
-          stroke="currentColor"
-          stroke-width="1.5"
-          viewBox="0 0 24 24"
+          class={`w-6 h-6 mx-auto`}
           xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <path
+          viewBox="0 0 256 256"
+          ><rect width="256" height="256" fill="none" /><polyline
+            points="128 80 128 128 168 152"
+            fill="none"
+            stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z"
-          />
-        </svg>
+            stroke-width="16"
+          /><polyline
+            points="72 104 32 104 32 64"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="16"
+          /><path
+            d="M67.6,192A88,88,0,1,0,65.77,65.77C54,77.69,44.28,88.93,32,104"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="16"
+          /></svg
+        >
       </button>
     {:else if $page.route.id === '/main/profile'}
       <button

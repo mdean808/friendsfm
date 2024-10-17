@@ -1,4 +1,4 @@
-import type { Position } from '@capacitor/geolocation';
+import type { AudialAttempt } from "./audial";
 
 export enum UserState {
   unregistered = 'unregistered',
@@ -121,7 +121,7 @@ export interface Submission {
   time: Date;
   lateTime: Date;
   comments: Comment[];
-  audial: Audial;
+  audial: AudialAttempt;
   currentlyListening?: Song;
   caption?: string;
   likes: { id: string; username: string }[];
@@ -134,11 +134,6 @@ export interface Comment {
     username: string;
   };
   content: string;
-}
-
-export interface Audial {
-  number: number;
-  score: string;
 }
 
 export enum ResponseType {
@@ -154,7 +149,7 @@ export interface NetworkResponse {
 
 export interface StrippedSubmission {
   song: Song;
-  audial: Audial;
+  audial: AudialAttempt;
   location: {
     longitude: number;
     latitude: number;

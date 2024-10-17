@@ -20,7 +20,7 @@ import {
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { refreshMessagingToken, updateMusicPlatform } from '$lib/user';
-import { MusicPlatform, NotificationType } from '$lib/types';
+import { MusicPlatform, NotificationType } from '$lib/types/friendsfm';
 
 export const ssr = false;
 export const prerender = true;

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { activeHomeTab, hashCode, intToRGB } from '$lib/util';
-  import type { Submission } from '$lib/types';
+  import type { Submission } from '$lib/types/friendsfm';
   import Heart from '$components/icons/Heart.svelte';
   import Comment from '$components/icons/Comment.svelte';
   import MusicPlatformIcon from '$components/icons/MusicPlatformIcon.svelte';

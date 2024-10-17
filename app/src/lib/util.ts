@@ -1,12 +1,12 @@
 import { get, writable, type Writable } from 'svelte/store';
-import type { Submission, Toast } from './types';
+import type { Submission, Toast } from './types/friendsfm';
 import Network from './network';
 
 export const searchType = <Writable<'track' | 'album' | 'playlist' | 'artist'>>(
   writable('track')
 );
 
-export const prevPath = <Writable<string>>writable('/main/home/');
+export const prevPath = <Writable<string | null>>writable('/main/home/');
 
 export const initParams = <Writable<URLSearchParams>>writable();
 

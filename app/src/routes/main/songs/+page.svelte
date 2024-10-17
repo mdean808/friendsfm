@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import MusicPlatformIcon from '$components/icons/MusicPlatformIcon.svelte';
   import { session } from '$lib/session';
-  import type { SavedSong } from '$lib/types';
+  import type { SavedSong } from '$lib/types/friendsfm';
   import { insets } from '$lib/device';
   import { saveSong, toggleSong, unsaveSong } from '$lib/songs';
   import { formatDurationPlayed } from '$lib/dates';

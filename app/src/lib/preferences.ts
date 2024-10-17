@@ -1,5 +1,5 @@
 import { Preferences } from '@capacitor/preferences';
-import type { SavedSong, Submission, User } from '$lib/types';
+import type { SavedSong, Submission, User } from '$lib/types/friendsfm';
 
 export const getUser = async () => {
   const userRes = await Preferences.get({ key: 'user' });

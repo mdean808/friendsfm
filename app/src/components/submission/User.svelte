@@ -1,6 +1,6 @@
 <script lang="ts">
   import { showToast } from '$lib/util';
-  import type { Submission } from '$lib/types';
+  import type { Submission } from '$lib/types/friendsfm';
   import SubmissionSong from './Song.svelte';
   import SubmissionTime from './Time.svelte';
   import SubmissionActions from './Actions.svelte';

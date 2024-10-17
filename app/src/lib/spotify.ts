@@ -1,5 +1,5 @@
 import { spotifyAuthCode, updateMusicPlatform } from './user';
-import { MusicPlatform } from './types';
+import { MusicPlatform } from './types/friendsfm';
 import { Capacitor } from '@capacitor/core';
 import { dev } from '$app/environment';
 
