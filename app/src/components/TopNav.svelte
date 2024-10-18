@@ -5,8 +5,43 @@
   import { editingProfile } from '$lib/util';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
-  import { createSongsPlaylist } from '$lib/songs';
   import { FirebaseFirestore } from '@capacitor-firebase/firestore';
+  import { onMount } from 'svelte';
+
+  let audialDecade: string;
+  let audialDecadeColor: string;
+  onMount(() => {
+    switch (new Date().getDay()) {
+      case 0:
+        audialDecade = '50s';
+        audialDecadeColor = 'yellow-400';
+        break;
+      case 1:
+        audialDecade = '80s';
+        audialDecadeColor = 'teal-500';
+        break;
+      case 2:
+        audialDecade = '2000s';
+        audialDecadeColor = 'purple-500';
+        break;
+      case 3:
+        audialDecade = '70s';
+        audialDecadeColor = 'emerald-500';
+        break;
+      case 4:
+        audialDecade = '60s';
+        audialDecadeColor = 'orange-500';
+        break;
+      case 5:
+        audialDecade = '2010s';
+        audialDecadeColor = 'indigo-500';
+        break;
+      case 6:
+        audialDecade = '90s';
+        audialDecadeColor = 'cyan-500';
+        break;
+    }
+  });
 
   const toggleEditingProfile = async () => {
     if ($editingProfile) {
@@ -92,6 +127,12 @@
     <h1 class="text-center mx-auto text-2xl text-white truncate flex-grow px-4">
       {#if ($page.url.pathname.split('/').pop() || 'home').includes('home')}
         {getShortDate(new Date())}
+      {:else if $page.url.pathname.includes('audial')}
+        audial<span
+          class={`absolute rotate-45 text-${audialDecadeColor} text-sm -right-${
+            audialDecade?.length > 3 ? '7' : '2'
+          }`}>{audialDecade}</span
+        >
       {:else}
         {$page.url.pathname.split('/').pop() || 'home'}
       {/if}
@@ -192,4 +233,7 @@
       </button>
     {/if}
   </div>
+  <div
+    class="hidden text-indigo-500 text-yellow-400 text-teal-500 text-orange-500 text-purple-500 text-cyan-500 text-emerald-500"
+  />
 </div>

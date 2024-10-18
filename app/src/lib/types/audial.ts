@@ -6,7 +6,7 @@ export interface AudialSong {
 }
 
 export interface AudialGuess {
-  song: AudialSong;
+  song: AudialSong | null;
   correct: boolean;
   artistCorrect: boolean;
 }
@@ -18,4 +18,3 @@ export interface AudialAttempt {
   attempts: number;
   type?: string;
 }
-

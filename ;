@@ -1,35 +1,26 @@
 <script lang="ts">
-  import LoadingIndicator from '$components/LoadingIndicator.svelte';
-  import Controller from '$components/audial/Controller.svelte';
-  import AudialGame from '$components/audial/Game.svelte';
+  import Loading from '$components/Loading.svelte';
   import { getCurrentAudial, audialTracks, audialAnswer } from '$lib/audial';
   import { insets } from '$lib/device';
-  import { userSubmission } from '$lib/submission';
   import { onMount } from 'svelte';
   let loading = true;
   onMount(async () => {
     const { tracks, answer } = await getCurrentAudial();
     audialTracks.set(tracks);
     audialAnswer.set(answer);
-    loading = false;
   });
 </script>
 
 <div
   style={`height: calc(100vh - ${64 + $insets.bottom + $insets.top}px); padding-bottom: calc(70px + ${$insets.bottom}px)`}
-  class="overflow-y-scroll relative"
+  class="overflow-y-scroll"
 >
-  <div class="px-2">
+  <div class="px-4">
     {#if loading}
-      <LoadingIndicator className="w-10 h-10 mx-auto" />
+      <Loading />
     {:else}
       <div class="max-w-screen-md mx-auto">
-        {#if $userSubmission}
-          <AudialGame />
-          <Controller />
-        {:else}
-          <p>Please submit before playing audial</p>
-        {/if}
+        <div class="text-center p-3"></div>
       </div>
     {/if}
   </div>

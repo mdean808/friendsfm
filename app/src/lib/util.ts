@@ -22,7 +22,9 @@ export const publicProfileUsername = <Writable<string>>writable();
 
 export const currSubNumber = <Writable<number>>writable();
 
-export const historyCurrentDay = <Writable<number>>writable(get(currSubNumber) - 1);
+export const historyCurrentDay = <Writable<number>>(
+  writable(get(currSubNumber) - 1)
+);
 
 export const editingProfile = <Writable<boolean>>writable(false);
 
@@ -47,7 +49,7 @@ export const showToast = (options: {
   toast.set({ visible: true, ...options });
   setTimeout(
     () => toast.set({ visible: false, ...options }),
-    options.duration || 5000,
+    options.duration || 5000
   );
 };
 
@@ -83,7 +85,7 @@ export function getRelativeLuminance(rgb: [number, number, number]) {
 
 export function getContrastRatio(
   rgb1: [number, number, number],
-  rgb2: [number, number, number],
+  rgb2: [number, number, number]
 ) {
   let l1 = getRelativeLuminance(rgb1);
   let l2 = getRelativeLuminance(rgb2);
@@ -126,4 +128,9 @@ export const sortByDate = (a: Submission, b: Submission) => {
   } catch {
     return 1;
   }
+};
+
+export const daysBetweenDates = (d1: Date, d2: Date) => {
+  const diffTime = Math.abs(d1.getTime() - d2.getTime());
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
