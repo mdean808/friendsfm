@@ -47,8 +47,10 @@
       {$audialAnswer.name} by {$audialAnswer.artists[0].name}
     </div>
   {/if}
-  <span class="my-2">audial #{daysBetweenDates(new Date(), FIRST_DAY)}</span>
-  <span> {generateEmojis()}</span>
+  <p class="mt-2 mb-1 text-center">
+    audial #{daysBetweenDates(new Date(), FIRST_DAY)}
+  </p>
+  <p class="text-center">{generateEmojis()}</p>
   <div class="w-full mx-auto my-2">
     <Button
       title="Share Score"
@@ -61,7 +63,7 @@
     <p
       class={`${
         notifyClipboard ? 'opacity-100' : 'opacity-0'
-      } text-blue-100 font-semibold transition-all duration-500 my-2`}
+      } text-blue-100 font-semibold transition-all duration-500 my-2 w-full text-center`}
     >
       copied to clipboard.
     </p>

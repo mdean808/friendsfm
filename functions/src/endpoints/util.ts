@@ -22,7 +22,6 @@ export const updateuserthing = onRequest({ cors: true }, async (_req, res) => {
 export const converttimestampstodate = onRequest(
   { cors: true },
   async (_req, res) => {
-    //todo: write a function to convert all firestore timestamps to dates
     res.sendStatus(200);
   }
 );

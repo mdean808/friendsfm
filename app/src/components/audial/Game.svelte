@@ -9,11 +9,7 @@
     audialSongPaused,
   } from '$lib/audial';
   import { spotifyTrackToAudialSong } from '$lib/audial';
-  import type {
-    AudialAttempt,
-    AudialGuess,
-    AudialSong,
-  } from '$lib/types/audial';
+  import type { AudialGuess, AudialSong } from '$lib/types/audial';
   import type { SpotifyTrack } from '$lib/types/friendsfm';
   import Button from '$components/Button.svelte';
   import GameEnd from '$components/audial/GameEnd.svelte';
@@ -21,25 +17,6 @@
   import { userSubmission } from '$lib/submission';
   import LoadingIndicator from '$components/LoadingIndicator.svelte';
 
-  onMount(async () => {
-    // if we are in a new date from the past, take the new random song and set it to the current one.
-    //    reset the attempts.
-    if (
-      !$audialAttempt ||
-      new Date($audialAttempt.date).toLocaleDateString() !==
-        new Date().toLocaleDateString()
-    ) {
-      audialAttempt.set(<AudialAttempt>{
-        guesses: [],
-        date: new Date(),
-        correct: false,
-        attempts: 0,
-        type: 'default',
-      });
-    } else {
-      audialAttempt.update((a) => ({ ...a, type: 'default' }));
-    }
-  });
   let currentSelectedSong = <AudialSong | null>{};
 
   const chooseSong = async () => {
@@ -128,7 +105,7 @@
   <LoadingIndicator />
 {:else}
   <div>
-    <!-- PLAYLIST/GENRE TITLE -->
+    <!-- DIRECTIONS -->
     {#if $audialAttempt.attempts === 0}
       <div class="w-full px-0 sm:px-20 transition-all duration-200">
         <p class="text-center mx-auto w-full text-blue-100">
@@ -137,6 +114,75 @@
         <p class="text-center mx-auto w-full text-blue-100">
           you have 6 attempts.
         </p>
+      </div>
+    {/if}
+    <!-- INPUT -->
+    {#if $audialAttempt.attempts < 6 && !$audialAttempt.correct}
+      <div class="flex mt-6 mb-2" title="guess a song">
+        <AutoComplete
+          name="song-selection"
+          className="w-10/12"
+          inputClassName="border-gray-600 border-2 w-full h-8 px-2 py-5 rounded-sm bg-gray-900 hover:border-gray-400 focus:border-gray-400 outline-none transition-all duration-200"
+          dropdownClassName="p-0 bg-gray-900"
+          placeholder={`${6 - $audialAttempt.attempts} ${
+            6 - $audialAttempt.attempts !== 1 ? 'attempts' : 'attempt'
+          } left`}
+          minCharactersToSearch={2}
+          searchFunction={searchSongs}
+          bind:selectedItem={currentSelectedSong}
+          labelFieldName="name"
+          valueFieldName="id"
+          showLoadingIndicator
+          noInputStyles
+          hideArrow
+          showClear={!!currentSelectedSong?.id}
+        >
+          <div
+            slot="item"
+            let:item
+            class="border-2 h-10 px-2 py-3 w-full text-left rounded-sm bg-gray-900 text-white hover:text-blue-500 hover:border-blue-500 overflow-ellipsis whitespace-nowrap overflow-hidden transition-colors duration-150"
+          >
+            <span>{item.name}</span>
+          </div>
+          <div slot="no-results" class="py-1">
+            <span>could not find this song in the playlist.</span>
+          </div>
+          <div slot="loading" class="py-1">
+            <span>searching for songs...</span>
+          </div>
+        </AutoComplete>
+        <div class="w-2/12 pl-2 mt-0.5" title="guess selected song">
+          <Button
+            title="Submit Song Guess"
+            type="primary"
+            className="w-full rounded-lg"
+            on:click={chooseSong}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 mx-auto"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              />
+            </svg>
+          </Button>
+          <div
+            class="text-gray-400 cursor-pointer text-center underline underline-offset-1"
+            on:click={skipSong}
+            on:keypress={skipSong}
+            role="button"
+            tabindex="0"
+          >
+            skip
+          </div>
+        </div>
       </div>
     {/if}
     <!-- GUESSES -->
@@ -186,73 +232,7 @@
           </div>
         {/each}
       {/if}
-      {#if $audialAttempt.attempts < 6 && !$audialAttempt.correct}
-        <div class="flex mt-6 mb-2" title="guess a song">
-          <AutoComplete
-            name="song-selection"
-            className="w-10/12"
-            inputClassName="border-gray-600 border-2 w-full h-8 px-2 py-5 rounded-sm bg-gray-900 hover:border-gray-400 focus:border-gray-400 outline-none transition-all duration-200"
-            dropdownClassName="p-0 bg-gray-900"
-            placeholder={`${6 - $audialAttempt.attempts} ${
-              6 - $audialAttempt.attempts !== 1 ? 'attempts' : 'attempt'
-            } left`}
-            minCharactersToSearch={2}
-            searchFunction={searchSongs}
-            bind:selectedItem={currentSelectedSong}
-            labelFieldName="name"
-            valueFieldName="id"
-            showLoadingIndicator
-            noInputStyles
-            hideArrow
-          >
-            <div
-              slot="item"
-              let:item
-              class="border-2 h-10 px-2 py-3 w-full text-left rounded-sm bg-gray-900 text-white hover:text-blue-500 hover:border-blue-500 overflow-ellipsis whitespace-nowrap overflow-hidden transition-colors duration-150"
-            >
-              <span>{item.name}</span>
-            </div>
-            <div slot="no-results" class="py-1">
-              <span>could not find this song in the playlist.</span>
-            </div>
-            <div slot="loading" class="py-1">
-              <span>searching for songs...</span>
-            </div>
-          </AutoComplete>
-          <div class="w-2/12 pl-2 mt-0.5" title="guess selected song">
-            <Button
-              title="Submit Song Guess"
-              type="primary"
-              className="w-full rounded-lg"
-              on:click={chooseSong}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6 mx-auto"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-            </Button>
-            <div
-              class="text-gray-400 cursor-pointer text-center underline underline-offset-1"
-              on:click={skipSong}
-              on:keypress={skipSong}
-              role="button"
-              tabindex="0"
-            >
-              skip
-            </div>
-          </div>
-        </div>
-      {:else}
+      {#if $audialAttempt.attempts === 6 || $audialAttempt.correct}
         <GameEnd />
       {/if}
     </div>

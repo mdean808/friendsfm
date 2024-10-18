@@ -7,7 +7,13 @@ const BASE_URL = 'https://us-central1-audial-6e1bd.cloudfunctions.net';
 
 export const audialTracks = writable<SpotifyTrack[]>([]);
 export const audialAnswer = writable<SpotifyTrack>();
-export const audialAttempt = writable<AudialAttempt>();
+export const audialAttempt = writable<AudialAttempt>({
+  guesses: [],
+  date: new Date(),
+  correct: false,
+  attempts: 0,
+  type: 'default',
+});
 export const audialSongPaused = writable<boolean>(true);
 
 // save the score to the submission
