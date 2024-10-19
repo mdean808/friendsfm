@@ -46,7 +46,9 @@
       <div class="max-w-screen-md mx-auto">
         {#if $userSubmission}
           <AudialGame />
-          <Controller />
+          {#if !$audialAttempt.correct && $audialAttempt.guesses.length !== 6}
+            <Controller />
+          {/if}
         {:else}
           <p class="text-center mt-4">
             please share what you're listening to before playing.

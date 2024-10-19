@@ -3,34 +3,45 @@
   import Button from '$components/Button.svelte';
   import { page } from '$app/stores';
   import { audialAnswer, audialAttempt } from '$lib/audial';
+  import { Share } from '@capacitor/share';
+  import { friendSubmissions } from '$lib/submission';
+  import type { AudialAttempt } from '$lib/types/audial';
 
   let notifyClipboard = false;
   const FIRST_DAY = new Date('4/12/2022');
 
-  const generateEmojis = () => {
+  const generateEmojis = (attempt?: AudialAttempt) => {
     let emojiString = '';
-    for (const guess of $audialAttempt.guesses || []) {
+    for (const guess of attempt?.guesses || $audialAttempt.guesses || []) {
       if (guess.correct) emojiString += '🟩 ';
       else if (guess.artistCorrect) emojiString += '🟨 ';
       else if (!guess.song) emojiString += '⬜ ';
       else emojiString += '🟥 ';
     }
-    for (let i = 0; i < 6 - $audialAttempt.attempts; i++) {
+    for (
+      let i = 0;
+      i < 6 - (attempt?.attempts || $audialAttempt.attempts);
+      i++
+    ) {
       emojiString += '⬛ ';
     }
     return emojiString;
   };
 
-  const generateShareClipboard = () => {
+  const generateShareClipboard = async () => {
     let string = 'audial #' + daysBetweenDates(new Date(), FIRST_DAY);
     string += '\n' + generateEmojis();
-    string += '\n' + $page.url.toString();
-    navigator.clipboard.writeText(string);
-    notifyClipboard = true;
+    if (await Share.canShare()) {
+      await Share.share({ url: 'https://audial.mogdan.xyz', text: string });
+    } else {
+      string += '\n' + $page.url.toString();
+      navigator.clipboard.writeText(string);
+      notifyClipboard = true;
+    }
   };
 </script>
 
-<div class="py-3">
+<div class="mt-1">
   {#if !$audialAttempt.correct}
     <div
       title="Open in Spotify"
@@ -63,9 +74,27 @@
     <p
       class={`${
         notifyClipboard ? 'opacity-100' : 'opacity-0'
-      } text-blue-100 font-semibold transition-all duration-500 my-2 w-full text-center`}
+      } text-blue-100 font-semibold transition-all duration-500 my-1 w-full text-center`}
     >
       copied to clipboard.
     </p>
+    <!-- LEADERBOARD -->
+    <h2 class="text-xl text-center">friends</h2>
+    <div class="py-2 px-6">
+      <div class="flex w-full text-gray-400 border-b border-gray-300 space-x-4">
+        <div class="w-7/12">user</div>
+        <div class="w-5/12">score</div>
+      </div>
+      <div class="overflow-y-auto h-[18vh]">
+        {#each [...$friendSubmissions, ...$friendSubmissions, ...$friendSubmissions] as userSub}
+          <div class="flex space-x-4 pt-2">
+            <div class="w-7/12 truncate">
+              {userSub.user.username}
+            </div>
+            <div class="w-5/12">{generateEmojis(userSub.audial)}</div>
+          </div>
+        {/each}
+      </div>
+    </div>
   </div>
 </div>
