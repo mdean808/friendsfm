@@ -4,7 +4,7 @@
   import { session } from '$lib/session';
   import type { SavedSong } from '$lib/types/friendsfm';
   import { insets } from '$lib/device';
-  import { saveSong, toggleSong, unsaveSong } from '$lib/songs';
+  import { toggleSong } from '$lib/songs';
   import { formatDurationPlayed } from '$lib/dates';
   import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 
@@ -29,11 +29,10 @@
       loadingSongs = false;
     }
   });
-
 </script>
 
 <div
-  style={`height: calc(100vh - ${64 + $insets.bottom + $insets.top}px); padding-bottom: calc(70px + ${$insets.bottom}px)`}
+  style={`height: calc(100dvh - ${64 + $insets.bottom + $insets.top}px); padding-bottom: calc(70px + ${$insets.bottom}px)`}
   class="overflow-y-scroll"
 >
   <div>

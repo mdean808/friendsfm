@@ -11,8 +11,8 @@
 >
   <div class="sticky top-0 w-full mx-auto">
     <div
-      class="text-white mx-auto text-center"
-      style="height: calc(100% - 60px); overflow-y: scroll;"
+      class="text-white mx-auto text-center overflow-y-scroll"
+      style="height: calc(100% - 60px); max-height: 100dvh;"
     >
       <slot />
     </div>

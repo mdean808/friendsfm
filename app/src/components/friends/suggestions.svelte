@@ -54,7 +54,7 @@
 </script>
 
 <div
-  style={`max-height: calc(100vh - ${211 + $insets.bottom}px)`}
+  style={`max-height: calc(100dvh - ${211 + $insets.bottom + $insets.top}px)`}
   class="bg-gray-800 h-auto overflow-scroll"
 >
   {#if loading}

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import AutoComplete from 'simple-svelte-autocomplete';
   import {
     audialTracks,
@@ -12,7 +11,6 @@
   import type { AudialGuess, AudialSong } from '$lib/types/audial';
   import type { SpotifyTrack } from '$lib/types/friendsfm';
   import Button from '$components/Button.svelte';
-  import GameEnd from '$components/audial/GameEnd.svelte';
   import { Dialog } from '@capacitor/dialog';
   import { userSubmission } from '$lib/submission';
   import LoadingIndicator from '$components/LoadingIndicator.svelte';
@@ -101,10 +99,10 @@
   };
 </script>
 
-{#if !$audialAttempt}
-  <LoadingIndicator />
-{:else}
-  <div>
+<div id="game">
+  {#if !$audialAttempt}
+    <LoadingIndicator />
+  {:else}
     <!-- DIRECTIONS -->
     {#if $audialAttempt.attempts === 0}
       <div class="w-full px-0 sm:px-20 transition-all duration-200">
@@ -232,9 +230,6 @@
           </div>
         {/each}
       {/if}
-      {#if $audialAttempt.attempts === 6 || $audialAttempt.correct}
-        <GameEnd />
-      {/if}
     </div>
-  </div>
-{/if}
+  {/if}
+</div>

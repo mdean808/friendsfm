@@ -241,7 +241,7 @@
     {/if}
     <div
       transition:slide
-      style={`height: calc(100vh - ${
+      style={`height: calc(100dvh - ${
         ($insets.bottom ? $insets.bottom + 50 : 0) +
         (focused ? $keyboardHeight + 441 : 441) +
         ($activeSubmission.caption ? captionHeight : 0)

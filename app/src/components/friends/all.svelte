@@ -8,6 +8,7 @@
   import { session } from '$lib/session';
   import { publicProfileUsername } from '$lib/util';
   import { goto } from '$app/navigation';
+  import { insets } from '$lib/device';
 
   const swipePosStart = { x: 0, y: 0 };
   const swipePosCurrent = { x: 0, y: 0 };
@@ -75,7 +76,7 @@
     </div>
   {/if}
   <div
-    style={`max-height: calc(100vh - 211px)`}
+    style={`max-height: calc(100dvh - ${209 + $insets.bottom + $insets.top}px)`}
     class="bg-gray-800 h-auto overflow-scroll"
   >
     {#each $session.user.friends as friend}

@@ -8,7 +8,8 @@
     toast,
     errorToast,
     appLoaded,
-    publicProfileUsername, prevPath,
+    publicProfileUsername,
+    prevPath,
   } from '$lib/util';
   import { fade, slide } from 'svelte/transition';
   import Toast from '$components/Toast.svelte';
@@ -41,7 +42,7 @@
     (() => {
       if ($navigating) {
         // set previous route
-        prevPath.set($navigating.from?.route.id)
+        prevPath.set($navigating.from?.url.pathname || '/main/home');
         // handle dynamic route updates
         if ($navigating.to?.route?.id === '/modal/profile') {
           $page.url.searchParams.set('user', $publicProfileUsername);
@@ -126,7 +127,7 @@
     style={`padding-top: ${$insets?.top}px; padding-bottom: ${
       $page.route.id?.includes('submission') ? 0 : $insets?.bottom / 2
     }px`}
-    class={`relative h-screen max-h-screen ${$page.route.id?.includes('submission') ? '' : ''}`}
+    class={`relative h-screen max-h-[100dvh] ${$page.route.id?.includes('submission') ? '' : ''}`}
   >
     <!-- START absolute positioning -->
 

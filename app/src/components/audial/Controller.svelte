@@ -1,17 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import type { AudialAttempt } from '$lib/types/audial';
   import AttemptVisualizer from '$components/audial/AttemptVisualizer.svelte';
   import { page } from '$app/stores';
-  import { audialAnswer, audialSongPaused } from '$lib/audial';
+  import { audialAnswer, audialAttempt, audialSongPaused } from '$lib/audial';
 
   let player: HTMLAudioElement;
-  let attempt = <AudialAttempt>{
-    attempts: 0,
-    guesses: [],
-    correct: false,
-    date: new Date(),
-  };
   let paused = true;
   let songLength = 0;
   let timeElapsed = '0:00';
@@ -50,7 +43,7 @@
     timeElapsed = '0:00';
     let denominator: number;
     const BASE_LENGTH_DIVIDER = 0.08333333;
-    switch (attempt.attempts) {
+    switch ($audialAttempt.attempts) {
       case 0:
         denominator = BASE_LENGTH_DIVIDER;
         break;
@@ -72,7 +65,7 @@
         break;
     }
     // get the duration in song length, divided by 2, unless 100% correct!
-    const durationMS = attempt.correct
+    const durationMS = $audialAttempt.correct
       ? player.duration * 1000
       : (player.duration / 2) * 1000 * denominator;
     playerTimeout = setTimeout(() => {
@@ -99,10 +92,10 @@
 </script>
 
 <footer
-  class="border-t border-white bottom-16 left-0 w-full absolute bg-gray-800"
+  class="border-t border-white left-0 w-full bottom-0 absolute bg-gray-800"
 >
   <div class="border-b">
-    <AttemptVisualizer {attempt} />
+    <AttemptVisualizer attempt={$audialAttempt} />
   </div>
 
   <div class="max-w-screen-md mx-auto p-3">

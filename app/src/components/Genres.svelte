@@ -235,7 +235,7 @@
 <div
   bind:this={parentDiv}
   class="scroll-m-20 scroll-smooth overflow-hidden"
-  style={`height: calc(100vh - ${250 - $insets.bottom}px)`}
+  style={`height: calc(100dvh - ${250 - $insets.bottom}px)`}
 >
   <div class={`w-full mx-auto py-2`}>
     <div
@@ -263,7 +263,7 @@
     </div>
   </div>
   <div
-    style={`height: calc(100vh - ${400 - $insets.bottom}px);`}
+    style={`height: calc(100dvh - ${400 - $insets.bottom}px);`}
     class="mx-auto w-full h-full text-center pt-2 pb-[200px] px-2 overflow-y-scroll"
   >
     {#each genres as genre}
@@ -383,7 +383,8 @@
                   <div class="h-full">
                     <svg
                       on:click={(e) => toggleSongHelper(e, sub, loadingHeart)}
-                      on:keypress={(e) => toggleSongHelper(e, sub, loadingHeart)}
+                      on:keypress={(e) =>
+                        toggleSongHelper(e, sub, loadingHeart)}
                       role="button"
                       tabindex="0"
                       class={`w-6 h-6 ml-auto flex-grow-0 flex-shrink ${

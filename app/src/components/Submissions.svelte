@@ -1,13 +1,16 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
   import type { IonRefresher } from '@ionic/core/components/ion-refresher';
   import type { IonContent } from '@ionic/core/components/ion-content';
   import SkeletonSubmission from '$components/submission/Skeleton.svelte';
   import LargeSubmission from './LargeSubmission.svelte';
   import UserSubmission from './submission/User.svelte';
   import { MusicPlatform, type Submission } from '$lib/types/friendsfm';
-  import {loadingFriendSubmissions, sortByDate, submissionsScroll} from '$lib/util';
+  import {
+    loadingFriendSubmissions,
+    sortByDate,
+    submissionsScroll,
+  } from '$lib/util';
   import {
     createSubmissionsPlaylist,
     loadFriendSubmissions,
@@ -22,7 +25,6 @@
   let loadingSubmission: boolean = false;
   let loadingNewLateSubmission: boolean = false;
   let sortedFriendSubmissions: Submission[];
-
 
   friendSubmissions.subscribe((val) => {
     if (val) sortedFriendSubmissions = [...val].sort(sortByDate);
@@ -61,7 +63,10 @@
   };
 </script>
 
-<ion-content id="ion-content-submissions" style={`height: calc(100vh - 110px)`}>
+<ion-content
+  id="ion-content-submissions"
+  style={`height: calc(100dvh - 110px)`}
+>
   <ion-refresher id="refresher" slot="fixed">
     <ion-refresher-content />
   </ion-refresher>

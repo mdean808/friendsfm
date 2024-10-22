@@ -105,92 +105,92 @@
   };
 </script>
 
-<div class="fixed top-0 bg-gray-800 w-full z-50">
-  <div class="w-full flex flex-row justify-between items-center h-[55px] px-2">
-    <button on:click={() => goto('/main/audial')} class="flex-grow-0">
-      <svg
-        class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${$session.user.public.musicPlatform}`}
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M6 18L18 6M6 6l12 12"
-        ></path>
-      </svg>
-    </button>
-    <h1 class="text-center pt-2 mx-auto text-2xl text-white flex-grow">
-      history
-    </h1>
-    <div class="flex-grow-0 text-transparent">
-      <svg
-        fill="none"
-        class="w-8 h-8"
-        stroke="currentColor"
-        stroke-width="1.5"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M15.75 19.5L8.25 12l7.5-7.5"
-        ></path>
-      </svg>
-    </div>
-  </div>
-  <div
-    class="flex bg-gray-800 bg-opacity-70 backdrop-blur-md border-t border-b border-white z-10 pt-2 pb-2 px-6"
-  >
-    <button on:click={getPreviousDay} class="text-transparent">
-      <svg
-        class={`flex-end w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-blue-500`}
-        data-slot="icon"
-        fill="none"
-        stroke-width="1.5"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M15.75 19.5 8.25 12l7.5-7.5"
-        ></path>
-      </svg>
-    </button>
-    <h2 class="text-xl flex-grow text-center text-gray-300">
-      {getShortDate(currentDate)}
-    </h2>
-    <button on:click={getNextDay} class="text-transparent">
-      <svg
-        class={`flex-start w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 ${$historyCurrentDay + 1 === $currSubNumber ? 'text-gray-400' : 'text-blue-500'}`}
-        data-slot="icon"
-        fill="none"
-        stroke-width="1.5"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="m8.25 4.5 7.5 7.5-7.5 7.5"
-        ></path>
-      </svg>
-    </button>
+<div
+  class="w-full bg-gray-800 bg-opacity-70 backdrop-blur-md flex flex-row justify-between items-center h-[55px] px-2"
+>
+  <button on:click={() => goto('/main/audial')} class="flex-grow-0">
+    <svg
+      class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${$session.user.public.musicPlatform}`}
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M6 18L18 6M6 6l12 12"
+      ></path>
+    </svg>
+  </button>
+  <h1 class="text-center pt-2 mx-auto text-2xl text-white flex-grow">
+    history
+  </h1>
+  <div class="flex-grow-0 text-transparent">
+    <svg
+      fill="none"
+      class="w-8 h-8"
+      stroke="currentColor"
+      stroke-width="1.5"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M15.75 19.5L8.25 12l7.5-7.5"
+      ></path>
+    </svg>
   </div>
 </div>
-
-<div class="px-4 mt-32">
+<div class="flex border-t border-b border-white pt-2 pb-2 px-6">
+  <button on:click={getPreviousDay} class="text-transparent">
+    <svg
+      class={`flex-end w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-blue-500`}
+      data-slot="icon"
+      fill="none"
+      stroke-width="1.5"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M15.75 19.5 8.25 12l7.5-7.5"
+      ></path>
+    </svg>
+  </button>
+  <h2 class="text-xl flex-grow text-center text-gray-300">
+    {getShortDate(currentDate)}
+  </h2>
+  <button on:click={getNextDay} class="text-transparent">
+    <svg
+      class={`flex-start w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 ${$historyCurrentDay + 1 === $currSubNumber ? 'text-gray-400' : 'text-blue-500'}`}
+      data-slot="icon"
+      fill="none"
+      stroke-width="1.5"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="m8.25 4.5 7.5 7.5-7.5 7.5"
+      ></path>
+    </svg>
+  </button>
+</div>
+<div
+  style={`max-height: calc(100dvh - ${105 + $insets.top + $insets.bottom}px);`}
+  class="px-4 h-full overflow-y-scroll"
+>
   {#key activeDaySubmission}
     {#if loadingHistory}
       <div class="my-2 border-b-2 border-gray-400">

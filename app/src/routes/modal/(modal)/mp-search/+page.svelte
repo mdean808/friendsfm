@@ -224,7 +224,7 @@
   </div>
 </div>
 
-<div class="overflow-y-scroll" style={`height: calc(100vh - ${130}px)`}>
+<div class="overflow-y-scroll" style={`height: calc(100dvh - ${130}px)`}>
   {#if spotifyResponse?.tracks?.items}
     {#each spotifyResponse.tracks.items as track, i}
       <div

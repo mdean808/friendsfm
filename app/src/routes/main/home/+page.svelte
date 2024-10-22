@@ -40,7 +40,7 @@
 {:else if $submissionLoaded && !$userSubmission}
   <div
     id="home"
-    style={`height: calc(100vh - ${64 + $insets.bottom + $insets.top}px)`}
+    style={`height: calc(100dvh - ${64 + $insets.bottom + $insets.top}px)`}
     class={`text-center w-full px-4 overflow-y-scroll`}
   >
     <div class="h-full">

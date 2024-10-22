@@ -1,4 +1,5 @@
 <script lang="ts">
+  import GameEnd from '$components/audial/GameEnd.svelte';
   import LoadingIndicator from '$components/LoadingIndicator.svelte';
   import Controller from '$components/audial/Controller.svelte';
   import AudialGame from '$components/audial/Game.svelte';
@@ -13,16 +14,15 @@
   import { userSubmission } from '$lib/submission';
   import { onMount } from 'svelte';
   let loading = true;
+  let gameHeight = 0;
   // save each change to the current attempt to the database
   audialAttempt.subscribe(async (val) => {
-    // todo: prevent this from resetting when a uesr already has an attempt
     if (
       !$userSubmission ||
       !val ||
       val.attempts < $userSubmission.audial.attempts
     )
       return;
-    console.log($userSubmission.audial.attempts, val.attempts);
     await setSubmissionAudial($userSubmission, val);
   });
   onMount(async () => {
@@ -36,8 +36,8 @@
 </script>
 
 <div
-  style={`height: calc(100vh - ${64 + $insets.bottom + $insets.top}px); padding-bottom: calc(70px + ${$insets.bottom}px)`}
-  class="overflow-y-scroll relative"
+  style={`max-height: calc(100dvh - ${64 + 70 + $insets.bottom + $insets.top}px); height: calc(100dvh - ${64 + 70 + $insets.bottom + $insets.top}px);`}
+  class="overflow-y-hidden relative"
 >
   <div class="px-2">
     {#if loading}
@@ -45,9 +45,13 @@
     {:else}
       <div class="max-w-screen-md mx-auto">
         {#if $userSubmission}
-          <AudialGame />
+          <div bind:clientHeight={gameHeight}>
+            <AudialGame />
+          </div>
           {#if !$audialAttempt.correct && $audialAttempt.guesses.length !== 6}
             <Controller />
+          {:else}
+            <GameEnd {gameHeight} />
           {/if}
         {:else}
           <p class="text-center mt-4">
