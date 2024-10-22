@@ -53,7 +53,7 @@ export default class Submission implements SubmissionType {
     this.id = id;
     this.number = number || -1;
     this.song = song || ({} as Song);
-    this.audial = audial || ({} as AudialAttempt);
+    this.audial = audial || ({ attempts: -1 } as AudialAttempt);
     this.location = location || ({} as Location);
     this.late = late || false;
     this.time = time || new Date();

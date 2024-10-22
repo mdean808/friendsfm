@@ -17,12 +17,7 @@
   let gameHeight = 0;
   // save each change to the current attempt to the database
   audialAttempt.subscribe(async (val) => {
-    if (
-      !$userSubmission ||
-      !val ||
-      val.attempts < $userSubmission.audial.attempts
-    )
-      return;
+    if (!$userSubmission || !val || val.attempts !== -1) return;
     await setSubmissionAudial($userSubmission, val);
   });
   onMount(async () => {
