@@ -138,39 +138,29 @@
       {/if}
     </h1>
     {#if $page.route.id === '/main/audial'}
+      <!-- AUDIAL RIGHT BUTTON -->
       <button
+        on:click={() => goto('/about')}
         class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900"
-        on:click={() => goto('/modal/history')}
       >
         <svg
-          class={`w-6 h-6 mx-auto`}
+          fill="none"
+          class="w-6 h-6"
+          stroke="currentColor"
+          stroke-width="1.5"
+          viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 256 256"
-          ><rect width="256" height="256" fill="none" /><polyline
-            points="128 80 128 128 168 152"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          /><polyline
-            points="72 104 32 104 32 64"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          /><path
-            d="M67.6,192A88,88,0,1,0,65.77,65.77C54,77.69,44.28,88.93,32,104"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          /></svg
+          aria-hidden="true"
         >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+          ></path>
+        </svg>
       </button>
     {:else if $page.route.id === '/main/profile'}
+      <!-- PROFILE RIGHT BUTTON -->
       <button
         class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900"
         on:click={toggleEditingProfile}
@@ -212,24 +202,36 @@
     {:else}
       <!-- HOMEPAGE RIGHT BUTTON -->
       <button
-        on:click={() => goto('/about')}
         class="flex-grow-0 p-3 m-2 rounded-3xl bg-gray-900"
+        on:click={() => goto('/modal/history')}
       >
         <svg
-          fill="none"
-          class="w-6 h-6"
-          stroke="currentColor"
-          stroke-width="1.5"
-          viewBox="0 0 24 24"
+          class={`w-6 h-6 mx-auto`}
           xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <path
+          viewBox="0 0 256 256"
+          ><rect width="256" height="256" fill="none" /><polyline
+            points="128 80 128 128 168 152"
+            fill="none"
+            stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-          ></path>
-        </svg>
+            stroke-width="16"
+          /><polyline
+            points="72 104 32 104 32 64"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="16"
+          /><path
+            d="M67.6,192A88,88,0,1,0,65.77,65.77C54,77.69,44.28,88.93,32,104"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="16"
+          /></svg
+        >
       </button>
     {/if}
   </div>

@@ -12,7 +12,11 @@ import { getUserStatistics, refreshMessagingToken } from './user';
 import { goto } from '$app/navigation';
 import { page } from '$app/stores';
 import { browser } from '$app/environment';
-import { friendSubmissions } from './submission';
+import {
+  friendSubmissions,
+  loadUserSubmission,
+  loadFriendSubmissions,
+} from './submission';
 import { songs } from './songs';
 
 export type Session = {
@@ -165,6 +169,8 @@ export const authSession = async (
       email: u.email,
       public: publicData,
     };
+    loadUserSubmission();
+    loadFriendSubmissions();
     await goto('/main/home/');
   } else {
     const tempU = { ...u } as any;

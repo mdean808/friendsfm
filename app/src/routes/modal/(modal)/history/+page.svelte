@@ -108,7 +108,7 @@
 <div
   class="w-full bg-gray-800 bg-opacity-70 backdrop-blur-md flex flex-row justify-between items-center h-[55px] px-2"
 >
-  <button on:click={() => goto('/main/audial')} class="flex-grow-0">
+  <button on:click={() => goto('/main/home')} class="flex-grow-0">
     <svg
       class={`w-8 h-8 p-1 border-gray-700 rounded-md border bg-gray-800 text-${$session.user.public.musicPlatform}`}
       fill="none"

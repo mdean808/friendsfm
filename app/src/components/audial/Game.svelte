@@ -68,6 +68,7 @@
       await setSubmissionAudial($userSubmission!, $audialAttempt!);
     }
     currentSelectedSong = null;
+    (document.getElementById('select-input') as HTMLInputElement).value = '';
   };
 
   const skipSong = () => {
@@ -127,6 +128,7 @@
         <AutoComplete
           name="song-selection"
           className="w-10/12"
+          inputId="select-input"
           inputClassName="border-gray-600 border-2 w-full h-8 px-2 py-5 rounded-sm bg-gray-900 hover:border-gray-400 focus:border-gray-400 outline-none transition-all duration-200"
           dropdownClassName="p-0 bg-gray-900"
           placeholder={`${6 - $audialAttempt.attempts} ${

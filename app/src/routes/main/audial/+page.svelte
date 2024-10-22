@@ -26,7 +26,8 @@
     audialTracks.set(tracks);
     audialAnswer.set(answer);
     // load the current attempt from the current submission
-    if ($userSubmission?.audial.type) audialAttempt.set($userSubmission.audial);
+    if ($userSubmission?.audial?.type)
+      audialAttempt.set($userSubmission.audial);
     else
       audialAttempt.set({
         attempts: -1,
