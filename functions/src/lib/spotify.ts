@@ -6,10 +6,8 @@ export const getSpotifySong = async (song: Song | SavedSong) => {
     process.env.SPOTIFY_CLIENT_ID,
     process.env.SPOTIFY_CLIENT_SECRET
   );
-  console.log(song)
 
   const res = await spotifyApi.getSong(song.name, song.artist);
-  console.log(res)
 
   return res.tracks?.items[0];
 };

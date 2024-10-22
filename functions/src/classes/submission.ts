@@ -6,7 +6,7 @@ import {
   FieldValue,
 } from 'firebase-admin/firestore';
 import {
-  Audial,
+  AudialAttempt,
   MusicPlatform,
   Song,
   Submission as SubmissionType,
@@ -53,7 +53,7 @@ export default class Submission implements SubmissionType {
     this.id = id;
     this.number = number || -1;
     this.song = song || ({} as Song);
-    this.audial = audial || ({} as Audial);
+    this.audial = audial || ({} as AudialAttempt);
     this.location = location || ({} as Location);
     this.late = late || false;
     this.time = time || new Date();
@@ -113,7 +113,7 @@ export default class Submission implements SubmissionType {
     };
   }
 
-  public async setAudial(audial: Audial) {
+  public async setAudial(audial: AudialAttempt) {
     if (!audial || !audial.score || !audial.number)
       throw new CustomError('Invalid audial provided');
     await this.dbRef.update({ audial });

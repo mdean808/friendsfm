@@ -8,6 +8,7 @@ import { getTrackGenre } from '../lib/gpt';
 import { newNotification } from '../lib/notifications';
 import { getSpotifySong } from '../lib/spotify';
 import {
+  AudialAttempt,
   Friend,
   MusicPlatform,
   MusicPlatformAuth,
@@ -192,7 +193,6 @@ export default class User implements UserType {
       songData = { ...songRes.data(), id: songRes.id } as SavedSong;
     }
 
-
     // add the new song to the playlist
     if (this.likedSongsPlaylist) {
       if (this.public.musicPlatform === MusicPlatform.spotify) {
@@ -258,9 +258,9 @@ export default class User implements UserType {
         (noGenre
           ? 'Unknown'
           : await getTrackGenre(
-            currentTrack.item.name,
-            currentTrack.item.artists[0]?.name || ''
-          )) || 'Unknown',
+              currentTrack.item.name,
+              currentTrack.item.artists[0]?.name || ''
+            )) || 'Unknown',
     } as Song;
   }
 
@@ -380,7 +380,6 @@ export default class User implements UserType {
       }
     }
     if (this.public.musicPlatform === MusicPlatform.appleMusic) {
-      console.log('previewSubmission:', appleMusicSong);
       song = {
         ...appleMusicSong,
         platforms: [],
@@ -422,7 +421,7 @@ export default class User implements UserType {
       late,
       lateTime,
       number: notificationsSnapshot.get('count'),
-      audial: { number: -1, score: '' },
+      audial: {} as AudialAttempt,
       song,
       location: { latitude: 0, longitude: 0 },
       comments: [],
@@ -497,7 +496,6 @@ export default class User implements UserType {
       }
     }
     if (this.public.musicPlatform === MusicPlatform.appleMusic) {
-      console.log('generateSubmission:', appleMusicSong);
       song = {
         ...appleMusicSong,
         platforms: [],
@@ -534,7 +532,7 @@ export default class User implements UserType {
       late,
       lateTime: lateTime.getTime(),
       number: notificationsSnapshot.get('count'),
-      audial: { number: -1, score: '' },
+      audial: {} as AudialAttempt,
       song,
       location: { latitude: latitude || 135, longitude: longitude || 90.0 },
       comments: [],
