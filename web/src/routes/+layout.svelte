@@ -25,7 +25,7 @@
     storageBucket: 'friendsfm.appspot.com',
     messagingSenderId: '611764643709',
     appId: '1:611764643709:web:6205eac2a611f00f348e14',
-    measurementId: 'G-3EBNK0XRNT',
+    measurementId: 'G-3V8P2H45PM',
   };
 
   // Initialize Firebase
