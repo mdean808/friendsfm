@@ -13,6 +13,7 @@
   import { insets } from '$lib/device';
   import { userSubmission } from '$lib/submission';
   import { onMount } from 'svelte';
+  import type { AudialAttempt } from '$lib/types/audial';
   let loading = true;
   let gameHeight = 0;
   // save each change to the current attempt to the database
@@ -25,7 +26,15 @@
     audialTracks.set(tracks);
     audialAnswer.set(answer);
     // load the current attempt from the current submission
-    if ($userSubmission) audialAttempt.set($userSubmission.audial);
+    if ($userSubmission?.audial.type) audialAttempt.set($userSubmission.audial);
+    else
+      audialAttempt.set({
+        attempts: -1,
+        correct: false,
+        guesses: [],
+        type: 'default',
+        date: new Date(),
+      } as AudialAttempt);
     loading = false;
   });
 </script>

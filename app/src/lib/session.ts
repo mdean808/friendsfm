@@ -92,16 +92,16 @@ export const saveSession = async () => {
 };
 
 export const endSession = async () => {
+  await FirebaseFirestore.updateDocument({
+    reference: `users/${get(session).user.id}`,
+    data: { messagingToken: null },
+  });
   unsubscribeSnapshots();
   await FirebaseAuthentication.signOut();
   await Preferences.setUser();
   await Preferences.setLogin();
   await Preferences.setSongs();
   await Preferences.setFriendSubmissions();
-  await FirebaseFirestore.updateDocument({
-    reference: `users/${get(session).user.id}`,
-    data: { messagingToken: null },
-  });
   friendSubmissions.set([]);
   songs.set([]);
   session.set({} as Session);

@@ -14,8 +14,15 @@
   import { Dialog } from '@capacitor/dialog';
   import { userSubmission } from '$lib/submission';
   import LoadingIndicator from '$components/LoadingIndicator.svelte';
+  import { onMount } from 'svelte';
 
   let currentSelectedSong = <AudialSong | null>{};
+
+  onMount(() => {
+    if ($audialAttempt.attempts === -1) {
+      $audialAttempt.attempts = 0;
+    }
+  });
 
   const chooseSong = async () => {
     audialSongPaused.set(true);
@@ -104,7 +111,7 @@
     <LoadingIndicator />
   {:else}
     <!-- DIRECTIONS -->
-    {#if $audialAttempt.attempts === 0}
+    {#if $audialAttempt.attempts === 0 || $audialAttempt.attempts === -1}
       <div class="w-full px-0 sm:px-20 transition-all duration-200">
         <p class="text-center mx-auto w-full text-blue-100">
           listen to the song and try to guess it correctly.

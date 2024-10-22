@@ -88,7 +88,7 @@
       class="overflow-y-auto"
       style={`height: calc(100dvh - ${64 + 70 + $insets.bottom + $insets.top + gameHeight + 155}px)`}
     >
-      {#each $friendSubmissions.filter((s) => s.audial?.guesses?.length === 6) as userSub}
+      {#each $friendSubmissions.filter((s) => s.audial?.guesses?.length === 6 || s.audial?.correct) as userSub}
         <div class="flex space-x-4 pt-2">
           <div class="w-1/2 truncate">
             {userSub.user.username}
