@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
   import { type UserProfile, MusicPlatform } from '../../../types';
   let username = $page.params.username;
-  let profile: UserProfile;
+  let profile: UserProfile = $state();
 
   onMount(async () => {
     const res = await fetch('https://getprofile-tprlxlzyxq-uc.a.run.app', {

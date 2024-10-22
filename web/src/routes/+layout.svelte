@@ -9,6 +9,11 @@
   import { getAnalytics, type Analytics } from 'firebase/analytics';
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
+  interface Props {
+    children?: import('svelte').Snippet;
+  }
+
+  let { children }: Props = $props();
 
   // Your web app's Firebase configuration
   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -29,7 +34,7 @@
   const auth = getAuth(app);
   const storage = getStorage(app);
   const rtdb = getDatabase(app);
-  let analytics = {} as Analytics;
+  let analytics = $state({} as Analytics);
 
   onMount(() => {
     analytics = getAnalytics(app);
@@ -62,7 +67,7 @@
           <p class="text-lg">the most social way to share your music.</p>
         {/if}
       </div>
-      <slot />
+      {@render children?.()}
     </div>
   </main>
   <footer class="shadow mx-auto bg-gray-700 w-full">
