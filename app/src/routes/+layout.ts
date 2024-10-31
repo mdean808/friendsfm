@@ -9,7 +9,7 @@ import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { SafeArea } from 'capacitor-plugin-safe-area';
 import { get } from 'svelte/store';
 import type { LayoutLoad } from './$types';
-import { appLoaded, initParams, publicProfileUsername } from '$lib/util';
+import { appLoaded, initParams, prevPath, publicProfileUsername } from '$lib/util';
 import { page } from '$app/stores';
 import {
   activeSubmission,
@@ -74,7 +74,6 @@ const setupDevice = async () => {
         }
         const sesh = get(session);
         const notification = action?.notification;
-        console.log(JSON.stringify(notification, null, '\t'));
         if (notification && sesh.loaded && sesh.loggedIn) {
           const data = notification.data as {
             [key: string]: any;
@@ -91,7 +90,9 @@ const setupDevice = async () => {
               type: data.type,
             },
           });
-          // handle notification actions and subsequente routing
+          // handle notification actions and subsequent routing
+          // make sure to set a prevPath to prevent errors
+          prevPath.set('/main/home')
           switch (data.type) {
             case NotificationType.Daily:
               userSubmission.set(null);

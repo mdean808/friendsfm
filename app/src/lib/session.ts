@@ -23,7 +23,7 @@ export type Session = {
   user: User;
   loggedIn: boolean;
   songs: SavedSong[];
-  friendSubmissions: Submission[];
+  friendSubmissions: Submission[]
   loaded: boolean;
 };
 
@@ -169,8 +169,6 @@ export const authSession = async (
       email: u.email,
       public: publicData,
     };
-    loadUserSubmission();
-    loadFriendSubmissions();
     await goto('/main/home/');
   } else {
     const tempU = { ...u } as any;
