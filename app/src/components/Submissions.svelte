@@ -6,11 +6,7 @@
   import LargeSubmission from './LargeSubmission.svelte';
   import UserSubmission from './submission/User.svelte';
   import { MusicPlatform, type Submission } from '$lib/types/friendsfm';
-  import {
-    loadingFriendSubmissions,
-    sortByDate,
-    submissionsScroll,
-  } from '$lib/util';
+  import { loadingFriendSubmissions, submissionsScroll, wait } from '$lib/util';
   import {
     createSubmissionsPlaylist,
     loadFriendSubmissions,
@@ -24,14 +20,9 @@
 
   let loadingSubmission: boolean = false;
   let loadingNewLateSubmission: boolean = false;
-  let sortedFriendSubmissions: Submission[];
-
-  friendSubmissions.subscribe((val) => {
-    if (val) sortedFriendSubmissions = [...val].sort(sortByDate);
-    if (val?.length > 0) loadingFriendSubmissions.set(false);
-  });
 
   onMount(async () => {
+    console.log('friendSubmissionsLoading: ', $loadingFriendSubmissions);
     const ionContent = window.document.getElementById(
       'ion-content-submissions'
     ) as IonContent;
@@ -57,8 +48,13 @@
     const refresher = window.document.getElementById(
       'refresher'
     ) as IonRefresher;
+    const ms1 = Date.now();
     loadUserSubmission();
     await loadFriendSubmissions();
+    const ms2 = Date.now();
+    if (ms2 - ms1 < 250) {
+      await wait(500);
+    }
     refresher.complete();
   };
 </script>
@@ -92,7 +88,7 @@
       <SkeletonSubmission />
       <SkeletonSubmission />
     {:else if !$loadingFriendSubmissions}
-      {#each sortedFriendSubmissions as submission}
+      {#each $friendSubmissions as submission}
         <div class="my-4">
           <LargeSubmission data={submission} />
           <!--<Submission data={submission} />-->

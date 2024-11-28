@@ -14,8 +14,6 @@ import { page } from '$app/stores';
 import { browser } from '$app/environment';
 import {
   friendSubmissions,
-  loadUserSubmission,
-  loadFriendSubmissions,
 } from './submission';
 import { songs } from './songs';
 

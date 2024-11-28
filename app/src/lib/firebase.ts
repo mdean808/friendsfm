@@ -19,7 +19,7 @@ import {
 import { browser } from '$app/environment';
 import { session } from './session';
 import { get } from 'svelte/store';
-import { chunkArray, currSubNumber, loadingFriendSubmissions } from './util';
+import { chunkArray, currSubNumber } from './util';
 import {
   activeSubmission,
   friendSubmissions,
@@ -219,16 +219,22 @@ export const setupSnapshots = async () => {
 
   const friendIdChunks = chunkArray(friendIds, 30);
 
+  let submissions: Submission[] = [];
+
   for (const chunk of friendIdChunks) {
     // Load friend submissions
     const docs = await FirebaseFirestore.getCollection({
       reference: 'submissions',
       compositeFilter: friendSubmissionsFilter(chunk),
+      queryConstraints: [
+        {
+          type: 'orderBy',
+          fieldPath: 'time',
+          directionStr: 'desc'
+        }
+      ]
     });
-    // reset friend submissions before new ones
-    friendSubmissions.set([]);
-    await updateSubmissions(docs.snapshots);
-    loadingFriendSubmissions.set(false);
+    submissions = [...submissions, ...await updateSubmissions(docs.snapshots)];
 
     // Snapshot friend submissions
     snapshots.friendSubmissions.push(
@@ -236,6 +242,13 @@ export const setupSnapshots = async () => {
         {
           reference: 'submissions',
           compositeFilter: friendSubmissionsFilter(chunk),
+          queryConstraints: [
+            {
+              type: 'orderBy',
+              fieldPath: 'time',
+              directionStr: 'desc'
+            }
+          ]
         },
         async (event, err) => {
           if (err)
@@ -253,6 +266,7 @@ export const setupSnapshots = async () => {
       )
     );
   }
+  friendSubmissions.set(submissions)
 };
 
 export const unsubscribeSnapshots = async () => {

@@ -6,13 +6,8 @@
   import { session } from '$lib/session';
   import { goto } from '$app/navigation';
   import { chunkArray, publicProfileUsername } from '$lib/util';
-  import {
-    loadUserSubmission,
-    previewSubmission,
-  } from '$lib/submission';
-  import {
-    FirebaseFirestore,
-  } from '@capacitor-firebase/firestore';
+  import { loadUserSubmission, previewSubmission } from '$lib/submission';
+  import { FirebaseFirestore } from '@capacitor-firebase/firestore';
   import { friendSubmissionsFilter } from '$lib/filters';
 
   let submission: Submission;
@@ -47,10 +42,16 @@
     // chunk because of firestore limitations
     const friendIdChunks = chunkArray(friendIds, 30);
     const friendPromises = friendIdChunks.map(async (chunk) => {
-
       const docs = await FirebaseFirestore.getCollection({
         reference: 'submissions',
         compositeFilter: friendSubmissionsFilter(chunk),
+        queryConstraints: [
+          {
+            type: 'orderBy',
+            fieldPath: 'time',
+            directionStr: 'desc',
+          },
+        ],
       });
 
       return docs.snapshots.map((snapshot) => {

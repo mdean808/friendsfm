@@ -9,7 +9,7 @@ import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { SafeArea } from 'capacitor-plugin-safe-area';
 import { get } from 'svelte/store';
 import type { LayoutLoad } from './$types';
-import { appLoaded, initParams, prevPath, publicProfileUsername } from '$lib/util';
+import { appLoaded, initParams, loadingFriendSubmissions, prevPath, publicProfileUsername } from '$lib/util';
 import { page } from '$app/stores';
 import {
   activeSubmission,
@@ -128,7 +128,7 @@ const setupDevice = async () => {
   insets.set(is.insets);
 };
 
-const setupQueriesAndDeeplinks = () => {
+const setupQueriesAndDeepLinks = () => {
   // setup for deep links and query parameters
   if (window.location.search)
     initParams.set(new URLSearchParams(window.location.search));
@@ -142,6 +142,7 @@ const setupSessionsAndAuth = async () => {
       if (get(session).loggedIn) return;
       await authSession(state.user);
       if (!snapshotsInit) {
+        loadingFriendSubmissions.set(true)
         await setupSnapshots().catch(async (e) => {
           if (e.message.includes('Missing or insufficient permissions')) {
             await FirebaseAuthentication.signOut();
@@ -155,6 +156,7 @@ const setupSessionsAndAuth = async () => {
             );
           }
         });
+        loadingFriendSubmissions.set(false);
         snapshotsInit = true;
       }
     } else {
@@ -169,6 +171,7 @@ const setupSessionsAndAuth = async () => {
   if (get(session).loggedIn) {
     if (!snapshotsInit) {
       // make sure we have a auth session saved
+      loadingFriendSubmissions.set(true)
       await setupSnapshots().catch(async (e) => {
         if (e.message.includes('Missing or insufficient permissions') || dev) {
           await FirebaseAuthentication.signOut();
@@ -178,6 +181,7 @@ const setupSessionsAndAuth = async () => {
           console.log('load: snapshot setup error', e, get(session));
         }
       });
+      loadingFriendSubmissions.set(false);
       snapshotsInit = true;
     }
     // check for music platform authentication on web only after authenticating
@@ -192,6 +196,7 @@ const setupSessionsAndAuth = async () => {
       // only setup the snapshots if we've already init them
       if (snapshotsInit) {
         await setupSnapshots();
+        loadingFriendSubmissions.set(false);
       }
   });
 };
@@ -213,7 +218,7 @@ const setupNavigationLogic = async () => {
 
 // page load setup
 if (browser) {
-  setupQueriesAndDeeplinks();
+  setupQueriesAndDeepLinks();
   (async () => {
     await setupDevice();
     await setupSessionsAndAuth();

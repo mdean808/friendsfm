@@ -1,7 +1,7 @@
 {
   "name": "friends-fm",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.5.1",
   "scripts": {
     "dev": "vite dev",
     "dev:cap": "vite dev --host",

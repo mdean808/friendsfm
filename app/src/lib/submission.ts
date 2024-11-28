@@ -10,7 +10,7 @@ import {
 import { Geolocation, type Position } from '@capacitor/geolocation';
 import AppleMusic, { AppleMusicPermissionsResults, type AppleMusicSong } from '$plugins/AppleMusic';
 import { Dialog } from '@capacitor/dialog';
-import { chunkArray, errorToast, loading, network, showToast, submissionLoaded } from './util';
+import { chunkArray, currSubNumber, errorToast, loading, network, showToast, submissionLoaded } from './util';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { session } from './session';
 import { type DocumentData, type DocumentSnapshot, FirebaseFirestore } from '@capacitor-firebase/firestore';
@@ -137,10 +137,8 @@ export const previewSubmission = async (): Promise<{
   if (get(session).user.public.musicPlatform === MusicPlatform.appleMusic) {
     // check apple music permissions.
     const perms = await AppleMusic.checkPermissions();
-    console.log('perms', perms);
     if (perms.receive !== AppleMusicPermissionsResults.granted) {
       const permsRes = await AppleMusic.requestPermissions();
-      console.log('permsres: ', permsRes);
       if (permsRes.receive !== AppleMusicPermissionsResults.granted) {
         return Dialog.alert({
           message:
@@ -151,7 +149,6 @@ export const previewSubmission = async (): Promise<{
     }
     try {
       recentlyPlayed = await AppleMusic.getRecentlyPlayed();
-      console.log('recentplayed', recentlyPlayed);
     } catch (e: any) {
       console.log(e);
       return errorToast({ content: e.message });
@@ -253,29 +250,28 @@ export const updateSubmissions = async (docs: DocumentSnapshot<DocumentData>[]) 
       },
     } as Submission;
 
-    friendSubmissions.update((fs) => {
-      // remove existing submission instance
-      fs = fs.filter((s) => s.id !== fSub.id);
-      // add updated submission instance
-      fs = [...fs, fSub];
-      // complete update
-      return fs;
-    });
+    // friendSubmissions.update((fs) => {
+    //   // remove existing submission instance
+    //   fs = fs.filter((s) => s.id !== fSub.id);
+    //   // add updated submission instance
+    //   fs = [...fs, fSub];
+    //   // complete update
+    //   return fs;
+    // });
     submissions.push(fSub);
   }
   return submissions;
 };
 
 export const loadFriendSubmissions = async (number?: number) => {
+  if (!number) number = get(currSubNumber)
+  let submissions: Submission[] = [];
   const friendIds = get(session).user.friends.map((f) => f.id);
-
   // no friends, no sense in making the requests
-  if (friendIds.length === 0) return;
+  if (friendIds.length === 0) return submissions;
 
   // chunk request by friend, since firestore only supports queries with <= 30
   const friendIdChunks = chunkArray(friendIds, 30);
-
-  let submissions: Submission[] = [];
 
 
   for (const chunk of friendIdChunks) {
@@ -283,9 +279,17 @@ export const loadFriendSubmissions = async (number?: number) => {
     const docs = await FirebaseFirestore.getCollection({
       reference: 'submissions',
       compositeFilter: friendSubmissionsFilter(chunk, number),
+      queryConstraints: [
+        {
+          type: 'orderBy',
+          fieldPath: 'time',
+          directionStr: 'desc'
+        }
+      ]
     });
-    submissions = await updateSubmissions(docs.snapshots);
+    submissions = [...submissions, ...await updateSubmissions(docs.snapshots)];
   }
+  friendSubmissions.set(submissions)
   return submissions;
 };
 
