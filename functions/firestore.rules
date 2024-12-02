@@ -8,6 +8,9 @@ service cloud.firestore {
         match /misc/notifications {
             allow get: if request.auth.uid != null;
         }
+        match /misc/app {
+            allow get;
+        }
 
         match /submissions/{submissionDoc} {
             // allow logged in users to view submissions

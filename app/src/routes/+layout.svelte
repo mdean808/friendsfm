@@ -35,6 +35,10 @@
   import { session } from '$lib/session';
   import { get } from 'svelte/store';
   import { App, type URLOpenListenerEvent } from '@capacitor/app';
+  import { FirebaseFirestore } from '@capacitor-firebase/firestore';
+  import { Dialog } from '@capacitor/dialog';
+  import preferences from '$lib/preferences';
+  import { Capacitor } from '@capacitor/core';
 
   //export let data: LayoutData;
 
@@ -104,6 +108,38 @@
       errorToast({ content: e as string });
     }
     await SplashScreen.hide();
+    // check app version
+    const serverInfo = await FirebaseFirestore.getDocument({
+      reference: 'misc/app',
+    });
+    if (Capacitor.getPlatform() !== 'web') {
+      // cast to number
+      const version = serverInfo.snapshot.data?.version
+        .split('.')
+        .map(Number)
+        .join('');
+      const localInfo = await App.getInfo();
+      const localVersion = localInfo.version.split('.').map(Number).join('');
+      if (localVersion < version) {
+        const res = await Dialog.confirm({
+          title: 'Update Available',
+          message: 'A new version of FriendsFM is available.',
+          cancelButtonTitle: 'Ignore',
+          okButtonTitle: 'Update',
+        });
+        if (res.value) {
+          // goto app store
+          if (Capacitor.getPlatform() === 'ios') {
+            window.location.href =
+              'https://apps.apple.com/us/app/friendsfm/id6445926913';
+          }
+          if (Capacitor.getPlatform() === 'android') {
+            window.location.href =
+              'https://play.google.com/store/apps/details?id=xyz.mogdan.friendsfm';
+          }
+        }
+      }
+    }
   });
 </script>
 

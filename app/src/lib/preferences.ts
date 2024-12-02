@@ -47,6 +47,7 @@ export const setFriendSubmissions = async (
     });
 };
 
+
 export default {
   getUser,
   setUser,
@@ -55,5 +56,5 @@ export default {
   getSongs,
   setSongs,
   getFriendSubmissions,
-  setFriendSubmissions,
+  setFriendSubmissions
 };
