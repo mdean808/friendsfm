@@ -17,22 +17,9 @@
 {#if $userSubmission}
   <div id="home" class={`text-center w-full h-auto px-4 overflow-y-scroll`}>
     <div class="h-full">
-      {#if $userSubmission && Submissions && Genres}
+      {#if $userSubmission}
         <div class="text-center w-full h-full">
-          <div>
-            <Tabs
-              loading={false}
-              activeTab={activeHomeTab}
-              tabs={[
-                {
-                  name: 'submissions',
-                  id: 'submissions',
-                  component: Submissions,
-                },
-                { name: 'nearby', id: 'genres', component: Genres },
-              ]}
-            />
-          </div>
+          <Submissions />
         </div>
       {/if}
     </div>

@@ -133,6 +133,8 @@
             audialDecade?.length > 3 ? '7' : '2'
           }`}>{audialDecade}</span
         >
+      {:else if $page.url.pathname.includes('map')}
+        genre map
       {:else}
         {$page.url.pathname.split('/').pop() || 'home'}
       {/if}

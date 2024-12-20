@@ -39,7 +39,7 @@
 </script>
 
 <div class={`w-full absolute left-0 bottom-0`} bind:this={elem}>
-  {#if !$userSubmission?.song && !$page.route.id?.includes('/main/audial')}
+  {#if !$userSubmission?.song && !$page.route.id?.includes('/main/map')}
     <div class="px-4 w-full mb-2">
       <div
         class="border-white rounded-lg bg-gray-800 bg-opacity-70 backdrop-blur-md py-3 px-3 border-2"
@@ -88,19 +88,19 @@
     <!--        </button>-->
 
     <button
-      on:click={() => goto('/main/audial')}
+      on:click={() => goto('/main/map')}
       class="w-1/3 flex justify-center py-2"
     >
       <span
         class={`mx-auto rounded-full border bg-gray-900 px-6 pt-1 ${
-          $page.route.id === '/main/audial'
+          $page.route.id === '/main/map'
             ? `border-${$session.user?.public?.musicPlatform} `
             : 'currentColor border-transparent'
         }`}
       >
         <svg
           class={`w-6 h-6 mx-auto ${
-            $page.route.id === '/main/audial'
+            $page.route.id === '/main/map'
               ? `text-${$session.user?.public?.musicPlatform}`
               : 'currentColor'
           }`}
@@ -115,10 +115,10 @@
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
-            d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z"
+            d="m6.115 5.19.319 1.913A6 6 0 0 0 8.11 10.36L9.75 12l-.387.775c-.217.433-.132.956.21 1.298l1.348 1.348c.21.21.329.497.329.795v1.089c0 .426.24.815.622 1.006l.153.076c.433.217.956.132 1.298-.21l.723-.723a8.7 8.7 0 0 0 2.288-4.042 1.087 1.087 0 0 0-.358-1.099l-1.33-1.108c-.251-.21-.582-.299-.905-.245l-1.17.195a1.125 1.125 0 0 1-.98-.314l-.295-.295a1.125 1.125 0 0 1 0-1.591l.13-.132a1.125 1.125 0 0 1 1.3-.21l.603.302a.809.809 0 0 0 1.086-1.086L14.25 7.5l1.256-.837a4.5 4.5 0 0 0 1.528-1.732l.146-.292M6.115 5.19A9 9 0 1 0 17.18 4.64M6.115 5.19A8.965 8.965 0 0 1 12 3c1.929 0 3.716.607 5.18 1.64"
           ></path>
         </svg>
-        <span class="text-white">audial</span>
+        <span class="text-white">map</span>
       </span>
     </button>
     <button

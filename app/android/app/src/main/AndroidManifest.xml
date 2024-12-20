@@ -94,7 +94,7 @@
         </provider>
     </application>
 
-    <uses-sdk android:minSdkVersion="27" android:targetSdkVersion="33" tools:ignore="GradleOverrides,ManifestOrder" />
+    <uses-sdk android:minSdkVersion="27" android:targetSdkVersion="34" tools:ignore="GradleOverrides,ManifestOrder" />
 
     <!-- Permissions -->
 
