@@ -1,5 +1,12 @@
 import { get, writable, type Writable } from 'svelte/store';
-import type { MusicPlatform, SavedSong, Song, Submission, User, UserStatistics } from '$lib/types/friendsfm';
+import type {
+  MusicPlatform,
+  SavedSong,
+  Song,
+  Submission,
+  User,
+  UserStatistics,
+} from '$lib/types/friendsfm';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { network } from '$lib/util';
 import { session } from '$lib/session';
@@ -21,26 +28,22 @@ export const loadUser = async (uid: string): Promise<User> => {
   });
   user.public = res.snapshot.data as User['public'];
   return user;
-}
+};
 
 export const refreshMessagingToken = async (token?: string) => {
   if (Capacitor.getPlatform() !== 'web' && !token) {
     await FirebaseMessaging.checkPermissions().catch(
       async () => await FirebaseMessaging.requestPermissions()
     );
-    const token = (await FirebaseMessaging.getToken())?.token;
-    await FirebaseFirestore.updateDocument({
-      reference: `users/${get(session).user.id}`,
-      data: { messagingToken: token },
-    });
-    return token;
-  } else if (token) {
-    await FirebaseFirestore.updateDocument({
-      reference: `users/${get(session).user.id}`,
-      data: { messagingToken: token },
-    });
-    return token;
+    token = (await FirebaseMessaging.getToken())?.token;
   }
+  // make sure to subscribe to the global topic
+  await FirebaseMessaging.subscribeToTopic({ topic: 'all' });
+  await FirebaseFirestore.updateDocument({
+    reference: `users/${get(session).user.id}`,
+    data: { messagingToken: token },
+  });
+  return token;
 };
 
 export const updateMusicPlatform = async (
